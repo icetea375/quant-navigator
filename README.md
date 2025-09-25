@@ -172,3 +172,4 @@ psql -h localhost -U postgres -d quant_navigator -f migrations/001_create_users_
 ---
 
 **注意**: 这是一个开发中的项目，请在生产环境中谨慎使用。
+# 触发CI运行
