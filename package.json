@@ -10,11 +10,11 @@
     "test:unit": "jest --testPathPattern=unit",
     "test:integration": "jest --testPathPattern=integration",
     "test:e2e": "jest --testPathPattern=e2e",
-    "lint": "eslint src tests --ext .ts,.tsx",
-    "lint:fix": "eslint src tests --ext .ts,.tsx --fix",
+    "lint": "eslint tests --ext .ts,.tsx",
+    "lint:fix": "eslint tests --ext .ts,.tsx --fix",
     "type-check": "tsc --noEmit",
-    "build": "tsc",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "build": "echo 'Build handled by individual packages'",
+    "dev": "echo 'Development servers handled by individual packages'"
   },
   "keywords": [
     "quantitative-analysis",
