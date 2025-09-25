@@ -1,5 +1,5 @@
 {
-  "name": "quant-navigator-frontend",
+  "name": "@quant-navigator/frontend-aigc",
   "version": "1.0.0",
   "description": "量化导航仪前端应用 - v10.1 仲裁界面升级版",
   "private": true,

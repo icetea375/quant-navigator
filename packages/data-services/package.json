@@ -1,0 +1,20 @@
+{
+  "name": "@quant-navigator/data-services",
+  "version": "1.0.0",
+  "description": "量化导航仪数据服务包",
+  "private": true,
+  "scripts": {
+    "dev": "python app/main.py",
+    "build": "echo 'Python package - no build needed'",
+    "test": "python -m pytest",
+    "lint": "python -m flake8 app/",
+    "format": "python -m black app/"
+  },
+  "keywords": [
+    "quantitative-analysis",
+    "data-services",
+    "python"
+  ],
+  "author": "AI Assistant",
+  "license": "MIT"
+}

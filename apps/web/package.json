@@ -1,0 +1,14 @@
+{
+  "name": "@quant-navigator/web",
+  "version": "1.0.0",
+  "description": "量化导航仪Web应用入口",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter @quant-navigator/frontend-main dev",
+    "build": "pnpm --filter @quant-navigator/frontend-main build",
+    "preview": "pnpm --filter @quant-navigator/frontend-main preview"
+  },
+  "dependencies": {
+    "@quant-navigator/frontend-main": "workspace:*"
+  }
+}

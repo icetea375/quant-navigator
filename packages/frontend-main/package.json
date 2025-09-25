@@ -1,5 +1,5 @@
 {
-  "name": "quantitative-navigator-frontend",
+  "name": "@quant-navigator/frontend-main",
   "version": "1.0.0",
   "description": "量化导航仪前端应用",
   "type": "module",

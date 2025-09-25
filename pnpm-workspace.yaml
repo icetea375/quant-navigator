@@ -2,6 +2,6 @@
 # 定义工作区包的位置
 packages:
   - 'packages/*'
-  - 'aigc/frontend' 
-  - 'frontend'
-  - 'tests'
+  - 'apps/*'
+  - 'libs/*'
+  - 'tools/tests'

@@ -1,20 +1,20 @@
 {
-  "name": "quant-navigator-v13",
-  "version": "13.0.0",
-  "description": "智能分析系统 v13.0 TDD最终版 - 遵循TDD宪法，测试驱动开发",
+  "name": "@quant-navigator/monorepo",
+  "version": "13.3.0",
+  "description": "量化导航仪Monorepo - 模块化单体架构",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:unit": "jest --testPathPattern=unit",
-    "test:integration": "jest --testPathPattern=integration",
-    "test:e2e": "jest --testPathPattern=e2e",
-    "lint": "eslint tests --ext .ts,.tsx",
-    "lint:fix": "eslint tests --ext .ts,.tsx --fix",
-    "type-check": "tsc --noEmit",
-    "build": "echo 'Build handled by individual packages'",
-    "dev": "echo 'Development servers handled by individual packages'"
+    "dev": "pnpm --parallel --filter './apps/*' dev",
+    "build": "pnpm --parallel --filter './packages/*' build",
+    "test": "pnpm --recursive test",
+    "test:unit": "pnpm --filter './tools/tests' test:unit",
+    "test:integration": "pnpm --filter './tools/tests' test:integration",
+    "test:e2e": "pnpm --filter './tools/tests' test:e2e",
+    "lint": "pnpm --recursive lint",
+    "lint:fix": "pnpm --recursive lint:fix",
+    "type-check": "pnpm --recursive type-check",
+    "clean": "pnpm --recursive clean && rm -rf node_modules",
+    "install:all": "pnpm install"
   },
   "keywords": [
     "quantitative-analysis",
@@ -45,22 +45,22 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "roots": ["<rootDir>/tests"],
+    "roots": ["<rootDir>/tools/tests"],
     "testMatch": [
-      "<rootDir>/tests/**/*.test.ts",
-      "<rootDir>/tests/**/*.spec.ts",
-      "<rootDir>/tests/**/*.test.tsx",
-      "<rootDir>/tests/**/*.spec.tsx"
+      "<rootDir>/tools/tests/**/*.test.ts",
+      "<rootDir>/tools/tests/**/*.spec.ts",
+      "<rootDir>/tools/tests/**/*.test.tsx",
+      "<rootDir>/tools/tests/**/*.spec.tsx"
     ],
     "transform": {
       "^.+\\.(ts|tsx)$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "src/**/*.{ts,tsx}",
-      "!src/**/*.d.ts",
-      "!src/**/*.stories.{ts,tsx}",
-      "!src/**/*.test.{ts,tsx}",
-      "!src/**/*.spec.{ts,tsx}"
+      "packages/**/*.{ts,tsx}",
+      "!packages/**/*.d.ts",
+      "!packages/**/*.stories.{ts,tsx}",
+      "!packages/**/*.test.{ts,tsx}",
+      "!packages/**/*.spec.{ts,tsx}"
     ],
     "coverageThreshold": {
       "global": {
@@ -70,6 +70,6 @@
         "statements": 80
       }
     },
-    "setupFilesAfterEnv": ["<rootDir>/tests/config/jest-setup.ts"]
+    "setupFilesAfterEnv": ["<rootDir>/tools/tests/config/jest-setup.ts"]
   }
 }

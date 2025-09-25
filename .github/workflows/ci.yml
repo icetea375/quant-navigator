@@ -69,7 +69,7 @@ jobs:
         if: always()
         with:
           name: unit-test-results
-          path: tests/reports/
+          path: tools/tests/reports/
 
   # 集成测试
   test-integration:
@@ -127,7 +127,7 @@ jobs:
 
       - name: Run database migrations
         run: |
-          cd database/migrations
+          cd libs/database/migrations
           for file in *.sql; do
             echo "Running migration: $file"
             psql -h localhost -p 5432 -U postgres -d quant_navigator_test -f "$file"
@@ -147,7 +147,7 @@ jobs:
         if: always()
         with:
           name: integration-test-results
-          path: tests/reports/
+          path: tools/tests/reports/
 
   # 端到端测试
   test-e2e:
@@ -208,7 +208,7 @@ jobs:
           BACKEND_PID=$!
           
           # Start frontend
-          cd ../../frontend && npm start &
+          cd ../../packages/frontend-main && npm start &
           FRONTEND_PID=$!
           
           # Wait for services to be ready
@@ -234,7 +234,7 @@ jobs:
         if: always()
         with:
           name: e2e-test-results
-          path: tests/reports/
+          path: tools/tests/reports/
 
   # 测试覆盖率
   coverage:
@@ -293,7 +293,7 @@ jobs:
 
       - name: Run database migrations
         run: |
-          cd database/migrations
+          cd libs/database/migrations
           for file in *.sql; do
             echo "Running migration: $file"
             psql -h localhost -p 5432 -U postgres -d quant_navigator_test -f "$file"
@@ -312,7 +312,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-reports
-          path: tests/reports/coverage/
+          path: tools/tests/reports/coverage/
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -452,7 +452,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: performance-results
-          path: tests/reports/performance/
+          path: tools/tests/reports/performance/
 
   # 部署到测试环境
   deploy-staging:

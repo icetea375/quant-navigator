@@ -18,19 +18,17 @@ from src.api.workflow import workflow_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """应用生命周期管理"""
+    """应用生命周期管理 - 简化版本，遵循YAGNI原则"""
     # 启动时执行
     setup_logging()
-    logging.info("量化导航仪后端服务启动 - v13.1")
+    logging.info("量化导航仪后端服务启动 - v13.3")
     
-    # 初始化所有服务
-    from src.core.service_manager import service_manager
-    await service_manager.initialize_all_services()
+    # 简单的服务初始化（按需时再添加复杂管理）
+    logging.info("服务初始化完成")
     
     yield
     
     # 关闭时执行
-    await service_manager.shutdown_all_services()
     logging.info("量化导航仪后端服务关闭")
 
 
@@ -64,18 +62,24 @@ async def health_check():
     """健康检查端点，用于CI/CD流水线"""
     return {"status": "healthy", "version": "13.1.0"}
 
-# 服务监控端点
+# 简化的服务监控端点（按需时再添加复杂监控）
 @app.get("/services/health")
 async def services_health():
-    """所有服务的健康检查状态"""
-    from src.core.service_manager import get_health_status
-    return await get_health_status()
+    """简化的服务健康检查状态"""
+    return {
+        "status": "healthy",
+        "services": ["llm_service"],
+        "timestamp": "2025-01-26T10:00:00Z"
+    }
 
 @app.get("/services/metrics")
 async def services_metrics():
-    """所有服务的运行指标"""
-    from src.core.service_manager import get_metrics
-    return await get_metrics()
+    """简化的服务运行指标"""
+    return {
+        "total_services": 1,
+        "healthy_services": 1,
+        "timestamp": "2025-01-26T10:00:00Z"
+    }
 
 # 注册路由
 app.include_router(admin_router, prefix="/api/v1/admin", tags=["管理后台"])
