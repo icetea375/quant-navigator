@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # 数据库服务
+  postgres:
+    image: postgres:15
+    container_name: quant-navigator-postgres
+    environment:
+      POSTGRES_DB: quant_navigator
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
+    networks:
+      - quant-navigator-network
+
+  # Redis缓存服务
+  redis:
+    image: redis:7-alpine
+    container_name: quant-navigator-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - quant-navigator-network
+
+  # 后端服务
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: quant-navigator-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/quant_navigator
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - quant-navigator-network
+
+  # 数据服务
+  data-services:
+    build:
+      context: ./data_services
+      dockerfile: Dockerfile
+    container_name: quant-navigator-data-services
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/quant_navigator
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - quant-navigator-network
+
+  # 前端服务
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: quant-navigator-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - quant-navigator-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  quant-navigator-network:
+    driver: bridge

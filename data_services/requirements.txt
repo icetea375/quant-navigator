@@ -1,0 +1,43 @@
+# LearningLoopCoordinator 核心依赖
+# 基于pydeps分析结果，锁定关键依赖版本
+
+# 核心机器学习框架
+numpy>=1.21.0,<2.0.0
+pandas>=1.3.0,<3.0.0
+scikit-learn>=1.0.0,<2.0.0
+lightgbm>=3.2.0,<4.0.0
+
+# 深度学习框架
+torch>=1.9.0,<3.0.0
+transformers>=4.20.0,<5.0.0
+
+# 数据库连接
+psycopg2-binary>=2.9.0,<3.0.0
+
+# 工具库
+joblib>=1.1.0,<2.0.0
+
+# 可选依赖 - 可视化和监控
+matplotlib>=3.5.0,<4.0.0
+seaborn>=0.11.0,<1.0.0
+tensorboard>=2.8.0,<3.0.0
+
+# 可选依赖 - 测试
+pytest>=7.0.0,<8.0.0
+pytest-cov>=3.0.0,<5.0.0
+
+# 可选依赖 - 开发工具
+jupyter>=1.0.0,<2.0.0
+ipython>=8.0.0,<9.0.0
+
+# 系统依赖说明
+# 注意：以下依赖需要系统级安装
+# - graphviz (用于pydeps生成依赖图)
+# - PostgreSQL (数据库服务器)
+# - CUDA (可选，用于GPU加速)
+
+# 安装说明
+# 1. 创建虚拟环境: python -m venv venv
+# 2. 激活虚拟环境: source venv/bin/activate (Linux/Mac) 或 venv\Scripts\activate (Windows)
+# 3. 安装依赖: pip install -r requirements.txt
+# 4. 安装系统依赖: brew install graphviz postgresql (Mac) 或 apt-get install graphviz postgresql (Ubuntu)

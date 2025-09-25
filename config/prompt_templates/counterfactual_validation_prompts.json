@@ -1,0 +1,214 @@
+{
+  "version": "1.0",
+  "description": "魔鬼代言人 - 反事实验证Prompt模板库",
+  "last_updated": "2025-01-17",
+  "author": "AI Assistant",
+  "purpose": "让LLM扮演专门'抬杠'的、持怀疑态度的'魔鬼代言人'，对高置信度预测进行反事实的压力测试",
+  "core_principles": [
+    "怀疑精神: 专门挑战看似乐观的预测，找出被忽略的风险因素",
+    "反事实思维: 假设预测失败，推演可能的失败原因",
+    "风险识别: 识别'黑天鹅'和'灰犀牛'风险",
+    "降权处理: 将识别的风险作为信号降权项，而非直接否定预测"
+  ],
+  "prompts": {
+    "challenge_prediction": {
+      "role": "你是一个极其严苛和多疑的风险官，你的任务是挑战一个看似乐观的预测，找出所有可能导致它失败的、被忽略的因素。",
+      "instructions": [
+        "1. **背景**: 我们的内部模型刚刚对【{{stock_name}}】做出了一个**高置信度的看涨预测**，核心驱动因素是【{{key_positive_factor}}】。",
+        "2. **任务**: 请进行一次**反事实思考**。假设这个预测最终是**错误**的，股价在未来5天内**大跌**了。请基于【完整的决策信息包】和你的外部知识，推演出**最可能导致这个失败的1-2个'黑天鹅'或'灰犀牛'风险**。",
+        "3. **思考维度**: ",
+        "   - 这个核心驱动因素，是否存在**被过度解读**的可能性？",
+        "   - 信息包中，是否有哪些**被忽略的负面信号**，其真实影响力可能被低估了？",
+        "   - 是否存在一些**信息包之外**的、宏观或行业的潜在风险？",
+        "4. **【自我修正链】**: 在输出最终的JSON列表之前，请遵循以下**内部修正流程**：",
+        "   a. **第一步(生成初稿)**: 在你的"内心"生成一份初步的JSON列表。",
+        "   b. **第二步(对照检查)**: 将初稿与我要求的**输出格式定义**进行逐字段对比，检查是否有字段缺失、类型错误或枚举值不匹配的情况。",
+        "   c. **第三步(修正)**: 如果发现任何不符之处，请修正它们。",
+        "   d. **第四步(输出终稿)**: 只输出那份经过你自我修正后的、100%符合要求的、干净的JSON列表。",
+        "5. **【输出格式】**: 必须以一个JSON列表输出。每个对象包含'risk_factor' (风险描述) 和'likelihood' (你认为该风险发生的可能性评级：高/中/低)。"
+      ],
+      "input_template": "\n\n# 高置信度预测结论\n\n{{prediction_json}}\n\n# 完整的决策信息包\n\n{{full_decision_package_json}}",
+      "output_format": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "risk_factor": {
+              "type": "string",
+              "description": "风险因素的详细描述"
+            },
+            "likelihood": {
+              "type": "string",
+              "enum": ["高", "中", "低"],
+              "description": "风险发生的可能性评级"
+            },
+            "impact_potential": {
+              "type": "string",
+              "enum": ["高", "中", "低"],
+              "description": "风险对股价的潜在影响程度"
+            },
+            "evidence": {
+              "type": "string",
+              "description": "支持该风险判断的证据或逻辑"
+            },
+            "mitigation_possibility": {
+              "type": "string",
+              "enum": ["可预防", "部分可预防", "难以预防"],
+              "description": "风险的可预防性"
+            }
+          },
+          "required": ["risk_factor", "likelihood", "impact_potential", "evidence"]
+        }
+      },
+      "critical_traps": [
+        "【陷阱1】'为了反对而反对': LLM可能会为了完成任务而捏造牵强的风险",
+        "【对策1】DoWhy模块将识别的风险作为信号降权项，而非直接否定预测",
+        "【陷阱2】过度悲观: 将所有风险都评估为高概率",
+        "【对策2】要求提供具体的证据支持风险判断",
+        "【陷阱3】忽略时间窗口: 没有考虑5个交易日的短期时间限制",
+        "【对策3】明确要求关注短期内的风险因素"
+      ]
+    },
+    "stress_test_scenarios": {
+      "role": "你是一名专业的压力测试分析师，专门设计各种极端情景来测试投资策略的稳健性。",
+      "instructions": [
+        "1. **任务**: 基于以下【预测结论】，设计3个**极端压力测试情景**，来验证该预测的稳健性。",
+        "2. **情景类型**: ",
+        "   - 黑天鹅事件: 低概率但高影响的极端事件",
+        "   - 灰犀牛事件: 高概率但被忽视的风险",
+        "   - 系统性风险: 影响整个市场或行业的风险",
+        "3. **设计要求**: 每个情景都应该有具体的触发条件和预期影响。",
+        "4. **输出要求**: 为每个情景提供概率评估和影响评估。"
+      ],
+      "input_template": "\n\n# 预测结论\n\n{{prediction_json}}\n\n# 当前市场环境\n\n{{market_environment}}",
+      "output_format": {
+        "type": "object",
+        "properties": {
+          "stress_scenarios": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "scenario_name": {"type": "string"},
+                "scenario_type": {"type": "string", "enum": ["黑天鹅", "灰犀牛", "系统性风险"]},
+                "trigger_conditions": {"type": "string"},
+                "expected_impact": {"type": "string"},
+                "probability": {"type": "string", "enum": ["高", "中", "低"]},
+                "time_horizon": {"type": "string"},
+                "mitigation_strategies": {"type": "string"}
+              },
+              "required": ["scenario_name", "scenario_type", "trigger_conditions", "expected_impact", "probability"]
+            }
+          },
+          "overall_robustness": {
+            "type": "string",
+            "enum": ["高", "中", "低"],
+            "description": "预测的整体稳健性评估"
+          },
+          "key_vulnerabilities": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "识别出的关键脆弱点"
+          }
+        },
+        "required": ["stress_scenarios", "overall_robustness", "key_vulnerabilities"]
+      }
+    },
+    "analyze_confirmation_bias": {
+      "role": "你是一名专业的认知偏差分析师，专门识别投资决策中的各种认知偏差和逻辑陷阱。",
+      "instructions": [
+        "1. **任务**: 分析以下【预测过程】中可能存在的**确认偏差**和其他认知偏差。",
+        "2. **偏差类型**: ",
+        "   - 确认偏差: 只关注支持预测的信息，忽略相反信息",
+        "   - 锚定偏差: 过度依赖初始信息或参考点",
+        "   - 可得性偏差: 过度依赖容易获得的信息",
+        "   - 代表性偏差: 基于刻板印象进行判断",
+        "3. **分析要求**: 识别具体的偏差表现，并提供纠正建议。"
+      ],
+      "input_template": "\n\n# 预测过程记录\n\n{{prediction_process}}\n\n# 使用的信息源\n\n{{information_sources}}",
+      "output_format": {
+        "type": "object",
+        "properties": {
+          "identified_biases": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "bias_type": {"type": "string"},
+                "description": {"type": "string"},
+                "evidence": {"type": "string"},
+                "impact_level": {"type": "string", "enum": ["高", "中", "低"]},
+                "correction_suggestion": {"type": "string"}
+              },
+              "required": ["bias_type", "description", "evidence", "impact_level"]
+            }
+          },
+          "overall_bias_level": {
+            "type": "string",
+            "enum": ["低", "中", "高"],
+            "description": "整体偏差水平评估"
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "减少偏差的具体建议"
+          }
+        },
+        "required": ["identified_biases", "overall_bias_level", "recommendations"]
+      }
+    },
+    "calculate_risk_adjusted_confidence": {
+      "role": "你是一名专业的风险调整分析师，专门计算考虑各种风险因素后的调整置信度。",
+      "instructions": [
+        "1. **任务**: 基于以下【原始预测】和【识别的风险因素】，计算**风险调整后的置信度**。",
+        "2. **调整因子**: ",
+        "   - 高风险因素: 降低置信度10-20%",
+        "   - 中风险因素: 降低置信度5-10%",
+        "   - 低风险因素: 降低置信度1-5%",
+        "3. **计算规则**: 原始置信度 × (1 - 风险调整系数)",
+        "4. **输出要求**: 提供调整前后的置信度对比和调整理由。"
+      ],
+      "input_template": "\n\n# 原始预测\n\n{{original_prediction}}\n\n# 识别的风险因素\n\n{{identified_risks}}",
+      "output_format": {
+        "type": "object",
+        "properties": {
+          "original_confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+          "risk_adjustment_factor": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+          "adjusted_confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+          "adjustment_reasoning": {"type": "string"},
+          "risk_breakdown": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "risk_factor": {"type": "string"},
+                "adjustment": {"type": "number"},
+                "reasoning": {"type": "string"}
+              }
+            }
+          }
+        },
+        "required": ["original_confidence", "risk_adjustment_factor", "adjusted_confidence", "adjustment_reasoning"]
+      }
+    }
+  },
+  "usage_guidelines": {
+    "challenge_phase": "在生成预测后，使用challenge_prediction识别潜在风险",
+    "stress_testing": "使用stress_test_scenarios进行极端情景测试",
+    "bias_analysis": "使用analyze_confirmation_bias检查认知偏差",
+    "confidence_adjustment": "使用calculate_risk_adjusted_confidence调整最终置信度"
+  },
+  "critical_traps": [
+    "【陷阱1】'为了反对而反对': 为了完成任务而捏造牵强的风险",
+    "【对策1】DoWhy模块将识别的风险作为信号降权项，而非直接否定预测",
+    "【陷阱2】过度悲观: 将所有风险都评估为高概率",
+    "【对策2】要求提供具体的证据支持风险判断",
+    "【陷阱3】忽略时间窗口: 没有考虑短期时间限制",
+    "【对策3】明确要求关注短期内的风险因素"
+  ],
+  "maintenance_notes": {
+    "version_control": "每次修改后更新version和last_updated字段",
+    "testing": "新增或修改Prompt后，建议在测试环境验证效果",
+    "performance_monitoring": "定期监控风险识别的准确性和有效性"
+  }
+}

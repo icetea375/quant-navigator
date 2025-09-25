@@ -1,0 +1,96 @@
+/* 可拖拽网格布局样式 */
+
+.draggable-grid-layout {
+  height: 100%;
+  position: relative;
+}
+
+.layout-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.layout {
+  height: 100%;
+}
+
+.draggable-panel {
+  height: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.draggable-panel:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.draggable-panel.maximized {
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  transform: none !important;
+}
+
+.draggable-panel.collapsed {
+  height: 40px !important;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: #fafafa;
+  border-bottom: 1px solid #e8e8e8;
+  border-radius: 8px 8px 0 0;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: #1890ff;
+}
+
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.panel-content {
+  height: calc(100% - 40px);
+  overflow: auto;
+  padding: 16px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .layout-controls {
+    top: 8px;
+    right: 8px;
+    padding: 4px;
+  }
+  
+  .panel-header {
+    padding: 4px 8px;
+  }
+  
+  .panel-actions {
+    gap: 2px;
+  }
+  
+  .panel-content {
+    padding: 8px;
+  }
+}

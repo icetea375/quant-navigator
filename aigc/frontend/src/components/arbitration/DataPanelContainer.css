@@ -1,0 +1,82 @@
+/* 数据面板容器样式 */
+
+.data-panel-container {
+  height: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.data-panel-container:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.data-panel-container.maximized {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 1000;
+}
+
+.data-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: #fafafa;
+  border-bottom: 1px solid #e8e8e8;
+  border-radius: 8px 8px 0 0;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: #1890ff;
+}
+
+.title-text {
+  margin-right: 8px;
+}
+
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.data-panel-content {
+  height: calc(100% - 40px);
+  overflow: auto;
+  padding: 16px;
+}
+
+.data-panel-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  background: #fff;
+}
+
+.data-panel-error {
+  padding: 16px;
+  background: #fff;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .data-panel-header {
+    padding: 4px 8px;
+  }
+  
+  .panel-actions {
+    gap: 2px;
+  }
+  
+  .data-panel-content {
+    padding: 8px;
+  }
+}
