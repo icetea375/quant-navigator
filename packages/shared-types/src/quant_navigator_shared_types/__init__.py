@@ -32,6 +32,21 @@ from .reports import (
     ReportStatus,
     ReportSection,
 )
+from .types.api import (
+    AnalysisResult,
+    ArbitrationCase,
+    ArbitrationCaseListResponse,
+    ArbitrationCaseResponse,
+    ArbitrationCaseUpdate,
+    ArbitrationStatus,
+    GeneratedReport as APIGeneratedReport,
+    ReportCreate,
+    ReportListResponse,
+    ReportResponse,
+    ReportUpdate,
+    SentimentAnalysis,
+    ValidationError,
+)
 
 __all__ = [
     # Common types
@@ -60,4 +75,18 @@ __all__ = [
     "ReportType",
     "ReportStatus",
     "ReportSection",
+    # API types
+    "AnalysisResult",
+    "ArbitrationCase",
+    "ArbitrationCaseListResponse",
+    "ArbitrationCaseResponse",
+    "ArbitrationCaseUpdate",
+    "ArbitrationStatus",
+    "APIGeneratedReport",
+    "ReportCreate",
+    "ReportListResponse",
+    "ReportResponse",
+    "ReportUpdate",
+    "SentimentAnalysis",
+    "ValidationError",
 ]
