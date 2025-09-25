@@ -23,9 +23,14 @@ async def lifespan(app: FastAPI):
     setup_logging()
     logging.info("量化导航仪后端服务启动 - v13.1")
     
+    # 初始化所有服务
+    from src.core.service_manager import service_manager
+    await service_manager.initialize_all_services()
+    
     yield
     
     # 关闭时执行
+    await service_manager.shutdown_all_services()
     logging.info("量化导航仪后端服务关闭")
 
 
@@ -58,6 +63,19 @@ app.add_middleware(
 async def health_check():
     """健康检查端点，用于CI/CD流水线"""
     return {"status": "healthy", "version": "13.1.0"}
+
+# 服务监控端点
+@app.get("/services/health")
+async def services_health():
+    """所有服务的健康检查状态"""
+    from src.core.service_manager import get_health_status
+    return await get_health_status()
+
+@app.get("/services/metrics")
+async def services_metrics():
+    """所有服务的运行指标"""
+    from src.core.service_manager import get_metrics
+    return await get_metrics()
 
 # 注册路由
 app.include_router(admin_router, prefix="/api/v1/admin", tags=["管理后台"])

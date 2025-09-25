@@ -1,5 +1,5 @@
 """
-LLM服务 - 遵循TDD原则实现
+LLM服务 - 遵循TDD原则实现，为微服务化做准备
 """
 
 import asyncio
@@ -7,17 +7,57 @@ import logging
 from typing import Dict, Any, Optional
 from src.core.config import settings
 from src.schemas.arbitration import AnalysisResult, SentimentAnalysis
+from src.core.service_base import ServiceBase
 
 
-class LLMService:
-    """LLM服务类 - 统一管理所有LLM API调用"""
+class LLMService(ServiceBase):
+    """LLM服务类 - 统一管理所有LLM API调用，继承ServiceBase为微服务化做准备"""
     
     def __init__(self):
         """初始化LLM服务"""
-        self.logger = logging.getLogger(__name__)
+        super().__init__("llm_service")
         self.qwen_api_key = settings.QWEN_API_KEY
         self.doubao_api_key = settings.DOUBAO_API_KEY
         self.openai_api_key = settings.OPENAI_API_KEY
+        self._call_count = 0
+        self._error_count = 0
+    
+    async def _on_initialize(self) -> None:
+        """LLM服务初始化"""
+        self.logger.info("LLM服务初始化完成")
+    
+    async def _on_shutdown(self) -> None:
+        """LLM服务关闭"""
+        self.logger.info("LLM服务关闭完成")
+    
+    async def health_check(self) -> Dict[str, Any]:
+        """健康检查"""
+        return {
+            "service_name": self.service_name,
+            "status": "healthy",
+            "timestamp": self._get_timestamp(),
+            "dependencies": list(self._dependencies.keys()),
+            "call_count": self._call_count,
+            "error_count": self._error_count,
+            "error_rate": self._error_count / max(self._call_count, 1)
+        }
+    
+    async def get_metrics(self) -> Dict[str, Any]:
+        """获取服务指标"""
+        return {
+            "service_name": self.service_name,
+            "is_initialized": self._is_initialized,
+            "dependency_count": len(self._dependencies),
+            "timestamp": self._get_timestamp(),
+            "total_calls": self._call_count,
+            "total_errors": self._error_count,
+            "success_rate": 1 - (self._error_count / max(self._call_count, 1))
+        }
+    
+    def _get_timestamp(self) -> str:
+        """获取当前时间戳"""
+        from datetime import datetime
+        return datetime.now().isoformat()
     
     async def analyze_fact(self, input_data: Dict[str, Any]) -> AnalysisResult:
         """
@@ -29,6 +69,7 @@ class LLMService:
         Returns:
             AnalysisResult: 分析结果
         """
+        self._call_count += 1
         try:
             # 模拟Qwen API调用
             await asyncio.sleep(0.1)  # 模拟网络延迟
@@ -48,6 +89,7 @@ class LLMService:
             )
             
         except Exception as e:
+            self._error_count += 1
             self.logger.error(f"Qwen事实分析失败: {str(e)}")
             raise Exception(f"Qwen事实分析失败: {str(e)}")
     
@@ -61,6 +103,7 @@ class LLMService:
         Returns:
             SentimentAnalysis: 情感分析结果
         """
+        self._call_count += 1
         try:
             # 模拟豆包API调用
             await asyncio.sleep(0.1)  # 模拟网络延迟
@@ -95,6 +138,7 @@ class LLMService:
             )
             
         except Exception as e:
+            self._error_count += 1
             self.logger.error(f"豆包情感分析失败: {str(e)}")
             raise Exception(f"豆包情感分析失败: {str(e)}")
     

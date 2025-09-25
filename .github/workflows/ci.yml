@@ -203,19 +203,19 @@ jobs:
 
       - name: Start services
         run: |
-          # Start backend
-          cd backend && npm start &
+          # Start Python backend
+          cd packages/backend-python && python -m uvicorn src.main:app --host 0.0.0.0 --port 8000 &
           BACKEND_PID=$!
           
           # Start frontend
-          cd ../frontend && npm start &
+          cd ../../frontend && npm start &
           FRONTEND_PID=$!
           
           # Wait for services to be ready
           sleep 30
           
           # Check if services are running
-          curl -f http://localhost:3001/health || exit 1
+          curl -f http://localhost:8000/health || exit 1
           curl -f http://localhost:3000 || exit 1
         env:
           DATABASE_URL: postgresql://postgres:testpass@localhost:5432/quant_navigator_test
