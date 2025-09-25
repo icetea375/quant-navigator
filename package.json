@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "pnpm --parallel --filter './apps/*' dev",
     "build": "pnpm --parallel --filter './packages/*' build",
+    "backend:dev": "pnpm --filter '@quant-navigator/backend' dev",
+    "backend:start": "pnpm --filter '@quant-navigator/backend' start",
     "test": "pnpm --recursive test",
     "test:unit": "pnpm --filter './tools/tests' test:unit",
     "test:integration": "pnpm --filter './tools/tests' test:integration",
