@@ -104,7 +104,7 @@ describe('GeneratedReports Entity Validation', () => {
 
     describe('report_date 字段校验', () => {
         it('应该拒绝无效的日期格式', async () => {
-            validGeneratedReport.report_date = 'invalid-date' as any;
+            validGeneratedReport.report_date = 'invalid-date';
             const errors = await validate(validGeneratedReport);
             expect(errors).toHaveLength(1);
             expect(errors[0].property).toBe('report_date');

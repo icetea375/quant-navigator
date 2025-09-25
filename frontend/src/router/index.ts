@@ -55,6 +55,24 @@ const routes: RouteRecordRaw[] = [
     name: 'Admin',
     component: () => import('@views/admin/SystemBrainConsole.vue'),
     meta: { title: '系统大脑控制台', requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/arbitration',
+    name: 'ArbitrationList',
+    component: () => import('@components/admin/ArbitrationCaseList.vue'),
+    meta: { title: 'AI仲裁案件管理', requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/arbitration/:caseId',
+    name: 'ArbitrationDetail',
+    component: () => import('@components/admin/ArbitrationCaseDetail.vue'),
+    meta: { title: '仲裁案件详情', requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/arbitration/:caseId/arbitrate',
+    name: 'ArbitrationArbitrate',
+    component: () => import('@components/admin/ArbitrationCaseDetail.vue'),
+    meta: { title: '仲裁决策', requiresAuth: true, requiresAdmin: true }
   }
 ]
 

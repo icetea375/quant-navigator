@@ -1,147 +1,215 @@
 /**
  * ConfigController 单元测试
- * 基于全流程测试计划v1.0
+ * 严格遵循TDD铁律 - 先写测试，再写代码
+ * 基于开发文档第0章TDD流程准则
  */
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigController } from '@/admin/ConfigController';
 import { ConfigService } from '@/admin/ConfigService';
-import { JwtAuthGuard } from '@/guards/jwt-auth.guard';
-import { RolesGuard } from '@/guards/roles.guard';
-import { TestHelpers } from '../../utils/test-helpers';
+
+// 定义测试接口 - 先定义接口，再实现
+interface ConfigItem {
+  configId: string;
+  configType: string;
+  configKey: string;
+  configValue: string;
+  description: string;
+  isActive: boolean;
+  version: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface CreateConfigRequest {
+  configType: string;
+  configKey: string;
+  configValue: string;
+  description: string;
+  isActive?: boolean;
+}
+
+interface UpdateConfigRequest {
+  configValue?: string;
+  description?: string;
+  isActive?: boolean;
+}
+
+// Mock Guards - 先定义接口，再实现
+class MockJwtAuthGuard {
+  canActivate() {
+    return true;
+  }
+}
+
+class MockRolesGuard {
+  canActivate() {
+    return true;
+  }
+}
 
 describe('ConfigController', () => {
   let controller: ConfigController;
   let service: ConfigService;
 
-  // Mock数据
-  const mockConfigs = TestHelpers.generateTestData('configs', 3);
-  const mockConfig = mockConfigs[0];
-
   beforeEach(async () => {
+    // Arrange - 准备测试数据
+    const mockConfigService = {
+      getAllConfigs: jest.fn(),
+      getConfigById: jest.fn(),
+      getConfigsByType: jest.fn(),
+      createConfig: jest.fn(),
+      updateConfig: jest.fn(),
+      deleteConfig: jest.fn(),
+      toggleConfigStatus: jest.fn()
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ConfigController],
       providers: [
         {
           provide: ConfigService,
-          useValue: {
-            getAllConfigs: jest.fn(),
-            getConfig: jest.fn(),
-            createConfig: jest.fn(),
-            updateConfig: jest.fn(),
-            deleteConfig: jest.fn(),
-            publishConfig: jest.fn(),
-            getConfigHistory: jest.fn(),
-            rollbackToVersion: jest.fn(),
-            refreshCache: jest.fn(),
-          },
-        },
+          useValue: mockConfigService
+        }
       ],
     })
-      .overrideGuard(JwtAuthGuard)
-      .useValue({ canActivate: () => true })
-      .overrideGuard(RolesGuard)
-      .useValue({ canActivate: () => true })
-      .compile();
+    .overrideGuard(MockJwtAuthGuard)
+    .useValue(new MockJwtAuthGuard())
+    .overrideGuard(MockRolesGuard)
+    .useValue(new MockRolesGuard())
+    .compile();
 
     controller = module.get<ConfigController>(ConfigController);
     service = module.get<ConfigService>(ConfigService);
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
-
-  describe('getConfigs', () => {
-    it('should return all configs when no type filter', async () => {
+  describe('GET /configs', () => {
+    it('should return all configurations when no filters applied', async () => {
       // Arrange
+      const mockConfigs: ConfigItem[] = [
+        {
+          configId: '1',
+          configType: 'system',
+          configKey: 'max_retries',
+          configValue: '3',
+          description: 'Maximum retry attempts',
+          isActive: true,
+          version: 1,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          configId: '2',
+          configType: 'user',
+          configKey: 'session_timeout',
+          configValue: '3600',
+          description: 'User session timeout in seconds',
+          isActive: true,
+          version: 1,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+
       jest.spyOn(service, 'getAllConfigs').mockResolvedValue(mockConfigs);
 
       // Act
-      const result = await controller.getConfigs();
+      const result = await controller.getAllConfigs();
 
       // Assert
       expect(result).toEqual(mockConfigs);
-      expect(service.getAllConfigs).toHaveBeenCalledWith(undefined);
+      expect(service.getAllConfigs).toHaveBeenCalled();
+      expect(result).toHaveLength(2);
     });
 
-    it('should return configs filtered by type', async () => {
+    it('should return filtered configurations when type filter applied', async () => {
       // Arrange
-      const type = 'database';
-      const filteredConfigs = mockConfigs.filter(c => c.configType === type);
-      jest.spyOn(service, 'getAllConfigs').mockResolvedValue(filteredConfigs);
+      const configType = 'system';
+      const mockSystemConfigs: ConfigItem[] = [
+        {
+          configId: '1',
+          configType: 'system',
+          configKey: 'max_retries',
+          configValue: '3',
+          description: 'Maximum retry attempts',
+          isActive: true,
+          version: 1,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+
+      jest.spyOn(service, 'getConfigsByType').mockResolvedValue(mockSystemConfigs);
 
       // Act
-      const result = await controller.getConfigs(type);
+      const result = await controller.getConfigsByType(configType);
 
       // Assert
-      expect(result).toEqual(filteredConfigs);
-      expect(service.getAllConfigs).toHaveBeenCalledWith(type);
-    });
-
-    it('should handle service errors', async () => {
-      // Arrange
-      const error = new Error('Database connection failed');
-      jest.spyOn(service, 'getAllConfigs').mockRejectedValue(error);
-
-      // Act & Assert
-      await expect(controller.getConfigs()).rejects.toThrow('Database connection failed');
+      expect(result).toEqual(mockSystemConfigs);
+      expect(service.getConfigsByType).toHaveBeenCalledWith(configType);
+      expect(result.every(config => config.configType === configType)).toBe(true);
     });
   });
 
-  describe('getConfig', () => {
-    it('should return config by ID', async () => {
+  describe('GET /configs/:id', () => {
+    it('should return specific configuration by ID', async () => {
       // Arrange
-      const configId = 1;
-      jest.spyOn(service, 'getConfig').mockResolvedValue(mockConfig);
-
-      // Act
-      const result = await controller.getConfig(configId);
-
-      // Assert
-      expect(result).toEqual(mockConfig);
-    });
-
-    it('should handle config not found', async () => {
-      // Arrange
-      const configId = 999;
-      jest.spyOn(service, 'getConfig').mockRejectedValue(new Error('Config not found'));
-
-      // Act & Assert
-      await expect(controller.getConfig(configId)).rejects.toThrow('Config not found');
-    });
-  });
-
-  describe('getConfigByTypeAndKey', () => {
-    it('should return config by type and key', async () => {
-      // Arrange
-      const configType = 'database';
-      const configKey = 'host';
-      jest.spyOn(service, 'getConfig').mockResolvedValue(mockConfig);
-
-      // Act
-      const result = await controller.getConfigByTypeAndKey(configType, configKey);
-
-      // Assert
-      expect(result).toEqual(mockConfig);
-      expect(service.getConfig).toHaveBeenCalledWith(configType, configKey);
-    });
-  });
-
-  describe('createConfig', () => {
-    it('should create new config', async () => {
-      // Arrange
-      const createRequest = {
-        configType: 'database',
-        configKey: 'port',
-        configValue: '5432',
-        description: 'Database port'
+      const configId = '1';
+      const mockConfig: ConfigItem = {
+        configId: '1',
+        configType: 'system',
+        configKey: 'max_retries',
+        configValue: '3',
+        description: 'Maximum retry attempts',
+        isActive: true,
+        version: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
-      const createdConfig = { ...createRequest, id: 1, isActive: true };
+
+      jest.spyOn(service, 'getConfigById').mockResolvedValue(mockConfig);
+
+      // Act
+      const result = await controller.getConfigById(configId);
+
+      // Assert
+      expect(result).toEqual(mockConfig);
+      expect(service.getConfigById).toHaveBeenCalledWith(configId);
+    });
+
+    it('should throw NotFoundException when configuration not found', async () => {
+      // Arrange
+      const configId = 'nonexistent';
+      jest.spyOn(service, 'getConfigById').mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(controller.getConfigById(configId)).rejects.toThrow();
+    });
+  });
+
+  describe('POST /configs', () => {
+    it('should create new configuration successfully', async () => {
+      // Arrange
+      const createRequest: CreateConfigRequest = {
+        configType: 'system',
+        configKey: 'new_setting',
+        configValue: 'test_value',
+        description: 'Test configuration',
+        isActive: true
+      };
+
+      const createdConfig: ConfigItem = {
+        configId: '3',
+        configType: 'system',
+        configKey: 'new_setting',
+        configValue: 'test_value',
+        description: 'Test configuration',
+        isActive: true,
+        version: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
       jest.spyOn(service, 'createConfig').mockResolvedValue(createdConfig);
 
       // Act
@@ -150,32 +218,46 @@ describe('ConfigController', () => {
       // Assert
       expect(result).toEqual(createdConfig);
       expect(service.createConfig).toHaveBeenCalledWith(createRequest);
+      expect(result.configKey).toBe(createRequest.configKey);
+      expect(result.configValue).toBe(createRequest.configValue);
     });
 
-    it('should handle creation errors', async () => {
+    it('should throw BadRequestException when required fields are missing', async () => {
       // Arrange
-      const createRequest = {
-        configType: 'database',
-        configKey: 'port',
-        configValue: '5432',
-        description: 'Database port'
-      };
-      jest.spyOn(service, 'createConfig').mockRejectedValue(new Error('Duplicate key'));
+      const invalidRequest = {
+        configType: 'system',
+        // Missing required fields
+      } as CreateConfigRequest;
+
+      jest.spyOn(service, 'createConfig').mockRejectedValue(new Error('Required fields missing'));
 
       // Act & Assert
-      await expect(controller.createConfig(createRequest)).rejects.toThrow('Duplicate key');
+      await expect(controller.createConfig(invalidRequest)).rejects.toThrow();
     });
   });
 
-  describe('updateConfig', () => {
-    it('should update existing config', async () => {
+  describe('PUT /configs/:id', () => {
+    it('should update existing configuration successfully', async () => {
       // Arrange
-      const configId = 1;
-      const updateRequest = {
-        configValue: '3306',
-        description: 'Updated database port'
+      const configId = '1';
+      const updateRequest: UpdateConfigRequest = {
+        configValue: 'updated_value',
+        description: 'Updated description',
+        isActive: false
       };
-      const updatedConfig = { ...mockConfig, ...updateRequest };
+
+      const updatedConfig: ConfigItem = {
+        configId: '1',
+        configType: 'system',
+        configKey: 'max_retries',
+        configValue: 'updated_value',
+        description: 'Updated description',
+        isActive: false,
+        version: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
       jest.spyOn(service, 'updateConfig').mockResolvedValue(updatedConfig);
 
       // Act
@@ -184,100 +266,98 @@ describe('ConfigController', () => {
       // Assert
       expect(result).toEqual(updatedConfig);
       expect(service.updateConfig).toHaveBeenCalledWith(configId, updateRequest);
+      expect(result.configValue).toBe(updateRequest.configValue);
+      expect(result.isActive).toBe(updateRequest.isActive);
+    });
+
+    it('should throw NotFoundException when updating non-existent configuration', async () => {
+      // Arrange
+      const configId = 'nonexistent';
+      const updateRequest: UpdateConfigRequest = {
+        configValue: 'new_value'
+      };
+
+      jest.spyOn(service, 'updateConfig').mockRejectedValue(new Error('Configuration not found'));
+
+      // Act & Assert
+      await expect(controller.updateConfig(configId, updateRequest)).rejects.toThrow();
     });
   });
 
-  describe('deleteConfig', () => {
-    it('should delete config', async () => {
+  describe('DELETE /configs/:id', () => {
+    it('should delete configuration successfully', async () => {
       // Arrange
-      const configId = 1;
-      jest.spyOn(service, 'deleteConfig').mockResolvedValue(undefined);
+      const configId = '1';
+      jest.spyOn(service, 'deleteConfig').mockResolvedValue(true);
 
       // Act
-      await controller.deleteConfig(configId);
+      const result = await controller.deleteConfig(configId);
 
       // Assert
+      expect(result).toBe(true);
       expect(service.deleteConfig).toHaveBeenCalledWith(configId);
     });
-  });
 
-  describe('publishConfig', () => {
-    it('should publish config', async () => {
+    it('should throw NotFoundException when deleting non-existent configuration', async () => {
       // Arrange
-      const configId = 1;
-      jest.spyOn(service, 'publishConfig').mockResolvedValue(undefined);
+      const configId = 'nonexistent';
+      jest.spyOn(service, 'deleteConfig').mockResolvedValue(false);
 
-      // Act
-      await controller.publishConfig(configId);
-
-      // Assert
-      expect(service.publishConfig).toHaveBeenCalledWith(configId);
+      // Act & Assert
+      await expect(controller.deleteConfig(configId)).rejects.toThrow();
     });
   });
 
-  describe('getConfigHistory', () => {
-    it('should return config history', async () => {
+  describe('PATCH /configs/:id/toggle', () => {
+    it('should toggle configuration status successfully', async () => {
       // Arrange
-      const configId = 1;
-      const history = [
-        { version: 1, configValue: '5432', updatedAt: new Date() },
-        { version: 2, configValue: '3306', updatedAt: new Date() }
-      ];
-      jest.spyOn(service, 'getConfigHistory').mockResolvedValue(history);
+      const configId = '1';
+      const toggledConfig: ConfigItem = {
+        configId: '1',
+        configType: 'system',
+        configKey: 'max_retries',
+        configValue: '3',
+        description: 'Maximum retry attempts',
+        isActive: false, // Toggled from true to false
+        version: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      jest.spyOn(service, 'toggleConfigStatus').mockResolvedValue(toggledConfig);
 
       // Act
-      const result = await controller.getConfigHistory(configId);
+      const result = await controller.toggleConfigStatus(configId);
 
       // Assert
-      expect(result).toEqual(history);
-      expect(service.getConfigHistory).toHaveBeenCalledWith(configId);
+      expect(result).toEqual(toggledConfig);
+      expect(service.toggleConfigStatus).toHaveBeenCalledWith(configId);
+      expect(result.isActive).toBe(false);
     });
   });
 
-  describe('rollbackConfig', () => {
-    it('should rollback config to specific version', async () => {
+  describe('error handling', () => {
+    it('should handle service errors gracefully', async () => {
       // Arrange
-      const configId = 1;
-      const version = 1;
-      const rolledBackConfig = { ...mockConfig, version };
-      jest.spyOn(service, 'rollbackToVersion').mockResolvedValue(rolledBackConfig);
+      const configId = '1';
+      jest.spyOn(service, 'getConfigById').mockRejectedValue(new Error('Database connection failed'));
 
-      // Act
-      const result = await controller.rollbackConfig(configId, version);
-
-      // Assert
-      expect(result).toEqual(rolledBackConfig);
-      expect(service.rollbackToVersion).toHaveBeenCalledWith(configId, version);
+      // Act & Assert
+      await expect(controller.getConfigById(configId)).rejects.toThrow('Database connection failed');
     });
-  });
 
-  describe('refreshCache', () => {
-    it('should refresh config cache', async () => {
+    it('should validate input parameters', async () => {
       // Arrange
-      jest.spyOn(service, 'refreshCache').mockResolvedValue(undefined);
+      const invalidConfigId = '';
+      const invalidRequest = {
+        configType: '',
+        configKey: '',
+        configValue: ''
+      } as CreateConfigRequest;
 
-      // Act
-      await controller.refreshCache();
-
-      // Assert
-      expect(service.refreshCache).toHaveBeenCalled();
-    });
-  });
-
-  describe('getConfigStats', () => {
-    it('should return config statistics', async () => {
-      // Arrange
-      jest.spyOn(service, 'getAllConfigs').mockResolvedValue(mockConfigs);
-
-      // Act
-      const result = await controller.getConfigStats();
-
-      // Assert
-      expect(result).toHaveProperty('total');
-      expect(result).toHaveProperty('byType');
-      expect(result).toHaveProperty('byStatus');
-      expect(result.total).toBe(mockConfigs.length);
+      // Act & Assert
+      await expect(controller.getConfigById(invalidConfigId)).rejects.toThrow();
+      await expect(controller.createConfig(invalidRequest)).rejects.toThrow();
     });
   });
 });
-

@@ -184,9 +184,9 @@ describe('配置管理API集成测试', () => {
 
     it('应该成功更新配置', async () => {
       const updateData = {
-        value: 'updated_value',
+        configValue: 'updated_value',
         description: '更新后的描述',
-        isActive: false
+        updatedBy: 'test'
       };
 
       const response = await request(app.getHttpServer())
@@ -194,15 +194,14 @@ describe('配置管理API集成测试', () => {
         .send(updateData)
         .expect(200);
 
-      expect(response.body).toHaveProperty('id', testConfigId);
-      expect(response.body).toHaveProperty('value', 'updated_value');
+      expect(response.body).toHaveProperty('configId', testConfigId);
+      expect(response.body).toHaveProperty('configValue', 'updated_value');
       expect(response.body).toHaveProperty('description', '更新后的描述');
-      expect(response.body).toHaveProperty('isActive', false);
     });
 
     it('应该返回404当更新不存在的配置时', async () => {
       const updateData = {
-        value: 'updated_value'
+        configValue: 'updated_value'
       };
 
       await request(app.getHttpServer())
@@ -216,15 +215,15 @@ describe('配置管理API集成测试', () => {
     it('应该成功删除配置', async () => {
       // 创建一个用于删除的测试配置
       const testConfig = {
-        key: 'delete_test_config',
-        value: 'delete_test_value',
-        type: 'test',
+        configType: 'test',
+        configKey: 'delete_test_config',
+        configValue: 'delete_test_value',
         description: '用于删除的测试配置',
-        isActive: true
+        createdBy: 'test'
       };
       
       const createdConfig = await configService.createConfig(testConfig);
-      const configId = createdConfig.id;
+      const configId = createdConfig.configId;
 
       const response = await request(app.getHttpServer())
         .delete(`/api/v1/admin/configs/${configId}`)
@@ -249,15 +248,15 @@ describe('配置管理API集成测试', () => {
     beforeAll(async () => {
       // 创建一个测试配置
       const testConfig = {
-        key: 'publish_test_config',
-        value: 'publish_test_value',
-        type: 'test',
+        configType: 'test',
+        configKey: 'publish_test_config',
+        configValue: 'publish_test_value',
         description: '用于发布的测试配置',
-        isActive: false
+        createdBy: 'test'
       };
       
       const createdConfig = await configService.createConfig(testConfig);
-      testConfigId = createdConfig.id;
+      testConfigId = createdConfig.configId;
     });
 
     afterAll(async () => {
@@ -288,15 +287,15 @@ describe('配置管理API集成测试', () => {
     beforeAll(async () => {
       // 创建一个测试配置
       const testConfig = {
-        key: 'rollback_test_config',
-        value: 'rollback_test_value',
-        type: 'test',
+        configType: 'test',
+        configKey: 'rollback_test_config',
+        configValue: 'rollback_test_value',
         description: '用于回滚的测试配置',
-        isActive: true
+        createdBy: 'test'
       };
       
       const createdConfig = await configService.createConfig(testConfig);
-      testConfigId = createdConfig.id;
+      testConfigId = createdConfig.configId;
     });
 
     afterAll(async () => {
@@ -348,18 +347,18 @@ describe('配置管理API集成测试', () => {
       const importData = {
         configs: [
           {
-            key: 'imported_config_1',
-            value: 'imported_value_1',
-            type: 'test',
+            configType: 'test',
+            configKey: 'imported_config_1',
+            configValue: 'imported_value_1',
             description: '导入的配置1',
-            isActive: true
+            createdBy: 'test'
           },
           {
-            key: 'imported_config_2',
-            value: 'imported_value_2',
-            type: 'test',
+            configType: 'test',
+            configKey: 'imported_config_2',
+            configValue: 'imported_value_2',
             description: '导入的配置2',
-            isActive: false
+            createdBy: 'test'
           }
         ]
       };
@@ -375,8 +374,8 @@ describe('配置管理API集成测试', () => {
       // 清理导入的配置
       const configs = await configService.getAllConfigs('test');
       for (const config of configs) {
-        if (config.key.startsWith('imported_config_')) {
-          await configService.deleteConfig(config.id);
+        if (config.configKey.startsWith('imported_config_')) {
+          await configService.deleteConfig(config.configId);
         }
       }
     });
@@ -385,8 +384,8 @@ describe('配置管理API集成测试', () => {
       const invalidImportData = {
         configs: [
           {
-            value: 'invalid_value'
-            // 缺少必要的 key 字段
+            configValue: 'invalid_value'
+            // 缺少必要的 configKey 字段
           }
         ]
       };

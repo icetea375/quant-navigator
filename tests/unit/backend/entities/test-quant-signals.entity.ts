@@ -69,7 +69,7 @@ describe('QuantSignals Entity Validation', () => {
             const errors = await validate(validQuantSignal);
             expect(errors).toHaveLength(1);
             expect(errors[0].property).toBe('target_code');
-            expect(errors[0].constraints?.isNotEmpty).toBeDefined();
+            expect(errors[0].constraints?.isNotEmpty).toBe('target_code should not be empty');
         });
 
         it('应该拒绝超过20字符的 target_code', async () => {
@@ -91,7 +91,7 @@ describe('QuantSignals Entity Validation', () => {
 
     describe('signal_date 字段校验', () => {
         it('应该拒绝无效的日期格式', async () => {
-            validQuantSignal.signal_date = 'invalid-date' as any;
+            validQuantSignal.signal_date = 'invalid-date';
             const errors = await validate(validQuantSignal);
             expect(errors).toHaveLength(1);
             expect(errors[0].property).toBe('signal_date');
@@ -150,29 +150,29 @@ describe('QuantSignals Entity Validation', () => {
             'bollinger_position', 'signal_confidence'
         ];
 
-        scoreFields.forEach(field => {
-            it(`应该拒绝小于0的 ${field}`, async () => {
-                (validQuantSignal as any)[field] = -0.1;
-                const errors = await validate(validQuantSignal);
-                expect(errors).toHaveLength(1);
-                expect(errors[0].property).toBe(field);
-                expect(errors[0].constraints?.min).toBeDefined();
-            });
+            scoreFields.forEach(field => {
+                it(`应该拒绝小于0的 ${field}`, async () => {
+                    (validQuantSignal as any)[field] = -0.1;
+                    const errors = await validate(validQuantSignal);
+                    expect(errors).toHaveLength(1);
+                    expect(errors[0].property).toBe(field);
+                    expect(errors[0].constraints?.min).toBeDefined();
+                });
 
-            it(`应该拒绝大于1的 ${field}`, async () => {
-                (validQuantSignal as any)[field] = 1.1;
-                const errors = await validate(validQuantSignal);
-                expect(errors).toHaveLength(1);
-                expect(errors[0].property).toBe(field);
-                expect(errors[0].constraints?.max).toBeDefined();
-            });
+                it(`应该拒绝大于1的 ${field}`, async () => {
+                    (validQuantSignal as any)[field] = 1.1;
+                    const errors = await validate(validQuantSignal);
+                    expect(errors).toHaveLength(1);
+                    expect(errors[0].property).toBe(field);
+                    expect(errors[0].constraints?.max).toBeDefined();
+                });
 
-            it(`应该接受空的 ${field}`, async () => {
-                (validQuantSignal as any)[field] = null;
-                const errors = await validate(validQuantSignal);
-                expect(errors).toHaveLength(0);
+                it(`应该接受空的 ${field}`, async () => {
+                    (validQuantSignal as any)[field] = null;
+                    const errors = await validate(validQuantSignal);
+                    expect(errors).toHaveLength(0);
+                });
             });
-        });
     });
 
     describe('RSI 字段校验', () => {

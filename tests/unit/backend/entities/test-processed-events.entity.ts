@@ -130,7 +130,7 @@ describe('ProcessedEvents Entity Validation', () => {
 
     describe('published_at 字段校验', () => {
         it('应该拒绝无效的日期格式', async () => {
-            validProcessedEvent.published_at = 'invalid-date' as any;
+            validProcessedEvent.published_at = 'invalid-date';
             const errors = await validate(validProcessedEvent);
             expect(errors).toHaveLength(1);
             expect(errors[0].property).toBe('published_at');

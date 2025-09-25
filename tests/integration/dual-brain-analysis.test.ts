@@ -222,8 +222,12 @@ describe('双脑分析集成测试', () => {
       // 验证结果
       expect(qwenResult.status).toBe('fulfilled');
       expect(doubaoResult.status).toBe('fulfilled');
-      expect(qwenResult.value).toEqual(mockQwenReport);
-      expect(doubaoResult.value).toEqual(mockDoubaoReport);
+      if (qwenResult.status === 'fulfilled') {
+        expect(qwenResult.value).toEqual(mockQwenReport);
+      }
+      if (doubaoResult.status === 'fulfilled') {
+        expect(doubaoResult.value).toEqual(mockDoubaoReport);
+      }
 
       // 验证并行执行时间（应该比串行执行快）
       const executionTime = endTime - startTime;
@@ -256,8 +260,12 @@ describe('双脑分析集成测试', () => {
       // 验证结果
       expect(qwenResult.status).toBe('fulfilled');
       expect(doubaoResult.status).toBe('rejected');
-      expect(qwenResult.value).toEqual(mockQwenReport);
-      expect(doubaoResult.reason.message).toBe('豆包API调用失败');
+      if (qwenResult.status === 'fulfilled') {
+        expect(qwenResult.value).toEqual(mockQwenReport);
+      }
+      if (doubaoResult.status === 'rejected') {
+        expect(doubaoResult.reason.message).toBe('豆包API调用失败');
+      }
     });
   });
 

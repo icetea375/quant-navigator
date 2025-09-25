@@ -94,7 +94,7 @@ describe('FinancialReports Entity Validation', () => {
 
     describe('report_date 字段校验', () => {
         it('应该拒绝无效的日期格式', async () => {
-            validFinancialReport.report_date = 'invalid-date' as any;
+            validFinancialReport.report_date = 'invalid-date';
             const errors = await validate(validFinancialReport);
             expect(errors).toHaveLength(1);
             expect(errors[0].property).toBe('report_date');
@@ -179,21 +179,21 @@ describe('FinancialReports Entity Validation', () => {
             'net_assets', 'book_value_per_share'
         ];
 
-        financialFields.forEach(field => {
-            it(`应该拒绝小于0的 ${field}`, async () => {
-                (validFinancialReport as any)[field] = -0.1;
-                const errors = await validate(validFinancialReport);
-                expect(errors).toHaveLength(1);
-                expect(errors[0].property).toBe(field);
-                expect(errors[0].constraints?.min).toBeDefined();
-            });
+            financialFields.forEach(field => {
+                it(`应该拒绝小于0的 ${field}`, async () => {
+                    (validFinancialReport as any)[field] = -0.1;
+                    const errors = await validate(validFinancialReport);
+                    expect(errors).toHaveLength(1);
+                    expect(errors[0].property).toBe(field);
+                    expect(errors[0].constraints?.min).toBeDefined();
+                });
 
-            it(`应该接受空的 ${field}`, async () => {
-                (validFinancialReport as any)[field] = null;
-                const errors = await validate(validFinancialReport);
-                expect(errors).toHaveLength(0);
+                it(`应该接受空的 ${field}`, async () => {
+                    (validFinancialReport as any)[field] = null;
+                    const errors = await validate(validFinancialReport);
+                    expect(errors).toHaveLength(0);
+                });
             });
-        });
     });
 
     describe('百分比字段校验 (0-100范围)', () => {
@@ -201,29 +201,29 @@ describe('FinancialReports Entity Validation', () => {
             'gross_margin', 'net_margin', 'r_d_ratio', 'debt_to_asset_ratio'
         ];
 
-        percentageFields.forEach(field => {
-            it(`应该拒绝小于0的 ${field}`, async () => {
-                (validFinancialReport as any)[field] = -0.1;
-                const errors = await validate(validFinancialReport);
-                expect(errors).toHaveLength(1);
-                expect(errors[0].property).toBe(field);
-                expect(errors[0].constraints?.min).toBeDefined();
-            });
+            percentageFields.forEach(field => {
+                it(`应该拒绝小于0的 ${field}`, async () => {
+                    (validFinancialReport as any)[field] = -0.1;
+                    const errors = await validate(validFinancialReport);
+                    expect(errors).toHaveLength(1);
+                    expect(errors[0].property).toBe(field);
+                    expect(errors[0].constraints?.min).toBeDefined();
+                });
 
-            it(`应该拒绝大于100的 ${field}`, async () => {
-                (validFinancialReport as any)[field] = 100.1;
-                const errors = await validate(validFinancialReport);
-                expect(errors).toHaveLength(1);
-                expect(errors[0].property).toBe(field);
-                expect(errors[0].constraints?.max).toBeDefined();
-            });
+                it(`应该拒绝大于100的 ${field}`, async () => {
+                    (validFinancialReport as any)[field] = 100.1;
+                    const errors = await validate(validFinancialReport);
+                    expect(errors).toHaveLength(1);
+                    expect(errors[0].property).toBe(field);
+                    expect(errors[0].constraints?.max).toBeDefined();
+                });
 
-            it(`应该接受空的 ${field}`, async () => {
-                (validFinancialReport as any)[field] = null;
-                const errors = await validate(validFinancialReport);
-                expect(errors).toHaveLength(0);
+                it(`应该接受空的 ${field}`, async () => {
+                    (validFinancialReport as any)[field] = null;
+                    const errors = await validate(validFinancialReport);
+                    expect(errors).toHaveLength(0);
+                });
             });
-        });
     });
 
     describe('data_completeness_score 字段校验', () => {

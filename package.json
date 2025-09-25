@@ -1,44 +1,90 @@
 {
-  "name": "quant-navigator-monorepo",
-  "version": "11.1.0",
-  "private": true,
-  "description": "量化导航仪 - 智能分析系统 Monorepo",
+  "name": "quant-navigator-v13",
+  "version": "13.0.0",
+  "description": "智能分析系统 v13.0 TDD最终版 - 遵循TDD宪法，测试驱动开发",
+  "main": "index.js",
   "scripts": {
-    "install:all": "pnpm install",
-    "test": "pnpm --filter papa-test-suite test",
-    "test:unit": "pnpm --filter papa-test-suite test -- --testPathPattern=unit",
-    "test:integration": "pnpm --filter papa-test-suite test -- --testPathPattern=integration", 
-    "test:e2e": "pnpm --filter papa-test-suite test -- --testPathPattern=e2e",
-    "test:backend": "pnpm --filter backend test && pnpm --filter aigc-backend test",
-    "test:coverage": "pnpm --filter papa-test-suite test:coverage",
-    "test:performance": "pnpm --filter papa-test-suite test -- --testPathPattern=performance",
-    "lint": "pnpm --filter backend lint && pnpm --filter frontend lint && pnpm --filter aigc-backend lint && pnpm --filter aigc-frontend lint",
-    "build": "pnpm --filter backend build && pnpm --filter frontend build && pnpm --filter aigc-backend build && pnpm --filter aigc-frontend build",
-    "clean": "rm -rf node_modules backend/node_modules frontend/node_modules aigc/backend/node_modules aigc/frontend/node_modules tests/node_modules && pnpm install",
-    "db:migrate:test": "echo 'Database migration for test environment'",
-    "db:seed:test": "echo 'Database seeding for test environment'"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest --testPathPattern=unit",
+    "test:integration": "jest --testPathPattern=integration",
+    "test:e2e": "jest --testPathPattern=e2e",
+    "lint": "eslint src tests --ext .ts,.tsx",
+    "lint:fix": "eslint src tests --ext .ts,.tsx --fix",
+    "type-check": "tsc --noEmit",
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
   },
+  "keywords": [
+    "quantitative-analysis",
+    "tdd",
+    "test-driven-development",
+    "ai-governance",
+    "financial-analysis"
+  ],
+  "author": "AI Assistant",
+  "license": "MIT",
   "devDependencies": {
-    "typescript": "^5.3.0",
-    "jest": "^29.7.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^20.0.0",
-    "tslib": "^2.6.0",
-    "@nestjs/cli": "^10.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "jest": "^29.6.0",
+    "prettier": "^3.0.0",
+    "ts-jest": "^29.1.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.1.0"
+  },
+  "dependencies": {
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/typeorm": "^10.0.0",
+    "@nestjs/cache-manager": "^3.0.1",
+    "@nestjs/schedule": "^4.0.0",
     "typeorm": "^0.3.0",
+    "pg": "^8.11.0",
+    "redis": "^4.6.0",
+    "cache-manager": "^5.0.0",
+    "cache-manager-redis-store": "^3.0.0",
+    "reflect-metadata": "^0.1.13",
     "class-validator": "^0.14.0",
-    "class-transformer": "^0.5.0",
-    "reflect-metadata": "^0.1.0",
-    "supertest": "^6.3.0",
-    "@types/supertest": "^2.0.0"
+    "class-transformer": "^0.5.1"
   },
-  "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
-  },
-  "packageManager": "pnpm@8.15.0"
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": ["<rootDir>/tests"],
+    "testMatch": [
+      "<rootDir>/tests/**/*.test.ts",
+      "<rootDir>/tests/**/*.spec.ts",
+      "<rootDir>/tests/**/*.test.tsx",
+      "<rootDir>/tests/**/*.spec.tsx"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!src/**/*.d.ts",
+      "!src/**/*.stories.{ts,tsx}",
+      "!src/**/*.test.{ts,tsx}",
+      "!src/**/*.spec.{ts,tsx}"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    },
+    "setupFilesAfterEnv": ["<rootDir>/tests/config/jest-setup.ts"]
+  }
 }

@@ -178,7 +178,7 @@ describe('HumanFeedbackLoop Entity Validation', () => {
 
     describe('feedback_date 字段校验', () => {
         it('应该拒绝无效的日期格式', async () => {
-            validFeedback.feedback_date = 'invalid-date' as any;
+            validFeedback.feedback_date = 'invalid-date';
             const errors = await validate(validFeedback);
             expect(errors).toHaveLength(1);
             expect(errors[0].property).toBe('feedback_date');
@@ -294,29 +294,29 @@ describe('HumanFeedbackLoop Entity Validation', () => {
             'innovation_score', 'learning_value', 'training_effectiveness'
         ];
 
-        scoreFields.forEach(field => {
-            it(`应该拒绝小于0的 ${field}`, async () => {
-                (validFeedback as any)[field] = -0.1;
-                const errors = await validate(validFeedback);
-                expect(errors).toHaveLength(1);
-                expect(errors[0].property).toBe(field);
-                expect(errors[0].constraints?.min).toBeDefined();
-            });
+            scoreFields.forEach(field => {
+                it(`应该拒绝小于0的 ${field}`, async () => {
+                    (validFeedback as any)[field] = -0.1;
+                    const errors = await validate(validFeedback);
+                    expect(errors).toHaveLength(1);
+                    expect(errors[0].property).toBe(field);
+                    expect(errors[0].constraints?.min).toBeDefined();
+                });
 
-            it(`应该拒绝大于1的 ${field}`, async () => {
-                (validFeedback as any)[field] = 1.1;
-                const errors = await validate(validFeedback);
-                expect(errors).toHaveLength(1);
-                expect(errors[0].property).toBe(field);
-                expect(errors[0].constraints?.max).toBeDefined();
-            });
+                it(`应该拒绝大于1的 ${field}`, async () => {
+                    (validFeedback as any)[field] = 1.1;
+                    const errors = await validate(validFeedback);
+                    expect(errors).toHaveLength(1);
+                    expect(errors[0].property).toBe(field);
+                    expect(errors[0].constraints?.max).toBeDefined();
+                });
 
-            it(`应该接受空的 ${field}`, async () => {
-                (validFeedback as any)[field] = null;
-                const errors = await validate(validFeedback);
-                expect(errors).toHaveLength(0);
+                it(`应该接受空的 ${field}`, async () => {
+                    (validFeedback as any)[field] = null;
+                    const errors = await validate(validFeedback);
+                    expect(errors).toHaveLength(0);
+                });
             });
-        });
     });
 
     describe('reviewer 字段校验', () => {

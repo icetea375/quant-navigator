@@ -65,7 +65,10 @@ case "$TEST_SCOPE" in
         ;;
     "e2e")
         echo "运行端到端测试..."
-        pnpm run test:e2e
+        echo "安装Playwright浏览器..."
+        pnpm --filter papa-test-suite run e2e:install
+        echo "运行E2E测试..."
+        pnpm --filter papa-test-suite run test:e2e
         ;;
     "backend")
         echo "运行所有后端模块的测试..."
