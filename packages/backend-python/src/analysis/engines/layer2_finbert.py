@@ -8,22 +8,23 @@ PredictionEngine Layer 2 - FinBERT增强层模型
 - 输出情绪预测结果P2
 """
 
+import json
+import logging
+import os
+import warnings
+from datetime import datetime
+from typing import Any, Dict, List, Tuple
+
 import numpy as np
 import torch
-from transformers import (
-    AutoTokenizer,
-    AutoModelForSequenceClassification,
-    TrainingArguments,
-    Trainer,
-    EarlyStoppingCallback,
-)
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
-import json
-import os
-import logging
-from typing import Dict, List, Tuple, Any
-from datetime import datetime
-import warnings
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    EarlyStoppingCallback,
+    Trainer,
+    TrainingArguments,
+)
 
 warnings.filterwarnings("ignore")
 

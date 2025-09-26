@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 豆包舆情感知分析器 (v10.5 "双脑分治"架构)
 专门负责基于外部实时网络信息的舆情感知分析
@@ -10,11 +9,11 @@
 """
 
 import json
+import sys
 import uuid
 from datetime import datetime
-from typing import Dict, Any
 from pathlib import Path
-import sys
+from typing import Any, Dict
 
 # 添加项目根目录到Python路径
 project_root = Path(__file__).parent

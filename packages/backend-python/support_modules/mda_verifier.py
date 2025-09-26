@@ -3,7 +3,8 @@ MD&A验证器模块 - 管理层讨论与分析验证
 """
 
 import logging
-from typing import Dict, Any
+from typing import Any, Dict
+
 from .llm_service import LLMService
 
 

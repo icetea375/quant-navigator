@@ -8,9 +8,9 @@ DataPipelineService数据存储集成测试
 - 测试成功路径、失败路径和数据验证
 """
 
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, AsyncMock
-from datetime import datetime
 
 from src.services.data_pipeline_service import DataPipelineService
 
@@ -104,7 +104,7 @@ class TestDataPipelineStorageIntegration:
     async def test_save_financial_factors_success(self, data_pipeline_service, sample_financial_factors):
         """测试成功保存财务因子"""
         result = await data_pipeline_service.save_financial_factors(sample_financial_factors)
-        
+
         assert result is True
         assert isinstance(result, bool)
 
@@ -117,10 +117,10 @@ class TestDataPipelineStorageIntegration:
             "pe_ratio": 15.0
             # 缺少 pb_ratio 字段
         }
-        
+
         with pytest.raises(Exception) as exc_info:
             await data_pipeline_service.save_financial_factors(incomplete_data)
-        
+
         assert "财务因子保存失败" in str(exc_info.value)
         assert "缺少必要字段" in str(exc_info.value)
 
@@ -128,20 +128,20 @@ class TestDataPipelineStorageIntegration:
     async def test_save_financial_factors_empty_data(self, data_pipeline_service):
         """测试保存空财务因子数据"""
         empty_data = {}
-        
+
         with pytest.raises(Exception) as exc_info:
             await data_pipeline_service.save_financial_factors(empty_data)
-        
+
         assert "财务因子保存失败" in str(exc_info.value)
         assert "缺少必要字段" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_save_financial_factors_database_error(self, data_pipeline_service, sample_financial_factors):
         """测试保存财务因子时数据库错误"""
-        with patch.object(data_pipeline_service, '_persist_financial_factors', side_effect=Exception("数据库连接失败")):
+        with patch.object(data_pipeline_service, "_persist_financial_factors", side_effect=Exception("数据库连接失败")):
             with pytest.raises(Exception) as exc_info:
                 await data_pipeline_service.save_financial_factors(sample_financial_factors)
-            
+
             assert "财务因子保存失败" in str(exc_info.value)
             assert "数据库连接失败" in str(exc_info.value)
 
@@ -151,7 +151,7 @@ class TestDataPipelineStorageIntegration:
     async def test_save_super_financial_factors_success(self, data_pipeline_service, sample_super_financial_factors):
         """测试成功保存超级财务因子"""
         result = await data_pipeline_service.save_super_financial_factors(sample_super_financial_factors)
-        
+
         assert result is True
         assert isinstance(result, bool)
 
@@ -164,10 +164,10 @@ class TestDataPipelineStorageIntegration:
             "pe_ratio": 15.0
             # 缺少 overall_score 和 value_score 字段
         }
-        
+
         with pytest.raises(Exception) as exc_info:
             await data_pipeline_service.save_super_financial_factors(incomplete_data)
-        
+
         assert "超级财务因子保存失败" in str(exc_info.value)
         assert "缺少必要字段" in str(exc_info.value)
 
@@ -175,20 +175,20 @@ class TestDataPipelineStorageIntegration:
     async def test_save_super_financial_factors_empty_data(self, data_pipeline_service):
         """测试保存空超级财务因子数据"""
         empty_data = {}
-        
+
         with pytest.raises(Exception) as exc_info:
             await data_pipeline_service.save_super_financial_factors(empty_data)
-        
+
         assert "超级财务因子保存失败" in str(exc_info.value)
         assert "缺少必要字段" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_save_super_financial_factors_database_error(self, data_pipeline_service, sample_super_financial_factors):
         """测试保存超级财务因子时数据库错误"""
-        with patch.object(data_pipeline_service, '_persist_super_financial_factors', side_effect=Exception("数据库连接失败")):
+        with patch.object(data_pipeline_service, "_persist_super_financial_factors", side_effect=Exception("数据库连接失败")):
             with pytest.raises(Exception) as exc_info:
                 await data_pipeline_service.save_super_financial_factors(sample_super_financial_factors)
-            
+
             assert "超级财务因子保存失败" in str(exc_info.value)
             assert "数据库连接失败" in str(exc_info.value)
 
@@ -204,7 +204,7 @@ class TestDataPipelineStorageIntegration:
             "pe_ratio": 15.0,
             "pb_ratio": 2.0
         }
-        
+
         # 应该不抛出异常
         await data_pipeline_service._persist_financial_factors(valid_data)
 
@@ -218,7 +218,7 @@ class TestDataPipelineStorageIntegration:
             "overall_score": 42.5,
             "value_score": 20.0
         }
-        
+
         # 应该不抛出异常
         await data_pipeline_service._persist_super_financial_factors(valid_data)
 
@@ -235,7 +235,7 @@ class TestDataPipelineStorageIntegration:
             "ps_ratio": 0.0,
             "dividend_yield": 0.0
         }
-        
+
         result = await data_pipeline_service.save_financial_factors(data_with_zeros)
         assert result is True
 
@@ -250,7 +250,7 @@ class TestDataPipelineStorageIntegration:
             "ps_ratio": -2.0,
             "dividend_yield": -1.0
         }
-        
+
         result = await data_pipeline_service.save_financial_factors(data_with_negatives)
         assert result is True
 
@@ -271,7 +271,7 @@ class TestDataPipelineStorageIntegration:
             "overall_score": 50.0,
             "calculated_at": "2024-01-01T10:00:00"
         }
-        
+
         result = await data_pipeline_service.save_super_financial_factors(data_with_edge_scores)
         assert result is True
 
@@ -281,11 +281,11 @@ class TestDataPipelineStorageIntegration:
     async def test_save_financial_factors_performance(self, data_pipeline_service, sample_financial_factors):
         """测试财务因子保存性能"""
         import time
-        
+
         start_time = time.time()
         result = await data_pipeline_service.save_financial_factors(sample_financial_factors)
         end_time = time.time()
-        
+
         assert result is True
         # 确保保存操作在合理时间内完成（小于1秒）
         assert (end_time - start_time) < 1.0
@@ -294,11 +294,11 @@ class TestDataPipelineStorageIntegration:
     async def test_save_super_financial_factors_performance(self, data_pipeline_service, sample_super_financial_factors):
         """测试超级财务因子保存性能"""
         import time
-        
+
         start_time = time.time()
         result = await data_pipeline_service.save_super_financial_factors(sample_super_financial_factors)
         end_time = time.time()
-        
+
         assert result is True
         # 确保保存操作在合理时间内完成（小于1秒）
         assert (end_time - start_time) < 1.0

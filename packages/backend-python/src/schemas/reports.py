@@ -2,10 +2,11 @@
 报告相关的Pydantic模式
 """
 
-from pydantic import BaseModel
 from datetime import date, datetime
-from typing import Optional
 from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel
 
 
 class ReportType(str, Enum):

@@ -2,8 +2,10 @@
 工作流API路由
 """
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks
 from datetime import date
+
+from fastapi import APIRouter, BackgroundTasks, HTTPException
+
 from src.services.simple_workflow_service import (
     SimpleWorkflowService as WorkflowService,
 )
@@ -30,7 +32,7 @@ async def run_daily_flow(background_tasks: BackgroundTasks, target_date: str = N
             "target_date": target_date,
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"启动日常分析工作流失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"启动日常分析工作流失败: {e!s}")
 
 
 @workflow_router.post("/run-historical-backfill")
@@ -52,7 +54,7 @@ async def run_historical_backfill(
         }
     except Exception as e:
         raise HTTPException(
-            status_code=500, detail=f"启动历史数据回填工作流失败: {str(e)}"
+            status_code=500, detail=f"启动历史数据回填工作流失败: {e!s}"
         )
 
 
@@ -70,7 +72,7 @@ async def get_workflow_status(workflow_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"获取工作流状态失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"获取工作流状态失败: {e!s}")
 
 
 @workflow_router.get("/logs/{workflow_id}")
@@ -82,4 +84,4 @@ async def get_workflow_logs(workflow_id: str):
 
         return {"success": True, "message": "获取工作流日志成功", "data": logs}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"获取工作流日志失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"获取工作流日志失败: {e!s}")

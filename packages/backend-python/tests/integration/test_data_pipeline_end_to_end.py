@@ -8,12 +8,12 @@ DataPipeline端到端集成测试
 - 测试完整的用户工作流
 """
 
-import pytest
 from unittest.mock import patch
-from datetime import datetime
 
-from src.services.data_sources.tushare_fetcher import TushareFetcher
+import pytest
+
 from src.services.data_pipeline_service import DataPipelineService
+from src.services.data_sources.tushare_fetcher import TushareFetcher
 
 
 class TestDataPipelineEndToEnd:
@@ -104,9 +104,9 @@ class TestDataPipelineEndToEnd:
         4. 保存到数据库
         """
         # 模拟DataPipelineService的Tushare API调用
-        with patch.object(data_pipeline_service.pro, 'stock_basic') as mock_stock_basic, \
-             patch.object(data_pipeline_service.pro, 'daily_basic') as mock_daily_basic, \
-             patch.object(data_pipeline_service.pro, 'daily') as mock_daily:
+        with patch.object(data_pipeline_service.pro, "stock_basic") as mock_stock_basic, \
+             patch.object(data_pipeline_service.pro, "daily_basic") as mock_daily_basic, \
+             patch.object(data_pipeline_service.pro, "daily") as mock_daily:
 
             # 设置模拟返回值
             import pandas as pd
@@ -163,9 +163,9 @@ class TestDataPipelineEndToEnd:
     async def test_data_pipeline_flow_with_empty_data(self, tushare_fetcher, data_pipeline_service):
         """测试数据管道流程处理空数据的情况"""
         # 模拟返回空数据
-        with patch.object(data_pipeline_service.pro, 'stock_basic') as mock_stock_basic, \
-             patch.object(data_pipeline_service.pro, 'daily_basic') as mock_daily_basic, \
-             patch.object(data_pipeline_service.pro, 'daily') as mock_daily:
+        with patch.object(data_pipeline_service.pro, "stock_basic") as mock_stock_basic, \
+             patch.object(data_pipeline_service.pro, "daily_basic") as mock_daily_basic, \
+             patch.object(data_pipeline_service.pro, "daily") as mock_daily:
 
             import pandas as pd
             mock_stock_basic.return_value = pd.DataFrame()
@@ -187,7 +187,7 @@ class TestDataPipelineEndToEnd:
     async def test_data_pipeline_flow_with_api_error(self, tushare_fetcher, data_pipeline_service):
         """测试数据管道流程处理API错误的情况"""
         # 模拟API错误
-        with patch.object(tushare_fetcher.pro, 'stock_basic', side_effect=Exception("API调用失败")):
+        with patch.object(tushare_fetcher.pro, "stock_basic", side_effect=Exception("API调用失败")):
             with pytest.raises(Exception) as exc_info:
                 await data_pipeline_service.fetch_tushare_data("000001.SZ", "20240101")
 
@@ -277,7 +277,7 @@ class TestDataPipelineEndToEnd:
         )
 
         # 模拟保存失败
-        with patch.object(data_pipeline_service, '_persist_financial_factors', side_effect=Exception("数据库连接失败")):
+        with patch.object(data_pipeline_service, "_persist_financial_factors", side_effect=Exception("数据库连接失败")):
             with pytest.raises(Exception) as exc_info:
                 await data_pipeline_service.save_financial_factors(financial_factors)
 

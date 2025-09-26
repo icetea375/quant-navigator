@@ -2,13 +2,14 @@
 仲裁服务 - 处理仲裁案件相关业务逻辑
 """
 
-from typing import List, Dict, Any, Optional
 from datetime import datetime
+from typing import Any, Dict, Optional
+
 from src.schemas.arbitration import (
+    AnalysisResult,
     ArbitrationCase,
     ArbitrationCaseCreate,
     ArbitrationCaseUpdate,
-    AnalysisResult,
     SentimentAnalysis,
 )
 

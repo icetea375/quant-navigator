@@ -4,19 +4,19 @@ Qwen LLM提供商实现 - 实现LlmProviderInterface接口
 """
 
 import logging
+import sys
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Optional
 
 import httpx
-
-import sys
-from pathlib import Path
 
 # 添加项目根目录到Python路径
 project_root = Path(__file__).parent.parent.parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from config.settings import settings
+
 from src.core.interfaces import (
     LlmProviderAuthenticationError,
     LlmProviderError,
@@ -114,7 +114,7 @@ class QwenProvider(LlmProviderInterface):
             from src.core.contract_validator import contract_validator
             if not contract_validator.validate_response(result, "chat_completion"):
                 raise LlmProviderError("Qwen API响应不符合契约定义")
-            
+
             # 提取生成的文本
             return result["output"]["text"]
 
@@ -192,7 +192,7 @@ class QwenProvider(LlmProviderInterface):
             from src.core.contract_validator import contract_validator
             if not contract_validator.validate_response(result, "chat_completion"):
                 raise LlmProviderError("Qwen API响应不符合契约定义")
-            
+
             # 提取生成的文本
             return result["output"]["text"]
 

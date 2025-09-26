@@ -2,10 +2,11 @@
 仲裁案件相关的Pydantic模式
 """
 
-from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional
 from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel, Field
 
 
 class ArbitrationStatus(str, Enum):

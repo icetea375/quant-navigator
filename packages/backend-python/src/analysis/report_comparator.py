@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 报告对比器 - v11.9架构升级核心模块
 实现双脑报告对比分析，为人类仲裁官提供高质量案情摘要
@@ -11,13 +10,13 @@
 
 import logging
 import re
-from typing import Dict, Any, List
-from dataclasses import dataclass
-from datetime import datetime
 
 # 导入LLM服务
 import sys
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
+from typing import Any, Dict, List
 
 project_root = Path(__file__).parent.parent.parent
 sys.path.append(str(project_root))
@@ -554,9 +553,7 @@ class ReportComparator:
                 response.startswith('"')
                 and response.endswith('"')
                 and len(response) > 2
-            ):
-                response = response[1:-1]
-            elif (
+            ) or (
                 response.startswith("'")
                 and response.endswith("'")
                 and len(response) > 2

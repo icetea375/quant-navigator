@@ -2,11 +2,13 @@
 管理后台API路由
 """
 
-from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
+
+from fastapi import APIRouter, HTTPException, Query
+
 from src.schemas.arbitration import (
-    ArbitrationCaseResponse,
     ArbitrationCaseListResponse,
+    ArbitrationCaseResponse,
     ArbitrationCaseUpdate,
 )
 from src.services.arbitration_service import ArbitrationService
@@ -36,7 +38,7 @@ async def get_arbitration_cases(
             size=size,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"获取仲裁案件列表失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"获取仲裁案件列表失败: {e!s}")
 
 
 @admin_router.get(
@@ -56,7 +58,7 @@ async def get_arbitration_case(case_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"获取仲裁案件详情失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"获取仲裁案件详情失败: {e!s}")
 
 
 @admin_router.put(
@@ -76,7 +78,7 @@ async def update_arbitration_case(case_id: str, update_data: ArbitrationCaseUpda
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"更新仲裁案件失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"更新仲裁案件失败: {e!s}")
 
 
 @admin_router.get("/arbitration-cases/{case_id}/preprocess")
@@ -87,7 +89,7 @@ async def preprocess_arbitration_case(case_id: str):
         result = await service.preprocess_case(case_id)
         return {"success": True, "message": "仲裁案件预处理完成", "data": result}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"预处理仲裁案件失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"预处理仲裁案件失败: {e!s}")
 
 
 @admin_router.get("/statistics")
@@ -98,4 +100,4 @@ async def get_admin_statistics():
         stats = await service.get_statistics()
         return {"success": True, "message": "获取统计信息成功", "data": stats}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"获取统计信息失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"获取统计信息失败: {e!s}")

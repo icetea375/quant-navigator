@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 预测生成器 - 多场景概率性预测生成
 v10.1 仲裁界面升级版
@@ -12,8 +11,8 @@ v10.1 仲裁界面升级版
 import json
 import logging
 from datetime import datetime
-from typing import List, Dict, Any
 from pathlib import Path
+from typing import Any, Dict, List
 
 from .llm_service import LLMService
 
@@ -50,7 +49,7 @@ class PredictionGenerator:
                 "config/prompt_templates/prediction_generation_prompts.json"
             )
             if template_path.exists():
-                with open(template_path, "r", encoding="utf-8") as f:
+                with open(template_path, encoding="utf-8") as f:
                     return json.load(f)
             else:
                 self.logger.warning("Prompt模板文件不存在，使用默认模板")

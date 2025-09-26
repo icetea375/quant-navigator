@@ -8,16 +8,17 @@ PredictionEngine Layer 1 - LightGBM基础层模型
 - 输出初步预测结果P1
 """
 
-import pandas as pd
-import numpy as np
-import lightgbm as lgb
-from sklearn.metrics import mean_squared_error, r2_score
-import joblib
-import os
-import logging
-from typing import Dict, Any
 import json
+import logging
+import os
 from datetime import datetime
+from typing import Any, Dict
+
+import joblib
+import lightgbm as lgb
+import numpy as np
+import pandas as pd
+from sklearn.metrics import mean_squared_error, r2_score
 
 
 class Layer1LightGBM:
@@ -238,7 +239,7 @@ class Layer1LightGBM:
             # 加载特征重要性
             importance_file = os.path.join(model_path, "feature_importance.json")
             if os.path.exists(importance_file):
-                with open(importance_file, "r") as f:
+                with open(importance_file) as f:
                     self.feature_importance = json.load(f)
 
             self.logger.info(f"Model loaded from {model_path}")

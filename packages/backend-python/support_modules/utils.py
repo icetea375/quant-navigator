@@ -5,7 +5,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 def load_config(config_path: str) -> Dict[str, Any]:
@@ -19,7 +19,7 @@ def load_config(config_path: str) -> Dict[str, Any]:
         配置字典
     """
     try:
-        with open(config_path, "r", encoding="utf-8") as f:
+        with open(config_path, encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
         # 返回默认配置

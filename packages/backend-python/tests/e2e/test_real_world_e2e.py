@@ -8,13 +8,13 @@
 - 只测试最核心的1-2个黄金路径
 """
 
-import pytest
 import os
 import time
-from datetime import datetime
 
-from src.services.data_sources.tushare_fetcher import TushareFetcher
+import pytest
+
 from src.services.data_pipeline_service import DataPipelineService
+from src.services.data_sources.tushare_fetcher import TushareFetcher
 
 
 class TestRealWorldE2E:
@@ -144,7 +144,7 @@ class TestRealWorldE2E:
             print(f"🎉 真实世界E2E测试完成！总耗时: {total_time:.2f}秒")
 
             # 输出关键指标供人工审查
-            print(f"\n📋 关键指标摘要:")
+            print("\n📋 关键指标摘要:")
             print(f"   股票代码: {financial_factors['stock_code']}")
             print(f"   交易日期: {financial_factors['trade_date']}")
             print(f"   PE比率: {pe_ratio:.2f}")
@@ -154,13 +154,13 @@ class TestRealWorldE2E:
 
         except Exception as e:
             print(f"\n❌ 真实世界E2E测试失败: {e}")
-            print(f"🔍 请人工判断失败原因:")
-            print(f"   1. 网络连接问题？")
-            print(f"   2. Tushare API问题？")
-            print(f"   3. 我们的代码问题？")
-            print(f"   4. 数据格式变化？")
-            print(f"\n如果是外部问题，可以忽略此失败")
-            print(f"如果是代码问题，请立即修复")
+            print("🔍 请人工判断失败原因:")
+            print("   1. 网络连接问题？")
+            print("   2. Tushare API问题？")
+            print("   3. 我们的代码问题？")
+            print("   4. 数据格式变化？")
+            print("\n如果是外部问题，可以忽略此失败")
+            print("如果是代码问题，请立即修复")
             raise
 
     @pytest.mark.e2e

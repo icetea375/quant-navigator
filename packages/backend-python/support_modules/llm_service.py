@@ -3,7 +3,7 @@ LLM服务模块 - 商业LLM API调用服务
 """
 
 import logging
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 class LLMService:

@@ -4,12 +4,14 @@
 使用Typer创建专业的命令行应用
 """
 
+from datetime import date, datetime
+
 import typer
-from datetime import datetime, date
+
+from src.core.logging_config import setup_logging
 from src.services.simple_workflow_service import (
     SimpleWorkflowService as WorkflowService,
 )
-from src.core.logging_config import setup_logging
 
 app = typer.Typer(help="量化导航仪后端服务 CLI")
 
@@ -38,7 +40,7 @@ def run_daily_flow(
         workflow_id = asyncio.run(workflow_service.run_daily_flow(target_date))
         typer.echo(f"工作流已启动，ID: {workflow_id}")
     except Exception as e:
-        typer.echo(f"启动工作流失败: {str(e)}", err=True)
+        typer.echo(f"启动工作流失败: {e!s}", err=True)
         raise typer.Exit(1)
 
 
@@ -66,7 +68,7 @@ def run_historical_backfill(
         )
         typer.echo(f"历史回填工作流已启动，ID: {workflow_id}")
     except Exception as e:
-        typer.echo(f"启动历史回填工作流失败: {str(e)}", err=True)
+        typer.echo(f"启动历史回填工作流失败: {e!s}", err=True)
         raise typer.Exit(1)
 
 

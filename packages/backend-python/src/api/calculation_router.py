@@ -2,9 +2,10 @@
 计算服务API路由
 """
 
-from fastapi import APIRouter, HTTPException
-from typing import Dict, Any
 import logging
+from typing import Any, Dict
+
+from fastapi import APIRouter, HTTPException
 
 logger = logging.getLogger(__name__)
 calculation_router = APIRouter()

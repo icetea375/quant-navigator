@@ -2,12 +2,14 @@
 报告管理API路由
 """
 
-from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
+
+from fastapi import APIRouter, HTTPException, Query
+
 from src.schemas.reports import (
-    ReportResponse,
-    ReportListResponse,
     ReportCreate,
+    ReportListResponse,
+    ReportResponse,
     ReportUpdate,
 )
 from src.services.report_service import ReportService
@@ -37,7 +39,7 @@ async def get_reports(
             size=size,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"获取报告列表失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"获取报告列表失败: {e!s}")
 
 
 @reports_router.get("/{report_id}", response_model=ReportResponse)
@@ -53,7 +55,7 @@ async def get_report(report_id: int):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"获取报告详情失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"获取报告详情失败: {e!s}")
 
 
 @reports_router.post("/", response_model=ReportResponse)
@@ -64,7 +66,7 @@ async def create_report(report_data: ReportCreate):
         report = await service.create_report(report_data)
         return ReportResponse(success=True, message="创建报告成功", data=report)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"创建报告失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"创建报告失败: {e!s}")
 
 
 @reports_router.put("/{report_id}", response_model=ReportResponse)
@@ -80,7 +82,7 @@ async def update_report(report_id: int, update_data: ReportUpdate):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"更新报告失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"更新报告失败: {e!s}")
 
 
 @reports_router.delete("/{report_id}")
@@ -96,4 +98,4 @@ async def delete_report(report_id: int):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"删除报告失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"删除报告失败: {e!s}")

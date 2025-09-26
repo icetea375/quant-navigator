@@ -181,7 +181,7 @@ class TestDetectAnomalies:
         mock_workflow.data_pipeline.get_price_anomalies_async.side_effect = Exception("数据管道错误")
 
         # 模拟asyncio.gather失败
-        with patch('asyncio.gather', side_effect=Exception("gather失败")):
+        with patch("asyncio.gather", side_effect=Exception("gather失败")):
             trade_date = "2025-01-17"
 
             with pytest.raises(QuantDataProviderError):

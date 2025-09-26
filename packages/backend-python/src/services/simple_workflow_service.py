@@ -4,8 +4,8 @@
 
 import asyncio
 import logging
-from typing import Dict, Any, Optional, List
 from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
 
 
 class SimpleWorkflowService:
@@ -60,7 +60,7 @@ class SimpleWorkflowService:
                     "error": str(e),
                 }
             )
-            self._add_log(workflow_id, f"工作流失败: {str(e)}", "error")
+            self._add_log(workflow_id, f"工作流失败: {e!s}", "error")
             self.logger.error(f"日常分析工作流失败: {workflow_id}, 错误: {e}")
             raise
 
@@ -113,7 +113,7 @@ class SimpleWorkflowService:
                     "error": str(e),
                 }
             )
-            self._add_log(workflow_id, f"历史回填工作流失败: {str(e)}", "error")
+            self._add_log(workflow_id, f"历史回填工作流失败: {e!s}", "error")
             self.logger.error(f"历史数据回填工作流失败: {workflow_id}, 错误: {e}")
             raise
 

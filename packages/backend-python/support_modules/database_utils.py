@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 数据库工具类 - 数据库连接和操作工具
 v10.1 仲裁界面升级版
@@ -11,14 +10,15 @@ v10.1 仲裁界面升级版
 
 import json
 import logging
-from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional
-from pathlib import Path
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import SQLAlchemyError
-import redis
 from contextlib import contextmanager
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import redis
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import sessionmaker
 
 
 class DatabaseManager:
@@ -210,7 +210,7 @@ class DatabaseManager:
         try:
             with self.get_session() as session:
                 # 构建更新语句
-                set_clause = ", ".join([f"{col} = :{col}" for col in data.keys()])
+                set_clause = ", ".join([f"{col} = :{col}" for col in data])
 
                 query = f"""
                 UPDATE {table_name}
@@ -698,12 +698,12 @@ class DatabaseManager:
             ORDER BY trade_date DESC, created_at DESC
             LIMIT 1
             """
-            
+
             results = self.execute_query(query, {
                 "stock_code": stock_code,
                 "trade_date": trade_date
             })
-            
+
             if results:
                 # 业务契约1：当存在数据时，返回查询结果
                 return results[0]
@@ -723,7 +723,7 @@ class DatabaseManager:
                     "summary": "暂无数据",
                     "created_at": None
                 }
-                
+
         except Exception as e:
             self.logger.error(f"获取MD&A数据失败: {stock_code} - {e}")
             # 业务契约3：当数据库查询失败时，优雅地处理错误
@@ -777,7 +777,7 @@ def load_config(config_path: str) -> Dict[str, Any]:
         if not config_file.exists():
             raise FileNotFoundError(f"配置文件不存在: {config_path}")
 
-        with open(config_file, "r", encoding="utf-8") as f:
+        with open(config_file, encoding="utf-8") as f:
             if config_file.suffix == ".json":
                 return json.load(f)
             elif config_file.suffix in [".yaml", ".yml"]:

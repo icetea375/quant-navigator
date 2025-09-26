@@ -5,18 +5,19 @@
 
 import logging
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
-from src.core.config import settings
-from src.core.logging_config import setup_logging
 from src.api.admin import admin_router
-from src.api.reports import reports_router
-from src.api.workflow import workflow_router
 from src.api.ai_router import ai_router
 from src.api.calculation_router import calculation_router
 from src.api.data_router import data_router
+from src.api.reports import reports_router
+from src.api.workflow import workflow_router
+from src.core.config import settings
+from src.core.logging_config import setup_logging
 
 
 @asynccontextmanager

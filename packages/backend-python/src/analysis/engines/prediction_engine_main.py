@@ -8,17 +8,18 @@ PredictionEngine主程序
 - 支持训练和预测模式
 """
 
-import pandas as pd
+import argparse
+import json
+import logging
+import os
+import sys
+from datetime import datetime
+from typing import Any, Dict, List
+
 import numpy as np
+import pandas as pd
 import psycopg2
 import psycopg2.extras
-import json
-import os
-import logging
-import argparse
-from datetime import datetime
-from typing import Dict, List, Any
-import sys
 
 # 添加当前目录到Python路径
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -547,7 +548,7 @@ def main():
 
     # 加载配置
     try:
-        with open(args.config, "r") as f:
+        with open(args.config) as f:
             config = json.load(f)
     except FileNotFoundError:
         # 使用默认配置

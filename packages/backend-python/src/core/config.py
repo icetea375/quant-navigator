@@ -12,7 +12,7 @@ sys.path.insert(0, str(project_root))
 
 try:
     # 导入统一配置
-    from config.settings import settings, get_settings, validate_critical_config
+    from config.settings import get_settings, settings, validate_critical_config
 except ImportError:
     # 如果无法导入，使用默认配置
     class DefaultSettings:
@@ -22,10 +22,10 @@ except ImportError:
         ALLOWED_HOSTS = ["*"]
         LOG_LEVEL = "INFO"
         LOG_FILE = "logs/backend.log"
-    
+
     settings = DefaultSettings()
     get_settings = lambda: settings
     validate_critical_config = lambda: True
 
 # 向后兼容：保持原有的settings实例
-__all__ = ['settings', 'get_settings', 'validate_critical_config']
+__all__ = ["get_settings", "settings", "validate_critical_config"]

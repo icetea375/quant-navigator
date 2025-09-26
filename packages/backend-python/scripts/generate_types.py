@@ -4,10 +4,11 @@
 从FastAPI的OpenAPI规范自动生成前端类型文件
 """
 
-import requests
 import sys
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
+
+import requests
 
 
 def fetch_openapi_spec(base_url: str = "http://localhost:8000") -> Dict[str, Any]:

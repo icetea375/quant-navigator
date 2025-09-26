@@ -22,16 +22,16 @@ sys.path.append(str(project_root))
 
 # 导入核心服务
 # 导入异常类
-from src.exceptions.workflow_exceptions import (  # noqa: E402
-    ArbitrationWorkflowError,
-    LLMServiceError,
-    QuantDataProviderError,
-)
 from schemas.arbitration import AnalysisResult  # noqa: E402
 from services.data_pipeline_service import DataPipelineService  # noqa: E402
 from services.llm_service import LLMService  # noqa: E402
 from services.meta_cognition_engine import MetaCognitionEngine  # noqa: E402
 from services.quant_signal_service import QuantSignalService  # noqa: E402
+from src.exceptions.workflow_exceptions import (  # noqa: E402
+    ArbitrationWorkflowError,
+    LLMServiceError,
+    QuantDataProviderError,
+)
 
 
 class MainWorkflow:

@@ -106,21 +106,21 @@ class TestMainWorkflowTDD:
         """
         # 模拟数据融合成功
         mock_workflow._execute_data_fusion = AsyncMock()
-        
+
         # 模拟异常检测失败
         mock_workflow._detect_anomalies = AsyncMock(
             side_effect=QuantDataProviderError("异常检测失败")
         )
-        
+
         # 模拟发送告警
         mock_workflow._send_critical_alert = AsyncMock()
-        
+
         # 模拟asyncio.sleep以避免测试卡住
-        with patch('asyncio.sleep', new_callable=AsyncMock):
+        with patch("asyncio.sleep", new_callable=AsyncMock):
             # 执行测试 - 应该抛出异常
             with pytest.raises(QuantDataProviderError):
                 await mock_workflow.run_daily_flow("2025-01-17")
-        
+
         # 验证告警被发送（可能被调用多次，因为重试机制）
         assert mock_workflow._send_critical_alert.call_count >= 1
 
@@ -196,9 +196,9 @@ class TestMainWorkflowTDD:
         assert result["status"] == "unhealthy"
         assert "数据库连接失败" in result["checks"]["database"]
         assert result["checks"]["llm_services"] == "healthy"
-    
+
     # ==================== 第六个测试：并发控制 ====================
-    
+
     @pytest.mark.asyncio
     async def test_load_stock_data_should_respect_concurrency_limit(self, mock_workflow):
         """
@@ -210,10 +210,10 @@ class TestMainWorkflowTDD:
         mock_workflow.data_pipeline.get_price_data_async = AsyncMock(return_value={"close": 10.0})
         mock_workflow.data_pipeline.get_news_data_async = AsyncMock(return_value={"news": "测试新闻"})
         mock_workflow.data_pipeline.get_announcement_data_async = AsyncMock(return_value={"announcement": "测试公告"})
-        
+
         # 执行测试
         result = await mock_workflow._load_stock_data("000001", "2025-01-17")
-        
+
         # 验证结果
         assert result["stock_code"] == "000001"
         assert result["trade_date"] == "2025-01-17"
@@ -221,9 +221,9 @@ class TestMainWorkflowTDD:
         assert result["price_data"]["close"] == 10.0
         assert result["news_data"]["news"] == "测试新闻"
         assert result["announcement_data"]["announcement"] == "测试公告"
-    
+
     # ==================== 第七个测试：单股票处理成功 ====================
-    
+
     @pytest.mark.asyncio
     async def test_process_single_stock_with_retry_should_succeed(self, mock_workflow):
         """
@@ -238,37 +238,37 @@ class TestMainWorkflowTDD:
             "financial_data": {"revenue": 1000},
             "technical_indicators": {"rsi": 50}
         })
-        
+
         # 模拟分析器成功
         mock_workflow.qwen_analyzer.analyze_async = AsyncMock(return_value={
             "stock_code": "000001",
             "analysis": "Qwen分析结果"
         })
         mock_workflow.doubao_analyzer.analyze_async = AsyncMock(return_value={
-            "stock_code": "000001", 
+            "stock_code": "000001",
             "analysis": "豆包分析结果"
         })
-        
+
         # 模拟数据库操作
         mock_workflow._save_report_to_db_async = AsyncMock(return_value={"id": "report_1"})
         mock_workflow._create_arbitration_case_async = AsyncMock(return_value={"case_id": "case_1"})
-        
+
         # 执行测试
         result = await mock_workflow._process_single_stock_with_retry("000001", "2025-01-17", 3)
-        
+
         # 验证结果
         assert result["stock_code"] == "000001"
         assert result["status"] == "success"
-        
+
         # 验证调用
         mock_workflow._load_stock_data.assert_called_once_with("000001", "2025-01-17")
         mock_workflow.qwen_analyzer.analyze_async.assert_called_once_with("000001", "2025-01-17")
         mock_workflow.doubao_analyzer.analyze_async.assert_called_once_with("000001", "2025-01-17")
         mock_workflow._save_report_to_db_async.assert_called()
         mock_workflow._create_arbitration_case_async.assert_called_once()
-    
+
     # ==================== 第八个测试：并行处理异常股票 ====================
-    
+
     @pytest.mark.asyncio
     async def test_process_anomaly_stocks_parallel_should_handle_mixed_results(self, mock_workflow):
         """
@@ -281,14 +281,14 @@ class TestMainWorkflowTDD:
                 return {"stock_code": stock_code, "status": "success"}
             else:
                 raise Exception(f"处理失败: {stock_code}")
-        
+
         mock_workflow._process_single_stock_with_retry = mock_process_single_stock
-        
+
         # 执行测试
         result = await mock_workflow._process_anomaly_stocks_parallel(
             ["000001", "000002"], "2025-01-17", 3
         )
-        
+
         # 验证结果
         assert result["successful"] == 1
         assert result["failed"] == 1

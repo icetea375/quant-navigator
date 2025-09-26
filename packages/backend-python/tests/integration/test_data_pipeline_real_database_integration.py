@@ -8,12 +8,11 @@ DataPipelineService真实数据库集成测试
 - 验证模块间交互的真实性
 """
 
-import pytest
+import os
 import sqlite3
 import tempfile
-import os
-from unittest.mock import patch, Mock
-from datetime import datetime
+
+import pytest
 
 from src.services.data_pipeline_service import DataPipelineService
 
@@ -24,7 +23,7 @@ class TestDataPipelineRealDatabaseIntegration:
     @pytest.fixture
     def temp_db_path(self):
         """创建临时数据库文件"""
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as tmp:
+        with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as tmp:
             return tmp.name
 
     @pytest.fixture
