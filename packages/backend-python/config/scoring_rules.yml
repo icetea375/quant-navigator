@@ -1,0 +1,41 @@
+# 评分规则配置文件
+# 格式: [最小值, 最大值, 得分] - 左闭右开区间
+
+value_score_rules:
+  pe:
+    - [0, 10, 25.0]      # PE in [0, 10) -> score 25.0
+    - [10, 20, 20.0]     # PE in [10, 20) -> score 20.0
+    - [20, 30, 15.0]     # PE in [20, 30) -> score 15.0
+    - [30, 50, 10.0]     # PE in [30, 50) -> score 10.0
+    - [50, 9999, 5.0]    # PE >= 50 -> score 5.0 (fallback)
+  
+  pb:
+    - [0, 1, 25.0]       # PB in [0, 1) -> score 25.0
+    - [1, 2, 20.0]       # PB in [1, 2) -> score 20.0
+    - [2, 3, 15.0]       # PB in [2, 3) -> score 15.0
+    - [3, 5, 10.0]       # PB in [3, 5) -> score 10.0
+    - [5, 9999, 5.0]     # PB >= 5 -> score 5.0 (fallback)
+  
+  ps:
+    - [0, 2, 25.0]       # PS in [0, 2) -> score 25.0
+    - [2, 5, 20.0]       # PS in [2, 5) -> score 20.0
+    - [5, 10, 15.0]      # PS in [5, 10) -> score 15.0
+    - [10, 20, 10.0]     # PS in [10, 20) -> score 10.0
+    - [20, 9999, 5.0]    # PS >= 20 -> score 5.0 (fallback)
+  
+  dividend_yield:
+    - [5, 9999, 25.0]    # 股息率 >= 5% -> score 25.0
+    - [3, 5, 20.0]       # 股息率 in [3%, 5%) -> score 20.0
+    - [1, 3, 15.0]       # 股息率 in [1%, 3%) -> score 15.0
+    - [0, 1, 10.0]       # 股息率 in [0%, 1%) -> score 10.0
+    - [-9999, 0, 5.0]    # 股息率 < 0% -> score 5.0 (fallback)
+
+# 其他评分规则可以在这里扩展
+growth_score_rules:
+  default: 50.0
+
+profitability_score_rules:
+  default: 50.0
+
+financial_health_score_rules:
+  default: 50.0
