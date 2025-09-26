@@ -56,6 +56,17 @@
               登录
             </el-button>
           </el-form-item>
+
+          <el-form-item>
+            <el-button
+              type="success"
+              class="demo-login-button"
+              data-testid="demo-login-button"
+              @click="handleDemoLogin"
+            >
+              🚀 演示登录 (无需密码)
+            </el-button>
+          </el-form-item>
         </el-form>
 
         <div class="form-footer">
@@ -74,7 +85,7 @@
           <p>基于AI技术的量化投资平台，为您的投资决策提供专业指导</p>
           <div class="features">
             <div class="feature">
-              <el-icon><Radar /></el-icon>
+              <el-icon><Monitor /></el-icon>
               <span>实时市场监控</span>
             </div>
             <div class="feature">
@@ -97,7 +108,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { TrendCharts, Radar, DataAnalysis } from '@element-plus/icons-vue'
+import { TrendCharts, Monitor, DataAnalysis } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -127,7 +138,7 @@ const handleLogin = async () => {
   await loginFormRef.value.validate(async (valid) => {
     if (valid) {
       const result = await authStore.login(loginForm.email, loginForm.password)
-      
+
       if (result.success) {
         ElMessage.success('登录成功')
         router.push('/private')
@@ -136,6 +147,17 @@ const handleLogin = async () => {
       }
     }
   })
+}
+
+const handleDemoLogin = async () => {
+  const result = authStore.demoLogin()
+
+  if (result.success) {
+    ElMessage.success('演示登录成功！欢迎体验仲裁功能')
+    router.push('/admin/arbitration')
+  } else {
+    ElMessage.error('演示登录失败')
+  }
 }
 </script>
 
@@ -207,6 +229,20 @@ const handleLogin = async () => {
   font-size: 16px;
 }
 
+.demo-login-button {
+  width: 100%;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #67c23a, #85ce61);
+  border: none;
+  margin-top: 10px;
+}
+
+.demo-login-button:hover {
+  background: linear-gradient(135deg, #5daf34, #73c956);
+}
+
 .form-footer {
   text-align: center;
   margin-top: 30px;
@@ -260,14 +296,13 @@ const handleLogin = async () => {
     grid-template-columns: 1fr;
     max-width: 400px;
   }
-  
+
   .login-illustration {
     display: none;
   }
-  
+
   .login-form {
     padding: 40px 30px;
   }
 }
 </style>
-

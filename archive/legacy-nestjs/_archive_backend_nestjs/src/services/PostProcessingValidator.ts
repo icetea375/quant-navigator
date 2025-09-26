@@ -64,7 +64,7 @@ export class LlmResponseFormatError extends Error {
  */
 export class LlmResponseValidationError extends Error {
   constructor(
-    message: string, 
+    message: string,
     public validationErrors: ValidationError[]
   ) {
     super(message);
@@ -77,7 +77,7 @@ export class LlmResponseValidationError extends Error {
  */
 export class LlmLowConfidenceError extends Error {
   constructor(
-    message: string, 
+    message: string,
     public confidenceScore: number,
     public threshold: number
   ) {
@@ -88,7 +88,7 @@ export class LlmLowConfidenceError extends Error {
 
 /**
  * 后处理验证器
- * 
+ *
  * 职责：
  * 1. 格式校验: 检查返回的是否是合法的JSON
  * 2. 模式校验: 检查JSON的字段、类型是否完全符合Schema
@@ -115,17 +115,17 @@ export class PostProcessingValidator {
     confidenceThreshold: number = 0.6
   ): Promise<ValidationResult> {
     const taskKey = `${taskType}_${Date.now()}`;
-    
+
     try {
       // 1. 尝试解析JSON
       let data = this.tryParseJSON(response);
-      
+
       // 2. 如果解析失败，尝试修复一次
       if (!data) {
         console.log(`🔧 JSON解析失败，尝试修复: ${taskType}`);
         const repairedResponse = await this.repairJSON(response, taskKey);
         data = this.tryParseJSON(repairedResponse);
-        
+
         if (!data) {
           throw new LlmResponseFormatError(
             'Failed to parse or repair JSON response',
@@ -211,7 +211,7 @@ export class PostProcessingValidator {
    */
   private async repairJSON(response: string, taskKey: string): Promise<string> {
     const attempts = this.repairAttempts.get(taskKey) || 0;
-    
+
     if (attempts >= this.MAX_REPAIR_ATTEMPTS) {
       throw new LlmResponseFormatError('Max repair attempts exceeded');
     }
@@ -249,7 +249,7 @@ ${response}
   private validateSchema(data: any, schema: z.ZodSchema): ValidationResult {
     try {
       const result = schema.safeParse(data);
-      
+
       if (result.success) {
         return {
           isValid: true,
@@ -334,7 +334,7 @@ ${response}
       const { optimistic, neutral, pessimistic } = data.probabilities;
       const sum = (optimistic || 0) + (neutral || 0) + (pessimistic || 0);
       const tolerance = 0.001; // 允许小的浮点误差
-      
+
       if (Math.abs(sum - 1.0) > tolerance) {
         violations.push({
           rule: 'probability_sum',
@@ -437,7 +437,7 @@ ${response}
       for (let i = 1; i < data.length; i++) {
         const prevDate = new Date(data[i-1].date);
         const currDate = new Date(data[i].date);
-        
+
         if (currDate < prevDate) {
           violations.push({
             rule: 'date_order',
@@ -481,15 +481,15 @@ ${response}
   public extractConfidenceScore(data: any): number {
     // 尝试多种可能的置信度字段名
     const confidenceFields = ['confidence_score', 'confidence', 'confidenceLevel', 'certainty'];
-    
+
     for (const field of confidenceFields) {
       if (data[field] !== undefined) {
-        const score = typeof data[field] === 'number' ? data[field] : 
+        const score = typeof data[field] === 'number' ? data[field] :
                      typeof data[field] === 'string' ? parseFloat(data[field]) : 0;
         return isNaN(score) ? 0 : score;
       }
     }
-    
+
     // 如果没有找到置信度字段，返回默认值
     return 0.5;
   }
@@ -593,7 +593,7 @@ ${response}
       'event_chain_building': 0.6,
       'default': 0.6
     };
-    
+
     return thresholds[taskType] || thresholds.default;
   }
 }

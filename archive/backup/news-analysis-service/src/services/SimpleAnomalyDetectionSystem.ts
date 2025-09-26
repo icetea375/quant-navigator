@@ -1,7 +1,7 @@
 /**
  * 简单异常检测系统
  * 集成四层映射架构与自适应异常发现系统到现有系统中
- * 
+ *
  * @author AI Assistant
  * @created 2025-01-17
  * @version 1.0.0
@@ -73,7 +73,7 @@ export class SimpleAnomalyDetectionSystem {
     this.logger = logger;
     this.monitor = monitor;
     this.config = config;
-    
+
     this.anomalyEngine = new AnomalyDetectionEngine(db, logger);
     this.relativeStrengthAnalyzer = new RelativeStrengthAnalyzer(db, logger);
     this.dataCollector = new FourLayerDataCollector(db, logger);
@@ -148,7 +148,7 @@ export class SimpleAnomalyDetectionSystem {
     detectionDate: string = new Date().toISOString().split('T')[0]
   ): Promise<any[]> {
     const startTime = Date.now();
-    
+
     try {
       this.logger.info('开始执行异常检测', {
         targetCodes,
@@ -157,7 +157,7 @@ export class SimpleAnomalyDetectionSystem {
 
       const results = [];
       const batchSize = this.config.batchSize;
-      
+
       // 分批处理
       for (let i = 0; i < targetCodes.length; i += batchSize) {
         const batch = targetCodes.slice(i, i + batchSize);
@@ -243,8 +243,8 @@ export class SimpleAnomalyDetectionSystem {
    * @returns 系统状态
    */
   getSystemStatus(): SystemStatus {
-    const averageProcessingTime = this.stats.totalDetections > 0 
-      ? this.stats.totalProcessingTime / this.stats.totalDetections 
+    const averageProcessingTime = this.stats.totalDetections > 0
+      ? this.stats.totalProcessingTime / this.stats.totalDetections
       : 0;
 
     return {
@@ -263,7 +263,7 @@ export class SimpleAnomalyDetectionSystem {
    */
   updateConfig(newConfig: Partial<AnomalyDetectionSystemConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    
+
     this.logger.info('异常检测系统配置已更新', {
       newConfig
     });
@@ -274,7 +274,7 @@ export class SimpleAnomalyDetectionSystem {
         clearInterval(this.detectionTimer);
         this.detectionTimer = null;
       }
-      
+
       if (this.config.autoDetection) {
         this.startAutoDetection();
       }
@@ -352,7 +352,7 @@ export class SimpleAnomalyDetectionSystem {
     try {
       // 检查四层映射数据是否存在
       const stats = await this.dataCollector.getDataCollectionStats();
-      
+
       if (stats.totalMappings === 0) {
         this.logger.info('初始化默认四层映射数据');
         await this.dataCollector.initializeDefaultMappings();
@@ -406,7 +406,7 @@ export class SimpleAnomalyDetectionSystem {
       ].filter(mapping => mapping.isActive);
 
       const targetCodes = allMappings.map(mapping => mapping.code);
-      
+
       if (targetCodes.length === 0) {
         this.logger.warn('没有可检测的目标');
         return;
@@ -430,7 +430,7 @@ export class SimpleAnomalyDetectionSystem {
    */
   private async processBatch(batch: string[], detectionDate: string): Promise<any[]> {
     const results = [];
-    
+
     for (const targetCode of batch) {
       try {
         const mapping = await this.dataCollector.getMappingByCode(targetCode);

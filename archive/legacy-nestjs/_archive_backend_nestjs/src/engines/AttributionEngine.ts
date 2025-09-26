@@ -102,12 +102,12 @@ export class AttributionEngine {
   private db: DatabaseConnection;
   private redis: Redis;
   private config: AttributionEngineConfig;
-  
+
   // 原 AnalysisPipeline 的组件
   private anomalyDetectionSystem: SimpleAnomalyDetectionSystem;
   private signalTranslationEngine: SignalTranslationEngine;
   private dualLLMCollaborationSystem: SimpleDualLLMCollaborationSystem;
-  
+
   private isRunning: boolean = false;
   private processingQueue: AnomalyEvent[] = [];
   private stats: {
@@ -130,7 +130,7 @@ export class AttributionEngine {
     this.db = db;
     this.redis = redis;
     this.config = config;
-    
+
     this.validateConfig(config);
     this.initializeComponents();
   }
@@ -140,7 +140,7 @@ export class AttributionEngine {
    */
   private validateConfig(config: AttributionEngineConfig): void {
     BaseConfigValidator.validate(config, [
-      'enabled', 'anomalyDetection', 'signalTranslation', 
+      'enabled', 'anomalyDetection', 'signalTranslation',
       'llmCollaboration', 'workflow', 'monitoring'
     ]);
   }
@@ -235,7 +235,7 @@ export class AttributionEngine {
    */
   async processAnomalyEvent(event: AnomalyEvent): Promise<AttributionResult> {
     const startTime = Date.now();
-    
+
     try {
       logger.info(`Processing anomaly event: ${event.id} for ${event.stockCode}`);
 
@@ -301,8 +301,8 @@ export class AttributionEngine {
    * 生成归因分析和叙事报告 - 合并为一次LLM调用
    */
   private async generateAttributionAndNarrative(
-    event: AnomalyEvent, 
-    translatedSignals: any, 
+    event: AnomalyEvent,
+    translatedSignals: any,
     evidence: any
   ): Promise<any> {
     const analysisTask = {
@@ -325,11 +325,11 @@ export class AttributionEngine {
   private async collectNewsEvidence(event: AnomalyEvent): Promise<any> {
     const query = `
       SELECT title, content, published_at, source, sentiment_score
-      FROM news_articles 
+      FROM news_articles
       WHERE stock_code = $1 AND published_at BETWEEN $2 AND $3
       ORDER BY published_at DESC LIMIT 20
     `;
-    
+
     const result = await this.db.query(query, [
       event.stockCode,
       new Date(event.timestamp - 24 * 60 * 60 * 1000),
@@ -344,11 +344,11 @@ export class AttributionEngine {
   private async collectTechnicalEvidence(event: AnomalyEvent): Promise<any> {
     const query = `
       SELECT signal_type, value, z_score, created_at
-      FROM quant_signals 
+      FROM quant_signals
       WHERE stock_code = $1 AND created_at BETWEEN $2 AND $3
       ORDER BY created_at DESC
     `;
-    
+
     const result = await this.db.query(query, [
       event.stockCode,
       new Date(event.timestamp - 7 * 24 * 60 * 60 * 1000),
@@ -363,12 +363,12 @@ export class AttributionEngine {
   private async collectFundamentalEvidence(event: AnomalyEvent): Promise<any> {
     const query = `
       SELECT pe_ratio, pb_ratio, roe, revenue_growth, profit_growth
-      FROM fundamental_data 
+      FROM fundamental_data
       WHERE stock_code = $1 AND report_date = (
         SELECT MAX(report_date) FROM fundamental_data WHERE stock_code = $1
       )
     `;
-    
+
     const result = await this.db.query(query, [event.stockCode]);
     return result.rows[0] || {};
   }
@@ -379,12 +379,12 @@ export class AttributionEngine {
   private async collectMarketEvidence(event: AnomalyEvent): Promise<any> {
     const query = `
       SELECT signal_type, value, z_score
-      FROM quant_signals 
+      FROM quant_signals
       WHERE signal_type IN ('macro_risk', 'market_style', 'sector_rotation')
         AND created_at BETWEEN $1 AND $2
       ORDER BY created_at DESC
     `;
-    
+
     const result = await this.db.query(query, [
       new Date(event.timestamp - 24 * 60 * 60 * 1000),
       new Date(event.timestamp)
@@ -403,11 +403,11 @@ export class AttributionEngine {
   private async saveAttributionResult(result: AttributionResult): Promise<void> {
     const query = `
       INSERT INTO attribution_results (
-        event_id, timestamp, stock_code, attribution_data, 
+        event_id, timestamp, stock_code, attribution_data,
         confidence, processing_time, created_at
       ) VALUES ($1, $2, $3, $4, $5, $6, NOW())
     `;
-    
+
     await this.db.query(query, [
       result.eventId,
       result.timestamp,
@@ -428,10 +428,10 @@ export class AttributionEngine {
     } else {
       this.stats.failedAttributions++;
     }
-    
+
     // 更新平均处理时间
-    this.stats.averageProcessingTime = 
-      (this.stats.averageProcessingTime * (this.stats.totalProcessed - 1) + processingTime) / 
+    this.stats.averageProcessingTime =
+      (this.stats.averageProcessingTime * (this.stats.totalProcessed - 1) + processingTime) /
       this.stats.totalProcessed;
   }
 

@@ -23,7 +23,7 @@
           </div>
         </el-card>
       </el-col>
-      
+
       <el-col :xs="24" :sm="12" :md="6">
         <el-card class="status-card">
           <div class="status-item">
@@ -37,7 +37,7 @@
           </div>
         </el-card>
       </el-col>
-      
+
       <el-col :xs="24" :sm="12" :md="6">
         <el-card class="status-card">
           <div class="status-item">
@@ -51,7 +51,7 @@
           </div>
         </el-card>
       </el-col>
-      
+
       <el-col :xs="24" :sm="12" :md="6">
         <el-card class="status-card">
           <div class="status-item">
@@ -83,7 +83,7 @@
           <DataPipelineMonitor />
         </el-card>
       </el-col>
-      
+
       <el-col :xs="24" :md="12">
         <el-card class="module-card">
           <template #header>
@@ -151,9 +151,9 @@ import DataPipelineMonitor from '@/components/admin/DataPipelineMonitor.vue'
 import AIEngineMonitor from '@/components/admin/AIEngineMonitor.vue'
 import SystemConfigPanel from '@/components/admin/SystemConfigPanel.vue'
 import SystemLogsPanel from '@/components/admin/SystemLogsPanel.vue'
-import { 
-  CircleCheck, Clock, Warning, InfoFilled, Refresh, 
-  Check, RefreshLeft 
+import {
+  CircleCheck, Clock, Warning, InfoFilled, Refresh,
+  Check, RefreshLeft
 } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 
@@ -322,20 +322,19 @@ onMounted(() => {
   .system-brain-console {
     padding: 10px;
   }
-  
+
   .page-header h1 {
     font-size: 24px;
   }
-  
+
   .status-item {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .header-actions {
     flex-direction: column;
     gap: 5px;
   }
 }
 </style>
-

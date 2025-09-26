@@ -14,15 +14,15 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 优先级和分歧度指标 -->
       <div class="case-metrics">
         <div class="metric-card">
           <div class="metric-label">优先级</div>
           <div class="metric-value">{{ Math.round((caseDetail?.priorityScore || 0) * 100) }}%</div>
           <div class="metric-bar">
-            <div 
-              class="metric-fill priority" 
+            <div
+              class="metric-fill priority"
               :style="{ width: (caseDetail?.priorityScore || 0) * 100 + '%' }"
             ></div>
           </div>
@@ -31,8 +31,8 @@
           <div class="metric-label">分歧度</div>
           <div class="metric-value">{{ Math.round((caseDetail?.divergenceScore || 0) * 100) }}%</div>
           <div class="metric-bar">
-            <div 
-              class="metric-fill divergence" 
+            <div
+              class="metric-fill divergence"
               :style="{ width: (caseDetail?.divergenceScore || 0) * 100 + '%' }"
             ></div>
           </div>
@@ -66,20 +66,20 @@
       <!-- 双脑报告对比 -->
       <div class="dual-report-comparison">
         <h2>🧠 双脑报告对比分析</h2>
-        
+
         <!-- 左右分栏布局 -->
         <div class="comparison-layout">
           <!-- 左侧：Qwen事实归因报告 -->
-          <div class="report-panel qwen-panel">
+          <div class="report-panel qwen-panel" data-testid="qwen-panel">
             <div class="panel-header">
               <h3>🧠 Qwen事实归因流</h3>
               <div class="analyzer-badge qwen-badge">
                 <span class="analyzer-type">事实归因</span>
-                <span class="confidence">{{ Math.round((caseDetail.qwenReport?.confidenceScore || 0) * 100) }}%</span>
+                <span class="confidence" data-testid="qwen-confidence">{{ Math.round((caseDetail.qwenReport?.confidenceScore || 0) * 100) }}%</span>
               </div>
             </div>
-            
-            <div class="report-content">
+
+            <div class="report-content" data-testid="qwen-analysis">
               <!-- 执行摘要 -->
               <div class="report-section">
                 <h4>📊 执行摘要</h4>
@@ -92,8 +92,8 @@
               <div class="report-section">
                 <h4>🔍 关键发现</h4>
                 <div class="findings-list">
-                  <div 
-                    v-for="(finding, index) in caseDetail.qwenReport?.keywords || []" 
+                  <div
+                    v-for="(finding, index) in caseDetail.qwenReport?.keywords || []"
                     :key="index"
                     class="finding-item"
                   >
@@ -107,8 +107,8 @@
                 <h4>📈 情感分析</h4>
                 <div class="sentiment-score">
                   <div class="sentiment-gauge">
-                    <div 
-                      class="gauge-fill" 
+                    <div
+                      class="gauge-fill"
                       :class="getSentimentClass(caseDetail.qwenReport?.sentimentScore)"
                       :style="{ width: Math.abs(caseDetail.qwenReport?.sentimentScore || 0) * 100 + '%' }"
                     ></div>
@@ -128,23 +128,31 @@
           </div>
 
           <!-- 右侧：豆包舆情感知报告 -->
-          <div class="report-panel doubao-panel">
+          <div class="report-panel doubao-panel" data-testid="doubao-panel">
             <div class="panel-header">
               <h3>🌊 豆包舆情感知流</h3>
               <div class="analyzer-badge doubao-badge">
                 <span class="analyzer-type">舆情感知</span>
-                <span class="confidence">{{ Math.round((caseDetail.doubaoReport?.confidenceScore || 0) * 100) }}%</span>
+                <span class="confidence" data-testid="doubao-confidence">{{ Math.round((caseDetail.doubaoReport?.confidenceScore || 0) * 100) }}%</span>
               </div>
             </div>
-            
-            <div class="report-content">
+
+            <div class="report-content" data-testid="doubao-analysis">
+              <!-- 执行摘要 -->
+              <div class="report-section">
+                <h4>📊 执行摘要</h4>
+                <div class="content-box">
+                  {{ caseDetail.doubaoReport?.content || '暂无数据' }}
+                </div>
+              </div>
+
               <!-- 情绪分析 -->
               <div class="report-section">
                 <h4>😊 情绪分析</h4>
                 <div class="sentiment-score">
                   <div class="sentiment-gauge">
-                    <div 
-                      class="gauge-fill" 
+                    <div
+                      class="gauge-fill"
                       :class="getSentimentClass(caseDetail.doubaoReport?.sentimentScore)"
                       :style="{ width: Math.abs(caseDetail.doubaoReport?.sentimentScore || 0) * 100 + '%' }"
                     ></div>
@@ -157,8 +165,8 @@
               <div class="report-section">
                 <h4>⚠️ 风险因素</h4>
                 <div class="risk-factors">
-                  <div 
-                    v-for="(risk, index) in caseDetail.doubaoReport?.sentimentAnalysis?.riskFactors || []" 
+                  <div
+                    v-for="(risk, index) in caseDetail.doubaoReport?.sentimentAnalysis?.riskFactors || []"
                     :key="index"
                     class="risk-item"
                   >
@@ -186,8 +194,8 @@
               <div class="report-section">
                 <h4>⚡ 实时事件影响</h4>
                 <div class="real-time-events">
-                  <div 
-                    v-for="(event, index) in caseDetail.doubaoReport?.sentimentAnalysis?.realTimeEvents || []" 
+                  <div
+                    v-for="(event, index) in caseDetail.doubaoReport?.sentimentAnalysis?.realTimeEvents || []"
                     :key="index"
                     class="event-item"
                   >
@@ -215,8 +223,8 @@
           <div class="metric-item">
             <span class="metric-label">投资建议一致性</span>
             <div class="metric-bar">
-              <div 
-                class="metric-fill" 
+              <div
+                class="metric-fill"
                 :style="{ width: getRecommendationConsistency() + '%' }"
               ></div>
             </div>
@@ -225,8 +233,8 @@
           <div class="metric-item">
             <span class="metric-label">情感差异度</span>
             <div class="metric-bar">
-              <div 
-                class="metric-fill" 
+              <div
+                class="metric-fill"
                 :style="{ width: getSentimentDifference() + '%' }"
               ></div>
             </div>
@@ -238,53 +246,57 @@
       <!-- 人类仲裁决策区域 -->
       <div v-if="caseDetail.status === 'PENDING_HUMAN'" class="arbitration-decision">
         <h2>⚖️ 人类仲裁决策</h2>
-        <div class="decision-form">
+        <div class="decision-form" data-testid="arbitration-decision-form">
           <div class="form-group">
             <label>最终投资建议</label>
-            <select v-model="arbitrationDecision.finalRecommendation">
+            <select v-model="arbitrationDecision.finalRecommendation" data-testid="final-recommendation-select">
               <option value="BUY">买入 (BUY)</option>
               <option value="HOLD">持有 (HOLD)</option>
               <option value="SELL">卖出 (SELL)</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label>置信度评估</label>
             <div class="confidence-input">
-              <input 
-                type="range" 
-                min="0" 
-                max="100" 
+              <input
+                type="range"
+                min="0"
+                max="100"
                 v-model="arbitrationDecision.confidenceLevel"
                 class="confidence-slider"
+                data-testid="confidence-slider"
               />
               <span class="confidence-display">{{ arbitrationDecision.confidenceLevel }}%</span>
             </div>
           </div>
-          
+
           <div class="form-group full-width">
             <label>仲裁理由</label>
-            <textarea 
+            <textarea
               v-model="arbitrationDecision.reasoning"
               placeholder="请详细说明您的仲裁理由..."
               rows="4"
+              data-testid="reasoning-textarea"
             ></textarea>
           </div>
-          
+
           <div class="form-group full-width">
             <label>关键分歧点</label>
-            <textarea 
+            <textarea
               v-model="arbitrationDecision.keyDisagreements"
               placeholder="记录两个AI分析的关键分歧点..."
               rows="3"
+              data-testid="key-disagreements-textarea"
             ></textarea>
           </div>
-          
+
           <div class="form-actions">
-            <button 
+            <button
               @click="submitArbitrationDecision"
               class="submit-btn"
               :disabled="!isDecisionValid"
+              data-testid="submit-arbitration-button"
             >
               提交仲裁决策
             </button>
@@ -328,7 +340,7 @@
       </div>
 
       <!-- 超级仪表盘集成 -->
-      <SuperDashboard 
+      <SuperDashboard
         :stockCode="caseDetail?.stockCode || ''"
         :reportDate="caseDetail?.reportDate || ''"
         :qwenReport="caseDetail?.qwenReport"
@@ -443,7 +455,67 @@ const loadCaseDetail = async () => {
   try {
     const response = await fetch(`/api/v1/admin/arbitration-cases/${caseId}`)
     if (response.ok) {
-      caseDetail.value = await response.json()
+      const result = await response.json()
+      // 适配Sprint 1 API响应格式
+      if (result.success && result.data) {
+        caseDetail.value = {
+          id: result.data.id,
+          caseId: result.data.case_id,
+          reportDate: result.data.trade_date,
+          stockCode: result.data.stock_code,
+          qwenReportId: result.data.qwen_report_id,
+          doubaoReportId: result.data.doubao_report_id,
+          divergenceScore: result.data.divergence_score,
+          consensusSummary: result.data.consensus_summary,
+          conflictSummary: result.data.conflict_summary,
+          priorityScore: result.data.priority_score,
+          status: result.data.status,
+          analysisMetadata: result.data.analysis_metadata,
+          humanDecision: result.data.human_decision ? {
+            finalRecommendation: result.data.final_recommendation,
+            confidenceLevel: Math.round(result.data.final_confidence * 100),
+            reasoning: result.data.human_decision,
+            keyDisagreements: result.data.conflict_summary,
+            arbitratorId: result.data.human_arbitrator_id
+          } : null,
+          qwenReport: {
+            id: result.data.qwen_report_id,
+            content: result.data.qwen_analysis?.analysis || '',
+            summary: result.data.qwen_analysis?.summary || '',
+            sentimentScore: result.data.qwen_analysis?.sentiment_score || 0,
+            keywords: result.data.qwen_analysis?.keywords || [],
+            entities: result.data.qwen_analysis?.entities || [],
+            confidenceScore: result.data.qwen_analysis?.confidence || 0,
+            investmentRecommendation: 'HOLD', // 默认值，实际应该从API获取
+            mdaScores: {
+              completenessScore: 0.8,
+              consistencyScore: 0.7
+            }
+          },
+          doubaoReport: {
+            id: result.data.doubao_report_id,
+            content: result.data.doubao_analysis?.analysis || '',
+            summary: result.data.doubao_analysis?.summary || '',
+            sentimentScore: result.data.doubao_analysis?.sentiment_score || 0,
+            keywords: result.data.doubao_analysis?.keywords || [],
+            entities: result.data.doubao_analysis?.entities || [],
+            confidenceScore: result.data.doubao_analysis?.confidence || 0,
+            investmentRecommendation: 'HOLD', // 默认值，实际应该从API获取
+            sentimentAnalysis: {
+              sentimentScore: result.data.doubao_analysis?.sentiment_score || 0,
+              confidenceLevel: result.data.doubao_analysis?.confidence || 0,
+              riskFactors: [],
+              marketConsensus: '',
+              contrarianView: '',
+              realTimeEvents: []
+            }
+          },
+          createdAt: result.data.created_at,
+          updatedAt: result.data.updated_at
+        }
+      } else {
+        caseDetail.value = null
+      }
     } else {
       caseDetail.value = null
     }
@@ -460,20 +532,52 @@ const submitArbitrationDecision = async () => {
 
   loading.value = true
   try {
-    const response = await fetch(`/api/v1/admin/arbitration-cases/${caseDetail.value.caseId}/decision`, {
+    const response = await fetch(`/api/v1/admin/arbitration-cases/${caseDetail.value.caseId}/feedback`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(arbitrationDecision)
+      body: JSON.stringify({
+        arbitrator_id: 'admin_001', // 临时硬编码，实际应该从用户认证获取
+        final_recommendation: arbitrationDecision.finalRecommendation,
+        final_confidence: arbitrationDecision.confidenceLevel / 100, // 转换为0-1范围
+        human_decision: arbitrationDecision.reasoning,
+        decision_factors: {
+          key_disagreements: arbitrationDecision.keyDisagreements,
+          decision_time_minutes: 30, // 临时硬编码
+          ai_summary_quality: 4,
+          priority_accuracy: 4,
+          divergence_analysis_quality: 4,
+          overall_satisfaction: 4
+        }
+      })
     })
 
     if (response.ok) {
-      // 重新加载案件详情
-      await loadCaseDetail()
+      const result = await response.json()
+      if (result.success) {
+        // 显示成功消息
+        const successMessage = document.createElement('div')
+        successMessage.setAttribute('data-testid', 'success-message')
+        successMessage.textContent = '仲裁判决提交成功！'
+        successMessage.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 15px; border-radius: 5px; z-index: 9999;'
+        document.body.appendChild(successMessage)
+
+        // 3秒后移除消息并跳转
+        setTimeout(() => {
+          document.body.removeChild(successMessage)
+          router.push('/admin/arbitration')
+        }, 3000)
+      } else {
+        alert(`提交失败: ${result.message}`)
+      }
+    } else {
+      const errorData = await response.json()
+      alert(`提交失败: ${errorData.detail || '未知错误'}`)
     }
   } catch (error) {
     console.error('提交仲裁决策失败:', error)
+    alert('提交仲裁决策失败，请重试')
   } finally {
     loading.value = false
   }
@@ -499,7 +603,9 @@ const ignoreCase = async () => {
     })
 
     if (response.ok) {
-      await loadCaseDetail()
+      alert('案件已忽略')
+      // 跳转回案件列表页面
+      router.push('/admin/arbitration')
     }
   } catch (error) {
     console.error('忽略案件失败:', error)
@@ -527,19 +633,19 @@ const getSentimentClass = (score: number) => {
 
 const getRecommendationConsistency = () => {
   if (!caseDetail.value?.qwenReport || !caseDetail.value?.doubaoReport) return 0
-  
+
   const qwenRec = caseDetail.value.qwenReport.investmentRecommendation
   const doubaoRec = caseDetail.value.doubaoReport.investmentRecommendation
-  
+
   return qwenRec === doubaoRec ? 100 : 0
 }
 
 const getSentimentDifference = () => {
   if (!caseDetail.value?.qwenReport || !caseDetail.value?.doubaoReport) return 0
-  
+
   const qwenSentiment = Math.abs(caseDetail.value.qwenReport.sentimentScore || 0)
   const doubaoSentiment = Math.abs(caseDetail.value.doubaoReport.sentimentScore || 0)
-  
+
   return Math.round(Math.abs(qwenSentiment - doubaoSentiment) * 100)
 }
 
@@ -1155,24 +1261,24 @@ onMounted(() => {
   .comparison-layout {
     grid-template-columns: 1fr;
   }
-  
+
   .summary-cards {
     grid-template-columns: 1fr;
   }
-  
+
   .decision-form {
     grid-template-columns: 1fr;
   }
-  
+
   .consensus-comparison {
     grid-template-columns: 1fr;
   }
-  
+
   .header-content {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .case-metrics {
     grid-template-columns: 1fr;
   }

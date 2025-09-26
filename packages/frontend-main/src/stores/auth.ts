@@ -31,22 +31,22 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const loginData: LoginRequest = { email, password }
       const response = await authApi.login(loginData)
-      
+
       token.value = response.token
       user.value = response.user
       lastActivity.value = Date.now()
-      
+
       // 保存到本地存储
       localStorage.setItem('token', response.token)
       localStorage.setItem('userRole', response.user.role)
       localStorage.setItem('userInfo', JSON.stringify(response.user))
-      
+
       return { success: true }
     } catch (error: any) {
       console.error('Login error:', error)
-      return { 
-        success: false, 
-        error: error.message || '登录失败，请检查邮箱和密码' 
+      return {
+        success: false,
+        error: error.message || '登录失败，请检查邮箱和密码'
       }
     } finally {
       isLoading.value = false
@@ -57,22 +57,22 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading.value = true
     try {
       const response = await authApi.register(userData)
-      
+
       token.value = response.token
       user.value = response.user
       lastActivity.value = Date.now()
-      
+
       // 保存到本地存储
       localStorage.setItem('token', response.token)
       localStorage.setItem('userRole', response.user.role)
       localStorage.setItem('userInfo', JSON.stringify(response.user))
-      
+
       return { success: true }
     } catch (error: any) {
       console.error('Register error:', error)
-      return { 
-        success: false, 
-        error: error.message || '注册失败，请稍后重试' 
+      return {
+        success: false,
+        error: error.message || '注册失败，请稍后重试'
       }
     } finally {
       isLoading.value = false
@@ -92,7 +92,7 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = null
       token.value = null
       lastActivity.value = 0
-      
+
       // 清除本地存储
       localStorage.removeItem('token')
       localStorage.removeItem('userRole')
@@ -126,9 +126,9 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: true }
     } catch (error: any) {
       console.error('Update profile error:', error)
-      return { 
-        success: false, 
-        error: error.message || '更新失败，请稍后重试' 
+      return {
+        success: false,
+        error: error.message || '更新失败，请稍后重试'
       }
     }
   }
@@ -139,9 +139,9 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: true }
     } catch (error: any) {
       console.error('Change password error:', error)
-      return { 
-        success: false, 
-        error: error.message || '密码修改失败，请检查原密码' 
+      return {
+        success: false,
+        error: error.message || '密码修改失败，请检查原密码'
       }
     }
   }
@@ -183,6 +183,32 @@ export const useAuthStore = defineStore('auth', () => {
     lastActivity.value = Date.now()
   }
 
+  // 演示模式登录 - 用于测试
+  const demoLogin = () => {
+    const demoUser = {
+      id: 'demo_001',
+      email: 'demo@quant-navigator.com',
+      name: '演示用户',
+      role: 'admin',
+      avatar: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+
+    const demoToken = 'demo_token_' + Date.now()
+
+    user.value = demoUser
+    token.value = demoToken
+    lastActivity.value = Date.now()
+
+    // 保存到本地存储
+    localStorage.setItem('token', demoToken)
+    localStorage.setItem('userRole', 'admin')
+    localStorage.setItem('userInfo', JSON.stringify(demoUser))
+
+    return { success: true }
+  }
+
   // 初始化时检查本地存储的用户信息
   const initFromStorage = () => {
     const storedUserInfo = localStorage.getItem('userInfo')
@@ -214,5 +240,6 @@ export const useAuthStore = defineStore('auth', () => {
     checkInactivity,
     updateActivity,
     initFromStorage,
+    demoLogin,
   }
 })

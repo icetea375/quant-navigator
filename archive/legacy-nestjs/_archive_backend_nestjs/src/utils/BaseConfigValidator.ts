@@ -38,15 +38,15 @@ export class BaseConfigValidator {
     if (config.timeout !== undefined && typeof config.timeout !== 'number') {
       throw new Error('timeout must be a number');
     }
-    
+
     if (config.retries !== undefined && typeof config.retries !== 'number') {
       throw new Error('retries must be a number');
     }
-    
+
     if (config.logLevel !== undefined && !['debug', 'info', 'warn', 'error'].includes(config.logLevel)) {
       throw new Error('logLevel must be one of: debug, info, warn, error');
     }
-    
+
     if (typeof config.enabled !== 'boolean') {
       throw new Error('enabled must be a boolean');
     }
@@ -60,7 +60,7 @@ export class BaseConfigValidator {
     if (config.timeout !== undefined && config.timeout <= 0) {
       throw new Error('timeout must be positive');
     }
-    
+
     if (config.retries !== undefined && config.retries < 0) {
       throw new Error('retries must be non-negative');
     }
@@ -75,7 +75,7 @@ export class BaseConfigValidator {
     if (typeof port !== 'number' || !Number.isInteger(port)) {
       throw new Error(`${fieldName} must be an integer`);
     }
-    
+
     if (port < 1 || port > 65535) {
       throw new Error(`${fieldName} must be between 1 and 65535`);
     }
@@ -90,7 +90,7 @@ export class BaseConfigValidator {
     if (typeof url !== 'string') {
       throw new Error(`${fieldName} must be a string`);
     }
-    
+
     try {
       new URL(url);
     } catch {
@@ -120,7 +120,7 @@ export class BaseConfigValidator {
     if (typeof value !== 'number') {
       throw new Error(`${fieldName} must be a number`);
     }
-    
+
     if (value < min || value > max) {
       throw new Error(`${fieldName} must be between ${min} and ${max}`);
     }
@@ -136,7 +136,7 @@ export class BaseConfigValidator {
     if (!Array.isArray(value)) {
       throw new Error(`${fieldName} must be an array`);
     }
-    
+
     if (value.length < minLength) {
       throw new Error(`${fieldName} must have at least ${minLength} items`);
     }
@@ -152,7 +152,7 @@ export class BaseConfigValidator {
     if (typeof value !== 'object' || value === null || Array.isArray(value)) {
       throw new Error(`${fieldName} must be an object`);
     }
-    
+
     if (requiredKeys) {
       for (const key of requiredKeys) {
         if (!(key in value)) {
@@ -198,10 +198,10 @@ export class BaseConfigValidator {
   ): T {
     // 合并默认配置
     const mergedConfig = { ...defaults, ...config };
-    
+
     // 验证必需字段
     this.validate(mergedConfig, requiredFields);
-    
+
     return mergedConfig;
   }
 

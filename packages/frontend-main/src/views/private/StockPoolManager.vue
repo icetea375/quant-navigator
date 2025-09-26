@@ -32,10 +32,10 @@
           </el-button>
         </el-empty>
       </div>
-      
-      <div 
-        v-for="pool in filteredStockPools" 
-        :key="pool.id" 
+
+      <div
+        v-for="pool in filteredStockPools"
+        :key="pool.id"
         class="stock-pool-card"
       >
         <div class="card-header">
@@ -49,10 +49,10 @@
             </el-button>
           </div>
         </div>
-        
+
         <div class="card-content">
           <p class="pool-description">{{ pool.description || '暂无描述' }}</p>
-          
+
           <div class="pool-stats">
             <div class="stat-item">
               <span class="stat-label">股票数量</span>
@@ -63,7 +63,7 @@
               <span class="stat-value">{{ formatDate(pool.createdAt) }}</span>
             </div>
           </div>
-          
+
           <div class="pool-symbols">
             <div class="symbols-header">
               <span>股票列表</span>
@@ -72,8 +72,8 @@
               </el-button>
             </div>
             <div class="symbols-list">
-              <el-tag 
-                v-for="symbol in pool.symbols.slice(0, 5)" 
+              <el-tag
+                v-for="symbol in pool.symbols.slice(0, 5)"
                 :key="symbol"
                 size="small"
                 class="symbol-tag"
@@ -90,8 +90,8 @@
     </div>
 
     <!-- 创建/编辑股票池对话框 -->
-    <el-dialog 
-      v-model="showCreateDialog" 
+    <el-dialog
+      v-model="showCreateDialog"
       :title="editingPool ? '编辑股票池' : '创建股票池'"
       width="600px"
     >
@@ -104,16 +104,16 @@
         <el-form-item label="名称" prop="name">
           <el-input v-model="poolForm.name" placeholder="请输入股票池名称" />
         </el-form-item>
-        
+
         <el-form-item label="描述" prop="description">
-          <el-input 
-            v-model="poolForm.description" 
-            type="textarea" 
+          <el-input
+            v-model="poolForm.description"
+            type="textarea"
             :rows="3"
             placeholder="请输入股票池描述"
           />
         </el-form-item>
-        
+
         <el-form-item label="股票代码" prop="symbols">
           <div class="symbols-input">
             <el-input
@@ -136,7 +136,7 @@
           </div>
         </el-form-item>
       </el-form>
-      
+
       <template #footer>
         <el-button @click="cancelEdit">取消</el-button>
         <el-button type="primary" @click="savePool" :loading="saving">
@@ -152,7 +152,7 @@
           <h3>{{ selectedPool.name }}</h3>
           <p>{{ selectedPool.description }}</p>
         </div>
-        
+
         <div class="details-stats">
           <div class="stat-card">
             <div class="stat-number">{{ selectedPool.symbols.length }}</div>
@@ -167,12 +167,12 @@
             <div class="stat-label">更新时间</div>
           </div>
         </div>
-        
+
         <div class="details-symbols">
           <h4>股票列表</h4>
           <div class="symbols-grid">
-            <el-tag 
-              v-for="symbol in selectedPool.symbols" 
+            <el-tag
+              v-for="symbol in selectedPool.symbols"
               :key="symbol"
               size="large"
               class="symbol-tag"
@@ -224,7 +224,7 @@ const poolRules: FormRules = {
 
 const filteredStockPools = computed(() => {
   if (!searchKeyword.value) return stockPools.value
-  return stockPools.value.filter(pool => 
+  return stockPools.value.filter(pool =>
     pool.name.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
     pool.description?.toLowerCase().includes(searchKeyword.value.toLowerCase())
   )
@@ -270,7 +270,7 @@ const deletePool = async (pool: StockPool) => {
       cancelButtonText: '取消',
       type: 'warning'
     })
-    
+
     await privateApi.deleteStockPool(pool.id)
     ElMessage.success('删除成功')
     loadStockPools()
@@ -300,7 +300,7 @@ const savePool = async () => {
           await privateApi.createStockPool(poolForm)
           ElMessage.success('创建成功')
         }
-        
+
         showCreateDialog.value = false
         resetForm()
         loadStockPools()
@@ -552,22 +552,21 @@ onMounted(() => {
     gap: 15px;
     align-items: stretch;
   }
-  
+
   .search-bar {
     justify-content: center;
   }
-  
+
   .stock-pools-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .pool-stats {
     grid-template-columns: 1fr;
   }
-  
+
   .details-stats {
     grid-template-columns: 1fr;
   }
 }
 </style>
-

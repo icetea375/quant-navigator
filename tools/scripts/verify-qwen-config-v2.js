@@ -55,7 +55,7 @@ qwenModels.forEach(model => {
 console.log('\n🔧 检查API配置中心参数:');
 const apiConfigParams = [
   'modelType',
-  'version', 
+  'version',
   'supportedFeatures',
   'maxTokens',
   'temperature',

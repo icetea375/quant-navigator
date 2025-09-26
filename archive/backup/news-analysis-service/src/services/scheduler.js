@@ -83,7 +83,7 @@ class SchedulerService {
       console.log(`[${new Date().toISOString()}] 开始执行时间线事件生成任务...`);
       const timelineResult = await this.timelineEventGenerator.generateEventsForAllTopics();
       console.log(`[${new Date().toISOString()}] 时间线事件生成任务完成:`, timelineResult);
-      
+
       // 清理过期新闻
       // this.newsRecommendationService.cleanExpiredNews();
     } catch (error) {

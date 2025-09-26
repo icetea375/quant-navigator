@@ -22,7 +22,7 @@ const dbManager = new DatabaseManager(require('../../../config/main_config.json'
 router.post('/analyze', async (req: Request, res: Response) => {
   try {
     const { stock_code, trade_date } = req.body;
-    
+
     if (!stock_code || !trade_date) {
       return res.status(400).json({
         success: false,
@@ -68,7 +68,7 @@ router.post('/analyze', async (req: Request, res: Response) => {
         status: 'pending_arbitration',
         created_at: new Date().toISOString()
       };
-      
+
       await dbManager.create_arbitration_case(arbitrationCase);
       console.log(`✅ 已创建仲裁案件: ${stock_code}`);
     }
@@ -101,7 +101,7 @@ router.post('/analyze', async (req: Request, res: Response) => {
 router.get('/pending-cases', async (req: Request, res: Response) => {
   try {
     const cases = await dbManager.get_pending_arbitration_cases();
-    
+
     res.json({
       success: true,
       data: cases
@@ -124,7 +124,7 @@ router.get('/case/:caseId/reports', async (req: Request, res: Response) => {
   try {
     const { caseId } = req.params;
     const caseData = await dbManager.get_arbitration_case(caseId);
-    
+
     if (!caseData) {
       return res.status(404).json({
         success: false,
@@ -163,11 +163,11 @@ router.get('/case/:caseId/reports', async (req: Request, res: Response) => {
 router.post('/case/:caseId/arbitrate', async (req: Request, res: Response) => {
   try {
     const { caseId } = req.params;
-    const { 
-      final_recommendation, 
-      confidence_level, 
-      reasoning, 
-      key_disagreements 
+    const {
+      final_recommendation,
+      confidence_level,
+      reasoning,
+      key_disagreements
     } = req.body;
 
     if (!final_recommendation || !reasoning) {
@@ -231,7 +231,7 @@ router.post('/case/:caseId/arbitrate', async (req: Request, res: Response) => {
 router.get('/performance', async (req: Request, res: Response) => {
   try {
     const stats = await dbManager.get_analyzer_performance_stats();
-    
+
     res.json({
       success: true,
       data: stats

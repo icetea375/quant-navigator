@@ -3,11 +3,11 @@
     <div v-if="attributions.length === 0" class="empty-state">
       <el-empty description="暂无持仓异动数据" />
     </div>
-    
+
     <div v-else class="attributions-grid">
-      <div 
-        v-for="attribution in attributions" 
-        :key="attribution.id" 
+      <div
+        v-for="attribution in attributions"
+        :key="attribution.id"
         class="attribution-card"
         :class="getAttributionClass(attribution)"
       >
@@ -25,13 +25,13 @@
             </div>
           </div>
         </div>
-        
+
         <div class="attribution-content">
           <div class="attribution-text">
             <h5>归因分析</h5>
             <p>{{ attribution.attribution }}</p>
           </div>
-          
+
           <div class="attribution-meta">
             <div class="meta-item">
               <el-icon><TrendCharts /></el-icon>
@@ -46,7 +46,7 @@
               <span>{{ formatTime(attribution.timestamp) }}</span>
             </div>
           </div>
-          
+
           <div class="attribution-actions">
             <el-button size="small" type="primary" @click="viewDetails(attribution)">
               查看详情
@@ -255,29 +255,28 @@ const addToWatchlist = (attribution: HotspotAttribution) => {
   .attributions-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .attribution-header {
     flex-direction: column;
     gap: 10px;
     align-items: flex-start;
   }
-  
+
   .price-change {
     text-align: left;
   }
-  
+
   .attribution-meta {
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .attribution-actions {
     justify-content: stretch;
   }
-  
+
   .attribution-actions .el-button {
     flex: 1;
   }
 }
 </style>
-

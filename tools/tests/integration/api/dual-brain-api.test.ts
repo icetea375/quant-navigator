@@ -92,7 +92,7 @@ describe('双脑分析API集成测试', () => {
 
         if (casesResponse.body.success && casesResponse.body.data.length > 0) {
           const caseId = casesResponse.body.data[0].id;
-          
+
           const response = await request(app)
             .get(`/api/dual-brain/case/${caseId}/reports`)
             .expect(200);
@@ -133,7 +133,7 @@ describe('双脑分析API集成测试', () => {
 
         if (casesResponse.body.success && casesResponse.body.data.length > 0) {
           const caseId = casesResponse.body.data[0].id;
-          
+
           const arbitrationData = {
             final_recommendation: '看涨',
             confidence_level: 85,

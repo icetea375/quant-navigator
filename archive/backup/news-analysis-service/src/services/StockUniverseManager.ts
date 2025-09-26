@@ -1,6 +1,6 @@
 /**
  * StockUniverseManager - 动态双层股票宇宙管理器
- * 
+ *
  * 功能：
  * 1. 管理核心宇宙(Core Universe)和观察宇宙(Observation Universe)
  * 2. 实现动态升降级机制
@@ -121,7 +121,7 @@ export class StockUniverseManager {
 
       // 6. 获取所有股票，构建观察宇宙
       const allStocks = await this.getAllStocks();
-      const observationStocks = allStocks.filter(stock => 
+      const observationStocks = allStocks.filter(stock =>
         !coreStocks.some(core => core.stock_code === stock.stock_code)
       );
       this.logger.info(`观察宇宙股票: ${observationStocks.length}只`);
@@ -146,12 +146,12 @@ export class StockUniverseManager {
     for (const indexCode of indexCodes) {
       try {
         const result = await this.db.query(`
-          SELECT DISTINCT ts_code 
-          FROM index_weight 
-          WHERE index_code = $1 
+          SELECT DISTINCT ts_code
+          FROM index_weight
+          WHERE index_code = $1
           AND trade_date = (
-            SELECT MAX(trade_date) 
-            FROM index_weight 
+            SELECT MAX(trade_date)
+            FROM index_weight
             WHERE index_code = $1
           )
         `, [indexCode]);
@@ -178,8 +178,8 @@ export class StockUniverseManager {
       try {
         const result = await this.db.query(`
           SELECT AVG(amount) as avg_amount
-          FROM daily_basic 
-          WHERE ts_code = $1 
+          FROM daily_basic
+          WHERE ts_code = $1
           AND trade_date >= CURRENT_DATE - INTERVAL '30 days'
         `, [stock]);
 
@@ -209,8 +209,8 @@ export class StockUniverseManager {
   private async getUserWatchlistStocks(): Promise<string[]> {
     try {
       const result = await this.db.query(`
-        SELECT DISTINCT stock_code 
-        FROM user_watchlist 
+        SELECT DISTINCT stock_code
+        FROM user_watchlist
         WHERE is_active = true
       `);
       return result.rows.map(row => row.stock_code);
@@ -226,8 +226,8 @@ export class StockUniverseManager {
   private async getAllStocks(): Promise<{stock_code: string}[]> {
     try {
       const result = await this.db.query(`
-        SELECT DISTINCT ts_code as stock_code 
-        FROM stock_basic 
+        SELECT DISTINCT ts_code as stock_code
+        FROM stock_basic
         WHERE list_status = 'L'
       `);
       return result.rows;
@@ -257,8 +257,8 @@ export class StockUniverseManager {
     // 插入核心宇宙股票
     for (const stock of coreStocks) {
       await this.db.query(`
-        INSERT INTO stock_universe_mapping 
-        (stock_code, universe_type, update_date, user_added) 
+        INSERT INTO stock_universe_mapping
+        (stock_code, universe_type, update_date, user_added)
         VALUES ($1, 'core', $2, $3)
       `, [stock, today, userStocks.includes(stock)]);
     }
@@ -266,8 +266,8 @@ export class StockUniverseManager {
     // 插入观察宇宙股票
     for (const stock of observationStocks) {
       await this.db.query(`
-        INSERT INTO stock_universe_mapping 
-        (stock_code, universe_type, update_date) 
+        INSERT INTO stock_universe_mapping
+        (stock_code, universe_type, update_date)
         VALUES ($1, 'observation', $2)
       `, [stock, today]);
     }
@@ -279,8 +279,8 @@ export class StockUniverseManager {
   async getCoreUniverseStocks(): Promise<string[]> {
     try {
       const result = await this.db.query(`
-        SELECT stock_code 
-        FROM stock_universe_mapping 
+        SELECT stock_code
+        FROM stock_universe_mapping
         WHERE universe_type = 'core'
         ORDER BY stock_code
       `);
@@ -297,8 +297,8 @@ export class StockUniverseManager {
   async getObservationUniverseStocks(): Promise<string[]> {
     try {
       const result = await this.db.query(`
-        SELECT stock_code 
-        FROM stock_universe_mapping 
+        SELECT stock_code
+        FROM stock_universe_mapping
         WHERE universe_type = 'observation'
         ORDER BY stock_code
       `);
@@ -315,8 +315,8 @@ export class StockUniverseManager {
   async isInCoreUniverse(stockCode: string): Promise<boolean> {
     try {
       const result = await this.db.query(`
-        SELECT 1 
-        FROM stock_universe_mapping 
+        SELECT 1
+        FROM stock_universe_mapping
         WHERE stock_code = $1 AND universe_type = 'core'
       `, [stockCode]);
       return result.rows.length > 0;
@@ -371,11 +371,11 @@ export class StockUniverseManager {
     try {
       const result = await this.db.query(`
         SELECT ts_code, amount
-        FROM daily_basic 
+        FROM daily_basic
         WHERE trade_date = CURRENT_DATE - INTERVAL '1 day'
         AND ts_code IN (
-          SELECT stock_code 
-          FROM stock_universe_mapping 
+          SELECT stock_code
+          FROM stock_universe_mapping
           WHERE universe_type = 'observation'
         )
         AND amount >= $1
@@ -395,14 +395,14 @@ export class StockUniverseManager {
     try {
       const result = await this.db.query(`
         SELECT stock_code
-        FROM quant_signals 
+        FROM quant_signals
         WHERE signal_date = CURRENT_DATE - INTERVAL '1 day'
         AND ts_code IN (
-          SELECT stock_code 
-          FROM stock_universe_mapping 
+          SELECT stock_code
+          FROM stock_universe_mapping
           WHERE universe_type = 'observation'
         )
-        AND (ABS(macro_risk_z_score) >= $1 
+        AND (ABS(macro_risk_z_score) >= $1
              OR ABS(quant_fingerprint_z_score) >= $1)
       `, [this.promotionCriteria.extreme_z_score_threshold]);
 
@@ -433,8 +433,8 @@ export class StockUniverseManager {
         WHERE uw.is_active = true
         AND uw.created_at >= CURRENT_DATE - INTERVAL '1 day'
         AND uw.stock_code IN (
-          SELECT stock_code 
-          FROM stock_universe_mapping 
+          SELECT stock_code
+          FROM stock_universe_mapping
           WHERE universe_type = 'observation'
         )
       `);
@@ -452,8 +452,8 @@ export class StockUniverseManager {
   private async promoteToCore(stockCode: string, reason: string): Promise<void> {
     try {
       await this.db.query(`
-        UPDATE stock_universe_mapping 
-        SET universe_type = 'core', 
+        UPDATE stock_universe_mapping
+        SET universe_type = 'core',
             update_date = CURRENT_DATE,
             promotion_reason = $2
         WHERE stock_code = $1
@@ -472,8 +472,8 @@ export class StockUniverseManager {
   private async demoteToObservation(stockCode: string, reason: string): Promise<void> {
     try {
       await this.db.query(`
-        UPDATE stock_universe_mapping 
-        SET universe_type = 'observation', 
+        UPDATE stock_universe_mapping
+        SET universe_type = 'observation',
             update_date = CURRENT_DATE,
             demotion_reason = $2
         WHERE stock_code = $1
@@ -524,11 +524,11 @@ export class StockUniverseManager {
       const threshold = 50000000; // 5000万元
       const result = await this.db.query(`
         SELECT ts_code
-        FROM daily_basic 
+        FROM daily_basic
         WHERE trade_date >= CURRENT_DATE - INTERVAL '30 days'
         AND ts_code IN (
-          SELECT stock_code 
-          FROM stock_universe_mapping 
+          SELECT stock_code
+          FROM stock_universe_mapping
           WHERE universe_type = 'core'
         )
         GROUP BY ts_code
@@ -557,26 +557,26 @@ export class StockUniverseManager {
   async getUniverseStats(): Promise<UniverseStats> {
     try {
       const coreResult = await this.db.query(`
-        SELECT COUNT(*) as count 
-        FROM stock_universe_mapping 
+        SELECT COUNT(*) as count
+        FROM stock_universe_mapping
         WHERE universe_type = 'core'
       `);
       const observationResult = await this.db.query(`
-        SELECT COUNT(*) as count 
-        FROM stock_universe_mapping 
+        SELECT COUNT(*) as count
+        FROM stock_universe_mapping
         WHERE universe_type = 'observation'
       `);
       const promotionResult = await this.db.query(`
-        SELECT COUNT(*) as count 
-        FROM stock_universe_mapping 
-        WHERE universe_type = 'core' 
+        SELECT COUNT(*) as count
+        FROM stock_universe_mapping
+        WHERE universe_type = 'core'
         AND update_date = CURRENT_DATE
         AND promotion_reason IS NOT NULL
       `);
       const demotionResult = await this.db.query(`
-        SELECT COUNT(*) as count 
-        FROM stock_universe_mapping 
-        WHERE universe_type = 'observation' 
+        SELECT COUNT(*) as count
+        FROM stock_universe_mapping
+        WHERE universe_type = 'observation'
         AND update_date = CURRENT_DATE
         AND demotion_reason IS NOT NULL
       `);
@@ -601,8 +601,8 @@ export class StockUniverseManager {
   async updateUniverseMapping(stockCode: string, universeType: 'core' | 'observation', reason?: string): Promise<void> {
     try {
       await this.db.query(`
-        UPDATE stock_universe_mapping 
-        SET universe_type = $2, 
+        UPDATE stock_universe_mapping
+        SET universe_type = $2,
             update_date = CURRENT_DATE,
             ${universeType === 'core' ? 'promotion_reason' : 'demotion_reason'} = $3
         WHERE stock_code = $1

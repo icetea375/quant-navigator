@@ -22,11 +22,11 @@
 
     <!-- 报告列表 -->
     <div v-else class="report-items">
-      <div 
-        v-for="report in reports" 
+      <div
+        v-for="report in reports"
         :key="report.reportId"
         class="report-item"
-        :class="{ 
+        :class="{
           'selected': selectedReportId === report.reportId,
           'pending': report.feedbackStatus === 'pending',
           'good': report.feedbackStatus === 'good',
@@ -37,7 +37,7 @@
       >
         <!-- 状态指示器 -->
         <div class="status-indicator">
-          <div 
+          <div
             class="status-dot"
             :class="report.feedbackStatus"
           ></div>
@@ -50,11 +50,11 @@
             <span class="stock-code">{{ report.stockCode }}</span>
             <span class="report-type">{{ getReportTypeLabel(report.reportType) }}</span>
           </div>
-          
+
           <div class="report-summary">
             {{ report.summary || '暂无摘要' }}
           </div>
-          
+
           <div class="report-meta">
             <span class="report-date">{{ formatDate(report.reportDate) }}</span>
             <span class="feedback-status">{{ getStatusLabel(report.feedbackStatus) }}</span>
@@ -63,7 +63,7 @@
 
         <!-- 操作按钮 -->
         <div class="report-actions">
-          <button 
+          <button
             class="action-btn"
             @click.stop="handleReportSelect(report.reportId)"
           >
@@ -388,17 +388,17 @@ const formatDate = (dateString: string) => {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .report-header {
     flex-wrap: wrap;
   }
-  
+
   .report-actions {
     margin-left: 0;
     margin-top: 10px;
     width: 100%;
   }
-  
+
   .action-btn {
     width: 100%;
   }

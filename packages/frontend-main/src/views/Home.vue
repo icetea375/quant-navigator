@@ -52,7 +52,7 @@
           <div class="features-grid">
             <div class="feature-card">
               <div class="feature-icon">
-                <el-icon><Radar /></el-icon>
+                <el-icon><Monitor /></el-icon>
               </div>
               <h3>市场雷达</h3>
               <p>实时监控市场动态，智能识别投资机会和风险信号</p>
@@ -113,7 +113,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
-import { TrendCharts, ArrowDown, Radar, User, DataAnalysis } from '@element-plus/icons-vue'
+import { TrendCharts, ArrowDown, Monitor, User, DataAnalysis } from '@element-plus/icons-vue'
 
 const authStore = useAuthStore()
 </script>
@@ -287,19 +287,18 @@ const authStore = useAuthStore()
   .hero-title {
     font-size: 36px;
   }
-  
+
   .hero-subtitle {
     font-size: 18px;
   }
-  
+
   .hero-actions {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .features-grid {
     grid-template-columns: 1fr;
   }
 }
 </style>
-

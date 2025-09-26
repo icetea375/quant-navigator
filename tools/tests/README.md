@@ -215,7 +215,7 @@ NODE_ENV=test
    ```bash
    # 检查数据库服务
    docker-compose up -d postgres
-   
+
    # 检查连接配置
    echo $DATABASE_URL
    ```
@@ -224,7 +224,7 @@ NODE_ENV=test
    ```bash
    # 检查Redis服务
    docker-compose up -d redis
-   
+
    # 检查连接配置
    echo $REDIS_URL
    ```

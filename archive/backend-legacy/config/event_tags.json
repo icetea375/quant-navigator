@@ -1,0 +1,870 @@
+{
+  "version": "2.1",
+  "description": "公告重要性评分算法事件标签知识库 - 支持非开发人员维护的外部化配置",
+  "last_updated": "2025-01-17",
+  "tags": {
+    "E001": {
+      "tag_name": "业绩超预期",
+      "description": "公司发布的业绩预告或报告显著超过市场一致预期",
+      "base_score": 9,
+      "sentiment": "Positive",
+      "keywords": ["业绩预增", "扭亏为盈", "业绩快报", "同比增长", "净利润增长"],
+      "confidence_threshold": 0.8
+    },
+    "E002": {
+      "tag_name": "业绩低于预期",
+      "description": "公司发布的业绩预告或报告显著低于市场一致预期",
+      "base_score": 9,
+      "sentiment": "Negative",
+      "keywords": ["业绩预减", "首亏", "同比下降", "净利润下滑"],
+      "confidence_threshold": 0.8
+    },
+    "E003": {
+      "tag_name": "重大合同中标",
+      "description": "公司公告签订了对其收入有重大影响的新合同或订单",
+      "base_score": 8,
+      "sentiment": "Positive",
+      "keywords": ["重大合同", "中标", "签订合同", "项目中标", "重大订单", "大单", "订单公告", "合同订单"],
+      "confidence_threshold": 0.7
+    },
+    "E004": {
+      "tag_name": "研发管线重大突破",
+      "description": "例如新药获批、纳入突破性疗法、关键技术验证成功",
+      "base_score": 9,
+      "sentiment": "Positive",
+      "keywords": ["新药获批", "突破性疗法", "技术验证", "研发突破"],
+      "confidence_threshold": 0.8
+    },
+    "E005": {
+      "tag_name": "监管处罚相关",
+      "description": "公司或关键高管受到证监会、交易所等机构的行政处罚或立案调查",
+      "base_score": 9,
+      "sentiment": "Negative",
+      "keywords": ["监管处罚", "行政处罚", "立案调查", "监管函", "收到立案调查通知书", "被立案调查", "监管调查"],
+      "confidence_threshold": 0.9
+    },
+    "E006": {
+      "tag_name": "股东大幅减持",
+      "description": "控股股东、实控人或大股东公布大规模减持计划",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["控股股东减持", "实控人减持", "大股东减持", "大幅减持", "减持股份计划", "股东减持", "减持预披露"],
+      "confidence_threshold": 0.7
+    },
+    "E007": {
+      "tag_name": "核心高管离职",
+      "description": "创始人、董事长、CEO或CFO等核心管理人员离职",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["董事长离职", "总经理离职", "CEO离职", "CFO离职"],
+      "confidence_threshold": 0.6
+    },
+    "E008": {
+      "tag_name": "股权激励相关",
+      "description": "公司发布涉及核心员工的股权激励计划或员工持股计划",
+      "base_score": 7,
+      "sentiment": "Positive",
+      "keywords": ["股权激励", "股票期权", "限制性股票", "员工持股", "股权激励计划", "员工持股计划", "激励计划"],
+      "confidence_threshold": 0.6
+    },
+    "E009": {
+      "tag_name": "股票回购相关",
+      "description": "公司公告股票回购计划、回购进展或大规模回购",
+      "base_score": 6,
+      "sentiment": "Positive",
+      "keywords": ["股票回购", "股份回购", "回购计划", "回购进展", "大规模回购", "回购股份方案", "回购公司股份"],
+      "confidence_threshold": 0.6
+    },
+    "E010": {
+      "tag_name": "收到大额政府补助",
+      "description": "公司收到政府大额补助或补贴",
+      "base_score": 5,
+      "sentiment": "Positive",
+      "keywords": ["政府补助", "政府补贴", "财政补助", "专项资金"],
+      "confidence_threshold": 0.5
+    },
+    "E011": {
+      "tag_name": "重大资产重组相关",
+      "description": "公司发布重大资产重组预案、重组进展或重组计划",
+      "base_score": 10,
+      "sentiment": "Positive",
+      "keywords": ["资产重组", "重大资产重组", "重组预案", "收购预案", "重组计划", "筹划重大资产重组", "重大资产重组预案"],
+      "confidence_threshold": 0.9
+    },
+    "E012": {
+      "tag_name": "重组失败/终止",
+      "description": "重大资产重组失败或终止",
+      "base_score": 10,
+      "sentiment": "Negative",
+      "keywords": ["重组失败", "重组终止", "收购失败", "并购终止"],
+      "confidence_threshold": 0.9
+    },
+    "E014": {
+      "tag_name": "主要产品/服务涨价",
+      "description": "公司主要产品或服务价格上调",
+      "base_score": 7,
+      "sentiment": "Positive",
+      "keywords": ["产品涨价", "服务涨价", "价格上调", "提价"],
+      "confidence_threshold": 0.6
+    },
+    "E015": {
+      "tag_name": "计提大额资产减值",
+      "description": "公司计提大额资产减值准备",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["资产减值", "计提减值", "减值准备", "商誉减值"],
+      "confidence_threshold": 0.7
+    },
+    "E016": {
+      "tag_name": "获得重要资质认证",
+      "description": "公司获得重要的行业资质或认证",
+      "base_score": 6,
+      "sentiment": "Positive",
+      "keywords": ["资质认证", "行业认证", "质量认证", "技术认证"],
+      "confidence_threshold": 0.5
+    },
+    "E017": {
+      "tag_name": "重大投资决策",
+      "description": "公司发布重大投资决策或投资项目",
+      "base_score": 7,
+      "sentiment": "Positive",
+      "keywords": ["重大投资", "投资项目", "投资决策", "扩产投资"],
+      "confidence_threshold": 0.6
+    },
+    "E018": {
+      "tag_name": "债务违约相关",
+      "description": "公司出现债务违约、逾期情况或面临流动性危机",
+      "base_score": 9,
+      "sentiment": "Negative",
+      "keywords": ["债务违约", "债务逾期", "违约", "逾期", "流动性危机", "债务危机", "未能清偿到期债务"],
+      "confidence_threshold": 0.8
+    },
+    "E020": {
+      "tag_name": "行业政策利好",
+      "description": "公司所在行业获得政策支持或利好",
+      "base_score": 6,
+      "sentiment": "Positive",
+      "keywords": ["政策支持", "行业利好", "政策利好", "政策扶持"],
+      "confidence_threshold": 0.5
+    },
+    "E021": {
+      "tag_name": "财务数据造假",
+      "description": "公司财务数据存在造假行为",
+      "base_score": 10,
+      "sentiment": "Negative",
+      "keywords": ["财务造假", "数据造假", "虚假陈述", "财务舞弊"],
+      "confidence_threshold": 0.9
+    },
+    "E022": {
+      "tag_name": "获得关键监管批准",
+      "description": "获得关键监管批准（如新药、金融牌照）",
+      "base_score": 10,
+      "sentiment": "Positive",
+      "keywords": ["监管批准", "新药获批", "金融牌照", "关键许可"],
+      "confidence_threshold": 0.9
+    },
+    "E023": {
+      "tag_name": "产品重大安全问题",
+      "description": "产品出现重大安全问题或大规模召回",
+      "base_score": 9,
+      "sentiment": "Negative",
+      "keywords": ["产品召回", "安全问题", "质量事故", "大规模召回"],
+      "confidence_threshold": 0.8
+    },
+    "E024": {
+      "tag_name": "核心技术专利获批",
+      "description": "核心技术专利获批",
+      "base_score": 9,
+      "sentiment": "Positive",
+      "keywords": ["专利获批", "核心技术专利", "发明专利", "专利授权"],
+      "confidence_threshold": 0.8
+    },
+    "E025": {
+      "tag_name": "进入巨头核心供应链",
+      "description": "进入巨头核心供应链（苹果/华为/英伟达等）",
+      "base_score": 9,
+      "sentiment": "Positive",
+      "keywords": ["供应链", "核心供应商", "苹果供应链", "华为供应链"],
+      "confidence_threshold": 0.8
+    },
+    "E026": {
+      "tag_name": "被踢出重要供应链",
+      "description": "被踢出重要供应链",
+      "base_score": 9,
+      "sentiment": "Negative",
+      "keywords": ["供应链中断", "被踢出供应链", "供应商变更"],
+      "confidence_threshold": 0.8
+    },
+    "E027": {
+      "tag_name": "创始人/CEO严重负面",
+      "description": "创始人/CEO/核心高管被捕或严重负面",
+      "base_score": 9,
+      "sentiment": "Negative",
+      "keywords": ["高管被捕", "创始人负面", "CEO负面", "高管负面"],
+      "confidence_threshold": 0.8
+    },
+    "E029": {
+      "tag_name": "遭遇反垄断调查",
+      "description": "遭遇反垄断或关键业务调查",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["反垄断调查", "反垄断", "业务调查", "监管调查"],
+      "confidence_threshold": 0.7
+    },
+    "E031": {
+      "tag_name": "新产品发布反响热烈",
+      "description": "新产品发布且市场反响热烈",
+      "base_score": 8,
+      "sentiment": "Positive",
+      "keywords": ["新产品发布", "市场反响热烈", "产品热销"],
+      "confidence_threshold": 0.7
+    },
+    "E032": {
+      "tag_name": "成功的重大并购",
+      "description": "成功的重大并购/收购",
+      "base_score": 8,
+      "sentiment": "Positive",
+      "keywords": ["重大并购", "成功收购", "并购成功"],
+      "confidence_threshold": 0.7
+    },
+    "E033": {
+      "tag_name": "核心客户流失",
+      "description": "核心客户流失",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["客户流失", "核心客户流失", "大客户流失"],
+      "confidence_threshold": 0.7
+    },
+    "E034": {
+      "tag_name": "关键专利到期",
+      "description": "关键专利到期或被判无效",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["专利到期", "专利无效", "关键专利到期"],
+      "confidence_threshold": 0.7
+    },
+    "E035": {
+      "tag_name": "重大安全生产事故",
+      "description": "重大安全生产事故",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["安全生产事故", "重大事故", "安全事故"],
+      "confidence_threshold": 0.7
+    },
+    "E036": {
+      "tag_name": "收到立案调查通知书",
+      "description": "收到监管机构立案调查通知书",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["立案调查通知书", "立案调查", "监管调查"],
+      "confidence_threshold": 0.7
+    },
+    "E037": {
+      "tag_name": "上调全年业绩指引",
+      "description": "上调全年业绩指引",
+      "base_score": 8,
+      "sentiment": "Positive",
+      "keywords": ["上调业绩指引", "业绩指引上调", "上调预期"],
+      "confidence_threshold": 0.7
+    },
+    "E038": {
+      "tag_name": "下调全年业绩指引",
+      "description": "下调全年业绩指引",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["下调业绩指引", "业绩指引下调", "下调预期"],
+      "confidence_threshold": 0.7
+    },
+    "E039": {
+      "tag_name": "签订改变基本面的特大订单",
+      "description": "签订改变公司基本面的特大订单",
+      "base_score": 8,
+      "sentiment": "Positive",
+      "keywords": ["特大订单", "改变基本面", "重大订单"],
+      "confidence_threshold": 0.7
+    },
+    "E040": {
+      "tag_name": "签订大额订单",
+      "description": "签订大额订单",
+      "base_score": 7,
+      "sentiment": "Positive",
+      "keywords": ["大额订单", "大单", "重要订单"],
+      "confidence_threshold": 0.6
+    },
+    "E041": {
+      "tag_name": "与行业巨头达成战略合作",
+      "description": "与行业巨头达成战略合作",
+      "base_score": 7,
+      "sentiment": "Positive",
+      "keywords": ["战略合作", "行业巨头合作", "巨头合作"],
+      "confidence_threshold": 0.6
+    },
+    "E042": {
+      "tag_name": "环保问题被重罚",
+      "description": "环保问题被处以重罚",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["环保处罚", "环保重罚", "环保问题"],
+      "confidence_threshold": 0.6
+    },
+    "E043": {
+      "tag_name": "关键项目正式投产",
+      "description": "关键项目/工厂正式投产",
+      "base_score": 7,
+      "sentiment": "Positive",
+      "keywords": ["项目投产", "工厂投产", "正式投产"],
+      "confidence_threshold": 0.6
+    },
+    "E044": {
+      "tag_name": "并购收购失败",
+      "description": "并购/收购失败",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["并购失败", "收购失败", "交易失败"],
+      "confidence_threshold": 0.6
+    },
+    "E045": {
+      "tag_name": "重大数据泄露",
+      "description": "重大数据泄露或网络安全事件",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["数据泄露", "网络安全事件", "信息安全"],
+      "confidence_threshold": 0.6
+    },
+    "E046": {
+      "tag_name": "扭亏为盈",
+      "description": "扭亏为盈",
+      "base_score": 7,
+      "sentiment": "Positive",
+      "keywords": ["扭亏为盈", "扭亏", "由亏转盈"],
+      "confidence_threshold": 0.6
+    },
+    "E047": {
+      "tag_name": "商誉大规模减值",
+      "description": "商誉大规模减值",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["商誉减值", "大规模减值", "商誉减值准备"],
+      "confidence_threshold": 0.6
+    },
+    "E048": {
+      "tag_name": "获得知名机构大额投资",
+      "description": "获得知名机构/政府大额投资",
+      "base_score": 7,
+      "sentiment": "Positive",
+      "keywords": ["知名机构投资", "大额投资", "政府投资"],
+      "confidence_threshold": 0.6
+    },
+    "E049": {
+      "tag_name": "陷入重大诉讼仲裁",
+      "description": "陷入重大诉讼/仲裁",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["重大诉讼", "重大仲裁", "法律纠纷"],
+      "confidence_threshold": 0.6
+    },
+    "E050": {
+      "tag_name": "供应链严重中断",
+      "description": "供应链严重中断",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["供应链中断", "供应链问题", "供应中断"],
+      "confidence_threshold": 0.6
+    },
+    "E051": {
+      "tag_name": "被知名指数纳入",
+      "description": "被知名指数纳入（如MSCI, 沪深300）",
+      "base_score": 6,
+      "sentiment": "Positive",
+      "keywords": ["指数纳入", "MSCI纳入", "沪深300", "指数成分股"],
+      "confidence_threshold": 0.5
+    },
+    "E053": {
+      "tag_name": "获得有利的重大诉讼判决",
+      "description": "获得有利的重大诉讼判决",
+      "base_score": 6,
+      "sentiment": "Positive",
+      "keywords": ["有利判决", "胜诉", "诉讼胜利"],
+      "confidence_threshold": 0.5
+    },
+    "E054": {
+      "tag_name": "评级机构下调公司评级",
+      "description": "评级机构下调公司评级",
+      "base_score": 6,
+      "sentiment": "Negative",
+      "keywords": ["评级下调", "信用评级下调", "评级降级"],
+      "confidence_threshold": 0.5
+    },
+    "E055": {
+      "tag_name": "大规模裁员",
+      "description": "大规模裁员",
+      "base_score": 6,
+      "sentiment": "Negative",
+      "keywords": ["大规模裁员", "裁员", "人员优化"],
+      "confidence_threshold": 0.5
+    },
+    "E057": {
+      "tag_name": "遭遇知名做空机构狙击",
+      "description": "遭遇知名做空机构狙击",
+      "base_score": 6,
+      "sentiment": "Negative",
+      "keywords": ["做空狙击", "做空机构", "被做空"],
+      "confidence_threshold": 0.5
+    },
+    "E058": {
+      "tag_name": "宣布提高股息分红",
+      "description": "宣布提高股息分红",
+      "base_score": 5,
+      "sentiment": "Positive",
+      "keywords": ["提高股息", "增加分红", "提高分红"],
+      "confidence_threshold": 0.5
+    },
+    "E059": {
+      "tag_name": "获得国家级重要奖项",
+      "description": "获得国家级/行业重要奖项",
+      "base_score": 5,
+      "sentiment": "Positive",
+      "keywords": ["国家级奖项", "行业奖项", "重要奖项"],
+      "confidence_threshold": 0.5
+    },
+    "E060": {
+      "tag_name": "核心高管正常变动",
+      "description": "核心高管正常变动",
+      "base_score": 5,
+      "sentiment": "Negative",
+      "keywords": ["高管变动", "核心高管变动", "人事变动"],
+      "confidence_threshold": 0.5
+    },
+    "E061": {
+      "tag_name": "管理层核心技术人员增持",
+      "description": "管理层/核心技术人员增持",
+      "base_score": 5,
+      "sentiment": "Positive",
+      "keywords": ["管理层增持", "核心人员增持", "高管增持"],
+      "confidence_threshold": 0.5
+    },
+    "E062": {
+      "tag_name": "增发配股计划",
+      "description": "增发/配股计划（稀释股权）",
+      "base_score": 5,
+      "sentiment": "Negative",
+      "keywords": ["增发计划", "配股计划", "股权稀释"],
+      "confidence_threshold": 0.5
+    },
+    "E063": {
+      "tag_name": "新产品发布但市场反应平平",
+      "description": "新产品发布但市场反应平平",
+      "base_score": 4,
+      "sentiment": "Negative",
+      "keywords": ["新产品发布", "市场反应平平", "产品反响一般"],
+      "confidence_threshold": 0.4
+    },
+    "E064": {
+      "tag_name": "获得高新技术企业认定",
+      "description": "获得高新技术企业认定",
+      "base_score": 4,
+      "sentiment": "Positive",
+      "keywords": ["高新技术企业", "高新认定", "技术企业认定"],
+      "confidence_threshold": 0.4
+    },
+    "E065": {
+      "tag_name": "部分生产线临时停产",
+      "description": "部分生产线临时停产",
+      "base_score": 4,
+      "sentiment": "Negative",
+      "keywords": ["临时停产", "生产线停产", "部分停产"],
+      "confidence_threshold": 0.4
+    },
+    "E066": {
+      "tag_name": "高管发表不当言论引发争议",
+      "description": "高管发表不当言论引发争议",
+      "base_score": 4,
+      "sentiment": "Negative",
+      "keywords": ["不当言论", "高管争议", "言论争议"],
+      "confidence_threshold": 0.4
+    },
+    "E067": {
+      "tag_name": "公司或产品被媒体正面报道",
+      "description": "公司或产品被媒体正面报道",
+      "base_score": 3,
+      "sentiment": "Positive",
+      "keywords": ["正面报道", "媒体正面", "好评报道"],
+      "confidence_threshold": 0.3
+    },
+    "E068": {
+      "tag_name": "股东大会通过重要决议",
+      "description": "股东大会通过重要决议",
+      "base_score": 3,
+      "sentiment": "Positive",
+      "keywords": ["股东大会", "重要决议", "决议通过"],
+      "confidence_threshold": 0.3
+    },
+    "E069": {
+      "tag_name": "公司或产品被媒体负面报道",
+      "description": "公司或产品被媒体负面报道",
+      "base_score": 3,
+      "sentiment": "Negative",
+      "keywords": ["负面报道", "媒体负面", "负面新闻"],
+      "confidence_threshold": 0.3
+    },
+    "E070": {
+      "tag_name": "分析师上调目标价",
+      "description": "分析师上调目标价",
+      "base_score": 2,
+      "sentiment": "Positive",
+      "keywords": ["上调目标价", "目标价上调", "分析师上调"],
+      "confidence_threshold": 0.2
+    },
+    "E071": {
+      "tag_name": "分析师下调目标价",
+      "description": "分析师下调目标价",
+      "base_score": 2,
+      "sentiment": "Negative",
+      "keywords": ["下调目标价", "目标价下调", "分析师下调"],
+      "confidence_threshold": 0.2
+    },
+    "E072": {
+      "tag_name": "临床试验取得重大突破性进展",
+      "description": "临床试验取得重大突破性进展",
+      "base_score": 9,
+      "sentiment": "Positive",
+      "keywords": ["临床试验突破", "重大进展", "突破性进展"],
+      "confidence_threshold": 0.8
+    },
+    "E073": {
+      "tag_name": "核心技术或商业机密被盗",
+      "description": "核心技术或商业机密被盗",
+      "base_score": 9,
+      "sentiment": "Negative",
+      "keywords": ["技术被盗", "商业机密泄露", "核心技术泄露"],
+      "confidence_threshold": 0.8
+    },
+    "E074": {
+      "tag_name": "主营产品面临技术迭代被市场淘汰的风险",
+      "description": "主营产品面临技术迭代被市场淘汰的风险",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["技术迭代", "产品淘汰", "市场淘汰风险"],
+      "confidence_threshold": 0.7
+    },
+    "E075": {
+      "tag_name": "核心生产设施遭遇重大事故",
+      "description": "核心生产设施遭遇火灾、自然灾害等重大事故",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["生产设施事故", "火灾", "自然灾害", "重大事故"],
+      "confidence_threshold": 0.7
+    },
+    "E076": {
+      "tag_name": "中标重大政府或行业采购项目",
+      "description": "中标重大政府或行业采购项目",
+      "base_score": 7,
+      "sentiment": "Positive",
+      "keywords": ["政府采购", "行业采购", "重大采购项目"],
+      "confidence_threshold": 0.6
+    },
+    "E077": {
+      "tag_name": "重要融资计划失败或被取消",
+      "description": "重要融资计划失败或被取消",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["融资失败", "融资取消", "融资计划失败"],
+      "confidence_threshold": 0.6
+    },
+    "E078": {
+      "tag_name": "剥离出售非核心或亏损业务",
+      "description": "剥离/出售非核心或亏损业务",
+      "base_score": 6,
+      "sentiment": "Positive",
+      "keywords": ["剥离业务", "出售业务", "非核心业务"],
+      "confidence_threshold": 0.5
+    },
+    "E079": {
+      "tag_name": "重要战略合作伙伴遭遇破产或重大危机",
+      "description": "重要战略合作伙伴遭遇破产或重大危机",
+      "base_score": 6,
+      "sentiment": "Negative",
+      "keywords": ["合作伙伴破产", "战略伙伴危机", "合作伙伴危机"],
+      "confidence_threshold": 0.5
+    },
+    "E080": {
+      "tag_name": "成功进入新的重要海外市场",
+      "description": "成功进入新的重要海外市场",
+      "base_score": 6,
+      "sentiment": "Positive",
+      "keywords": ["海外市场", "国际市场", "新市场进入"],
+      "confidence_threshold": 0.5
+    },
+    "E081": {
+      "tag_name": "评级机构上调公司信用评级",
+      "description": "评级机构上调公司信用评级",
+      "base_score": 5,
+      "sentiment": "Positive",
+      "keywords": ["信用评级上调", "评级上调", "评级提升"],
+      "confidence_threshold": 0.5
+    },
+    "E082": {
+      "tag_name": "因严重违规行为被吊销重要经营资质或许可证",
+      "description": "因严重违规行为被吊销重要经营资质或许可证",
+      "base_score": 10,
+      "sentiment": "Negative",
+      "keywords": ["吊销资质", "吊销许可证", "严重违规"],
+      "confidence_threshold": 0.9
+    },
+    "E083": {
+      "tag_name": "成功完成重大科技研发项目并实现商业化",
+      "description": "成功完成重大科技研发项目并实现商业化",
+      "base_score": 9,
+      "sentiment": "Positive",
+      "keywords": ["科技研发完成", "商业化成功", "研发项目完成"],
+      "confidence_threshold": 0.8
+    },
+    "E084": {
+      "tag_name": "核心产品被竞争对手推出更具颠覆性替代品",
+      "description": "核心产品被竞争对手推出更具颠覆性替代品",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["颠覆性替代品", "竞争对手替代", "产品替代"],
+      "confidence_threshold": 0.7
+    },
+    "E085": {
+      "tag_name": "获得重大政府补贴或税收优惠",
+      "description": "获得重大政府补贴或税收优惠",
+      "base_score": 7,
+      "sentiment": "Positive",
+      "keywords": ["政府补贴", "税收优惠", "重大补贴"],
+      "confidence_threshold": 0.6
+    },
+    "E086": {
+      "tag_name": "因产品质量或服务问题引发大规模消费者抵制",
+      "description": "因产品质量或服务问题引发大规模消费者抵制",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["消费者抵制", "质量问题", "服务问题"],
+      "confidence_threshold": 0.6
+    },
+    "E087": {
+      "tag_name": "在关键市场取得重大市场份额增长",
+      "description": "在关键市场取得重大市场份额增长",
+      "base_score": 7,
+      "sentiment": "Positive",
+      "keywords": ["市场份额增长", "市场占有率提升", "关键市场增长"],
+      "confidence_threshold": 0.6
+    },
+    "E088": {
+      "tag_name": "遭遇行业性政策收紧或限制性法规出台",
+      "description": "遭遇行业性政策收紧或限制性法规出台",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["政策收紧", "限制性法规", "行业政策收紧"],
+      "confidence_threshold": 0.6
+    },
+    "E089": {
+      "tag_name": "重要供应商破产或出现严重运营问题",
+      "description": "重要供应商破产或出现严重运营问题",
+      "base_score": 6,
+      "sentiment": "Negative",
+      "keywords": ["供应商破产", "供应商问题", "供应链问题"],
+      "confidence_threshold": 0.5
+    },
+    "E090": {
+      "tag_name": "被纳入国家级地方重点支持产业或示范项目清单",
+      "description": "被纳入国家级/地方重点支持产业或示范项目清单",
+      "base_score": 6,
+      "sentiment": "Positive",
+      "keywords": ["重点支持产业", "示范项目", "国家级支持"],
+      "confidence_threshold": 0.5
+    },
+    "E091": {
+      "tag_name": "宣布股票分拆或合股",
+      "description": "宣布股票分拆或合股（非同寻常，旨在优化股价结构）",
+      "base_score": 5,
+      "sentiment": "Positive",
+      "keywords": ["股票分拆", "股票合股", "股价结构优化"],
+      "confidence_threshold": 0.5
+    },
+    "E093": {
+      "tag_name": "受益于重大利好行业政策",
+      "description": "受益于重大利好行业政策（如补贴、准入放宽）",
+      "base_score": 8,
+      "sentiment": "Positive",
+      "keywords": ["利好政策", "行业政策利好", "政策受益"],
+      "confidence_threshold": 0.7
+    },
+    "E095": {
+      "tag_name": "产品定价遭遇政府强制干预或价格上限",
+      "description": "产品定价遭遇政府强制干预或价格上限",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["价格干预", "价格上限", "政府干预"],
+      "confidence_threshold": 0.7
+    },
+    "E096": {
+      "tag_name": "遭遇大规模劳工罢工",
+      "description": "遭遇大规模劳工罢工",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["劳工罢工", "大规模罢工", "工人罢工"],
+      "confidence_threshold": 0.6
+    },
+    "E097": {
+      "tag_name": "公司控制权之争或代理权争夺",
+      "description": "公司控制权之争或代理权争夺",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["控制权之争", "代理权争夺", "控制权争夺"],
+      "confidence_threshold": 0.6
+    },
+    "E098": {
+      "tag_name": "因ESG问题被重要指数剔除或机构投资者抛售",
+      "description": "因ESG问题被重要指数剔除或机构投资者抛售",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["ESG问题", "指数剔除", "机构抛售"],
+      "confidence_threshold": 0.6
+    },
+    "E099": {
+      "tag_name": "获得长期低成本的债务融资",
+      "description": "获得长期、低成本的债务融资",
+      "base_score": 6,
+      "sentiment": "Positive",
+      "keywords": ["低成本融资", "长期融资", "债务融资"],
+      "confidence_threshold": 0.5
+    },
+    "E100": {
+      "tag_name": "与竞争对手就专利纠纷达成有利和解",
+      "description": "与竞争对手就专利纠纷达成有利和解",
+      "base_score": 6,
+      "sentiment": "Positive",
+      "keywords": ["专利纠纷和解", "有利和解", "专利和解"],
+      "confidence_threshold": 0.5
+    },
+    "E101": {
+      "tag_name": "宣布削减或取消股息分红",
+      "description": "宣布削减或取消股息分红",
+      "base_score": 6,
+      "sentiment": "Negative",
+      "keywords": ["削减分红", "取消分红", "减少分红"],
+      "confidence_threshold": 0.5
+    },
+    "E102": {
+      "tag_name": "被列入实体清单或贸易黑名单",
+      "description": "被列入实体清单或贸易黑名单",
+      "base_score": 9,
+      "sentiment": "Negative",
+      "keywords": ["实体清单", "贸易黑名单", "制裁清单"],
+      "confidence_threshold": 0.8
+    },
+    "E103": {
+      "tag_name": "遭遇主要出口市场加征高额关税",
+      "description": "遭遇主要出口市场加征高额关税",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["加征关税", "高额关税", "出口关税"],
+      "confidence_threshold": 0.7
+    },
+    "E104": {
+      "tag_name": "公司内部控制出现重大缺陷",
+      "description": "公司内部控制出现重大缺陷",
+      "base_score": 8,
+      "sentiment": "Negative",
+      "keywords": ["内控缺陷", "内部控制问题", "内控重大缺陷"],
+      "confidence_threshold": 0.7
+    },
+    "E105": {
+      "tag_name": "获得出口进口关键许可或配额",
+      "description": "获得出口/进口关键许可或配额",
+      "base_score": 8,
+      "sentiment": "Positive",
+      "keywords": ["出口许可", "进口许可", "关键配额"],
+      "confidence_threshold": 0.7
+    },
+    "E106": {
+      "tag_name": "关键原材料价格大幅下跌",
+      "description": "关键原材料价格大幅下跌",
+      "base_score": 7,
+      "sentiment": "Positive",
+      "keywords": ["原材料价格下跌", "成本下降", "原材料降价"],
+      "confidence_threshold": 0.6
+    },
+    "E107": {
+      "tag_name": "关键原材料价格大幅上涨",
+      "description": "关键原材料价格大幅上涨",
+      "base_score": 7,
+      "sentiment": "Negative",
+      "keywords": ["原材料价格上涨", "成本上升", "原材料涨价"],
+      "confidence_threshold": 0.6
+    },
+    "E108": {
+      "tag_name": "成功实施重大成本削减或效率提升计划",
+      "description": "成功实施重大成本削减或效率提升计划",
+      "base_score": 6,
+      "sentiment": "Positive",
+      "keywords": ["成本削减", "效率提升", "成本控制"],
+      "confidence_threshold": 0.5
+    },
+    "E109": {
+      "tag_name": "核心产品被曝出存在设计缺陷",
+      "description": "核心产品被曝出存在设计缺陷（但未到召回程度）",
+      "base_score": 5,
+      "sentiment": "Negative",
+      "keywords": ["设计缺陷", "产品缺陷", "质量问题"],
+      "confidence_threshold": 0.5
+    },
+    "E110": {
+      "tag_name": "公司治理评级获上调",
+      "description": "公司治理评级获上调",
+      "base_score": 5,
+      "sentiment": "Positive",
+      "keywords": ["治理评级上调", "公司治理提升", "治理评级"],
+      "confidence_threshold": 0.5
+    },
+    "E111": {
+      "tag_name": "董事长或CEO发表积极且有影响力的公开讲话",
+      "description": "董事长或CEO发表积极且有影响力的公开讲话",
+      "base_score": 4,
+      "sentiment": "Positive",
+      "keywords": ["CEO讲话", "董事长讲话", "公开讲话"],
+      "confidence_threshold": 0.4
+    }
+  },
+  "score_ranges": {
+    "1-3": {
+      "description": "低重要性事件",
+      "market_impact": "minimal",
+      "typical_events": ["常规公告", "日常经营信息"]
+    },
+    "4-6": {
+      "description": "中等重要性事件",
+      "market_impact": "moderate",
+      "typical_events": ["一般性投资", "常规合作", "政府补助"]
+    },
+    "7-8": {
+      "description": "高重要性事件",
+      "market_impact": "significant",
+      "typical_events": ["重大合同", "高管变动", "股权激励"]
+    },
+    "9-10": {
+      "description": "极高重要性事件",
+      "market_impact": "major",
+      "typical_events": ["业绩超预期", "监管处罚", "资产重组"]
+    }
+  },
+  "sentiment_mapping": {
+    "Positive": {
+      "description": "正面事件，通常对股价有积极影响",
+      "alpha_adjustment_range": "-2 to +5"
+    },
+    "Negative": {
+      "description": "负面事件，通常对股价有消极影响",
+      "alpha_adjustment_range": "-5 to +2"
+    }
+  },
+  "maintenance_notes": {
+    "how_to_add_tag": "在tags对象中添加新的标签，确保包含所有必需字段",
+    "how_to_modify_tag": "直接修改对应tag_id的标签对象",
+    "how_to_disable_tag": "将base_score设置为0或添加exclusion_keywords",
+    "version_control": "每次修改后更新version和last_updated字段",
+    "testing": "新增标签后建议在测试环境验证分类准确性"
+  }
+}

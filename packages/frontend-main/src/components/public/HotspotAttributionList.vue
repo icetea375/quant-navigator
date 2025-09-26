@@ -3,35 +3,35 @@
     <div v-if="events.length === 0" class="empty-state">
       <el-empty description="暂无数据" />
     </div>
-    
+
     <div v-else class="events-grid">
-      <div 
-        v-for="event in events" 
-        :key="event.id" 
+      <div
+        v-for="event in events"
+        :key="event.id"
         class="event-card"
         :class="getEventClass(event)"
       >
         <div class="event-header">
           <div class="event-title">{{ event.title }}</div>
           <div class="event-meta">
-            <el-tag 
-              :type="getImportanceType(event.importance)" 
+            <el-tag
+              :type="getImportanceType(event.importance)"
               size="small"
             >
               {{ getImportanceText(event.importance) }}
             </el-tag>
-            <el-tag 
-              :type="getImpactType(event.impact)" 
+            <el-tag
+              :type="getImpactType(event.impact)"
               size="small"
             >
               {{ getImpactText(event.impact) }}
             </el-tag>
           </div>
         </div>
-        
+
         <div class="event-content">
           <p class="event-description">{{ event.description }}</p>
-          
+
           <div class="event-details">
             <div class="detail-item">
               <el-icon><Calendar /></el-icon>
@@ -216,20 +216,19 @@ const formatTime = (timestamp: string) => {
   .events-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .event-header {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .event-meta {
     align-self: flex-start;
   }
-  
+
   .event-details {
     flex-direction: column;
     gap: 8px;
   }
 }
 </style>
-

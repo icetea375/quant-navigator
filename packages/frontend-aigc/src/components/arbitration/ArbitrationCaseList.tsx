@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { List, Card, Tag, Button, Input, Select, Typography, Space, Tooltip, Badge } from 'antd';
-import { 
-  SearchOutlined, 
-  FilterOutlined, 
-  ClockCircleOutlined, 
+import {
+  SearchOutlined,
+  FilterOutlined,
+  ClockCircleOutlined,
   ExclamationCircleOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -19,7 +19,7 @@ const { Option } = Select;
 /**
  * 仲裁案例列表组件
  * 展示待仲裁案例列表，支持智能筛选和排序
- * 
+ *
  * 核心特性：
  * 1. 案例列表展示
  * 2. 智能筛选和搜索
@@ -56,26 +56,26 @@ const ArbitrationCaseList: React.FC<ArbitrationCaseListProps> = ({
   // 过滤和排序数据
   const filteredCases = useMemo(() => {
     let filtered = cases;
-    
+
     // 搜索过滤
     if (searchText) {
-      filtered = filtered.filter(case => 
+      filtered = filtered.filter(case =>
         case.stockCode.toLowerCase().includes(searchText.toLowerCase()) ||
         case.stockName.toLowerCase().includes(searchText.toLowerCase()) ||
         case.reportType.toLowerCase().includes(searchText.toLowerCase())
       );
     }
-    
+
     // 优先级过滤
     if (priorityFilter.length > 0) {
       filtered = filtered.filter(case => priorityFilter.includes(case.priority));
     }
-    
+
     // 状态过滤
     if (statusFilter.length > 0) {
       filtered = filtered.filter(case => statusFilter.includes(case.status));
     }
-    
+
     // 排序
     filtered.sort((a, b) => {
       switch (sortBy) {
@@ -89,7 +89,7 @@ const ArbitrationCaseList: React.FC<ArbitrationCaseListProps> = ({
           return 0;
       }
     });
-    
+
     return filtered;
   }, [cases, searchText, priorityFilter, statusFilter, sortBy]);
 
@@ -101,9 +101,9 @@ const ArbitrationCaseList: React.FC<ArbitrationCaseListProps> = ({
       completed: { color: 'green', text: '已完成', icon: <CheckCircleOutlined /> },
       rejected: { color: 'red', text: '已拒绝', icon: <CloseCircleOutlined /> }
     };
-    
+
     const config = statusConfig[status] || { color: 'default', text: status, icon: null };
-    
+
     return (
       <Tag color={config.color} icon={config.icon}>
         {config.text}
@@ -120,9 +120,9 @@ const ArbitrationCaseList: React.FC<ArbitrationCaseListProps> = ({
       4: { color: 'green', text: '低' },
       5: { color: 'default', text: '最低' }
     };
-    
+
     const config = priorityConfig[priority] || { color: 'default', text: `P${priority}` };
-    
+
     return (
       <Tag color={config.color}>
         {config.text}
@@ -138,9 +138,9 @@ const ArbitrationCaseList: React.FC<ArbitrationCaseListProps> = ({
       verification: { color: 'green', text: '验证' },
       analysis: { color: 'orange', text: '分析' }
     };
-    
+
     const config = typeConfig[type] || { color: 'default', text: type };
-    
+
     return (
       <Tag color={config.color}>
         {config.text}
@@ -152,7 +152,7 @@ const ArbitrationCaseList: React.FC<ArbitrationCaseListProps> = ({
   const renderCaseItem = (caseItem: ArbitrationCaseInfo) => {
     const isSelected = selectedCaseId === caseItem.caseId;
     const isUrgent = caseItem.priority <= 2;
-    const isOverdue = caseItem.status === 'pending' && 
+    const isOverdue = caseItem.status === 'pending' &&
       new Date().getTime() - new Date(caseItem.createdAt).getTime() > 24 * 60 * 60 * 1000;
 
     return (
@@ -189,14 +189,14 @@ const ArbitrationCaseList: React.FC<ArbitrationCaseListProps> = ({
               </Tooltip>
             </div>
           </div>
-          
+
           <div className="case-content">
             <div className="case-tags">
               {getStatusTag(caseItem.status)}
               {getPriorityTag(caseItem.priority)}
               {getReportTypeTag(caseItem.reportType)}
             </div>
-            
+
             <div className="case-meta">
               <Text type="secondary">
                 创建时间: {new Date(caseItem.createdAt).toLocaleString()}
@@ -223,7 +223,7 @@ const ArbitrationCaseList: React.FC<ArbitrationCaseListProps> = ({
           style={{ width: 300 }}
           allowClear
         />
-        
+
         <Select
           mode="multiple"
           placeholder="优先级"
@@ -238,7 +238,7 @@ const ArbitrationCaseList: React.FC<ArbitrationCaseListProps> = ({
           <Option value={4}>低</Option>
           <Option value={5}>最低</Option>
         </Select>
-        
+
         <Select
           mode="multiple"
           placeholder="状态"
@@ -252,7 +252,7 @@ const ArbitrationCaseList: React.FC<ArbitrationCaseListProps> = ({
           <Option value="completed">已完成</Option>
           <Option value="rejected">已拒绝</Option>
         </Select>
-        
+
         <Select
           value={sortBy}
           onChange={setSortBy}
@@ -262,7 +262,7 @@ const ArbitrationCaseList: React.FC<ArbitrationCaseListProps> = ({
           <Option value="date">时间</Option>
           <Option value="status">状态</Option>
         </Select>
-        
+
         <Button
           type="primary"
           icon={<FilterOutlined />}
@@ -349,15 +349,15 @@ const ArbitrationCaseList: React.FC<ArbitrationCaseListProps> = ({
   return (
     <div className="arbitration-case-list">
       <Title level={4}>仲裁案例列表</Title>
-      
+
       {renderStatistics()}
-      
+
       <Divider />
-      
+
       {renderFilterToolbar()}
-      
+
       <Divider />
-      
+
       <div className="case-list">
         <List
           dataSource={filteredCases}

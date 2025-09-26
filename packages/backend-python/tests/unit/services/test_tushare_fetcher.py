@@ -411,7 +411,7 @@ class TestTushareFetcher:
         """测试标准化财务数据时处理空DataFrame的情况"""
         empty_df = pd.DataFrame()
         result = fetcher._standardize_financial_data(empty_df, "000001.SZ", "20240101")
-        
+
         assert isinstance(result, dict)
         assert len(result) == 0
 
@@ -419,7 +419,7 @@ class TestTushareFetcher:
         """测试标准化行业分类数据时处理空DataFrame的情况"""
         empty_df = pd.DataFrame()
         result = fetcher._standardize_industry_classification(empty_df, "000001.SZ")
-        
+
         assert isinstance(result, dict)
         assert len(result) == 0
 
@@ -427,6 +427,6 @@ class TestTushareFetcher:
         """测试标准化市场数据时处理空DataFrame的情况"""
         empty_df = pd.DataFrame()
         result = fetcher._standardize_market_data(empty_df, "20240101")
-        
+
         assert isinstance(result, dict)
         assert len(result) == 0

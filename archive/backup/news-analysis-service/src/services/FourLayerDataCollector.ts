@@ -1,7 +1,7 @@
 /**
  * 四层映射数据收集器
  * 负责收集和管理四层映射架构的数据
- * 
+ *
  * @author AI Assistant
  * @created 2025-01-17
  * @version 1.0.0
@@ -165,7 +165,7 @@ export class FourLayerDataCollector {
       });
 
       const results: FourLayerMappingData[] = [];
-      
+
       for (const config of configs) {
         const mapping = await this.addMapping(config);
         results.push(mapping);
@@ -234,7 +234,7 @@ export class FourLayerDataCollector {
   async getLayerData(layerLevel: number, activeOnly: boolean = true): Promise<FourLayerMappingData[]> {
     try {
       let query = `
-        SELECT * FROM four_layer_mapping 
+        SELECT * FROM four_layer_mapping
         WHERE layer_level = ?
       `;
       const params: any[] = [layerLevel];
@@ -287,7 +287,7 @@ export class FourLayerDataCollector {
   async getChildrenData(parentId: number, activeOnly: boolean = true): Promise<FourLayerMappingData[]> {
     try {
       let query = `
-        SELECT * FROM four_layer_mapping 
+        SELECT * FROM four_layer_mapping
         WHERE parent_id = ?
       `;
       const params: any[] = [parentId];
@@ -371,7 +371,7 @@ export class FourLayerDataCollector {
       updateValues.push(id);
 
       await this.db.execute(`
-        UPDATE four_layer_mapping 
+        UPDATE four_layer_mapping
         SET ${updateFields.join(', ')}
         WHERE id = ?
       `, updateValues);
@@ -413,7 +413,7 @@ export class FourLayerDataCollector {
       if (softDelete) {
         // 软删除：设置为非激活状态
         await this.db.execute(`
-          UPDATE four_layer_mapping 
+          UPDATE four_layer_mapping
           SET is_active = 0, updated_at = ?
           WHERE id = ?
         `, [new Date().toISOString(), id]);

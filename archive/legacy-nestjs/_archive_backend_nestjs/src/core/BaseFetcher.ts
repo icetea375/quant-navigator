@@ -56,10 +56,10 @@ export abstract class BaseFetcher extends BaseService {
     return await this.executeTask(`fetch_${dataType}`, async () => {
       const results = await Promise.all(methods.map(method => method()));
       const totalCount = results.reduce((sum, data) => sum + (data?.length || 0), 0);
-      
+
       this.fetcherStats.dataVolume[dataVolumeKey] = totalCount;
       this.fetcherStats.lastDataUpdate = new Date().toISOString();
-      
+
       logger.debug(`Fetched ${totalCount} ${dataType} records`);
       return results.flat();
     });
@@ -76,8 +76,8 @@ export abstract class BaseFetcher extends BaseService {
     try {
       const cached = await this.redis.get(cacheKey);
       if (cached) {
-        this.fetcherStats.cacheHitRate = 
-          (this.fetcherStats.cacheHitRate * (this.fetcherStats.totalRequests - 1) + 1) / 
+        this.fetcherStats.cacheHitRate =
+          (this.fetcherStats.cacheHitRate * (this.fetcherStats.totalRequests - 1) + 1) /
           this.fetcherStats.totalRequests;
         return JSON.parse(cached);
       }

@@ -209,14 +209,14 @@ export class TokenTester {
     // 模拟处理时间（基于轮数和模型复杂度）
     const baseTime = this.getBaseProcessingTime(model, provider);
     const processingTime = baseTime * rounds + Math.random() * 1000; // 添加随机延迟
-    
+
     // 模拟输出内容（基于输入长度和轮数）
     const outputLength = Math.round(input.length * 0.8 * rounds); // 输出长度约为输入的80%乘以轮数
     const output = this.generateMockOutput(input, outputLength);
-    
+
     // 模拟质量评分（基于轮数，轮数越多质量越高）
     const quality = Math.min(0.95, 0.7 + (rounds - 1) * 0.1);
-    
+
     return {
       output,
       processingTime,
@@ -229,13 +229,13 @@ export class TokenTester {
    */
   async runSingleTest(config: TestConfig): Promise<TokenTestResult[]> {
     const results: TokenTestResult[] = [];
-    
+
     console.log(`🧪 执行测试: ${config.taskType} - ${config.provider}/${config.model} - ${config.rounds}轮`);
-    
+
     for (let i = 0; i < config.sampleSize; i++) {
       for (const inputSize of config.inputSizes) {
         const testData = this.generateTestData(config.taskType, inputSize);
-        
+
         try {
           const { output, processingTime, quality } = await this.simulateLLMCall(
             testData.input,
@@ -243,7 +243,7 @@ export class TokenTester {
             config.provider,
             config.rounds
           );
-          
+
           const result = this.calculator.recordTokenUsage(
             config.taskType,
             config.model,
@@ -254,11 +254,11 @@ export class TokenTester {
             processingTime,
             quality
           );
-          
+
           results.push(result);
-          
+
           console.log(`  ✅ 样本 ${i + 1}/${config.sampleSize} (${inputSize}): ${result.totalTokens} tokens, ${result.cost.toFixed(4)}元`);
-          
+
           // 添加延迟避免过快执行
           await new Promise(resolve => setTimeout(resolve, 100));
         } catch (error) {
@@ -266,7 +266,7 @@ export class TokenTester {
         }
       }
     }
-    
+
     return results;
   }
 
@@ -278,20 +278,20 @@ export class TokenTester {
     if (!suite) {
       throw new Error(`测试套件 ${suiteName} 不存在`);
     }
-    
+
     console.log(`🚀 开始执行测试套件: ${suite.name}`);
     console.log(`📝 描述: ${suite.description}`);
     console.log(`📊 测试数量: ${suite.tests.length}`);
-    
+
     const allResults: TokenTestResult[] = [];
-    
+
     for (const test of suite.tests) {
       const results = await this.runSingleTest(test);
       allResults.push(...results);
     }
-    
+
     console.log(`✅ 测试套件 ${suite.name} 完成，共收集 ${allResults.length} 个样本`);
-    
+
     return allResults;
   }
 
@@ -300,16 +300,16 @@ export class TokenTester {
    */
   async runAllTests(): Promise<TokenTestResult[]> {
     console.log('🚀 开始执行所有测试套件');
-    
+
     const allResults: TokenTestResult[] = [];
-    
+
     for (const suite of this.testSuites) {
       const results = await this.runTestSuite(suite.name);
       allResults.push(...results);
     }
-    
+
     console.log(`✅ 所有测试完成，共收集 ${allResults.length} 个样本`);
-    
+
     return allResults;
   }
 
@@ -319,38 +319,38 @@ export class TokenTester {
   generateTestReport(): string {
     const summary = this.calculator.getTestResultsSummary();
     const benchmarks = this.calculator.getAllBenchmarks();
-    
+
     let report = '# Token消耗测试报告\n\n';
     report += `**测试时间**: ${new Date().toLocaleString()}\n`;
     report += `**总测试数**: ${summary.totalTests}\n`;
     report += `**总Token消耗**: ${summary.totalTokens.toLocaleString()}\n`;
     report += `**总成本**: ${summary.totalCost.toFixed(4)}元\n`;
     report += `**平均质量**: ${(summary.avgQuality * 100).toFixed(1)}%\n\n`;
-    
+
     report += '## 按任务类型统计\n\n';
     report += '| 任务类型 | 测试数 | 总Tokens | 总成本(元) | 平均质量 |\n';
     report += '|----------|--------|----------|------------|----------|\n';
-    
+
     Object.entries(summary.byTaskType).forEach(([taskType, stats]) => {
       report += `| ${taskType} | ${stats.count} | ${stats.totalTokens.toLocaleString()} | ${stats.totalCost.toFixed(4)} | ${(stats.avgQuality * 100).toFixed(1)}% |\n`;
     });
-    
+
     report += '\n## 按模型统计\n\n';
     report += '| 模型 | 测试数 | 总Tokens | 总成本(元) | 平均质量 |\n';
     report += '|------|--------|----------|------------|----------|\n';
-    
+
     Object.entries(summary.byModel).forEach(([model, stats]) => {
       report += `| ${model} | ${stats.count} | ${stats.totalTokens.toLocaleString()} | ${stats.totalCost.toFixed(4)} | ${(stats.avgQuality * 100).toFixed(1)}% |\n`;
     });
-    
+
     report += '\n## 基准数据\n\n';
     report += '| 任务类型 | 模型 | 轮数 | 平均输入Tokens | 平均输出Tokens | 平均总Tokens | 平均成本(元) | 样本数 | 置信度 |\n';
     report += '|----------|------|------|----------------|----------------|--------------|-------------|--------|--------|\n';
-    
+
     benchmarks.forEach(benchmark => {
       report += `| ${benchmark.taskType} | ${benchmark.provider}/${benchmark.model} | ${benchmark.rounds} | ${benchmark.avgInputTokens.toFixed(0)} | ${benchmark.avgOutputTokens.toFixed(0)} | ${benchmark.avgTotalTokens.toFixed(0)} | ${benchmark.avgCost.toFixed(4)} | ${benchmark.sampleSize} | ${(benchmark.confidence * 100).toFixed(1)}% |\n`;
     });
-    
+
     return report;
   }
 
@@ -368,7 +368,7 @@ export class TokenTester {
       'gemini-2.5-flash': 800,
       'gemini-2.5-pro': 2000
     };
-    
+
     return baseTimes[model] || 1500;
   }
 
@@ -379,13 +379,13 @@ export class TokenTester {
     const words = input.split(' ');
     const outputWords = [];
     let currentLength = 0;
-    
+
     while (currentLength < targetLength && outputWords.length < words.length * 2) {
       const randomWord = words[Math.floor(Math.random() * words.length)];
       outputWords.push(randomWord);
       currentLength += randomWord.length;
     }
-    
+
     return outputWords.join(' ') + '。';
   }
 }

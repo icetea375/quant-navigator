@@ -2,7 +2,7 @@
   <div class="technical-analysis">
     <h3>📈 技术指标分析</h3>
     <p class="description">基于技术指标的综合分析，为仲裁决策提供技术面支撑</p>
-    
+
     <div class="analysis-content">
       <!-- 主要技术指标 -->
       <div class="main-indicators">
@@ -25,7 +25,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="indicator-card">
             <div class="indicator-title">相对强弱指数 (RSI)</div>
             <div class="rsi-container">
@@ -36,7 +36,7 @@
               <div class="rsi-status">{{ getRSIStatus(technicalData.rsi) }}</div>
             </div>
           </div>
-          
+
           <div class="indicator-card">
             <div class="indicator-title">MACD</div>
             <div class="macd-container">
@@ -56,7 +56,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="indicator-card">
             <div class="indicator-title">布林带</div>
             <div class="bollinger-container">
@@ -79,13 +79,13 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 技术信号 -->
       <div class="technical-signals">
         <h4>🚦 技术信号</h4>
         <div class="signals-grid">
-          <div 
-            v-for="(signal, index) in technicalSignals" 
+          <div
+            v-for="(signal, index) in technicalSignals"
             :key="index"
             class="signal-item"
             :class="signal.type"
@@ -97,8 +97,8 @@
               <div class="signal-strength">
                 强度: {{ signal.strength }}/10
                 <div class="strength-bar">
-                  <div 
-                    class="strength-fill" 
+                  <div
+                    class="strength-fill"
                     :style="{ width: (signal.strength * 10) + '%' }"
                   ></div>
                 </div>
@@ -107,7 +107,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 支撑阻力位 -->
       <div class="support-resistance">
         <h4>🎯 支撑阻力位</h4>
@@ -115,8 +115,8 @@
           <div class="level-group">
             <h5>阻力位</h5>
             <div class="level-list">
-              <div 
-                v-for="(level, index) in resistanceLevels" 
+              <div
+                v-for="(level, index) in resistanceLevels"
                 :key="index"
                 class="level-item resistance"
               >
@@ -125,12 +125,12 @@
               </div>
             </div>
           </div>
-          
+
           <div class="level-group">
             <h5>支撑位</h5>
             <div class="level-list">
-              <div 
-                v-for="(level, index) in supportLevels" 
+              <div
+                v-for="(level, index) in supportLevels"
                 :key="index"
                 class="level-item support"
               >
@@ -141,13 +141,13 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 技术形态识别 -->
       <div class="pattern-recognition">
         <h4>🔍 技术形态识别</h4>
         <div class="patterns-grid">
-          <div 
-            v-for="(pattern, index) in technicalPatterns" 
+          <div
+            v-for="(pattern, index) in technicalPatterns"
             :key="index"
             class="pattern-card"
             :class="pattern.confidence > 70 ? 'high-confidence' : pattern.confidence > 40 ? 'medium-confidence' : 'low-confidence'"
@@ -159,8 +159,8 @@
               <div class="pattern-confidence">
                 置信度: {{ pattern.confidence }}%
                 <div class="confidence-bar">
-                  <div 
-                    class="confidence-fill" 
+                  <div
+                    class="confidence-fill"
                     :style="{ width: pattern.confidence + '%' }"
                   ></div>
                 </div>
@@ -285,7 +285,7 @@ const getBollingerPosition = () => {
   const price = technicalData.value.currentPrice
   const upper = technicalData.value.bollingerUpper
   const lower = technicalData.value.bollingerLower
-  
+
   if (price > upper) return '上轨上方'
   if (price < lower) return '下轨下方'
   return '轨道内'
@@ -704,11 +704,11 @@ onMounted(() => {
   .patterns-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .sr-levels {
     grid-template-columns: 1fr;
   }
-  
+
   .signal-strength,
   .pattern-confidence {
     flex-direction: column;

@@ -34,9 +34,9 @@ export class ArbitrationCaseEntity {
   @Column({ name: 'priority_score', type: 'decimal', precision: 5, scale: 4 })
   priorityScore: number;
 
-  @Column({ 
-    name: 'status', 
-    type: 'enum', 
+  @Column({
+    name: 'status',
+    type: 'enum',
     enum: ['PENDING_HUMAN', 'IGNORED', 'ARBITRATED'],
     default: 'PENDING_HUMAN'
   })

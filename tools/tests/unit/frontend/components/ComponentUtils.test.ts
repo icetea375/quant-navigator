@@ -30,19 +30,19 @@ const getConfidenceColor = (confidence: number): string => {
 
 const validateForm = (formData: any): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
-  
+
   if (!formData.final_recommendation) {
     errors.push('请选择最终推荐');
   }
-  
+
   if (!formData.reasoning) {
     errors.push('请填写推理过程');
   }
-  
+
   if (formData.confidence_level < 0 || formData.confidence_level > 100) {
     errors.push('置信度必须在0-100之间');
   }
-  
+
   return {
     isValid: errors.length === 0,
     errors
@@ -170,7 +170,7 @@ describe('前端组件工具函数测试', () => {
       const today = new Date();
       const yesterday = new Date(today);
       yesterday.setDate(yesterday.getDate() - 1);
-      
+
       const result = calculateDaysPending(yesterday.toISOString());
       expect(result).toBeGreaterThanOrEqual(1);
     });
@@ -185,7 +185,7 @@ describe('前端组件工具函数测试', () => {
       const today = new Date();
       const threeDaysAgo = new Date(today);
       threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-      
+
       const result = calculateDaysPending(threeDaysAgo.toISOString());
       expect(result).toBe(3);
     });

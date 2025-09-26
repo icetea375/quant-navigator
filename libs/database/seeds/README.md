@@ -191,7 +191,7 @@ SELECT 'human_feedback_loop', COUNT(*) FROM human_feedback_loop;
 
 ---
 
-**文档版本**: v1.0  
-**最后更新**: 2025-01-17  
-**维护者**: AI Assistant  
+**文档版本**: v1.0
+**最后更新**: 2025-01-17
+**维护者**: AI Assistant
 **优化说明**: 基于v10.1架构，提供完整的数据库种子数据解决方案，确保系统能够快速启动和正常运行

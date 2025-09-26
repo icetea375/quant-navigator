@@ -27,7 +27,7 @@ export enum SignalStatus {
 export class QuantSignals {
     // 添加索引签名以支持动态属性访问
     [key: string]: any;
-    
+
     @PrimaryGeneratedColumn('uuid')
     signal_id: string;
 
@@ -305,7 +305,7 @@ export class QuantSignals {
         // 确保任何通过 new QuantSignals() 创建的实例，
         // status字段都有一个确定的值，与数据库默认值保持一致
         this.status = SignalStatus.ACTIVE;
-        
+
         // 初始化所有必填字段
         this.signal_id = '';
         this.target_code = '';
@@ -313,7 +313,7 @@ export class QuantSignals {
         this.signal_type = SignalType.INDIVIDUAL;
         this.created_at = new Date();
         this.updated_at = new Date();
-        
+
         // 初始化所有可为空字段
         this.return_z_score = null;
         this.volume_z_score = null;

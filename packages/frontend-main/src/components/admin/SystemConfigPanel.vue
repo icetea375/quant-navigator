@@ -27,7 +27,7 @@
           </el-form-item>
         </el-form>
       </el-tab-pane>
-      
+
       <el-tab-pane label="AI配置" name="ai">
         <el-form :model="aiConfig" label-width="120px">
           <el-form-item label="模型版本">
@@ -50,7 +50,7 @@
           </el-form-item>
         </el-form>
       </el-tab-pane>
-      
+
       <el-tab-pane label="数据库配置" name="database">
         <el-form :model="dbConfig" label-width="120px">
           <el-form-item label="数据库类型">
@@ -74,7 +74,7 @@
           </el-form-item>
         </el-form>
       </el-tab-pane>
-      
+
       <el-tab-pane label="监控配置" name="monitoring">
         <el-form :model="monitoringConfig" label-width="120px">
           <el-form-item label="监控开关">
@@ -160,4 +160,3 @@ const monitoringConfig = reactive({
   margin: 10px 0;
 }
 </style>
-

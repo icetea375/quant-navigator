@@ -423,7 +423,7 @@ export const exportApiDocsAsMarkdown = () => {
   docs.endpoints.public.endpoints.forEach(endpoint => {
     markdown += `### ${endpoint.method} ${endpoint.path}\n\n`
     markdown += `${endpoint.description}\n\n`
-    
+
     if (endpoint.parameters && endpoint.parameters.length > 0) {
       markdown += `**请求参数:**\n\n`
       endpoint.parameters.forEach(param => {
@@ -447,7 +447,7 @@ export const exportApiDocsAsMarkdown = () => {
   docs.endpoints.private.endpoints.forEach(endpoint => {
     markdown += `### ${endpoint.method} ${endpoint.path}\n\n`
     markdown += `${endpoint.description}\n\n`
-    
+
     if (endpoint.parameters && endpoint.parameters.length > 0) {
       markdown += `**请求参数:**\n\n`
       endpoint.parameters.forEach(param => {
@@ -471,7 +471,7 @@ export const exportApiDocsAsMarkdown = () => {
   docs.endpoints.admin.endpoints.forEach(endpoint => {
     markdown += `### ${endpoint.method} ${endpoint.path}\n\n`
     markdown += `${endpoint.description}\n\n`
-    
+
     if (endpoint.parameters && endpoint.parameters.length > 0) {
       markdown += `**请求参数:**\n\n`
       endpoint.parameters.forEach(param => {
@@ -496,4 +496,3 @@ export const exportApiDocsAsMarkdown = () => {
 
   return markdown
 }
-

@@ -290,7 +290,7 @@ describe('HumanFeedbackLoop Entity Validation', () => {
 
     describe('评分字段校验', () => {
         const scoreFields = [
-            'accuracy_score', 'completeness_score', 'logic_score', 
+            'accuracy_score', 'completeness_score', 'logic_score',
             'innovation_score', 'learning_value', 'training_effectiveness'
         ];
 
@@ -454,7 +454,7 @@ describe('HumanFeedbackLoop Entity Validation', () => {
 
         it('应该接受边界值的评分字段', async () => {
             const scoreFields = [
-                'accuracy_score', 'completeness_score', 'logic_score', 
+                'accuracy_score', 'completeness_score', 'logic_score',
                 'innovation_score', 'learning_value', 'training_effectiveness'
             ];
 

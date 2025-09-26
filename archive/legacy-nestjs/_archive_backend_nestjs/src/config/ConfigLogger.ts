@@ -46,14 +46,14 @@ export class ConfigLogger {
       // 写入日志文件
       const logLine = JSON.stringify(fullLog) + '\n'
       fs.appendFileSync(this.logFile, logLine, 'utf8')
-      
+
       // 同时输出到控制台
       console.log(`📝 配置变更日志: ${log.configType} ${log.action}`, {
         id: fullLog.id,
         success: log.success,
         fields: log.changes.fields
       })
-      
+
       return fullLog
     } catch (error) {
       console.error('写入配置变更日志失败:', error)
@@ -75,7 +75,7 @@ export class ConfigLogger {
 
       const logContent = fs.readFileSync(this.logFile, 'utf8')
       const lines = logContent.trim().split('\n').filter(line => line.trim())
-      
+
       let logs: ConfigChangeLog[] = lines.map(line => {
         try {
           return JSON.parse(line) as ConfigChangeLog

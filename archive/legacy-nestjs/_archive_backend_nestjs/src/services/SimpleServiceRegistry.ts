@@ -49,7 +49,7 @@ export class SimpleServiceRegistry {
     this.db = db;
     this.redis = redis;
     this.config = config;
-    
+
     this.validateConfig(config);
     this.initializeTables();
     this.loadServices();
@@ -65,7 +65,7 @@ export class SimpleServiceRegistry {
     }
 
     this.isRunning = true;
-    
+
     // 启动心跳检查
     this.heartbeatInterval = setInterval(() => {
       this.checkHeartbeats();
@@ -88,7 +88,7 @@ export class SimpleServiceRegistry {
     if (!this.isRunning) return;
 
     this.isRunning = false;
-    
+
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = undefined;
@@ -108,17 +108,17 @@ export class SimpleServiceRegistry {
   async registerService(service: ServiceInfo): Promise<void> {
     try {
       this.validateService(service);
-      
+
       service.registeredAt = Date.now();
       service.lastHeartbeat = Date.now();
       service.status = 'unknown';
 
       this.services.set(service.id, service);
       this.registeredServices.add(service.id);
-      
+
       await this.storeService(service);
       await this.updateRedisService(service);
-      
+
       logger.info(`📝 服务已注册: ${service.name}@${service.host}:${service.port}`);
     } catch (error) {
       BaseErrorHandler.handle(error, 'SimpleServiceRegistry');
@@ -138,10 +138,10 @@ export class SimpleServiceRegistry {
 
       this.services.delete(serviceId);
       this.registeredServices.delete(serviceId);
-      
+
       await this.removeServiceFromDb(serviceId);
       await this.removeServiceFromRedis(serviceId);
-      
+
       logger.info(`🗑️ 服务已注销: ${serviceId}`);
     } catch (error) {
       BaseErrorHandler.handle(error, 'SimpleServiceRegistry');
@@ -161,10 +161,10 @@ export class SimpleServiceRegistry {
 
       service.lastHeartbeat = Date.now();
       service.status = 'healthy';
-      
+
       await this.updateServiceInDb(service);
       await this.updateRedisService(service);
-      
+
     } catch (error) {
       BaseErrorHandler.handle(error, 'SimpleServiceRegistry');
     }
@@ -184,7 +184,7 @@ export class SimpleServiceRegistry {
 
       // 按标签过滤
       if (tags && tags.length > 0) {
-        services = services.filter(service => 
+        services = services.filter(service =>
           tags.every(tag => service.tags.includes(tag))
         );
       }
@@ -233,7 +233,7 @@ export class SimpleServiceRegistry {
           service.status = 'unhealthy';
           await this.updateServiceInDb(service);
           await this.updateRedisService(service);
-          
+
           logger.warn(`💔 服务心跳超时: ${service.name}@${service.host}:${service.port}`);
         }
       }
@@ -254,7 +254,7 @@ export class SimpleServiceRegistry {
             service.status = isHealthy ? 'healthy' : 'unhealthy';
             await this.updateServiceInDb(service);
             await this.updateRedisService(service);
-            
+
             if (isHealthy) {
               logger.info(`✅ 服务健康检查通过: ${service.name}`);
             } else {
@@ -278,7 +278,7 @@ export class SimpleServiceRegistry {
       const http = require('http');
       const https = require('https');
       const url = require('url');
-      
+
       const serviceUrl = new url.URL(service.healthCheckUrl);
       const isHttps = serviceUrl.protocol === 'https:';
       const client = isHttps ? https : http;
@@ -310,15 +310,15 @@ export class SimpleServiceRegistry {
     if (!service.id || !service.name || !service.host || !service.port) {
       throw new Error('Service must have id, name, host, and port');
     }
-    
+
     if (service.port < 1 || service.port > 65535) {
       throw new Error('Port must be between 1 and 65535');
     }
-    
+
     if (!['http', 'https', 'tcp', 'udp'].includes(service.protocol)) {
       throw new Error('Invalid protocol');
     }
-    
+
     if (!['healthy', 'unhealthy', 'unknown'].includes(service.status)) {
       throw new Error('Invalid status');
     }
@@ -329,7 +329,7 @@ export class SimpleServiceRegistry {
    */
   private validateConfig(config: ServiceRegistryConfig): void {
     BaseConfigValidator.validate(config, ['enabled', 'heartbeatInterval', 'healthCheckInterval']);
-    
+
     if (config.heartbeatInterval <= 0) {
       throw new Error('heartbeatInterval must be positive');
     }
@@ -382,7 +382,7 @@ export class SimpleServiceRegistry {
   private async loadServices(): Promise<void> {
     try {
       const services = await this.db.query('SELECT * FROM services');
-      
+
       for (const row of services) {
         const service: ServiceInfo = {
           id: row.id,
@@ -399,7 +399,7 @@ export class SimpleServiceRegistry {
           healthCheckUrl: row.health_check_url,
           weight: row.weight
         };
-        
+
         this.services.set(service.id, service);
       }
 
@@ -489,7 +489,7 @@ export class SimpleServiceRegistry {
       const totalServices = this.services.size;
       const healthyServices = Array.from(this.services.values()).filter(s => s.status === 'healthy').length;
       const unhealthyServices = Array.from(this.services.values()).filter(s => s.status === 'unhealthy').length;
-      
+
       return {
         total: totalServices,
         healthy: healthyServices,

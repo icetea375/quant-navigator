@@ -214,15 +214,14 @@ onMounted(() => {
     gap: 15px;
     align-items: flex-start;
   }
-  
+
   .header-actions {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .page-header h1 {
     font-size: 24px;
   }
 }
 </style>
-

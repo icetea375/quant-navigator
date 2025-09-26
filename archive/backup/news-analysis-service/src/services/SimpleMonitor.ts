@@ -118,7 +118,7 @@ export class SimpleMonitor {
   private db: any; // 数据库连接
   private alertNotifier: AlertNotifier;
   private healthChecker: SimpleHealthChecker;
-  
+
   // 业务指标计数器
   private apiRequestCount: number = 0;
   private apiErrorCount: number = 0;
@@ -150,13 +150,13 @@ export class SimpleMonitor {
     }
 
     this.isRunning = true;
-    
+
     if (this.config.enabled) {
       // 启动指标收集
       this.intervalId = setInterval(() => {
         this.collectMetrics();
       }, this.config.metricsInterval);
-      
+
       // 启动健康检查
       await this.healthChecker.start();
     }
@@ -173,12 +173,12 @@ export class SimpleMonitor {
     }
 
     this.isRunning = false;
-    
+
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
     }
-    
+
     // 停止健康检查
     await this.healthChecker.stop();
 
@@ -368,52 +368,52 @@ export class SimpleMonitor {
   private checkAlerts(systemMetrics: SystemMetrics, businessMetrics: BusinessMetrics): void {
     // 检查系统指标告警
     if (systemMetrics.cpu.usage > this.config.alertThresholds.cpu) {
-      this.createAlert('cpu', 'high', 
-        `CPU usage is ${systemMetrics.cpu.usage.toFixed(2)}%`, 
-        systemMetrics.cpu.usage, 
+      this.createAlert('cpu', 'high',
+        `CPU usage is ${systemMetrics.cpu.usage.toFixed(2)}%`,
+        systemMetrics.cpu.usage,
         this.config.alertThresholds.cpu
       );
     }
 
     if (systemMetrics.memory.usage > this.config.alertThresholds.memory) {
-      this.createAlert('memory', 'high', 
-        `Memory usage is ${systemMetrics.memory.usage.toFixed(2)}%`, 
-        systemMetrics.memory.usage, 
+      this.createAlert('memory', 'high',
+        `Memory usage is ${systemMetrics.memory.usage.toFixed(2)}%`,
+        systemMetrics.memory.usage,
         this.config.alertThresholds.memory
       );
     }
 
     if (systemMetrics.disk.usage > this.config.alertThresholds.disk) {
-      this.createAlert('disk', 'high', 
-        `Disk usage is ${systemMetrics.disk.usage.toFixed(2)}%`, 
-        systemMetrics.disk.usage, 
+      this.createAlert('disk', 'high',
+        `Disk usage is ${systemMetrics.disk.usage.toFixed(2)}%`,
+        systemMetrics.disk.usage,
         this.config.alertThresholds.disk
       );
     }
 
     // 检查业务指标告警
     if (businessMetrics.api.responseTime > this.config.alertThresholds.apiResponseTime) {
-      this.createAlert('api', 'medium', 
-        `API response time is ${businessMetrics.api.responseTime.toFixed(2)}ms`, 
-        businessMetrics.api.responseTime, 
+      this.createAlert('api', 'medium',
+        `API response time is ${businessMetrics.api.responseTime.toFixed(2)}ms`,
+        businessMetrics.api.responseTime,
         this.config.alertThresholds.apiResponseTime,
         'API Gateway'
       );
     }
 
     if (businessMetrics.api.errorRate > this.config.alertThresholds.apiErrorRate) {
-      this.createAlert('api', 'high', 
-        `API error rate is ${businessMetrics.api.errorRate.toFixed(2)}%`, 
-        businessMetrics.api.errorRate, 
+      this.createAlert('api', 'high',
+        `API error rate is ${businessMetrics.api.errorRate.toFixed(2)}%`,
+        businessMetrics.api.errorRate,
         this.config.alertThresholds.apiErrorRate,
         'API Gateway'
       );
     }
 
     if (businessMetrics.business.scoringAccuracy < (100 - this.config.alertThresholds.businessErrorRate)) {
-      this.createAlert('business', 'medium', 
-        `Scoring accuracy is ${businessMetrics.business.scoringAccuracy.toFixed(2)}%`, 
-        businessMetrics.business.scoringAccuracy, 
+      this.createAlert('business', 'medium',
+        `Scoring accuracy is ${businessMetrics.business.scoringAccuracy.toFixed(2)}%`,
+        businessMetrics.business.scoringAccuracy,
         100 - this.config.alertThresholds.businessErrorRate,
         'Announcement Scoring'
       );
@@ -439,7 +439,7 @@ export class SimpleMonitor {
 
     this.alerts.push(alert);
     console.warn(`Alert created: ${message}`);
-    
+
     // 发送告警通知
     if (this.config.alerting.enabled) {
       this.alertNotifier.sendAlert(alert);

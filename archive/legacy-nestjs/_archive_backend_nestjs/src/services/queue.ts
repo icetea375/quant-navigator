@@ -44,10 +44,10 @@ export class AnalysisQueue {
   constructor() {
     this.llmManager = LLMServiceManager.getInstance();
     this.db = DatabaseConnection.getInstance();
-    
+
     // 直接使用模拟队列，避免Redis连接阻塞
     this.setupMockQueue();
-    
+
     // 在后台尝试连接Redis，但不阻塞构造函数
     setTimeout(() => {
       this.tryInitializeRedis();
@@ -56,7 +56,7 @@ export class AnalysisQueue {
 
   private setupMockQueue(): void {
     console.log('🔧 使用模拟队列模式');
-    
+
     // 创建模拟的Redis和队列对象
     this.redis = {
       connect: () => Promise.resolve(),
@@ -64,7 +64,7 @@ export class AnalysisQueue {
       on: () => {},
       off: () => {}
     };
-    
+
     this.queue = {
       process: () => {},
       add: () => Promise.resolve({}),
@@ -76,7 +76,7 @@ export class AnalysisQueue {
   private async tryInitializeRedis(): Promise<void> {
     try {
       console.log('🔄 尝试连接Redis...');
-      
+
       // 使用更保守的配置
       this.redis = new Redis({
         host: process.env['REDIS_HOST'] || 'localhost',
@@ -90,7 +90,7 @@ export class AnalysisQueue {
         retryDelayOnFailover: 500,
         enableOfflineQueue: false
       } as any);
-      
+
       this.queue = new Queue('news-analysis', {
         redis: {
           host: process.env['REDIS_HOST'] || 'localhost',
@@ -108,10 +108,10 @@ export class AnalysisQueue {
           }
         }
       });
-      
+
       console.log('✅ Redis连接成功');
       this.setupQueueHandlers();
-      
+
     } catch (error) {
       console.log('⚠️ Redis连接失败，继续使用模拟队列:', error instanceof Error ? error instanceof Error ? error.message : String(error) : '未知错误');
     }
@@ -121,39 +121,39 @@ export class AnalysisQueue {
     // 处理任务
     this.queue.process(async (job: any) => {
       const { analysisId, newsType, analysisType, newsContent, newsTitle, priority } = job.data;
-      
+
       try {
         // 更新任务状态为处理中
         await this.updateAnalysisStatus(analysisId, 'processing');
-        
+
         // 根据分析类型选择LLM服务
         const llmService = this.llmManager.selectBestService({
           priority: this.mapPriorityToLLM(priority),
           maxTokens: this.getMaxTokensForAnalysis(analysisType)
         });
-        
+
         if (!llmService) {
           throw new Error('没有可用的LLM服务');
         }
-        
+
         // 生成分析策略
         const strategy = await this.generateAnalysisStrategy(llmService, newsType, analysisType);
-        
+
         // 执行分析
         const result = await this.executeAnalysis(llmService, strategy, newsContent, newsTitle);
-        
+
         // 保存分析结果
         await this.saveAnalysisResult(analysisId, strategy, result);
-        
+
         // 更新任务状态为完成
         await this.updateAnalysisStatus(analysisId, 'completed', result);
-        
+
         return {
           analysisId,
           success: true,
           result
         };
-        
+
       } catch (error) {
         const errorMessage = error instanceof Error ? error instanceof Error ? error.message : String(error) : '未知错误';
         await this.updateAnalysisStatus(analysisId, 'failed', undefined, errorMessage);
@@ -178,15 +178,15 @@ export class AnalysisQueue {
   }
 
   public async addJob(
-    type: JobType, 
-    data: Omit<AnalysisJobData, 'priority'>, 
+    type: JobType,
+    data: Omit<AnalysisJobData, 'priority'>,
     priority: JobPriority = JobPriority.NORMAL
   ): Promise<Queue.Job<AnalysisJobData>> {
     const jobData: AnalysisJobData = {
       ...data,
       priority
     };
-    
+
     return this.queue.add(type, jobData, {
       priority,
       delay: this.calculateDelay(priority),
@@ -228,8 +228,8 @@ export class AnalysisQueue {
   }
 
   private async generateAnalysisStrategy(
-    llmService: any, 
-    newsType: string, 
+    llmService: any,
+    newsType: string,
     analysisType: string
   ): Promise<string> {
     const prompt = `
@@ -246,19 +246,19 @@ export class AnalysisQueue {
 
 请用JSON格式返回策略。
     `;
-    
+
     const response = await this.llmManager.callLLM(llmService.name, prompt, {
       maxTokens: 1000,
       temperature: 0.3
     });
-    
+
     return response.content;
   }
 
   private async executeAnalysis(
-    llmService: any, 
-    strategy: string, 
-    newsContent?: string, 
+    llmService: any,
+    strategy: string,
+    newsContent?: string,
     newsTitle?: string
   ): Promise<any> {
     const prompt = `
@@ -272,39 +272,39 @@ ${strategy}
 
 请按照策略要求进行分析，并返回结构化的分析结果。
     `;
-    
+
     const response = await this.llmManager.callLLM(llmService.name, prompt, {
       maxTokens: 3000,
       temperature: 0.5
     });
-    
+
     return response.content;
   }
 
   private async updateAnalysisStatus(
-    analysisId: string, 
+    analysisId: string,
     status: 'pending' | 'processing' | 'completed' | 'failed',
     result?: any,
     errorMessage?: string
   ): Promise<void> {
     const db = this.db.getConnection();
     const now = Date.now();
-    
+
     if (status === 'completed') {
       db.prepare(`
-        UPDATE analysis_results 
+        UPDATE analysis_results
         SET status = ?, updated_at = ?, completed_at = ?, summary = ?
         WHERE id = ?
       `).run(status, now, now, result, analysisId);
     } else if (status === 'failed') {
       db.prepare(`
-        UPDATE analysis_results 
+        UPDATE analysis_results
         SET status = ?, updated_at = ?, error_message = ?
         WHERE id = ?
       `).run(status, now, errorMessage, analysisId);
     } else {
       db.prepare(`
-        UPDATE analysis_results 
+        UPDATE analysis_results
         SET status = ?, updated_at = ?
         WHERE id = ?
       `).run(status, now, analysisId);
@@ -312,15 +312,15 @@ ${strategy}
   }
 
   private async saveAnalysisResult(
-    analysisId: string, 
-    strategy: string, 
+    analysisId: string,
+    strategy: string,
     result: any
   ): Promise<void> {
     const db = this.db.getConnection();
     const now = Date.now();
-    
+
     db.prepare(`
-      UPDATE analysis_results 
+      UPDATE analysis_results
       SET strategy = ?, summary = ?, updated_at = ?
       WHERE id = ?
     `).run(strategy, result, now, analysisId);
@@ -331,7 +331,7 @@ ${strategy}
     if (!job) {
       return null;
     }
-    
+
     return {
       id: job.id,
       data: job.data,
@@ -349,7 +349,7 @@ ${strategy}
     const active = await this.queue.getActive();
     const completed = await this.queue.getCompleted();
     const failed = await this.queue.getFailed();
-    
+
     return {
       waiting: waiting.length,
       active: active.length,

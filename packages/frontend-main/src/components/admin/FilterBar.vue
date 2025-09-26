@@ -15,8 +15,8 @@
       <!-- 自定义日期范围 -->
       <div v-if="filters.dateRange === 'custom'" class="filter-group">
         <label>开始日期</label>
-        <input 
-          type="date" 
+        <input
+          type="date"
           v-model="filters.startDate"
           @change="handleFilterChange"
         />
@@ -24,8 +24,8 @@
 
       <div v-if="filters.dateRange === 'custom'" class="filter-group">
         <label>结束日期</label>
-        <input 
-          type="date" 
+        <input
+          type="date"
           v-model="filters.endDate"
           @change="handleFilterChange"
         />
@@ -57,8 +57,8 @@
       <!-- 股票代码搜索 -->
       <div class="filter-group">
         <label>股票代码</label>
-        <input 
-          type="text" 
+        <input
+          type="text"
           v-model="filters.stockCode"
           placeholder="输入股票代码"
           @input="handleStockCodeChange"
@@ -105,7 +105,7 @@ const filters = ref({
 // 计算属性
 const computedFilters = computed(() => {
   const result: any = {}
-  
+
   if (filters.value.dateRange === 'custom') {
     if (filters.value.startDate) {
       result.startDate = filters.value.startDate
@@ -118,23 +118,23 @@ const computedFilters = computed(() => {
     const endDate = new Date()
     const startDate = new Date()
     startDate.setDate(endDate.getDate() - days)
-    
+
     result.startDate = startDate.toISOString().split('T')[0]
     result.endDate = endDate.toISOString().split('T')[0]
   }
-  
+
   if (filters.value.reportType) {
     result.reportType = filters.value.reportType
   }
-  
+
   if (filters.value.feedbackStatus) {
     result.feedbackStatus = filters.value.feedbackStatus
   }
-  
+
   if (filters.value.stockCode) {
     result.stockCode = filters.value.stockCode
   }
-  
+
   return result
 })
 
@@ -236,7 +236,7 @@ function debounce(func: Function, wait: number) {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .filter-group {
     min-width: auto;
   }

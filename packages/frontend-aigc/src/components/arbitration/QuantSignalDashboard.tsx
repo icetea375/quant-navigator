@@ -2,12 +2,12 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Card, Row, Col, Statistic, Progress, Tag, Tooltip, Typography, Divider } from 'antd';
 import { GaugeChart, GaugeChartProps } from '@ant-design/charts';
 import { RadarChart, RadarChartProps } from '@ant-design/charts';
-import { 
-  ThunderboltOutlined, 
-  TrendingUpOutlined, 
+import {
+  ThunderboltOutlined,
+  TrendingUpOutlined,
   TrendingDownOutlined,
   InfoCircleOutlined,
-  WarningOutlined 
+  WarningOutlined
 } from '@ant-design/icons';
 import { QuantSignalDashboardProps, QuantSignalsData } from '../../types/arbitration';
 import './QuantSignalDashboard.css';
@@ -17,7 +17,7 @@ const { Text, Title } = Typography;
 /**
  * 量化信号仪表盘组件
  * 展示当日量化信号和市场背景，支持可视化分析
- * 
+ *
  * 核心特性：
  * 1. 仪表盘图表展示Z-Score
  * 2. 雷达图展示多维度信号
@@ -139,7 +139,7 @@ const QuantSignalDashboard: React.FC<QuantSignalDashboardProps> = ({
           {signals.map((signal, index) => {
             const strength = getSignalStrength(signal.value);
             const direction = getSignalDirection(signal.value);
-            
+
             return (
               <Col span={6} key={index}>
                 <div
@@ -156,8 +156,8 @@ const QuantSignalDashboard: React.FC<QuantSignalDashboardProps> = ({
                   </div>
                   <div className="signal-value">
                     <Text
-                      style={{ 
-                        fontSize: '24px', 
+                      style={{
+                        fontSize: '24px',
                         color: direction.color,
                         fontWeight: 'bold'
                       }}
@@ -167,8 +167,8 @@ const QuantSignalDashboard: React.FC<QuantSignalDashboardProps> = ({
                   </div>
                   <div className="signal-strength">
                     <Tag color={strength.color}>
-                      {strength.level === 'strong' ? '强' : 
-                       strength.level === 'medium' ? '中' : 
+                      {strength.level === 'strong' ? '强' :
+                       strength.level === 'medium' ? '中' :
                        strength.level === 'weak' ? '弱' : '中性'}
                     </Tag>
                   </div>
@@ -214,7 +214,7 @@ const QuantSignalDashboard: React.FC<QuantSignalDashboardProps> = ({
           {signals.map((signal, index) => {
             const strength = getSignalStrength(signal.value);
             const direction = getSignalDirection(signal.value);
-            
+
             return (
               <Col span={6} key={index}>
                 <div
@@ -231,8 +231,8 @@ const QuantSignalDashboard: React.FC<QuantSignalDashboardProps> = ({
                   </div>
                   <div className="signal-value">
                     <Text
-                      style={{ 
-                        fontSize: '20px', 
+                      style={{
+                        fontSize: '20px',
                         color: direction.color,
                         fontWeight: 'bold'
                       }}
@@ -242,8 +242,8 @@ const QuantSignalDashboard: React.FC<QuantSignalDashboardProps> = ({
                   </div>
                   <div className="signal-strength">
                     <Tag color={strength.color}>
-                      {strength.level === 'strong' ? '强' : 
-                       strength.level === 'medium' ? '中' : 
+                      {strength.level === 'strong' ? '强' :
+                       strength.level === 'medium' ? '中' :
                        strength.level === 'weak' ? '弱' : '中性'}
                     </Tag>
                   </div>
@@ -292,7 +292,7 @@ const QuantSignalDashboard: React.FC<QuantSignalDashboardProps> = ({
         <Row gutter={[16, 16]}>
           {factors.map((factor, index) => {
             const color = factor.value > 0.7 ? '#52c41a' : factor.value > 0.5 ? '#faad14' : '#ff4d4f';
-            
+
             return (
               <Col span={6} key={index}>
                 <div className="factor-item">
@@ -304,8 +304,8 @@ const QuantSignalDashboard: React.FC<QuantSignalDashboardProps> = ({
                   </div>
                   <div className="factor-value">
                     <Text
-                      style={{ 
-                        fontSize: '24px', 
+                      style={{
+                        fontSize: '24px',
                         color: color,
                         fontWeight: 'bold'
                       }}
@@ -371,7 +371,7 @@ const QuantSignalDashboard: React.FC<QuantSignalDashboardProps> = ({
             />
           </Col>
         </Row>
-        
+
         <div className="score-warning">
           {overallScore < 0.3 && (
             <div className="warning-item">
@@ -414,17 +414,17 @@ const QuantSignalDashboard: React.FC<QuantSignalDashboardProps> = ({
     <div className="quant-signal-dashboard">
       <div className="dashboard-content">
         {renderIndividualSignals()}
-        
+
         <Divider />
-        
+
         {renderMarketSignals()}
-        
+
         <Divider />
-        
+
         {renderManagementFactors()}
-        
+
         <Divider />
-        
+
         {renderOverallScore()}
       </div>
     </div>

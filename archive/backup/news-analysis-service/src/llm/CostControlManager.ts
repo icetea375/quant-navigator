@@ -148,16 +148,16 @@ export class CostControlManager {
   private checkBudgetLimits(): void {
     const today = new Date().toISOString().split('T')[0];
     const currentMonth = today.substring(0, 7);
-    
+
     const dailyCost = this.dailyCosts.get(today) || 0;
     const monthlyCost = this.monthlyCosts.get(currentMonth) || 0;
 
     // 检查每日限制
     this.checkDailyLimit(dailyCost);
-    
+
     // 检查每月限制
     this.checkMonthlyLimit(monthlyCost);
-    
+
     // 检查任务类型限制
     this.checkTaskTypeLimits();
   }
@@ -167,7 +167,7 @@ export class CostControlManager {
    */
   private checkDailyLimit(dailyCost: number): void {
     const percentage = dailyCost / this.budgetConfig.dailyLimit;
-    
+
     if (percentage >= this.budgetConfig.emergencyThreshold) {
       this.addAlert({
         type: 'emergency',
@@ -194,7 +194,7 @@ export class CostControlManager {
    */
   private checkMonthlyLimit(monthlyCost: number): void {
     const percentage = monthlyCost / this.budgetConfig.monthlyLimit;
-    
+
     if (percentage >= this.budgetConfig.emergencyThreshold) {
       this.addAlert({
         type: 'emergency',
@@ -221,7 +221,7 @@ export class CostControlManager {
    */
   private checkTaskTypeLimits(): void {
     const today = new Date().toISOString().split('T')[0];
-    const todayRecords = this.costRecords.filter(r => 
+    const todayRecords = this.costRecords.filter(r =>
       new Date(r.timestamp).toISOString().split('T')[0] === today
     );
 
@@ -357,7 +357,7 @@ export class CostControlManager {
     }
 
     // 轮数减少优化
-    const highRoundTasks = this.costRecords.filter(r => 
+    const highRoundTasks = this.costRecords.filter(r =>
       r.totalTokens > 5000 && r.qualityScore && r.qualityScore > 0.8
     );
 
@@ -394,7 +394,7 @@ export class CostControlManager {
     }
 
     // 质量调整优化
-    const lowQualityTasks = this.costRecords.filter(r => 
+    const lowQualityTasks = this.costRecords.filter(r =>
       r.qualityScore && r.qualityScore < 0.6
     );
 
@@ -426,7 +426,7 @@ export class CostControlManager {
     this.costRecords.forEach(record => {
       if (processed.has(record.taskId)) return;
 
-      const similar = this.costRecords.filter(r => 
+      const similar = this.costRecords.filter(r =>
         r.taskType === record.taskType &&
         r.provider === record.provider &&
         r.model === record.model &&
@@ -460,14 +460,14 @@ export class CostControlManager {
   } {
     const today = new Date().toISOString().split('T')[0];
     const currentMonth = today.substring(0, 7);
-    
+
     const dailyCost = this.dailyCosts.get(today) || 0;
     const monthlyCost = this.monthlyCosts.get(currentMonth) || 0;
 
     const taskTypeStatus: Record<string, { current: number; limit: number; percentage: number }> = {};
     Object.keys(this.budgetConfig.taskTypeLimits).forEach(taskType => {
-      const todayRecords = this.costRecords.filter(r => 
-        r.taskType === taskType && 
+      const todayRecords = this.costRecords.filter(r =>
+        r.taskType === taskType &&
         new Date(r.timestamp).toISOString().split('T')[0] === today
       );
       const current = todayRecords.reduce((sum, r) => sum + r.cost, 0);

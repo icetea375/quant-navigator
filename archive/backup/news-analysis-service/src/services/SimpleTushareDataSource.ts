@@ -319,7 +319,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getStockBasicInfo(tsCode?: string): Promise<StockBasicInfo[]> {
     try {
       const cacheKey = `stock_basic_${tsCode || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -363,7 +363,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getIndexBasicInfo(tsCode?: string): Promise<IndexBasicInfo[]> {
     try {
       const cacheKey = `index_basic_${tsCode || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -407,7 +407,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getDailyData(tsCode: string, startDate?: string, endDate?: string): Promise<DailyData[]> {
     try {
       const cacheKey = `daily_${tsCode}_${startDate || 'all'}_${endDate || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -455,7 +455,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getFinancialData(tsCode: string, startDate?: string, endDate?: string): Promise<FinancialData[]> {
     try {
       const cacheKey = `financial_${tsCode}_${startDate || 'all'}_${endDate || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -503,7 +503,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getRealtimeData(tsCodes: string[]): Promise<DailyData[]> {
     try {
       const cacheKey = `realtime_${tsCodes.join(',')}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -544,7 +544,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getNewsData(startDate?: string, endDate?: string): Promise<NewsData[]> {
     try {
       const cacheKey = `news_${startDate || 'all'}_${endDate || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -593,7 +593,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getIndexDailyData(tsCode: string, startDate?: string, endDate?: string): Promise<IndexDailyData[]> {
     try {
       const cacheKey = `index_daily_${tsCode}_${startDate || 'all'}_${endDate || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -637,7 +637,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
         console.warn(`Index daily data not available for ${tsCode}. This may be due to insufficient permissions or interface changes. Please contact Tushare support.`);
         return [];
       }
-      
+
       logger.error('SimpleTushareDataSource error:', error);
       throw new Error(`Failed to get index daily data: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -649,7 +649,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getDailyBasicData(tsCode: string, startDate?: string, endDate?: string): Promise<DailyBasicData[]> {
     try {
       const cacheKey = `daily_basic_${tsCode}_${startDate || 'all'}_${endDate || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -699,7 +699,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getAnnouncementData(tsCode?: string, startDate?: string, endDate?: string): Promise<AnnouncementData[]> {
     try {
       const cacheKey = `anns_${tsCode || 'all'}_${startDate || 'all'}_${endDate || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -744,7 +744,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
         console.warn('Announcement API requires special permission. Please contact Tushare support.');
         return [];
       }
-      
+
       logger.error('SimpleTushareDataSource error:', error);
       throw new Error(`Failed to get announcement data: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -758,7 +758,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getTopListData(tradeDate?: string): Promise<TopListData[]> {
     try {
       const cacheKey = `top_list_${tradeDate || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -795,7 +795,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
         console.warn(`Top list data not available for ${tradeDate || 'current date'}. This may be due to insufficient permissions or interface changes. Please contact Tushare support.`);
         return [];
       }
-      
+
       logger.error('SimpleTushareDataSource error:', error);
       throw new Error(`Failed to get top list data: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -807,7 +807,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getDcHotData(tradeDate?: string, hotType?: string): Promise<DcHotData[]> {
     try {
       const cacheKey = `dc_hot_${tradeDate || 'all'}_${hotType || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -854,7 +854,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getThsHotData(tradeDate?: string, market?: string): Promise<ThsHotData[]> {
     try {
       const cacheKey = `ths_hot_${tradeDate || 'all'}_${market || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -901,7 +901,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getLimitListData(tradeDate?: string): Promise<LimitListData[]> {
     try {
       const cacheKey = `limit_list_d_${tradeDate || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -945,7 +945,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getTradeCalData(startDate?: string, endDate?: string): Promise<TradeCalData[]> {
     try {
       const cacheKey = `trade_cal_${startDate || 'all'}_${endDate || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -992,7 +992,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getThsMemberData(tsCode?: string): Promise<ThsMemberData[]> {
     try {
       const cacheKey = `ths_member_${tsCode || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -1036,7 +1036,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
   public async getDcMemberData(tsCode?: string): Promise<DcMemberData[]> {
     try {
       const cacheKey = `dc_member_${tsCode || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.caching.enabled) {
         const cached = await this.getCachedData(cacheKey);
@@ -1079,7 +1079,7 @@ export class SimpleTushareDataSource extends BaseFetcher {
    */
   private async makeRequest(apiName: string, params: any): Promise<any> {
     const axios = require('axios');
-    
+
     try {
       const response = await axios.post(this.config.baseUrl, params, {
         timeout: this.config.timeout,

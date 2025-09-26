@@ -46,7 +46,7 @@ describe('事件类型契约验证', () => {
     it('必须严格限制anomaly_type枚举值', () => {
       // 按照宪法第4条：禁止类型欺骗，必须使用正确的类型
       const validTypes: Array<AnomalyEvent['anomaly_type']> = ['price', 'volume', 'volatility', 'correlation'];
-      
+
       validTypes.forEach(type => {
         const event: AnomalyEvent = {
           id: 'test',
@@ -68,14 +68,14 @@ describe('事件类型契约验证', () => {
           },
           metadata: {}
         };
-        
+
         expect(event.anomaly_type).toBe(type);
       });
     });
 
     it('必须严格限制severity枚举值', () => {
       const validSeverities: Array<AnomalyEvent['severity']> = ['low', 'medium', 'high', 'critical'];
-      
+
       validSeverities.forEach(severity => {
         const event: AnomalyEvent = {
           id: 'test',
@@ -97,7 +97,7 @@ describe('事件类型契约验证', () => {
           },
           metadata: {}
         };
-        
+
         expect(event.severity).toBe(severity);
       });
     });

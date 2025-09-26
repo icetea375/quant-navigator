@@ -1,6 +1,6 @@
 /**
  * WorkflowOrchestrator - 工作流编排器
- * 
+ *
  * 功能：
  * 1. 协调各个核心组件的执行
  * 2. 支持动态股票宇宙管理
@@ -58,7 +58,7 @@ export class WorkflowOrchestrator {
     this.db = db;
     this.logger = logger;
     this.config = config;
-    
+
     // 初始化各个组件
     this.stockUniverseManager = new StockUniverseManager(db, logger);
     this.dataPipeline = new DataPipelineV15Manager(db, logger);
@@ -156,10 +156,10 @@ export class WorkflowOrchestrator {
     try {
       this.logger.info('检查每日股票晋升...');
       const promotedStocks = await this.stockUniverseManager.checkDailyPromotions();
-      
+
       if (promotedStocks.length > 0) {
         this.logger.info(`发现${promotedStocks.length}只股票需要晋升到核心宇宙`);
-        
+
         // 对晋升的股票执行核心宇宙处理
         for (const stockCode of promotedStocks) {
           await this.processCoreUniverseStock(stockCode);
@@ -177,10 +177,10 @@ export class WorkflowOrchestrator {
   private async executeDataPipeline(): Promise<void> {
     try {
       this.logger.info('执行数据管道...');
-      
+
       // 获取所有股票列表
       const allStocks = await this.stockUniverseManager.getAllStocks();
-      
+
       // 执行数据获取
       await this.dataPipeline.fetchAllData({
         symbols: allStocks.map(stock => stock.stock_code),
@@ -201,7 +201,7 @@ export class WorkflowOrchestrator {
   private async executeCoreUniverseProcessing(): Promise<number> {
     try {
       this.logger.info('执行核心宇宙处理...');
-      
+
       // 获取核心宇宙股票列表
       const coreStocks = await this.stockUniverseManager.getCoreUniverseStocks();
       this.logger.info(`核心宇宙股票数量: ${coreStocks.length}`);
@@ -253,7 +253,7 @@ export class WorkflowOrchestrator {
   private async executeObservationUniverseProcessing(): Promise<number> {
     try {
       this.logger.info('执行观察宇宙处理...');
-      
+
       // 获取观察宇宙股票列表
       const observationStocks = await this.stockUniverseManager.getObservationUniverseStocks();
       this.logger.info(`观察宇宙股票数量: ${observationStocks.length}`);
@@ -302,10 +302,10 @@ export class WorkflowOrchestrator {
   private async executeLearningLoopCoordinator(): Promise<void> {
     try {
       this.logger.info('执行学习循环协调器...');
-      
+
       // 获取核心宇宙股票列表
       const coreStocks = await this.stockUniverseManager.getCoreUniverseStocks();
-      
+
       // 通过HTTP API调用Python学习循环协调器
       const response = await fetch('http://localhost:8001/api/learning-loop/execute', {
         method: 'POST',
@@ -338,9 +338,9 @@ export class WorkflowOrchestrator {
   async executeMonthlyDemotionCheck(): Promise<void> {
     try {
       this.logger.info('执行月度降级检查...');
-      
+
       const demotedStocks = await this.stockUniverseManager.checkMonthlyDemotions();
-      
+
       if (demotedStocks.length > 0) {
         this.logger.info(`发现${demotedStocks.length}只股票需要降级到观察宇宙`);
       }
@@ -358,7 +358,7 @@ export class WorkflowOrchestrator {
   async getWorkflowStatus(): Promise<any> {
     try {
       const universeStats = await this.stockUniverseManager.getUniverseStats();
-      
+
       return {
         universe: universeStats,
         config: this.config,
@@ -381,7 +381,7 @@ export class WorkflowOrchestrator {
         FROM workflow_execution_log
         WHERE status = 'success'
       `);
-      
+
       return result.rows[0]?.last_execution || null;
     } catch (error) {
       this.logger.warn('获取上次执行时间失败:', error);
@@ -404,7 +404,7 @@ export class WorkflowOrchestrator {
   private async logWorkflowExecution(result: WorkflowExecutionResult): Promise<void> {
     try {
       await this.db.query(`
-        INSERT INTO workflow_execution_log 
+        INSERT INTO workflow_execution_log
         (execution_time, status, duration, core_processed, observation_processed, errors, warnings)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
       `, [
@@ -440,10 +440,10 @@ export class WorkflowOrchestrator {
   async promoteStockToCore(stockCode: string, reason: string): Promise<void> {
     try {
       await this.stockUniverseManager.updateUniverseMapping(stockCode, 'core', reason);
-      
+
       // 立即处理晋升的股票
       await this.processCoreUniverseStock(stockCode);
-      
+
       this.logger.info(`股票${stockCode}已手动晋升到核心宇宙`);
     } catch (error) {
       this.logger.error(`手动晋升股票${stockCode}失败:`, error);
@@ -457,7 +457,7 @@ export class WorkflowOrchestrator {
   async demoteStockToObservation(stockCode: string, reason: string): Promise<void> {
     try {
       await this.stockUniverseManager.updateUniverseMapping(stockCode, 'observation', reason);
-      
+
       this.logger.info(`股票${stockCode}已手动降级到观察宇宙`);
     } catch (error) {
       this.logger.error(`手动降级股票${stockCode}失败:`, error);

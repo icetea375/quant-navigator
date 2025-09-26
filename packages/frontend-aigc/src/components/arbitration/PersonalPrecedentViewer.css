@@ -142,23 +142,23 @@
   .precedent-toolbar {
     padding: 8px;
   }
-  
+
   .precedent-list {
     padding: 8px;
   }
-  
+
   .precedent-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .precedent-footer {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .precedent-scores {
     flex-direction: column;
     align-items: flex-start;

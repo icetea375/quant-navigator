@@ -27,7 +27,7 @@ export enum ReportStatus {
 export class FinancialReports {
     // 添加索引签名以支持动态属性访问
     [key: string]: any;
-    
+
     @PrimaryGeneratedColumn('uuid')
     report_id: string;
 
@@ -320,7 +320,7 @@ export class FinancialReports {
         // 确保任何通过 new FinancialReports() 创建的实例，
         // status字段都有一个确定的值，与数据库默认值保持一致
         this.status = ReportStatus.DRAFT;
-        
+
         // 初始化所有必填字段
         this.report_id = '';
         this.stock_code = '';
@@ -329,7 +329,7 @@ export class FinancialReports {
         this.fiscal_year = new Date().getFullYear();
         this.created_at = new Date();
         this.updated_at = new Date();
-        
+
         // 初始化所有可为空字段
         this.revenue = null;
         this.revenue_growth_rate = null;

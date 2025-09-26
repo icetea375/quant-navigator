@@ -55,7 +55,7 @@ export class SimpleMonitoringSystem {
     this.db = db;
     this.redis = redis;
     this.config = config;
-    
+
     this.validateConfig(config);
     this.initializeComponents();
   }
@@ -152,10 +152,10 @@ export class SimpleMonitoringSystem {
 
       // 存储到Redis用于快速查询
       const key = `metric:${metric}:${Date.now()}`;
-      await this.redis.setex(key, 3600, JSON.stringify({ 
-        value, 
-        tags: tags || {}, 
-        timestamp: Date.now() 
+      await this.redis.setex(key, 3600, JSON.stringify({
+        value,
+        tags: tags || {},
+        timestamp: Date.now()
       }));
 
     } catch (error) {
@@ -297,7 +297,7 @@ export class SimpleMonitoringSystem {
     try {
       const memUsage = process.memoryUsage();
       const cpuUsage = process.cpuUsage();
-      
+
       return {
         memory: {
           rss: memUsage.rss,
@@ -340,7 +340,7 @@ export class SimpleMonitoringSystem {
     try {
       const memUsage = process.memoryUsage();
       const cpuUsage = process.cpuUsage();
-      
+
       // 记录内存使用率
       const memoryUsagePercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
       await this.recordMetric('system.memory.usage_percent', memoryUsagePercent, {
@@ -450,7 +450,7 @@ export class SimpleMonitoringSystem {
    */
   private validateConfig(config: MonitoringConfig): void {
     BaseConfigValidator.validate(config, ['enabled', 'alertManager', 'serviceRegistry', 'distributedLock']);
-    
+
     if (config.alertManager.checkInterval <= 0) {
       throw new Error('alertManager.checkInterval must be positive');
     }

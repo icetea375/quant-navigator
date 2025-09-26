@@ -71,7 +71,7 @@ export class SimpleCache {
     this.enableStatistics = options.enableStatistics || true;
     this.consistencyMode = options.consistencyMode || 'eventual';
     this.preloadKeys = options.preloadKeys || [];
-    
+
     this.stats = {
       hits: 0,
       misses: 0,
@@ -85,11 +85,11 @@ export class SimpleCache {
       totalSize: 0,
       evictions: 0
     };
-    
+
     this.validateConfig(options);
     this.initializeConsistencyRules();
     this.startHealthChecks();
-    
+
     // 异步预加载
     if (this.preloadKeys.length > 0) {
       this.preloadCache().catch(error => {
@@ -139,7 +139,7 @@ export class SimpleCache {
     } catch (error) {
       this.stats.errors++;
       BaseErrorHandler.handle(error, 'SimpleCache');
-      
+
       if (error instanceof Error) {
         if (error instanceof Error ? error.message : String(error).includes('timeout')) {
           return null;
@@ -220,14 +220,14 @@ export class SimpleCache {
    */
   async mget<T>(keys: string[]): Promise<Map<string, T>> {
     const result = new Map<string, T>();
-    
+
     for (const key of keys) {
       const value = await this.get<T>(key);
       if (value !== null) {
         result.set(key, value);
       }
     }
-    
+
     return result;
   }
 
@@ -276,7 +276,7 @@ export class SimpleCache {
    */
   async preloadCache(): Promise<void> {
     if (this.isPreloading) return;
-    
+
     this.isPreloading = true;
     console.log('🔄 开始缓存预热...');
 
@@ -531,7 +531,7 @@ export class SimpleCache {
       if (memoryItem && !this.isExpired(memoryItem)) {
         return Math.max(0, Math.floor((memoryItem.expiry - Date.now()) / 1000));
       }
-      
+
       return await this.redis.ttl(key);
     } catch (error) {
       BaseErrorHandler.handle(error, 'SimpleCache');
@@ -548,7 +548,7 @@ export class SimpleCache {
       if (memoryItem) {
         memoryItem.expiry = Date.now() + ttl * 1000;
       }
-      
+
       const redisResult = await this.redis.expire(key, ttl);
       return redisResult > 0;
     } catch (error) {
@@ -610,7 +610,7 @@ export class SimpleCache {
       // 检查内存使用
       const memoryUsage = this.getMemoryUsage();
       const memoryUsagePercent = (memoryUsage / this.maxMemorySize) * 100;
-      
+
       if (memoryUsagePercent > 90) {
         healthStatus.issues.push(`内存使用率过高: ${memoryUsagePercent.toFixed(2)}%`);
         healthStatus.status = 'warning';
@@ -626,7 +626,7 @@ export class SimpleCache {
       // 检查错误率
       const totalOperations = this.stats.hits + this.stats.misses + this.stats.sets + this.stats.deletes;
       const errorRate = totalOperations > 0 ? this.stats.errors / totalOperations : 0;
-      
+
       if (errorRate > 0.01) { // 错误率超过1%
         healthStatus.issues.push(`操作错误率过高: ${(errorRate * 100).toFixed(2)}%`);
         healthStatus.status = 'warning';
@@ -651,7 +651,7 @@ export class SimpleCache {
   getDetailedMetrics(): any {
     const stats = this.getStats();
     const healthStatus = this.getHealthStatus();
-    
+
     return {
       timestamp: Date.now(),
       stats,
@@ -672,13 +672,13 @@ export class SimpleCache {
    */
   async mdel(keys: string[]): Promise<number> {
     let deletedCount = 0;
-    
+
     for (const key of keys) {
       if (await this.delete(key)) {
         deletedCount++;
       }
     }
-    
+
     return deletedCount;
   }
 
@@ -688,7 +688,7 @@ export class SimpleCache {
   async getAllKeys(): Promise<string[]> {
     const memoryKeys = Array.from(this.memoryCache.keys());
     const redisKeys = await this.getKeys();
-    
+
     // 合并并去重
     const allKeys = [...new Set([...memoryKeys, ...redisKeys])];
     return allKeys;
@@ -700,7 +700,7 @@ export class SimpleCache {
   getCacheSize(): { memory: number; redis: number; total: number } {
     const memorySize = this.memoryCache.size;
     const redisSize = this.stats.redisItems;
-    
+
     return {
       memory: memorySize,
       redis: redisSize,
@@ -714,7 +714,7 @@ export class SimpleCache {
   async cleanupExpiredItems(): Promise<number> {
     let cleanedCount = 0;
     const now = Date.now();
-    
+
     // 清理内存缓存中的过期项
     for (const [key, item] of this.memoryCache) {
       if (now > item.expiry) {
@@ -722,25 +722,25 @@ export class SimpleCache {
         cleanedCount++;
       }
     }
-    
+
     // 清理Redis中的过期项（这里简化处理）
     try {
       const keys = await this.redis.keys('*');
       const pipeline = this.redis.pipeline();
-      
+
       for (const key of keys) {
         pipeline.ttl(key);
       }
-      
+
       const results = await pipeline.exec();
       const expiredKeys = [];
-      
+
       for (let i = 0; i < keys.length; i++) {
         if (results && results[i] && results[i][1] === -2) { // TTL为-2表示键不存在
           expiredKeys.push(keys[i]);
         }
       }
-      
+
       if (expiredKeys.length > 0) {
         await this.redis.del(...expiredKeys);
         cleanedCount += expiredKeys.length;
@@ -748,7 +748,7 @@ export class SimpleCache {
     } catch (error) {
       BaseErrorHandler.handle(error, 'SimpleCache');
     }
-    
+
     this.updateStats();
     return cleanedCount;
   }
@@ -780,7 +780,7 @@ export class SimpleCache {
       clearInterval(this.healthCheckInterval);
       this.healthCheckInterval = null;
     }
-    
+
     this.memoryCache.clear();
     this.metrics.clear();
     console.log('🛑 缓存系统已销毁');

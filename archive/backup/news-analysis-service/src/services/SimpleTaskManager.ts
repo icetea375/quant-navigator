@@ -81,7 +81,7 @@ export class SimpleTaskManager {
       averageExecutionTime: 0,
       successRate: 0
     };
-    
+
     this.validateConfig(config);
     this.initializeTables();
     this.loadPersistedTasks();
@@ -143,7 +143,7 @@ export class SimpleTaskManager {
       };
 
       this.taskQueue.set(taskId, task);
-      
+
       if (this.config.enablePersistence) {
         await this.storeTask(task);
       }
@@ -238,7 +238,7 @@ export class SimpleTaskManager {
 
     } catch (error) {
       console.error(`❌ 任务执行失败: ${taskId}`, error);
-      
+
       // 重试逻辑
       if (task.retryCount < task.maxRetries) {
         task.retryCount++;
@@ -349,11 +349,11 @@ export class SimpleTaskManager {
     if (task.startedAt && task.completedAt) {
       const executionTime = task.completedAt.getTime() - task.startedAt.getTime();
       const totalExecutions = this.stats.completed + this.stats.failed;
-      
+
       if (totalExecutions === 1) {
         this.stats.averageExecutionTime = executionTime;
       } else {
-        this.stats.averageExecutionTime = 
+        this.stats.averageExecutionTime =
           (this.stats.averageExecutionTime * (totalExecutions - 1) + executionTime) / totalExecutions;
       }
     }
@@ -371,7 +371,7 @@ export class SimpleTaskManager {
    */
   private validateConfig(config: TaskConfig): void {
     BaseConfigValidator.validate(config, ['enabled', 'maxConcurrent', 'retryDelay', 'maxRetries']);
-    
+
     if (config.maxConcurrent <= 0) {
       throw new Error('maxConcurrent must be positive');
     }
@@ -468,7 +468,7 @@ export class SimpleTaskManager {
 
     try {
       const tasks = await this.db.query('SELECT * FROM tasks WHERE status IN (?, ?)', ['pending', 'running']);
-      
+
       for (const row of tasks) {
         const task: Task = {
           id: row.id,
@@ -506,7 +506,7 @@ export class SimpleTaskManager {
    */
   private updateStatsFromTask(task: Task): void {
     this.stats.total++;
-    
+
     switch (task.status) {
       case 'pending':
         this.stats.pending++;
@@ -585,7 +585,7 @@ export class SimpleTaskManager {
     const tasksToRemove: string[] = [];
 
     for (const [taskId, task] of this.taskQueue) {
-      if ((task.status === 'completed' || task.status === 'failed') && 
+      if ((task.status === 'completed' || task.status === 'failed') &&
           task.completedAt && task.completedAt < cutoffDate) {
         tasksToRemove.push(taskId);
       }

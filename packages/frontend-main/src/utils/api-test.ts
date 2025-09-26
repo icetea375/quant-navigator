@@ -9,7 +9,7 @@ export const API_TEST_CONFIG = {
     password: 'testpass123',
     email: 'test@example.com'
   },
-  
+
   // API端点测试
   endpoints: {
     public: [
@@ -32,7 +32,7 @@ export const API_TEST_CONFIG = {
 // API连接测试
 export const testApiConnection = async () => {
   console.log('🔍 开始API连接测试...')
-  
+
   const results = {
     public: [] as Array<{ name: string; success: boolean; error?: string }>,
     private: [] as Array<{ name: string; success: boolean; error?: string }>,
@@ -58,7 +58,7 @@ export const testApiConnection = async () => {
     // 尝试登录
     await authApi.login(API_TEST_CONFIG.testUser)
     console.log('✅ 用户登录成功')
-    
+
     for (const endpoint of API_TEST_CONFIG.endpoints.private) {
       try {
         await endpoint.method()
@@ -173,9 +173,8 @@ export const generateMockData = {
 export const enableApiMocking = () => {
   if (process.env.NODE_ENV === 'development') {
     console.log('🎭 启用API模拟模式')
-    
+
     // 这里可以集成mock服务，如MSW (Mock Service Worker)
     // 或者简单的拦截器来返回模拟数据
   }
 }
-

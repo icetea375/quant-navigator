@@ -58,7 +58,7 @@ export class AlertNotifier {
   private async sendEmailAlert(alert: Alert): Promise<void> {
     try {
       const nodemailer = require('nodemailer');
-      
+
       const transporter = nodemailer.createTransporter({
         host: this.config.email.smtp,
         port: this.config.email.port,
@@ -89,7 +89,7 @@ export class AlertNotifier {
   private async sendDingtalkAlert(alert: Alert): Promise<void> {
     try {
       const axios = require('axios');
-      
+
       const message = {
         msgtype: 'text',
         text: {
@@ -120,7 +120,7 @@ export class AlertNotifier {
         <div style="background-color: ${severityColors[alert.severity]}; color: white; padding: 20px; text-align: center;">
           <h1>🚨 ${alert.severity.toUpperCase()} ALERT</h1>
         </div>
-        
+
         <div style="padding: 20px; background-color: #f8f9fa;">
           <h2>Alert Details</h2>
           <table style="width: 100%; border-collapse: collapse;">
@@ -158,7 +158,7 @@ export class AlertNotifier {
             </tr>
           </table>
         </div>
-        
+
         <div style="padding: 20px; background-color: #ffffff;">
           <h3>Action Required</h3>
           <p>Please investigate and resolve this alert as soon as possible.</p>

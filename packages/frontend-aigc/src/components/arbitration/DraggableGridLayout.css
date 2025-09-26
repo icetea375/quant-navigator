@@ -81,15 +81,15 @@
     right: 8px;
     padding: 4px;
   }
-  
+
   .panel-header {
     padding: 4px 8px;
   }
-  
+
   .panel-actions {
     gap: 2px;
   }
-  
+
   .panel-content {
     padding: 8px;
   }

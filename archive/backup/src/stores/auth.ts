@@ -31,7 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = data.user
       localStorage.setItem('token', data.token)
       localStorage.setItem('userRole', data.user.role)
-      
+
       return { success: true }
     } catch (error) {
       console.error('Login error:', error)
@@ -61,7 +61,7 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = data.user
       localStorage.setItem('token', data.token)
       localStorage.setItem('userRole', data.user.role)
-      
+
       return { success: true }
     } catch (error) {
       console.error('Register error:', error)

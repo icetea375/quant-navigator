@@ -127,7 +127,7 @@ export function selectProviderForTask(
   taskType: 'content_extraction' | 'data_analysis' | 'chinese_processing' | 'fast_processing' | 'general' | 'etf_analysis'
 ): LLMProvider | null {
   const providers = getProvidersByPriority();
-  
+
   if (providers.length === 0) {
     return null;
   }
@@ -138,16 +138,16 @@ export function selectProviderForTask(
     case 'fast_processing':
       // 优先使用豆包Flash，响应速度快
       return providers.find(p => p.name === '豆包' && p.models.includes('doubao-seed-1-6-flash-250615')) || providers[0];
-    
+
     case 'chinese_processing':
       // 优先使用中文能力强的模型
       return providers.find(p => p.name === '豆包') || providers.find(p => p.name === '腾讯混元') || providers[0];
-    
+
     case 'data_analysis':
     case 'etf_analysis':
       // 优先使用分析能力强的模型
       return providers.find(p => p.name === '豆包' && p.models.includes('doubao-seed-1-6-250615')) || providers[0];
-    
+
     case 'general':
     default:
       return providers[0];
@@ -172,13 +172,13 @@ export function getDefaultOptions(): LLMOptions {
  */
 export function validateConfig(): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
-  
+
   // 检查是否有可用的提供商
   const availableProviders = getAvailableProviders();
   if (availableProviders.length === 0) {
     errors.push('没有可用的LLM提供商，请检查环境变量配置');
   }
-  
+
   // 检查每个提供商的配置
   Object.entries(UNIFIED_LLM_CONFIG).forEach(([key, provider]) => {
     if (provider.enabled) {
@@ -190,7 +190,7 @@ export function validateConfig(): { valid: boolean; errors: string[] } {
       }
     }
   });
-  
+
   return {
     valid: errors.length === 0,
     errors
@@ -212,7 +212,7 @@ export function getConfigSummary(): {
 } {
   const providers = Object.values(UNIFIED_LLM_CONFIG);
   const availableProviders = providers.filter(p => p.enabled);
-  
+
   return {
     totalProviders: providers.length,
     availableProviders: availableProviders.length,

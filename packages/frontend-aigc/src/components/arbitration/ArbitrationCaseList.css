@@ -116,21 +116,21 @@
   .case-statistics {
     padding: 8px;
   }
-  
+
   .case-filter-toolbar {
     padding: 8px;
   }
-  
+
   .case-list {
     padding: 8px;
   }
-  
+
   .case-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .case-tags {
     flex-direction: column;
     align-items: flex-start;

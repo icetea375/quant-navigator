@@ -4,12 +4,12 @@
       <h4>个性化市场分析</h4>
       <el-tag type="success" size="small">专属定制</el-tag>
     </div>
-    
+
     <div class="briefing-content">
       <div class="summary-section">
         <p class="summary-text">{{ briefing.summary || '正在生成个性化分析...' }}</p>
       </div>
-      
+
       <div class="personalized-stats">
         <div class="stat-item">
           <div class="stat-value">{{ getRelevantEventsCount() }}</div>
@@ -28,7 +28,7 @@
           <div class="stat-label">机会评分</div>
         </div>
       </div>
-      
+
       <div class="personalized-insights">
         <h5>个性化洞察</h5>
         <ul class="insights-list">
@@ -40,7 +40,7 @@
           </li>
         </ul>
       </div>
-      
+
       <div class="update-info">
         <el-icon><Clock /></el-icon>
         <span>基于您的持仓生成于 {{ formatTime(briefing.date) }}</span>
@@ -84,7 +84,7 @@ const getOpportunityScore = () => {
 
 const personalizedInsights = computed(() => {
   const insights = []
-  
+
   // 基于事件生成洞察
   if (props.briefing.events?.length) {
     const highImpactEvents = props.briefing.events.filter(e => e.importance === 'high')
@@ -97,7 +97,7 @@ const personalizedInsights = computed(() => {
       })
     }
   }
-  
+
   // 基于热点生成洞察
   if (props.briefing.hotspots?.length) {
     const highConfidenceHotspots = props.briefing.hotspots.filter(h => h.confidence > 0.8)
@@ -110,11 +110,11 @@ const personalizedInsights = computed(() => {
       })
     }
   }
-  
+
   // 基于市场趋势生成洞察
   const positiveEvents = props.briefing.events?.filter(e => e.impact === 'positive').length || 0
   const negativeEvents = props.briefing.events?.filter(e => e.impact === 'negative').length || 0
-  
+
   if (positiveEvents > negativeEvents) {
     insights.push({
       id: 'positive-trend',
@@ -130,7 +130,7 @@ const personalizedInsights = computed(() => {
       text: '市场情绪偏向谨慎，建议降低风险敞口'
     })
   }
-  
+
   // 默认洞察
   if (insights.length === 0) {
     insights.push({
@@ -140,7 +140,7 @@ const personalizedInsights = computed(() => {
       text: '市场相对平稳，建议保持当前投资策略'
     })
   }
-  
+
   return insights
 })
 
@@ -264,15 +264,15 @@ const formatTime = (dateString: string) => {
   .my-briefing-card {
     padding: 20px;
   }
-  
+
   .personalized-stats {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .stat-value {
     font-size: 24px;
   }
-  
+
   .briefing-header {
     flex-direction: column;
     gap: 10px;
@@ -280,4 +280,3 @@ const formatTime = (dateString: string) => {
   }
 }
 </style>
-

@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Responsive, WidthProvider, Layout } from 'react-grid-layout';
 import { Card, Button, Tooltip } from 'antd';
-import { 
-  FullscreenOutlined, 
-  FullscreenExitOutlined, 
+import {
+  FullscreenOutlined,
+  FullscreenExitOutlined,
   CloseOutlined,
-  SettingOutlined 
+  SettingOutlined
 } from '@ant-design/icons';
 import { DraggableGridLayoutProps, GridLayout } from '../../types/arbitration';
 import 'react-grid-layout/css/styles.css';
@@ -17,7 +17,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 /**
  * 可拖拽网格布局组件
  * 支持拖拽、缩放、最大化/最小化、关闭面板
- * 
+ *
  * 核心特性：
  * 1. 动态布局管理
  * 2. 面板状态控制
@@ -174,7 +174,7 @@ const DraggableGridLayout: React.FC<DraggableGridLayoutProps> = ({
   // 渲染面板内容
   const renderPanelContent = useCallback((panelId: string, children: React.ReactNode) => {
     const isCollapsed = collapsedPanels.has(panelId);
-    
+
     if (isCollapsed) {
       return null;
     }
@@ -192,7 +192,7 @@ const DraggableGridLayout: React.FC<DraggableGridLayoutProps> = ({
       if (React.isValidElement(child)) {
         const panelId = child.props['data-panel-id'] || child.key;
         const title = child.props['data-panel-title'] || '数据面板';
-        
+
         return (
           <div key={panelId} data-grid={layout.find(item => item.i === panelId)}>
             <Card
@@ -223,7 +223,7 @@ const DraggableGridLayout: React.FC<DraggableGridLayoutProps> = ({
           />
         </Tooltip>
       </div>
-      
+
       <ResponsiveGridLayout
         className="layout"
         layouts={{ lg: getCurrentLayout() }}

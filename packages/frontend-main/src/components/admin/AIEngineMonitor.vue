@@ -1,8 +1,8 @@
 <template>
   <div class="ai-engine-monitor">
     <div class="engines-grid">
-      <div 
-        v-for="engine in aiEngines" 
+      <div
+        v-for="engine in aiEngines"
         :key="engine.name"
         class="engine-card"
         :class="engine.status"
@@ -18,41 +18,41 @@
             </el-tag>
           </div>
         </div>
-        
+
         <div class="engine-metrics">
           <div class="metric">
             <span class="metric-label">CPU使用率</span>
             <div class="metric-bar">
-              <div 
-                class="metric-fill" 
+              <div
+                class="metric-fill"
                 :style="{ width: engine.cpuUsage + '%' }"
                 :class="getUsageClass(engine.cpuUsage)"
               ></div>
             </div>
             <span class="metric-value">{{ engine.cpuUsage }}%</span>
           </div>
-          
+
           <div class="metric">
             <span class="metric-label">内存使用率</span>
             <div class="metric-bar">
-              <div 
-                class="metric-fill" 
+              <div
+                class="metric-fill"
                 :style="{ width: engine.memoryUsage + '%' }"
                 :class="getUsageClass(engine.memoryUsage)"
               ></div>
             </div>
             <span class="metric-value">{{ engine.memoryUsage }}%</span>
           </div>
-          
+
           <div class="metric">
             <span class="metric-label">处理请求</span>
             <span class="metric-value">{{ engine.requestCount }}/分钟</span>
           </div>
         </div>
-        
+
         <div class="engine-actions">
-          <el-button 
-            size="small" 
+          <el-button
+            size="small"
             :type="engine.status === 'running' ? 'danger' : 'primary'"
             @click="toggleEngine(engine)"
           >
@@ -276,29 +276,28 @@ onMounted(() => {
   .engines-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .engine-header {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .metric {
     flex-direction: column;
     align-items: flex-start;
     gap: 5px;
   }
-  
+
   .metric-bar {
     width: 100%;
   }
-  
+
   .engine-actions {
     justify-content: stretch;
   }
-  
+
   .engine-actions .el-button {
     flex: 1;
   }
 }
 </style>
-

@@ -118,14 +118,14 @@ export class QuantSignalEngine extends BaseEngine {
   public async calculateMacroRiskSignals(): Promise<SignalData[]> {
     return await this.processTask('macro_risk_calculation', async () => {
       const signals: SignalData[] = [];
-      
+
       // 获取宽基指数数据
       const broadIndexData = await this.getIndexData('broad');
-      
+
       for (const index of broadIndexData) {
         const riskScore = await this.calculateRiskScore(index);
         const zScore = await this.calculateZScore(riskScore, 'macro_risk');
-        
+
         const signal: SignalData = {
           id: `macro_risk_${index.code}_${Date.now()}`,
           signalType: 'macro_risk',
@@ -148,16 +148,16 @@ export class QuantSignalEngine extends BaseEngine {
           },
           calculatedAt: Date.now()
         };
-        
+
         signals.push(signal);
       }
-      
+
       // 缓存信号
       this.signalCache.set('macro_risk', signals);
-      
+
       // 保存到数据库
       await this.saveSignalsToDatabase(signals);
-      
+
       logger.info(`Calculated ${signals.length} macro risk signals`);
       return signals;
     });
@@ -169,14 +169,14 @@ export class QuantSignalEngine extends BaseEngine {
   public async calculateMarketStyleSignals(): Promise<SignalData[]> {
     return await this.processTask('market_style_calculation', async () => {
       const signals: SignalData[] = [];
-      
+
       // 获取一级指数数据
       const primaryIndexData = await this.getIndexData('primary');
-      
+
       for (const index of primaryIndexData) {
         const styleScore = await this.calculateStyleScore(index);
         const zScore = await this.calculateZScore(styleScore, 'market_style');
-        
+
         const signal: SignalData = {
           id: `market_style_${index.code}_${Date.now()}`,
           signalType: 'market_style',
@@ -198,16 +198,16 @@ export class QuantSignalEngine extends BaseEngine {
           },
           calculatedAt: Date.now()
         };
-        
+
         signals.push(signal);
       }
-      
+
       // 缓存信号
       this.signalCache.set('market_style', signals);
-      
+
       // 保存到数据库
       await this.saveSignalsToDatabase(signals);
-      
+
       logger.info(`Calculated ${signals.length} market style signals`);
       return signals;
     });
@@ -219,14 +219,14 @@ export class QuantSignalEngine extends BaseEngine {
   public async calculateQuantFingerprintSignals(): Promise<SignalData[]> {
     return await this.processTask('quant_fingerprint_calculation', async () => {
       const signals: SignalData[] = [];
-      
+
       // 获取龙头股数据
       const leadingStocksData = await this.getStockData('leading');
-      
+
       for (const stock of leadingStocksData) {
         const fingerprintScore = await this.calculateFingerprintScore(stock);
         const zScore = await this.calculateZScore(fingerprintScore, 'quant_fingerprint');
-        
+
         const signal: SignalData = {
           id: `quant_fingerprint_${stock.code}_${Date.now()}`,
           signalType: 'quant_fingerprint',
@@ -249,16 +249,16 @@ export class QuantSignalEngine extends BaseEngine {
           },
           calculatedAt: Date.now()
         };
-        
+
         signals.push(signal);
       }
-      
+
       // 缓存信号
       this.signalCache.set('quant_fingerprint', signals);
-      
+
       // 保存到数据库
       await this.saveSignalsToDatabase(signals);
-      
+
       logger.info(`Calculated ${signals.length} quant fingerprint signals`);
       return signals;
     });
@@ -269,11 +269,11 @@ export class QuantSignalEngine extends BaseEngine {
    */
   public async getAllSignals(): Promise<SignalData[]> {
     const allSignals: SignalData[] = [];
-    
+
     for (const signals of this.signalCache.values()) {
       allSignals.push(...signals);
     }
-    
+
     return allSignals;
   }
 
@@ -299,13 +299,13 @@ export class QuantSignalEngine extends BaseEngine {
       },
       lastUpdate: this.lastUpdate
     };
-    
+
     for (const [type, signals] of this.signalCache.entries()) {
       stats.totalSignals += signals.length;
       stats.anomalySignals += signals.filter(s => s.isAnomaly).length;
       stats.signalTypes[type as keyof typeof stats.signalTypes] = signals.length;
     }
-    
+
     return stats;
   }
 
@@ -317,12 +317,12 @@ export class QuantSignalEngine extends BaseEngine {
     const volatilityWeight = 0.4;
     const priceChangeWeight = 0.3;
     const volumeChangeWeight = 0.3;
-    
-    const riskScore = 
+
+    const riskScore =
       (Math.abs(index.volatility) * volatilityWeight) +
       (Math.abs(index.priceChangePercent) * priceChangeWeight) +
       (Math.abs(index.volumeChange) * volumeChangeWeight);
-    
+
     return riskScore;
   }
 
@@ -334,7 +334,7 @@ export class QuantSignalEngine extends BaseEngine {
     const growthFactor = this.calculateGrowthFactor(index);
     const valueFactor = this.calculateValueFactor(index);
     const momentumFactor = this.calculateMomentumFactor(index);
-    
+
     return (growthFactor + valueFactor + momentumFactor) / 3;
   }
 
@@ -346,7 +346,7 @@ export class QuantSignalEngine extends BaseEngine {
     const technicalFactor = this.calculateTechnicalFactor(stock);
     const fundamentalFactor = this.calculateFundamentalFactor(stock);
     const sentimentFactor = this.calculateSentimentFactor(stock);
-    
+
     return (technicalFactor + fundamentalFactor + sentimentFactor) / 3;
   }
 
@@ -356,19 +356,19 @@ export class QuantSignalEngine extends BaseEngine {
   private async calculateZScore(value: number, signalType: string): Promise<number> {
     // 从数据库获取历史数据计算Z分数
     const historicalData = await this.getHistoricalSignalData(signalType);
-    
+
     if (historicalData.length < 2) {
       return 0;
     }
-    
+
     const mean = historicalData.reduce((sum, val) => sum + val, 0) / historicalData.length;
     const variance = historicalData.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / historicalData.length;
     const stdDev = Math.sqrt(variance);
-    
+
     if (stdDev === 0) {
       return 0;
     }
-    
+
     return (value - mean) / stdDev;
   }
 
@@ -378,7 +378,7 @@ export class QuantSignalEngine extends BaseEngine {
   private calculateConfidence(zScore: number): number {
     // 基于Z分数的绝对值计算置信度
     const absZScore = Math.abs(zScore);
-    
+
     if (absZScore >= 3) return 0.95;
     if (absZScore >= 2) return 0.85;
     if (absZScore >= 1) return 0.70;
@@ -392,7 +392,7 @@ export class QuantSignalEngine extends BaseEngine {
     // 基于PE比率和价格变化计算成长因子
     const peFactor = index.pe > 0 ? Math.min(index.pe / 20, 1) : 0;
     const priceChangeFactor = Math.max(0, index.priceChangePercent / 10);
-    
+
     return (peFactor + priceChangeFactor) / 2;
   }
 
@@ -411,7 +411,7 @@ export class QuantSignalEngine extends BaseEngine {
     // 基于价格变化和成交量变化计算动量因子
     const priceMomentum = Math.tanh(index.priceChangePercent / 5);
     const volumeMomentum = Math.tanh(index.volumeChange / 50);
-    
+
     return (priceMomentum + volumeMomentum) / 2;
   }
 
@@ -422,7 +422,7 @@ export class QuantSignalEngine extends BaseEngine {
     // 基于技术指标计算技术因子
     const volatilityFactor = Math.tanh(stock.volatility / 2);
     const priceChangeFactor = Math.tanh(stock.priceChangePercent / 10);
-    
+
     return (volatilityFactor + priceChangeFactor) / 2;
   }
 
@@ -433,7 +433,7 @@ export class QuantSignalEngine extends BaseEngine {
     // 基于PE、PB比率计算基本面因子
     const peFactor = stock.pe > 0 ? Math.min(stock.pe / 30, 1) : 0;
     const pbFactor = stock.pb > 0 ? Math.min(stock.pb / 5, 1) : 0;
-    
+
     return (peFactor + pbFactor) / 2;
   }
 
@@ -444,7 +444,7 @@ export class QuantSignalEngine extends BaseEngine {
     // 基于成交量变化和价格变化计算情感因子
     const volumeSentiment = Math.tanh(stock.volumeChange / 100);
     const priceSentiment = Math.tanh(stock.priceChangePercent / 15);
-    
+
     return (volumeSentiment + priceSentiment) / 2;
   }
 
@@ -475,7 +475,7 @@ export class QuantSignalEngine extends BaseEngine {
       'SELECT signal_value FROM quant_signals WHERE signal_type = $1 ORDER BY calculated_at DESC LIMIT 100',
       [signalType]
     );
-    
+
     return result.rows.map(row => parseFloat(row.signal_value));
   }
 
@@ -486,10 +486,10 @@ export class QuantSignalEngine extends BaseEngine {
     for (const signal of signals) {
       await this.db.query(`
         INSERT INTO quant_signals (
-          signal_type, signal_name, signal_value, z_score, is_anomaly, 
+          signal_type, signal_name, signal_value, z_score, is_anomaly,
           signal_data, calculated_at
         ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-        ON CONFLICT (signal_type, signal_name, calculated_at) 
+        ON CONFLICT (signal_type, signal_name, calculated_at)
         DO UPDATE SET
           signal_value = EXCLUDED.signal_value,
           z_score = EXCLUDED.z_score,
@@ -516,7 +516,7 @@ export class QuantSignalEngine extends BaseEngine {
    */
   protected async onStart(): Promise<void> {
     logger.info('QuantSignalEngine started');
-    
+
     // 启动定期计算任务
     if (this.config.signalTypes.macroRisk.enabled) {
       setInterval(() => {
@@ -525,7 +525,7 @@ export class QuantSignalEngine extends BaseEngine {
         });
       }, this.config.signalTypes.macroRisk.updateInterval * 60 * 1000);
     }
-    
+
     if (this.config.signalTypes.marketStyle.enabled) {
       setInterval(() => {
         this.calculateMarketStyleSignals().catch(error => {
@@ -533,7 +533,7 @@ export class QuantSignalEngine extends BaseEngine {
         });
       }, this.config.signalTypes.marketStyle.updateInterval * 60 * 1000);
     }
-    
+
     if (this.config.signalTypes.quantFingerprint.enabled) {
       setInterval(() => {
         this.calculateQuantFingerprintSignals().catch(error => {

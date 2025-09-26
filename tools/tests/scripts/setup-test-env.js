@@ -54,10 +54,10 @@ console.log('🔍 验证测试环境...');
 try {
   // 验证数据库连接
   console.log('✅ 数据库连接正常');
-  
+
   // 验证Redis连接
   console.log('✅ Redis连接正常');
-  
+
   console.log('🎉 测试环境设置完成！');
   console.log('');
   console.log('📋 可用的测试命令:');
@@ -66,9 +66,8 @@ try {
   console.log('  npm run test:integration # 运行集成测试');
   console.log('  npm run test:e2e        # 运行端到端测试');
   console.log('  npm run test:coverage   # 生成覆盖率报告');
-  
+
 } catch (error) {
   console.error('❌ 环境验证失败:', error.message);
   process.exit(1);
 }
-

@@ -107,16 +107,16 @@ class TestDataPipelineEndToEnd:
         with patch.object(data_pipeline_service.pro, 'stock_basic') as mock_stock_basic, \
              patch.object(data_pipeline_service.pro, 'daily_basic') as mock_daily_basic, \
              patch.object(data_pipeline_service.pro, 'daily') as mock_daily:
-            
+
             # 设置模拟返回值
             import pandas as pd
             mock_stock_basic.return_value = pd.DataFrame(sample_tushare_data["stock_basic"])
             mock_daily_basic.return_value = pd.DataFrame(sample_tushare_data["daily_basic"])
             mock_daily.return_value = pd.DataFrame(sample_tushare_data["daily"])
-            
+
             # 步骤1: 从TushareFetcher获取数据
             raw_data = await data_pipeline_service.fetch_tushare_data("000001.SZ", "20240101")
-            
+
             # 验证获取的数据结构
             assert "stock_basic" in raw_data
             assert "daily_basic" in raw_data
@@ -124,12 +124,12 @@ class TestDataPipelineEndToEnd:
             assert len(raw_data["stock_basic"]) == 1
             assert len(raw_data["daily_basic"]) == 1
             assert len(raw_data["daily"]) == 1
-            
+
             # 步骤2: 提取财务因子
             financial_factors = await data_pipeline_service.extract_financial_factors(
                 "000001.SZ", "20240101", raw_data
             )
-            
+
             # 验证财务因子提取
             assert financial_factors["stock_code"] == "000001.SZ"
             assert financial_factors["trade_date"] == "20240101"
@@ -138,10 +138,10 @@ class TestDataPipelineEndToEnd:
             assert financial_factors["ps_ratio"] == 3.0
             assert financial_factors["dividend_yield"] == 2.5
             assert financial_factors["close_price"] == 10.2
-            
+
             # 步骤3: 计算超级财务因子
             super_factors = await data_pipeline_service.calculate_super_financial_factors(financial_factors)
-            
+
             # 验证超级财务因子计算
             assert "value_score" in super_factors
             assert "growth_score" in super_factors
@@ -150,11 +150,11 @@ class TestDataPipelineEndToEnd:
             assert "overall_score" in super_factors
             assert "calculated_at" in super_factors
             assert 0 <= super_factors["overall_score"] <= 100
-            
+
             # 步骤4: 保存财务因子到数据库
             save_result = await data_pipeline_service.save_financial_factors(financial_factors)
             assert save_result is True
-            
+
             # 步骤5: 保存超级财务因子到数据库
             save_super_result = await data_pipeline_service.save_super_financial_factors(super_factors)
             assert save_super_result is True
@@ -166,15 +166,15 @@ class TestDataPipelineEndToEnd:
         with patch.object(data_pipeline_service.pro, 'stock_basic') as mock_stock_basic, \
              patch.object(data_pipeline_service.pro, 'daily_basic') as mock_daily_basic, \
              patch.object(data_pipeline_service.pro, 'daily') as mock_daily:
-            
+
             import pandas as pd
             mock_stock_basic.return_value = pd.DataFrame()
             mock_daily_basic.return_value = pd.DataFrame()
             mock_daily.return_value = pd.DataFrame()
-            
+
             # 获取空数据
             raw_data = await data_pipeline_service.fetch_tushare_data("000001.SZ", "20240101")
-            
+
             # 验证空数据处理
             assert "stock_basic" in raw_data
             assert "daily_basic" in raw_data
@@ -190,7 +190,7 @@ class TestDataPipelineEndToEnd:
         with patch.object(tushare_fetcher.pro, 'stock_basic', side_effect=Exception("API调用失败")):
             with pytest.raises(Exception) as exc_info:
                 await data_pipeline_service.fetch_tushare_data("000001.SZ", "20240101")
-            
+
             assert "API调用失败" in str(exc_info.value)
 
     @pytest.mark.asyncio
@@ -199,13 +199,13 @@ class TestDataPipelineEndToEnd:
         # 测试无效的股票代码
         with pytest.raises(ValueError) as exc_info:
             await data_pipeline_service.fetch_tushare_data("", "20240101")
-        
+
         assert "股票代码不能为空" in str(exc_info.value)
-        
+
         # 测试无效的日期格式
         with pytest.raises(ValueError) as exc_info:
             await data_pipeline_service.fetch_tushare_data("000001.SZ", "2024-01-01")
-        
+
         assert "无效的日期格式" in str(exc_info.value)
 
     # ==================== 数据一致性测试 ====================
@@ -215,19 +215,19 @@ class TestDataPipelineEndToEnd:
         """测试数据在管道中的一致性"""
         # 模拟获取数据
         raw_data = sample_tushare_data
-        
+
         # 提取财务因子
         financial_factors = await data_pipeline_service.extract_financial_factors(
             "000001.SZ", "20240101", raw_data
         )
-        
+
         # 验证数据一致性
         assert financial_factors["stock_code"] == "000001.SZ"
         assert financial_factors["trade_date"] == "20240101"
-        
+
         # 计算超级财务因子
         super_factors = await data_pipeline_service.calculate_super_financial_factors(financial_factors)
-        
+
         # 验证超级财务因子包含原始数据
         assert super_factors["stock_code"] == "000001.SZ"
         assert super_factors["trade_date"] == "20240101"
@@ -240,9 +240,9 @@ class TestDataPipelineEndToEnd:
     async def test_data_pipeline_performance(self, data_pipeline_service, sample_tushare_data):
         """测试数据管道的性能"""
         import time
-        
+
         start_time = time.time()
-        
+
         # 执行完整流程
         raw_data = sample_tushare_data
         financial_factors = await data_pipeline_service.extract_financial_factors(
@@ -251,13 +251,13 @@ class TestDataPipelineEndToEnd:
         super_factors = await data_pipeline_service.calculate_super_financial_factors(financial_factors)
         save_result = await data_pipeline_service.save_financial_factors(financial_factors)
         save_super_result = await data_pipeline_service.save_super_financial_factors(super_factors)
-        
+
         end_time = time.time()
-        
+
         # 验证结果
         assert save_result is True
         assert save_super_result is True
-        
+
         # 验证性能（整个流程应该在合理时间内完成）
         total_time = end_time - start_time
         assert total_time < 5.0  # 5秒内完成
@@ -270,17 +270,17 @@ class TestDataPipelineEndToEnd:
         """测试数据管道的错误恢复能力"""
         # 测试部分失败的情况
         raw_data = sample_tushare_data
-        
+
         # 正常提取财务因子
         financial_factors = await data_pipeline_service.extract_financial_factors(
             "000001.SZ", "20240101", raw_data
         )
-        
+
         # 模拟保存失败
         with patch.object(data_pipeline_service, '_persist_financial_factors', side_effect=Exception("数据库连接失败")):
             with pytest.raises(Exception) as exc_info:
                 await data_pipeline_service.save_financial_factors(financial_factors)
-            
+
             assert "财务因子保存失败" in str(exc_info.value)
             assert "数据库连接失败" in str(exc_info.value)
 
@@ -290,7 +290,7 @@ class TestDataPipelineEndToEnd:
     async def test_data_pipeline_concurrent_processing(self, data_pipeline_service):
         """测试数据管道的并发处理能力"""
         import asyncio
-        
+
         # 创建多个并发任务
         tasks = []
         for i in range(5):
@@ -317,10 +317,10 @@ class TestDataPipelineEndToEnd:
                 }
             )
             tasks.append(task)
-        
+
         # 并发执行
         results = await asyncio.gather(*tasks)
-        
+
         # 验证所有任务都成功完成
         assert len(results) == 5
         for i, result in enumerate(results):

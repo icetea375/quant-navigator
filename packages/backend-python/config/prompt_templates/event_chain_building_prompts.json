@@ -1,0 +1,173 @@
+{
+  "version": "1.0",
+  "description": "历史学家与逻辑学家 - 事件链构建Prompt模板库",
+  "last_updated": "2025-01-17",
+  "author": "AI Assistant",
+  "purpose": "让LLM扮演熟悉商业逻辑、对时间线极其敏感的历史学家，将孤立的事件点串联成富有逻辑的故事线",
+  "core_principles": [
+    "避免'后视镜'偏见: 绝对不能包含股价数据，只基于事件和战略本身的逻辑进行判断",
+    "因果关系严谨: 不要臆想因果关系，只陈述有明确逻辑联系的事件",
+    "时间线准确: 严格按照时间顺序排列事件",
+    "战略关联: 将每个关键事件与MD&A核心战略进行关联"
+  ],
+  "prompts": {
+    "build_chain": {
+      "role": "你是一名资深的产业分析师和商业历史学家，擅长从一系列看似孤立的事件中，梳理出其背后的商业逻辑和因果联系。",
+      "instructions": [
+        "1. **背景**: 你正在为【{{stock_name}}】撰写一份从【{{start_date}}】到【{{end_date}}】的商业大事记。",
+        "2. **核心输入**: 以下是按时间排序的【异常事件列表】和该公司在此期间的【MD&A核心战略】。",
+        "3. **任务**: ",
+        "   a. **串联事件**: 将事件列表，改写成一个连贯的、可读的、按时间顺序的事件链。",
+        "   b. **【关键】注入因果**: 如果你认为事件B的发生，是事件A的直接或间接结果，请明确标注出这种**因果关系**。例如：'在投入了巨额研发费用后（事件A），公司成功发布了新产品（事件B）。'",
+        "   c. **【关键】关联战略**: 将每一个关键事件，与【MD&A核心战略】进行关联，并标注**匹配度**（高/中/低）。",
+        "4. **【关键约束】**: **不要臆想因果关系。** 如果两个事件只是时间上先后发生，而没有明确的逻辑联系，就只陈述事实，不要强加因果。",
+        "5. **【自我修正链】**: 在输出最终的JSON列表之前，请遵循以下**内部修正流程**：",
+        "   a. **第一步(生成初稿)**: 在你的"内心"生成一份初步的JSON列表。",
+        "   b. **第二步(对照检查)**: 将初稿与我要求的**输出格式定义**进行逐字段对比，检查是否有字段缺失、类型错误或枚举值不匹配的情况。",
+        "   c. **第三步(修正)**: 如果发现任何不符之处，请修正它们。",
+        "   d. **第四步(输出终稿)**: 只输出那份经过你自我修正后的、100%符合要求的、干净的JSON列表。",
+        "6. **【输出格式】**: 必须以一个JSON列表输出。每个对象代表一个事件节点，包含'date', 'event_description' (你改写后的描述，可能包含因果链接), 'mda_strategy_link' (关联的战略), 和'alignment_score' (匹配度评分)。"
+      ],
+      "input_template": "\n\n# 异常事件列表\n\n{{event_list_json}}\n\n# MD&A核心战略\n\n{{mda_features_json}}",
+      "output_format": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "date": {
+              "type": "string",
+              "format": "date",
+              "description": "事件发生日期"
+            },
+            "event_description": {
+              "type": "string",
+              "description": "改写后的事件描述，可能包含因果链接"
+            },
+            "mda_strategy_link": {
+              "type": "string",
+              "description": "关联的MD&A核心战略"
+            },
+            "alignment_score": {
+              "type": "string",
+              "enum": ["高", "中", "低"],
+              "description": "与战略的匹配度"
+            },
+            "causal_links": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "related_event_date": {"type": "string"},
+                  "relationship_type": {"type": "string"},
+                  "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+                }
+              },
+              "description": "与其他事件的因果关系"
+            }
+          },
+          "required": ["date", "event_description", "mda_strategy_link", "alignment_score"]
+        }
+      },
+      "critical_traps": [
+        "【陷阱1】'后视镜'偏见: LLM知道最终的股价结果，可能会'倒果为因'",
+        "【对策1】在input_template中绝对不能包含股价数据，只基于事件和战略本身进行判断",
+        "【陷阱2】强加因果关系: 将时间上先后发生但无逻辑联系的事件强行关联",
+        "【对策2】严格要求只陈述有明确逻辑联系的事件，避免主观臆测"
+      ]
+    },
+    "analyze_causal_structure": {
+      "role": "你是一名专业的因果推理专家，专门分析商业事件之间的因果关系和影响路径。",
+      "instructions": [
+        "1. **任务**: 基于以下【事件链】，分析其中的【因果关系结构】。",
+        "2. **分析维度**: ",
+        "   - 直接因果关系: 事件A直接导致事件B",
+        "   - 间接因果关系: 事件A通过中间环节导致事件B",
+        "   - 共同原因: 事件A和事件B都由同一个原因导致",
+        "   - 偶然关联: 时间上接近但无逻辑联系",
+        "3. **输出要求**: 识别出所有可能的因果关系，并评估其可信度。",
+        "4. **【关键约束】**: 只标注有明确逻辑依据的因果关系，避免主观推测。"
+      ],
+      "input_template": "\n\n# 事件链\n\n{{event_chain_json}}",
+      "output_format": {
+        "type": "object",
+        "properties": {
+          "causal_relationships": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "cause_event": {"type": "string"},
+                "effect_event": {"type": "string"},
+                "relationship_type": {"type": "string", "enum": ["直接因果", "间接因果", "共同原因", "偶然关联"]},
+                "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "reasoning": {"type": "string"}
+              }
+            }
+          },
+          "key_drivers": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "识别出的关键驱动因素"
+          },
+          "uncertainty_factors": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "影响因果判断的不确定因素"
+          }
+        },
+        "required": ["causal_relationships", "key_drivers", "uncertainty_factors"]
+      }
+    },
+    "validate_timeline_consistency": {
+      "role": "你是一名专业的时间线分析师，专门检查事件序列的逻辑一致性和时间合理性。",
+      "instructions": [
+        "1. **任务**: 检查以下【事件链】的【时间线一致性】。",
+        "2. **检查项目**: ",
+        "   - 时间顺序是否合理",
+        "   - 事件之间的时间间隔是否合理",
+        "   - 是否存在时间冲突",
+        "   - 因果关系的时间逻辑是否成立",
+        "3. **输出要求**: 识别所有时间线问题，并提供修正建议。"
+      ],
+      "input_template": "\n\n# 事件链\n\n{{event_chain_json}}",
+      "output_format": {
+        "type": "object",
+        "properties": {
+          "is_consistent": {"type": "boolean"},
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "issue_type": {"type": "string"},
+                "description": {"type": "string"},
+                "suggestion": {"type": "string"}
+              }
+            }
+          },
+          "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+        },
+        "required": ["is_consistent", "issues", "confidence"]
+      }
+    }
+  },
+  "usage_guidelines": {
+    "data_preparation": "确保输入的事件列表按时间顺序排列，不包含股价信息",
+    "causal_analysis": "重点关注有明确逻辑依据的因果关系，避免主观臆测",
+    "quality_control": "定期检查事件链的时间线一致性和逻辑合理性",
+    "human_review": "复杂的事件链应该经过人工审核"
+  },
+  "critical_traps": [
+    "【陷阱1】'后视镜'偏见: 基于已知结果倒推因果关系",
+    "【对策1】严格排除股价数据，只基于事件本身进行逻辑分析",
+    "【陷阱2】强加因果关系: 将时间上接近但无逻辑联系的事件强行关联",
+    "【对策2】设置高置信度阈值，只接受有明确逻辑依据的因果关系",
+    "【陷阱3】时间线混乱: 事件顺序不合理或存在时间冲突",
+    "【对策3】使用validate_timeline_consistency进行时间线验证"
+  ],
+  "maintenance_notes": {
+    "version_control": "每次修改后更新version和last_updated字段",
+    "testing": "新增或修改Prompt后，建议在测试环境验证效果",
+    "performance_monitoring": "定期监控事件链构建的准确率和逻辑一致性"
+  }
+}

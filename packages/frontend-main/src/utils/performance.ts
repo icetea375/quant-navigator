@@ -237,18 +237,18 @@ export const batchOperations = {
     batchSize = 5
   ): Promise<T[]> => {
     const results: T[] = []
-    
+
     for (let i = 0; i < requests.length; i += batchSize) {
       const batch = requests.slice(i, i + batchSize)
       const batchResults = await Promise.allSettled(batch.map(req => req()))
-      
+
       batchResults.forEach(result => {
         if (result.status === 'fulfilled') {
           results.push(result.value)
         }
       })
     }
-    
+
     return results
   },
 }
@@ -259,17 +259,17 @@ export const performanceTips = {
   checkLargeImages: () => {
     const images = document.querySelectorAll('img')
     const largeImages: HTMLImageElement[] = []
-    
+
     images.forEach(img => {
       if (img.naturalWidth > 1920 || img.naturalHeight > 1080) {
         largeImages.push(img)
       }
     })
-    
+
     if (largeImages.length > 0) {
       console.warn(`发现 ${largeImages.length} 张大图片，建议优化`)
     }
-    
+
     return largeImages
   },
 
@@ -277,7 +277,7 @@ export const performanceTips = {
   checkUnusedCSS: () => {
     const stylesheets = document.styleSheets
     let unusedRules = 0
-    
+
     Array.from(stylesheets).forEach(sheet => {
       try {
         const rules = sheet.cssRules || sheet.rules
@@ -294,7 +294,7 @@ export const performanceTips = {
         // 跨域样式表无法访问
       }
     })
-    
+
     if (unusedRules > 0) {
       console.warn(`发现 ${unusedRules} 条未使用的CSS规则`)
     }
@@ -324,4 +324,3 @@ export const initPerformanceMonitoring = () => {
     cacheManager.clear()
   })
 }
-

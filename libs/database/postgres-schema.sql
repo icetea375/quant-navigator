@@ -245,7 +245,7 @@ ON CONFLICT (config_key) DO NOTHING;
 
 -- 创建视图：监控概览
 CREATE OR REPLACE VIEW monitoring_overview AS
-SELECT 
+SELECT
     level,
     COUNT(*) as total_count,
     COUNT(CASE WHEN is_anomaly = true THEN 1 END) as anomaly_count,
@@ -256,7 +256,7 @@ GROUP BY level;
 
 -- 创建视图：异常统计
 CREATE OR REPLACE VIEW anomaly_statistics AS
-SELECT 
+SELECT
     target_type,
     anomaly_type,
     severity,

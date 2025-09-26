@@ -5,9 +5,9 @@
  * 首席风险官/成本控制官视角的军事化AI军团测试
  */
 
-import { 
-  selectModelForTask, 
-  TASK_MODEL_MAPPING, 
+import {
+  selectModelForTask,
+  TASK_MODEL_MAPPING,
   AI_FORCE_STRUCTURE,
   batchOptimizer,
   llmGateway

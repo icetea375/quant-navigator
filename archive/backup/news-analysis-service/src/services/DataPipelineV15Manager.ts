@@ -9,7 +9,7 @@ import { ConceptFetcher, defaultConceptConfig, ConceptConfig } from '../fetchers
 import { TextualFetcher, defaultTextualConfig, TextualConfig } from '../fetchers/TextualFetcher';
 import { MoneyFlowFetcher, defaultMoneyFlowConfig, MoneyFlowConfig } from '../fetchers/MoneyFlowFetcher';
 import { MarketStructureFetcher, defaultMarketStructureConfig, MarketStructureConfig } from '../fetchers/MarketStructureFetcher';
-import { 
+import {
   QuantSignalEngineDataSourceAdapter,
   HotspotIntelligenceEngineDataSourceAdapter,
   AttributionCoreDataSourceAdapter
@@ -18,32 +18,32 @@ import { BaseErrorHandler } from '../utils/BaseErrorHandler';
 
 export interface DataPipelineV15Config {
   enabled: boolean;
-  
+
   // 骨架系统配置
   skeleton: {
     enabled: boolean;
     industry: IndustryConfig;
   };
-  
+
   // 神经系统配置
   nervous: {
     enabled: boolean;
     concept: ConceptConfig;
   };
-  
+
   // 深度文本配置
   textual: {
     enabled: boolean;
     textual: TextualConfig;
   };
-  
+
   // 博弈数据配置
   game: {
     enabled: boolean;
     moneyFlow: MoneyFlowConfig;
     marketStructure: MarketStructureConfig;
   };
-  
+
   // 调度配置
   schedule: {
     // 骨架更新 (低频)
@@ -53,19 +53,19 @@ export interface DataPipelineV15Config {
       day: number; // 1-31
       time: string; // "02:00"
     };
-    
+
     // 神经更新 (高频)
     nervousUpdate: {
       enabled: boolean;
       time: string; // "16:30"
     };
-    
+
     // 文本更新
     textualUpdate: {
       enabled: boolean;
       time: string; // "18:00"
     };
-    
+
     // 博弈数据更新
     gameUpdate: {
       enabled: boolean;
@@ -76,7 +76,7 @@ export interface DataPipelineV15Config {
 
 export interface DataPipelineV15Report {
   timestamp: string;
-  
+
   // 骨架系统报告
   skeleton: {
     success: boolean;
@@ -84,7 +84,7 @@ export interface DataPipelineV15Report {
     industryMembers: number;
     error?: string;
   };
-  
+
   // 神经系统报告
   nervous: {
     success: boolean;
@@ -92,7 +92,7 @@ export interface DataPipelineV15Report {
     conceptMembers: number;
     error?: string;
   };
-  
+
   // 文本系统报告
   textual: {
     success: boolean;
@@ -101,7 +101,7 @@ export interface DataPipelineV15Report {
     eInteraction: number;
     error?: string;
   };
-  
+
   // 博弈系统报告
   game: {
     success: boolean;
@@ -109,14 +109,14 @@ export interface DataPipelineV15Report {
     marketStructure: number;
     error?: string;
   };
-  
+
   // 智能引擎数据源状态
   engineDataSources: {
     quantSignal: boolean;
     hotspotIntelligence: boolean;
     attributionCore: boolean;
   };
-  
+
   summary: {
     totalSuccess: number;
     totalFailed: number;
@@ -128,14 +128,14 @@ export interface DataPipelineV15Report {
 export class DataPipelineV15Manager {
   private config: DataPipelineV15Config;
   private tushareSource: SimpleTushareDataSource;
-  
+
   // 数据获取器
   private industryFetcher?: IndustryFetcher;
   private conceptFetcher?: ConceptFetcher;
   private textualFetcher?: TextualFetcher;
   private moneyFlowFetcher?: MoneyFlowFetcher;
   private marketStructureFetcher?: MarketStructureFetcher;
-  
+
   // 智能引擎数据源适配器
   private quantSignalDataSource?: QuantSignalEngineDataSourceAdapter;
   private hotspotIntelligenceDataSource?: HotspotIntelligenceEngineDataSourceAdapter;
@@ -144,7 +144,7 @@ export class DataPipelineV15Manager {
   constructor(config?: Partial<DataPipelineV15Config>) {
     this.config = this.mergeConfig(config);
     this.tushareSource = new SimpleTushareDataSource(defaultTushareConfig);
-    
+
     this.initializeFetchers();
     this.initializeEngineDataSources();
   }
@@ -216,13 +216,13 @@ export class DataPipelineV15Manager {
       if (this.config.skeleton.enabled && this.industryFetcher) {
         try {
           const skeletonData = await this.industryFetcher.periodicUpdate();
-          
+
           report.skeleton.success = true;
-          report.skeleton.industryClassification = 
+          report.skeleton.industryClassification =
             skeletonData.shenwan.classification.length + skeletonData.citic.classification.length;
-          report.skeleton.industryMembers = 
+          report.skeleton.industryMembers =
             skeletonData.shenwan.members.length + skeletonData.citic.members.length;
-          
+
           console.log(`✅ Skeleton data updated: ${report.skeleton.industryClassification} industries, ${report.skeleton.industryMembers} members`);
         } catch (error) {
           report.skeleton.success = false;
@@ -233,7 +233,7 @@ export class DataPipelineV15Manager {
 
       report.summary.executionTime = Date.now() - startTime;
       this.updateSummary(report);
-      
+
       console.log('✅ Skeleton system update completed');
       return report;
 
@@ -258,13 +258,13 @@ export class DataPipelineV15Manager {
       if (this.config.nervous.enabled && this.conceptFetcher) {
         try {
           const nervousData = await this.conceptFetcher.dailyDataCollection(tradeDate);
-          
+
           report.nervous.success = true;
-          report.nervous.concepts = 
+          report.nervous.concepts =
             nervousData.thsConcepts.length + nervousData.dcConcepts.length;
-          report.nervous.conceptMembers = 
+          report.nervous.conceptMembers =
             nervousData.thsMembers.length + nervousData.dcMembers.length;
-          
+
           console.log(`✅ Nervous data updated: ${report.nervous.concepts} concepts, ${report.nervous.conceptMembers} members`);
         } catch (error) {
           report.nervous.success = false;
@@ -275,7 +275,7 @@ export class DataPipelineV15Manager {
 
       report.summary.executionTime = Date.now() - startTime;
       this.updateSummary(report);
-      
+
       console.log('✅ Nervous system update completed');
       return report;
 
@@ -300,12 +300,12 @@ export class DataPipelineV15Manager {
       if (this.config.textual.enabled && this.textualFetcher) {
         try {
           const textualData = await this.textualFetcher.dailyDataCollection(tradeDate);
-          
+
           report.textual.success = true;
           report.textual.longFormNews = textualData.longFormNews.length;
           report.textual.newsBroadcast = textualData.newsBroadcast.length;
           report.textual.eInteraction = textualData.eInteraction.length;
-          
+
           console.log(`✅ Textual data updated: ${report.textual.longFormNews} news, ${report.textual.newsBroadcast} broadcasts, ${report.textual.eInteraction} interactions`);
         } catch (error) {
           report.textual.success = false;
@@ -316,7 +316,7 @@ export class DataPipelineV15Manager {
 
       report.summary.executionTime = Date.now() - startTime;
       this.updateSummary(report);
-      
+
       console.log('✅ Textual intelligence update completed');
       return report;
 
@@ -369,7 +369,7 @@ export class DataPipelineV15Manager {
 
       report.summary.executionTime = Date.now() - startTime;
       this.updateSummary(report);
-      
+
       console.log('✅ Game theory data update completed');
       return report;
 
@@ -422,7 +422,7 @@ export class DataPipelineV15Manager {
 
       report.summary.executionTime = Date.now() - startTime;
       this.updateSummary(report);
-      
+
       console.log('✅ DataPipeline v1.5 full update completed');
       return report;
 
@@ -525,7 +525,7 @@ export class DataPipelineV15Manager {
     const systems = [report.skeleton, report.nervous, report.textual, report.game];
     report.summary.totalSuccess = systems.filter(s => s.success).length;
     report.summary.totalFailed = systems.filter(s => !s.success).length;
-    
+
     // 数据质量评估
     const successRate = report.summary.totalSuccess / systems.length;
     if (successRate >= 0.9) {

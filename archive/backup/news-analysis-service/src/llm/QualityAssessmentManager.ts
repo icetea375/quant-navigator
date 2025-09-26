@@ -150,7 +150,7 @@ export class QualityAssessmentManager {
 
     // 为每种任务类型配置评估策略
     const taskTypes = ['news_importance', 'timeline_build', 'historical_attribution', 'model_adjustment'];
-    
+
     taskTypes.forEach(taskType => {
       this.configs.set(taskType, [
         ...lightweightConfigs,
@@ -171,9 +171,9 @@ export class QualityAssessmentManager {
     qualityLevel: 'basic' | 'standard' | 'high' | 'premium' = 'standard'
   ): Promise<QualityAssessmentResult> {
     const config = this.selectAssessmentConfig(taskType, qualityLevel);
-    
+
     let result: QualityAssessmentResult;
-    
+
     switch (config.method) {
       case 'rule_based':
         result = await this.performRuleBasedAssessment(input, output, config);
@@ -191,7 +191,7 @@ export class QualityAssessmentManager {
 
     // 记录评估结果
     this.recordAssessmentResult(taskType, result);
-    
+
     return result;
   }
 
@@ -203,7 +203,7 @@ export class QualityAssessmentManager {
     qualityLevel: 'basic' | 'standard' | 'high' | 'premium'
   ): QualityAssessmentConfig {
     const configs = this.configs.get(taskType) || [];
-    
+
     // 根据质量等级选择配置
     switch (qualityLevel) {
       case 'basic':
@@ -242,10 +242,10 @@ export class QualityAssessmentManager {
 
     // 检查关键词
     const keywords = this.extractKeywords(input);
-    const keywordMatches = keywords.filter(keyword => 
+    const keywordMatches = keywords.filter(keyword =>
       output.toLowerCase().includes(keyword.toLowerCase())
     );
-    
+
     if (keywordMatches.length < keywords.length * 0.3) {
       issues.push('关键词覆盖率低');
       score -= 0.2;
@@ -294,10 +294,10 @@ export class QualityAssessmentManager {
   ): Promise<QualityAssessmentResult> {
     // 模拟LLM评估（实际实现中需要调用真实的LLM）
     const prompt = this.buildAssessmentPrompt(input, output, config.criteria);
-    
+
     // 模拟处理时间
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     // 模拟评估结果
     const score = 0.7 + Math.random() * 0.3; // 0.7-1.0
     const issues: string[] = [];
@@ -335,7 +335,7 @@ export class QualityAssessmentManager {
   ): Promise<QualityAssessmentResult> {
     // 模拟双LLM评估
     await new Promise(resolve => setTimeout(resolve, 2000));
-    
+
     // 双LLM评估通常更准确
     const score = 0.8 + Math.random() * 0.2; // 0.8-1.0
     const issues: string[] = [];
@@ -402,7 +402,7 @@ ${criteria.map(c => `- ${c}`).join('\n')}
    */
   private recordAssessmentResult(taskType: string, result: QualityAssessmentResult): void {
     this.assessmentHistory.push(result);
-    
+
     // 更新任务质量档案
     if (!this.taskProfiles.has(taskType)) {
       this.taskProfiles.set(taskType, {

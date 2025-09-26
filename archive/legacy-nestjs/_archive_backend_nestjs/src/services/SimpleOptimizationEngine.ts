@@ -116,7 +116,7 @@ export class SimpleOptimizationEngine {
     this.db = db;
     this.redis = redis;
     this.config = config;
-    
+
     this.validateConfig(config);
     this.initializeTables();
   }
@@ -131,7 +131,7 @@ export class SimpleOptimizationEngine {
     }
 
     this.isRunning = true;
-    
+
     // 启动定期优化
     this.optimizationInterval = setInterval(() => {
       this.performOptimization();
@@ -147,7 +147,7 @@ export class SimpleOptimizationEngine {
     if (!this.isRunning) return;
 
     this.isRunning = false;
-    
+
     if (this.optimizationInterval) {
       clearInterval(this.optimizationInterval);
       this.optimizationInterval = undefined;
@@ -178,7 +178,7 @@ export class SimpleOptimizationEngine {
       };
 
       await this.storePromptOptimization(optimization);
-      
+
       // 缓存优化结果
       if (this.config.storage.enableCaching) {
         await this.cacheOptimizationResult(optimization);
@@ -216,7 +216,7 @@ export class SimpleOptimizationEngine {
       };
 
       await this.storeModelParameterTuning(optimization);
-      
+
       // 缓存优化结果
       if (this.config.storage.enableCaching) {
         await this.cacheOptimizationResult(optimization);
@@ -255,7 +255,7 @@ export class SimpleOptimizationEngine {
       };
 
       await this.storeOptimizationResult(optimization);
-      
+
       // 缓存优化结果
       if (this.config.storage.enableCaching) {
         await this.cacheOptimizationResult(optimization);
@@ -293,7 +293,7 @@ export class SimpleOptimizationEngine {
       };
 
       await this.storeOptimizationResult(optimization);
-      
+
       // 缓存优化结果
       if (this.config.storage.enableCaching) {
         await this.cacheOptimizationResult(optimization);
@@ -325,7 +325,7 @@ export class SimpleOptimizationEngine {
       if (this.config.learning.enableA_BTesting) {
         const testResults = await this.performABTest(optimization);
         optimization.testResults = testResults;
-        
+
         // 根据测试结果决定是否部署
         if (testResults.accuracy > 0.7 && testResults.userSatisfaction > 0.7) {
           optimization.status = 'deployed';
@@ -341,7 +341,7 @@ export class SimpleOptimizationEngine {
       }
 
       await this.updateOptimizationResult(optimization);
-      
+
       logger.info(`🚀 优化结果已部署: ${optimizationId} (状态: ${optimization.status})`);
       return optimization.status === 'deployed';
     } catch (error) {
@@ -363,7 +363,7 @@ export class SimpleOptimizationEngine {
       optimization.status = 'rolled_back';
       optimization.rolledBackAt = Date.now();
       await this.updateOptimizationResult(optimization);
-      
+
       logger.info(`🔄 优化结果已回滚: ${optimizationId}`);
       return true;
     } catch (error) {
@@ -377,16 +377,16 @@ export class SimpleOptimizationEngine {
    */
   private generateOptimizedPrompt(originalPrompt: string, feedbackAnalysis: FeedbackAnalysis): string {
     let optimizedPrompt = originalPrompt;
-    
+
     // 基于反馈分析优化提示词
     if (feedbackAnalysis.insights.topIssues.includes('不准确')) {
       optimizedPrompt += '\n\n请确保分析结果的准确性，提供具体的数据支持。';
     }
-    
+
     if (feedbackAnalysis.insights.topIssues.includes('不完整')) {
       optimizedPrompt += '\n\n请提供全面的分析，包括多个维度的考虑。';
     }
-    
+
     if (feedbackAnalysis.insights.topIssues.includes('慢')) {
       optimizedPrompt += '\n\n请优先处理最重要的信息，提供简洁明了的分析。';
     }
@@ -395,7 +395,7 @@ export class SimpleOptimizationEngine {
     if (feedbackAnalysis.metrics.qualityScores.accuracy < 0.7) {
       optimizedPrompt += '\n\n请特别注意分析结果的准确性。';
     }
-    
+
     if (feedbackAnalysis.metrics.qualityScores.relevance < 0.7) {
       optimizedPrompt += '\n\n请确保分析内容与用户需求高度相关。';
     }
@@ -411,7 +411,7 @@ export class SimpleOptimizationEngine {
     feedbackAnalysis: FeedbackAnalysis
   ): Record<string, any> {
     const optimizedParams = { ...originalParams };
-    
+
     // 基于反馈调整参数
     if (feedbackAnalysis.metrics.qualityScores.accuracy < 0.7) {
       // 提高准确性相关参数
@@ -422,14 +422,14 @@ export class SimpleOptimizationEngine {
         optimizedParams.top_p = Math.max(0.8, optimizedParams.top_p);
       }
     }
-    
+
     if (feedbackAnalysis.metrics.qualityScores.timeliness < 0.7) {
       // 提高响应速度相关参数
       if (optimizedParams.max_tokens !== undefined) {
         optimizedParams.max_tokens = Math.min(2000, optimizedParams.max_tokens);
       }
     }
-    
+
     if (feedbackAnalysis.metrics.qualityScores.completeness < 0.7) {
       // 提高完整性相关参数
       if (optimizedParams.max_tokens !== undefined) {
@@ -448,7 +448,7 @@ export class SimpleOptimizationEngine {
     feedbackAnalysis: FeedbackAnalysis
   ): any {
     const optimizedConfig = { ...originalConfig };
-    
+
     // 基于反馈调整算法参数
     if (feedbackAnalysis.metrics.qualityScores.accuracy < 0.7) {
       // 提高准确性
@@ -456,7 +456,7 @@ export class SimpleOptimizationEngine {
         optimizedConfig.confidence_threshold = Math.max(0.7, optimizedConfig.confidence_threshold);
       }
     }
-    
+
     if (feedbackAnalysis.metrics.qualityScores.timeliness < 0.7) {
       // 提高响应速度
       if (optimizedConfig.timeout !== undefined) {
@@ -475,17 +475,17 @@ export class SimpleOptimizationEngine {
     feedbackAnalysis: FeedbackAnalysis
   ): any {
     const optimizedWorkflow = { ...originalWorkflow };
-    
+
     // 基于反馈调整工作流
     if (feedbackAnalysis.metrics.qualityScores.timeliness < 0.7) {
       // 优化工作流步骤，减少不必要的步骤
       if (optimizedWorkflow.steps) {
-        optimizedWorkflow.steps = optimizedWorkflow.steps.filter((step: any) => 
+        optimizedWorkflow.steps = optimizedWorkflow.steps.filter((step: any) =>
           step.essential !== false
         );
       }
     }
-    
+
     if (feedbackAnalysis.metrics.qualityScores.completeness < 0.7) {
       // 增加质量检查步骤
       if (optimizedWorkflow.steps) {
@@ -509,7 +509,7 @@ export class SimpleOptimizationEngine {
     feedbackAnalysis: FeedbackAnalysis
   ): { clarity: number; specificity: number; completeness: number; effectiveness: number } {
     const baseImprovement = Math.max(0, 1 - feedbackAnalysis.metrics.averageRating / 5);
-    
+
     return {
       clarity: baseImprovement * 0.3,
       specificity: baseImprovement * 0.3,
@@ -526,7 +526,7 @@ export class SimpleOptimizationEngine {
     feedbackAnalysis: FeedbackAnalysis
   ): { accuracy: number; precision: number; recall: number; f1Score: number } {
     const baseImprovement = Math.max(0, 1 - feedbackAnalysis.metrics.averageRating / 5);
-    
+
     return {
       accuracy: baseImprovement * 0.4,
       precision: baseImprovement * 0.2,
@@ -543,7 +543,7 @@ export class SimpleOptimizationEngine {
     feedbackAnalysis: FeedbackAnalysis
   ): { accuracy: number; relevance: number; completeness: number; timeliness: number; overall: number } {
     const baseImprovement = Math.max(0, 1 - feedbackAnalysis.metrics.averageRating / 5);
-    
+
     return {
       accuracy: baseImprovement * 0.3,
       relevance: baseImprovement * 0.3,
@@ -561,7 +561,7 @@ export class SimpleOptimizationEngine {
     feedbackAnalysis: FeedbackAnalysis
   ): { accuracy: number; relevance: number; completeness: number; timeliness: number; overall: number } {
     const baseImprovement = Math.max(0, 1 - feedbackAnalysis.metrics.averageRating / 5);
-    
+
     return {
       accuracy: baseImprovement * 0.2,
       relevance: baseImprovement * 0.2,
@@ -576,19 +576,19 @@ export class SimpleOptimizationEngine {
    */
   private getOptimizationTechniques(feedbackAnalysis: FeedbackAnalysis): string[] {
     const techniques: string[] = [];
-    
+
     if (feedbackAnalysis.metrics.qualityScores.accuracy < 0.7) {
       techniques.push('accuracy_enhancement');
     }
-    
+
     if (feedbackAnalysis.metrics.qualityScores.relevance < 0.7) {
       techniques.push('relevance_improvement');
     }
-    
+
     if (feedbackAnalysis.metrics.qualityScores.completeness < 0.7) {
       techniques.push('completeness_enhancement');
     }
-    
+
     if (feedbackAnalysis.metrics.qualityScores.timeliness < 0.7) {
       techniques.push('performance_optimization');
     }
@@ -601,12 +601,12 @@ export class SimpleOptimizationEngine {
    */
   private getParameterOptimizationTechniques(feedbackAnalysis: FeedbackAnalysis): string[] {
     const techniques: string[] = [];
-    
+
     if (feedbackAnalysis.metrics.qualityScores.accuracy < 0.7) {
       techniques.push('temperature_tuning');
       techniques.push('top_p_adjustment');
     }
-    
+
     if (feedbackAnalysis.metrics.qualityScores.timeliness < 0.7) {
       techniques.push('token_limit_optimization');
       techniques.push('timeout_adjustment');
@@ -621,10 +621,10 @@ export class SimpleOptimizationEngine {
   private calculateOptimizationConfidence(feedbackAnalysis: FeedbackAnalysis): number {
     const sampleSize = feedbackAnalysis.metrics.totalFeedback;
     const qualityScore = feedbackAnalysis.metrics.qualityScores.accuracy;
-    
+
     const sampleConfidence = Math.min(1, sampleSize / 50); // 基于样本大小
     const qualityConfidence = qualityScore;
-    
+
     return (sampleConfidence + qualityConfidence) / 2;
   }
 
@@ -653,7 +653,7 @@ export class SimpleOptimizationEngine {
     try {
       // 获取需要优化的目标
       const targets = await this.getOptimizationTargets();
-      
+
       for (const target of targets) {
         try {
           await this.optimizeTarget(target);
@@ -895,11 +895,11 @@ export class SimpleOptimizationEngine {
    */
   private validateConfig(config: OptimizationConfig): void {
     BaseConfigValidator.validate(config, ['enabled', 'optimization', 'learning']);
-    
+
     if (config.optimization.optimizationInterval <= 0) {
       throw new Error('optimizationInterval must be greater than 0');
     }
-    
+
     if (config.learning.learningRate <= 0 || config.learning.learningRate > 1) {
       throw new Error('learningRate must be between 0 and 1');
     }
@@ -920,7 +920,7 @@ export class SimpleOptimizationEngine {
       const totalOptimizations = await this.db.query('SELECT COUNT(*) as count FROM optimization_results');
       const deployedOptimizations = await this.db.query('SELECT COUNT(*) as count FROM optimization_results WHERE status = ?', ['deployed']);
       const pendingOptimizations = await this.db.query('SELECT COUNT(*) as count FROM optimization_results WHERE status = ?', ['pending']);
-      
+
       return {
         totalOptimizations: totalOptimizations[0].count,
         deployedOptimizations: deployedOptimizations[0].count,

@@ -329,7 +329,7 @@ export function selectProviderForTask(
   taskType: 'content_extraction' | 'data_analysis' | 'chinese_processing' | 'fast_processing' | 'general' | 'etf_analysis'
 ): LLMProvider | null {
   const providers = getProvidersByPriority();
-  
+
   if (providers.length === 0) {
     return null;
   }
@@ -340,16 +340,16 @@ export function selectProviderForTask(
     case 'fast_processing':
       // 优先使用豆包Flash，响应速度快
       return providers.find(p => p.name === '豆包' && p.models.includes('doubao-seed-1-6-flash-250615')) || providers[0];
-    
+
     case 'chinese_processing':
       // 优先使用中文能力强的模型
       return providers.find(p => p.name === '豆包') || providers.find(p => p.name === '腾讯混元') || providers[0];
-    
+
     case 'data_analysis':
     case 'etf_analysis':
       // 优先使用分析能力强的模型
       return providers.find(p => p.name === '豆包' && p.models.includes('doubao-seed-1-6-250615')) || providers[0];
-    
+
     case 'general':
     default:
       return providers[0];
@@ -374,13 +374,13 @@ export function getDefaultOptions(): LLMOptions {
  */
 export function validateConfig(): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
-  
+
   // 检查是否有可用的提供商
   const availableProviders = getAvailableProviders();
   if (availableProviders.length === 0) {
     errors.push('没有可用的LLM提供商，请检查环境变量配置');
   }
-  
+
   // 检查每个提供商的配置
   Object.entries(UNIFIED_LLM_CONFIG).forEach(([key, provider]) => {
     if (provider.enabled) {
@@ -392,7 +392,7 @@ export function validateConfig(): { valid: boolean; errors: string[] } {
       }
     }
   });
-  
+
   return {
     valid: errors.length === 0,
     errors
@@ -405,11 +405,11 @@ export function validateConfig(): { valid: boolean; errors: string[] } {
 export function getModelPricing(provider: string, model: string): ModelPricing | null {
   const config = buildUnifiedConfig();
   const providerConfig = config[provider];
-  
+
   if (!providerConfig || !providerConfig.modelPricing[model]) {
     return null;
   }
-  
+
   return providerConfig.modelPricing[model];
 }
 
@@ -417,20 +417,20 @@ export function getModelPricing(provider: string, model: string): ModelPricing |
  * 计算LLM调用成本
  */
 export function calculateLLMCost(
-  provider: string, 
-  model: string, 
-  inputTokens: number, 
+  provider: string,
+  model: string,
+  inputTokens: number,
   outputTokens: number
 ): number {
   const pricing = getModelPricing(provider, model);
-  
+
   if (!pricing) {
     return 0;
   }
-  
+
   const inputCost = (inputTokens / 1000000) * pricing.inputPricePerMillion;
   const outputCost = (outputTokens / 1000000) * pricing.outputPricePerMillion;
-  
+
   return inputCost + outputCost;
 }
 
@@ -449,7 +449,7 @@ export function getConfigSummary(): {
 } {
   const providers = Object.values(UNIFIED_LLM_CONFIG);
   const availableProviders = providers.filter(p => p.enabled);
-  
+
   return {
     totalProviders: providers.length,
     availableProviders: availableProviders.length,
@@ -619,7 +619,7 @@ export const PERFORMANCE_BENCHMARKS = {
     'doubao-seed-1-6-pro-250615': 4000,     // 4秒
     'gemini-2.5-pro': 8000                   // 8秒
   },
-  
+
   // 成功率基准
   success_rate: {
     'doubao-seed-1-6-flash-250615': 0.95,   // 95%
@@ -627,7 +627,7 @@ export const PERFORMANCE_BENCHMARKS = {
     'doubao-seed-1-6-pro-250615': 0.90,    // 90%
     'gemini-2.5-pro': 0.88                  // 88%
   },
-  
+
   // 质量分数基准
   quality_score: {
     'doubao-seed-1-6-flash-250615': 0.75,   // 75%
@@ -648,14 +648,14 @@ export const MONITORING_CONFIG = {
     quality_score: { threshold: 0.8, alert: true },      // 80%阈值
     cost_per_task: { threshold: 0.01, alert: true }      // 0.01元阈值
   },
-  
+
   // 告警配置
   alerts: {
     email: ['admin@example.com'],
     webhook: 'https://hooks.slack.com/...',
     threshold: 3  // 连续3次超阈值才告警
   },
-  
+
   // 自动调优
   auto_tuning: {
     enabled: true,

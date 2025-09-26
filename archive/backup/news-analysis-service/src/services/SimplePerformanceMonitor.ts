@@ -1,7 +1,7 @@
 /**
  * 性能监控服务
  * 监控系统性能指标和资源使用情况
- * 
+ *
  * 作者: AI Assistant
  * 创建时间: 2025-01-17
  * 版本: 1.0
@@ -300,7 +300,7 @@ export class SimplePerformanceMonitor {
   private async getAverageQueryTime(): Promise<number> {
     try {
       if (this.queryMetrics.length === 0) return 0;
-      
+
       const totalTime = this.queryMetrics.reduce((sum, qm) => sum + qm.executionTime, 0);
       return totalTime / this.queryMetrics.length;
     } catch (error) {
@@ -314,7 +314,7 @@ export class SimplePerformanceMonitor {
   private async getErrorRate(): Promise<number> {
     try {
       if (this.queryMetrics.length === 0) return 0;
-      
+
       const errorCount = this.queryMetrics.filter(qm => !qm.success).length;
       return (errorCount / this.queryMetrics.length) * 100;
     } catch (error) {
@@ -486,10 +486,10 @@ export class SimplePerformanceMonitor {
     try {
       const endTime = new Date();
       const startTime = new Date(endTime.getTime() - hours * 60 * 60 * 1000);
-      
+
       // 过滤指定时间范围内的指标
       const recentMetrics = this.metricsHistory.filter(m => m.timestamp >= startTime && m.timestamp <= endTime);
-      
+
       if (recentMetrics.length === 0) {
         throw new Error('No metrics available for the specified period');
       }

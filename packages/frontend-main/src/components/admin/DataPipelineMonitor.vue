@@ -6,7 +6,7 @@
         <span>{{ getStatusText(pipelineStatus.status) }}</span>
       </div>
     </div>
-    
+
     <div class="pipeline-metrics">
       <div class="metric-item">
         <div class="metric-label">处理速度</div>
@@ -21,12 +21,12 @@
         <div class="metric-value">{{ pipelineStatus.successRate }}%</div>
       </div>
     </div>
-    
+
     <div class="pipeline-stages">
       <h4>处理阶段</h4>
       <div class="stages-list">
-        <div 
-          v-for="stage in pipelineStages" 
+        <div
+          v-for="stage in pipelineStages"
           :key="stage.name"
           class="stage-item"
           :class="stage.status"
@@ -240,7 +240,7 @@ onMounted(() => {
   .pipeline-metrics {
     grid-template-columns: 1fr;
   }
-  
+
   .stage-item {
     flex-direction: column;
     gap: 10px;
@@ -248,4 +248,3 @@ onMounted(() => {
   }
 }
 </style>
-

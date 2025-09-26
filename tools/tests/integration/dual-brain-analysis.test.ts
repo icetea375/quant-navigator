@@ -286,16 +286,16 @@ describe('双脑分析集成测试', () => {
       };
 
       // 测试投资建议一致性
-      const recommendationConsistency = qwenReport.investment_recommendation === 
+      const recommendationConsistency = qwenReport.investment_recommendation ===
         doubaoReport.investment_implications.position_recommendation ? 100 : 0;
-      
+
       expect(recommendationConsistency).toBe(100);
 
       // 测试风险差异
       const qwenRisk = qwenReport.confidence_score * 100;
       const doubaoRisk = Math.abs(doubaoReport.sentiment_analysis.sentiment_score);
       const riskDifference = Math.abs(qwenRisk - doubaoRisk);
-      
+
       expect(riskDifference).toBe(10); // 85 - 75 = 10
     });
   });

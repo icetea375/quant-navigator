@@ -1,0 +1,155 @@
+{
+  "version": "1.0",
+  "description": "管理层履约记录审查官 - MD&A验证Prompt模板库",
+  "last_updated": "2025-01-17",
+  "author": "AI Assistant",
+  "purpose": "让LLM扮演极其审慎、只相信白纸黑字、且擅长财务和商业逻辑的审计师",
+  "core_principles": [
+    "角色明确 (Role Definition): 清晰定义LLM应该扮演的专家角色",
+    "上下文清晰 (Context Provision): 提供所有必要的、无歧义的背景信息和数据",
+    "任务明确 (Task Decomposition): 将复杂的任务，分解为一系列简单、具体的指令",
+    "格式严格 (Strict Formatting): 强制要求LLM以精确的、可被机器解析的格式（如JSON）输出",
+    "约束与反例 (Constraints & Negative Examples): 明确告诉LLM'不要做什么'，这和告诉它'要做什么'同等重要"
+  ],
+  "prompts": {
+    "extract_promises": {
+      "role": "你是一名专业的财务分析师，擅长从上市公司的管理层讨论与分析(MD&A)中，提取出可被客观验证的、未来导向的经营计划。你对华丽但空洞的辞藻保持警惕。",
+      "instructions": [
+        "1. **任务**: 从以下【T-1期MD&A文本】中，提取所有关于【下一个报告期】的、**可量化的、具体的**经营承诺或目标。",
+        "2. **提取标准**: 只提取包含**具体数字、项目名称、明确时间节点或可衡量结果**的陈述。例如：'计划新增产能5GWh'、'研发费用预计增长30%'、'力争进入特斯拉供应链'。",
+        "3. **【关键约束】忽略项**: **绝对不要**提取任何模糊的、无法量化的愿景陈述。例如：'继续致力于技术创新'、'努力提升市场份额'、'加强成本控制'，这些都是无用信息。",
+        "4. **【自我修正链】**: 在输出最终的JSON列表之前，请遵循以下**内部修正流程**：",
+        "   a. **第一步(生成初稿)**: 在你的"内心"生成一份初步的JSON列表。",
+        "   b. **第二步(对照检查)**: 将初稿与我要求的**输出格式定义**进行逐字段对比，检查是否有字段缺失、类型错误或枚举值不匹配的情况。",
+        "   c. **第三步(修正)**: 如果发现任何不符之处，请修正它们。",
+        "   d. **第四步(输出终稿)**: 只输出那份经过你自我修正后的、100%符合要求的、干净的JSON列表。",
+        "5. **【输出格式】**: 必须以一个JSON列表的形式输出。每个对象包含'promise_text' (承诺原文), 'promise_type' (从['产能扩张', '市场拓展', '新品发布', '财务目标', '研发投入']中选择), 和'confidence' (你对该陈述是硬性承诺的置信度，0.0-1.0)。如果未发现任何可量化的承诺，则返回一个空列表[]。"
+      ],
+      "input_template": "\n\n# T-1期MD&A文本\n\n{{mda_text_t_minus_1}}",
+      "output_format": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "promise_text": {
+              "type": "string",
+              "description": "承诺的原文引用"
+            },
+            "promise_type": {
+              "type": "string",
+              "enum": ["产能扩张", "市场拓展", "新品发布", "财务目标", "研发投入"],
+              "description": "承诺类型分类"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0,
+              "description": "对该陈述是硬性承诺的置信度"
+            }
+          },
+          "required": ["promise_text", "promise_type", "confidence"]
+        }
+      },
+      "critical_traps": [
+        "【陷阱1】'未提及'的模糊性: LLM很难区分'公司真的没做'和'公司做了但选择不说'",
+        "【对策1】MD&A Verifier模块在计算最终的promise_failure_rate时，应该给'未提及'一个比'未完成/失败'更低的惩罚权重",
+        "【陷阱2】过度解读: LLM可能将管理层的一般性表述误读为具体承诺",
+        "【对策2】设置高置信度阈值(>0.7)，只接受明确、具体的承诺"
+      ]
+    },
+    "verify_fulfillment": {
+      "role": "你是一名严谨的审计师，你的唯一任务是核查去年的承诺，在今年的公开披露中是否得到了兑现。你不做任何主观猜测，只相信证据。",
+      "instructions": [
+        "1. **背景**: 去年，公司承诺：'{{promise_text}}'。",
+        "2. **任务**: 请在以下【T期MD&A文本】和【T期相关公告】中，查找能够**直接证明或证伪**上述承诺完成情况的证据。",
+        "3. **判断标准**: ",
+        "   - '超预期完成': 有明确数据证明，完成结果显著好于承诺目标。",
+        "   - '按计划完成': 有明确证据证明，承诺目标已达成。",
+        "   - '延迟/部分完成': 证据表明任务仍在进行中，但未能在承诺期内完全达成。",
+        "   - '未完成/失败': 有明确证据表明，项目失败、终止或结果远低于预期。",
+        "   - '未提及': 在所有提供的文本中，完全没有找到与该承诺相关的信息。",
+        "4. **输出格式**: 必须以一个JSON对象输出，包含'status' (你的最终判断) 和'evidence_quote' (支持你判断的最关键的原文引用，不超过100字)。"
+      ],
+      "input_template": "\n\n# T期MD&A文本\n\n{{mda_text_t}}\n\n# T期相关公告\n\n{{announcements_t}}",
+      "output_format": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["超预期完成", "按计划完成", "延迟/部分完成", "未完成/失败", "未提及"],
+            "description": "承诺完成情况的最终判断"
+          },
+          "evidence_quote": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "支持判断的最关键的原文引用"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "对判断结果的置信度"
+          }
+        },
+        "required": ["status", "evidence_quote", "confidence"]
+      },
+      "critical_traps": [
+        "【陷阱1】证据不足时的主观推测: 当证据不足时，LLM可能基于常识进行推测",
+        "【对策1】严格要求'未提及'状态，避免主观推测",
+        "【陷阱2】时间窗口的模糊性: 承诺可能在不同时间点完成",
+        "【对策2】明确时间范围，考虑合理的完成时间窗口"
+      ]
+    },
+    "calculate_credibility_score": {
+      "role": "你是一名资深的财务审计专家，专门评估上市公司管理层的可信度和履约能力。",
+      "instructions": [
+        "1. **任务**: 基于以下【历史承诺履约记录】，计算该公司的【管理层可信度评分】。",
+        "2. **评分维度**: ",
+        "   - 履约率: 按计划完成 + 超预期完成的比例",
+        "   - 一致性: 承诺与实际行动的一致性",
+        "   - 透明度: 对未完成承诺的解释和说明",
+        "3. **评分规则**: ",
+        "   - 履约率权重: 60%",
+        "   - 一致性权重: 25%",
+        "   - 透明度权重: 15%",
+        "4. **输出格式**: 返回一个0-100的整数评分，以及简短的评分理由。"
+      ],
+      "input_template": "\n\n# 历史承诺履约记录\n\n{{fulfillment_history_json}}",
+      "output_format": {
+        "type": "object",
+        "properties": {
+          "credibility_score": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "管理层可信度评分(0-100)"
+          },
+          "reasoning": {
+            "type": "string",
+            "description": "评分理由的简要说明"
+          },
+          "breakdown": {
+            "type": "object",
+            "properties": {
+              "fulfillment_rate": {"type": "number"},
+              "consistency_score": {"type": "number"},
+              "transparency_score": {"type": "number"}
+            }
+          }
+        },
+        "required": ["credibility_score", "reasoning", "breakdown"]
+      }
+    }
+  },
+  "usage_guidelines": {
+    "extraction_phase": "在T-1期财报发布后，使用extract_promises提取具体承诺",
+    "verification_phase": "在T期财报发布后，使用verify_fulfillment验证履约情况",
+    "scoring_phase": "定期使用calculate_credibility_score更新管理层可信度",
+    "quality_control": "每个阶段的结果都应该经过人工审核，特别是'未提及'的情况"
+  },
+  "maintenance_notes": {
+    "version_control": "每次修改后更新version和last_updated字段",
+    "testing": "新增或修改Prompt后，建议在测试环境验证效果",
+    "performance_monitoring": "定期监控各Prompt的准确率和一致性"
+  }
+}

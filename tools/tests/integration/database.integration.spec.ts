@@ -66,11 +66,11 @@ describe('Database Integration Tests', () => {
 
       // Assert
       const result = await database.query(`
-        SELECT table_name 
-        FROM information_schema.tables 
+        SELECT table_name
+        FROM information_schema.tables
         WHERE table_name = 'test_configs'
       `);
-      
+
       expect(result.rows).toHaveLength(1);
     });
 
@@ -107,13 +107,13 @@ describe('Database Integration Tests', () => {
     it('should support database transactions', async () => {
       // Act
       const result = await database.transaction(async (client) => {
-        await client.query('INSERT INTO test_configs (config_type, config_key, config_value) VALUES ($1, $2, $3)', 
+        await client.query('INSERT INTO test_configs (config_type, config_key, config_value) VALUES ($1, $2, $3)',
           ['transaction_test', 'key1', 'value1']);
-        
-        await client.query('INSERT INTO test_configs (config_type, config_key, config_value) VALUES ($1, $2, $3)', 
+
+        await client.query('INSERT INTO test_configs (config_type, config_key, config_value) VALUES ($1, $2, $3)',
           ['transaction_test', 'key2', 'value2']);
-        
-        return await client.query('SELECT COUNT(*) as count FROM test_configs WHERE config_type = $1', 
+
+        return await client.query('SELECT COUNT(*) as count FROM test_configs WHERE config_type = $1',
           ['transaction_test']);
       });
 
@@ -125,15 +125,15 @@ describe('Database Integration Tests', () => {
       // Act & Assert
       await expect(
         database.transaction(async (client) => {
-          await client.query('INSERT INTO test_configs (config_type, config_key, config_value) VALUES ($1, $2, $3)', 
+          await client.query('INSERT INTO test_configs (config_type, config_key, config_value) VALUES ($1, $2, $3)',
             ['rollback_test', 'key1', 'value1']);
-          
+
           throw new Error('Simulated error');
         })
       ).rejects.toThrow('Simulated error');
 
       // Verify rollback
-      const result = await database.query('SELECT COUNT(*) as count FROM test_configs WHERE config_type = $1', 
+      const result = await database.query('SELECT COUNT(*) as count FROM test_configs WHERE config_type = $1',
         ['rollback_test']);
       expect(result.rows[0].count).toBe('0');
     });
@@ -142,14 +142,13 @@ describe('Database Integration Tests', () => {
   describe('Data Cleanup', () => {
     it('should clean up test data', async () => {
       // Act
-      await database.query('DELETE FROM test_configs WHERE config_type IN ($1, $2, $3)', 
+      await database.query('DELETE FROM test_configs WHERE config_type IN ($1, $2, $3)',
         ['test', 'transaction_test', 'rollback_test']);
 
       // Assert
-      const result = await database.query('SELECT COUNT(*) as count FROM test_configs WHERE config_type IN ($1, $2, $3)', 
+      const result = await database.query('SELECT COUNT(*) as count FROM test_configs WHERE config_type IN ($1, $2, $3)',
         ['test', 'transaction_test', 'rollback_test']);
       expect(result.rows[0].count).toBe('0');
     });
   });
 });
-

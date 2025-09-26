@@ -12,7 +12,7 @@ const { Option } = Select;
 /**
  * 原始文本浏览器组件
  * 展示AI分析的原文，支持高亮关键词和交互联动
- * 
+ *
  * 核心特性：
  * 1. 虚拟列表支持大数据量
  * 2. 关键词高亮和悬浮提示
@@ -34,13 +34,13 @@ const RawTextExplorer: React.FC<RawTextExplorerProps> = ({
   // 过滤数据
   const filteredData = useMemo(() => {
     return data.filter(item => {
-      const matchesSearch = !searchText || 
+      const matchesSearch = !searchText ||
         item.title.toLowerCase().includes(searchText.toLowerCase()) ||
         item.content.toLowerCase().includes(searchText.toLowerCase()) ||
         item.keywords.some(keyword => keyword.toLowerCase().includes(searchText.toLowerCase()));
-      
+
       const matchesType = eventTypeFilter === 'all' || item.eventType === eventTypeFilter;
-      
+
       return matchesSearch && matchesType;
     });
   }, [data, searchText, eventTypeFilter]);
@@ -109,7 +109,7 @@ const RawTextExplorer: React.FC<RawTextExplorerProps> = ({
   // 高亮文本中的关键词
   const highlightText = useCallback((text: string, keywords: string[]) => {
     if (keywords.length === 0) return text;
-    
+
     const regex = new RegExp(`(${keywords.join('|')})`, 'gi');
     return text.replace(regex, '<mark class="highlighted-keyword">$1</mark>');
   }, []);
@@ -170,7 +170,7 @@ const RawTextExplorer: React.FC<RawTextExplorerProps> = ({
               )}
             </div>
           </div>
-          
+
           <div className="event-content">
             <Paragraph
               ellipsis={{ rows: 3, expandable: true, symbol: '展开' }}
@@ -178,7 +178,7 @@ const RawTextExplorer: React.FC<RawTextExplorerProps> = ({
               dangerouslySetInnerHTML={{ __html: highlightedContent }}
             />
           </div>
-          
+
           <div className="event-footer">
             <div className="event-keywords">
               {renderKeywords(event.keywords)}

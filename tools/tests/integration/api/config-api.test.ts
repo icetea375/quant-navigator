@@ -58,7 +58,7 @@ describe('配置管理API集成测试', () => {
         description: '测试配置项',
         createdBy: 'test'
       };
-      
+
       const createdConfig = await configService.createConfig(testConfig);
       testConfigId = createdConfig.configId;
     });
@@ -170,7 +170,7 @@ describe('配置管理API集成测试', () => {
         description: '用于更新的测试配置',
         createdBy: 'test'
       };
-      
+
       const createdConfig = await configService.createConfig(testConfig);
       testConfigId = createdConfig.configId;
     });
@@ -221,7 +221,7 @@ describe('配置管理API集成测试', () => {
         description: '用于删除的测试配置',
         createdBy: 'test'
       };
-      
+
       const createdConfig = await configService.createConfig(testConfig);
       const configId = createdConfig.configId;
 
@@ -254,7 +254,7 @@ describe('配置管理API集成测试', () => {
         description: '用于发布的测试配置',
         createdBy: 'test'
       };
-      
+
       const createdConfig = await configService.createConfig(testConfig);
       testConfigId = createdConfig.configId;
     });
@@ -293,7 +293,7 @@ describe('配置管理API集成测试', () => {
         description: '用于回滚的测试配置',
         createdBy: 'test'
       };
-      
+
       const createdConfig = await configService.createConfig(testConfig);
       testConfigId = createdConfig.configId;
     });

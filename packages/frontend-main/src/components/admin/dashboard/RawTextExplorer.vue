@@ -2,7 +2,7 @@
   <div class="raw-text-explorer">
     <h3>📄 原始文本探索器</h3>
     <p class="description">深入分析双脑报告的原始文本内容，提取关键信息和模式</p>
-    
+
     <div class="explorer-content">
       <!-- 文本对比视图 -->
       <div class="text-comparison">
@@ -18,7 +18,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="text-panel doubao-text">
           <h4>🌊 豆包舆情感知报告</h4>
           <div class="text-content">
@@ -32,7 +32,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 关键词分析 -->
       <div class="keyword-analysis">
         <h4>🔍 关键词分析</h4>
@@ -40,8 +40,8 @@
           <div class="keyword-section">
             <h5>Qwen关键词</h5>
             <div class="keyword-tags">
-              <span 
-                v-for="(keyword, index) in qwenReport?.keywords || []" 
+              <span
+                v-for="(keyword, index) in qwenReport?.keywords || []"
                 :key="index"
                 class="keyword-tag qwen-tag"
               >
@@ -49,12 +49,12 @@
               </span>
             </div>
           </div>
-          
+
           <div class="keyword-section">
             <h5>豆包关键词</h5>
             <div class="keyword-tags">
-              <span 
-                v-for="(keyword, index) in doubaoReport?.keywords || []" 
+              <span
+                v-for="(keyword, index) in doubaoReport?.keywords || []"
                 :key="index"
                 class="keyword-tag doubao-tag"
               >
@@ -63,7 +63,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- 关键词重叠分析 -->
         <div class="keyword-overlap">
           <h5>关键词重叠分析</h5>
@@ -78,8 +78,8 @@
             </div>
           </div>
           <div class="overlap-keywords">
-            <span 
-              v-for="keyword in getOverlapKeywords()" 
+            <span
+              v-for="keyword in getOverlapKeywords()"
               :key="keyword"
               class="keyword-tag overlap-tag"
             >
@@ -88,7 +88,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 实体识别 -->
       <div class="entity-analysis">
         <h4>🏷️ 实体识别</h4>
@@ -96,8 +96,8 @@
           <div class="entity-section">
             <h5>Qwen识别的实体</h5>
             <div class="entity-tags">
-              <span 
-                v-for="(entity, index) in qwenReport?.entities || []" 
+              <span
+                v-for="(entity, index) in qwenReport?.entities || []"
                 :key="index"
                 class="entity-tag qwen-entity"
               >
@@ -105,12 +105,12 @@
               </span>
             </div>
           </div>
-          
+
           <div class="entity-section">
             <h5>豆包识别的实体</h5>
             <div class="entity-tags">
-              <span 
-                v-for="(entity, index) in doubaoReport?.entities || []" 
+              <span
+                v-for="(entity, index) in doubaoReport?.entities || []"
                 :key="index"
                 class="entity-tag doubao-entity"
               >
@@ -120,7 +120,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 文本相似度分析 -->
       <div class="similarity-analysis">
         <h4>📊 文本相似度分析</h4>
@@ -129,24 +129,24 @@
             <div class="metric-title">余弦相似度</div>
             <div class="metric-value">{{ getCosineSimilarity() }}%</div>
             <div class="metric-bar">
-              <div 
-                class="metric-fill" 
+              <div
+                class="metric-fill"
                 :style="{ width: getCosineSimilarity() + '%' }"
               ></div>
             </div>
           </div>
-          
+
           <div class="metric-card">
             <div class="metric-title">Jaccard相似度</div>
             <div class="metric-value">{{ getJaccardSimilarity() }}%</div>
             <div class="metric-bar">
-              <div 
-                class="metric-fill" 
+              <div
+                class="metric-fill"
                 :style="{ width: getJaccardSimilarity() + '%' }"
               ></div>
             </div>
           </div>
-          
+
           <div class="metric-card">
             <div class="metric-title">编辑距离</div>
             <div class="metric-value">{{ getEditDistance() }}</div>
@@ -173,21 +173,21 @@ const props = defineProps<Props>()
 // 计算关键词重叠
 const getOverlapKeywords = () => {
   if (!props.qwenReport?.keywords || !props.doubaoReport?.keywords) return []
-  
+
   const qwenKeywords = new Set(props.qwenReport.keywords.map((k: string) => k.toLowerCase()))
   const doubaoKeywords = new Set(props.doubaoReport.keywords.map((k: string) => k.toLowerCase()))
-  
+
   return Array.from(qwenKeywords).filter(keyword => doubaoKeywords.has(keyword))
 }
 
 // 计算重叠率
 const getOverlapRate = () => {
   if (!props.qwenReport?.keywords || !props.doubaoReport?.keywords) return 0
-  
+
   const qwenKeywords = new Set(props.qwenReport.keywords.map((k: string) => k.toLowerCase()))
   const doubaoKeywords = new Set(props.doubaoReport.keywords.map((k: string) => k.toLowerCase()))
   const overlap = getOverlapKeywords().length
-  
+
   const union = new Set([...qwenKeywords, ...doubaoKeywords]).size
   return union > 0 ? Math.round((overlap / union) * 100) : 0
 }
@@ -195,38 +195,38 @@ const getOverlapRate = () => {
 // 计算余弦相似度（简化版）
 const getCosineSimilarity = () => {
   if (!props.qwenReport?.content || !props.doubaoReport?.content) return 0
-  
+
   // 简化的余弦相似度计算
   const qwenWords = props.qwenReport.content.toLowerCase().split(/\s+/)
   const doubaoWords = props.doubaoReport.content.toLowerCase().split(/\s+/)
-  
+
   const qwenWordCount = new Map()
   const doubaoWordCount = new Map()
-  
+
   qwenWords.forEach(word => {
     qwenWordCount.set(word, (qwenWordCount.get(word) || 0) + 1)
   })
-  
+
   doubaoWords.forEach(word => {
     doubaoWordCount.set(word, (doubaoWordCount.get(word) || 0) + 1)
   })
-  
+
   const allWords = new Set([...qwenWordCount.keys(), ...doubaoWordCount.keys()])
   let dotProduct = 0
   let qwenNorm = 0
   let doubaoNorm = 0
-  
+
   allWords.forEach(word => {
     const qwenCount = qwenWordCount.get(word) || 0
     const doubaoCount = doubaoWordCount.get(word) || 0
-    
+
     dotProduct += qwenCount * doubaoCount
     qwenNorm += qwenCount * qwenCount
     doubaoNorm += doubaoCount * doubaoCount
   })
-  
+
   if (qwenNorm === 0 || doubaoNorm === 0) return 0
-  
+
   const similarity = dotProduct / (Math.sqrt(qwenNorm) * Math.sqrt(doubaoNorm))
   return Math.round(similarity * 100)
 }
@@ -234,28 +234,28 @@ const getCosineSimilarity = () => {
 // 计算Jaccard相似度
 const getJaccardSimilarity = () => {
   if (!props.qwenReport?.keywords || !props.doubaoReport?.keywords) return 0
-  
+
   const qwenKeywords = new Set(props.qwenReport.keywords.map((k: string) => k.toLowerCase()))
   const doubaoKeywords = new Set(props.doubaoReport.keywords.map((k: string) => k.toLowerCase()))
-  
+
   const intersection = new Set([...qwenKeywords].filter(x => doubaoKeywords.has(x)))
   const union = new Set([...qwenKeywords, ...doubaoKeywords])
-  
+
   return union.size > 0 ? Math.round((intersection.size / union.size) * 100) : 0
 }
 
 // 计算编辑距离（简化版）
 const getEditDistance = () => {
   if (!props.qwenReport?.content || !props.doubaoReport?.content) return 0
-  
+
   const str1 = props.qwenReport.content.toLowerCase()
   const str2 = props.doubaoReport.content.toLowerCase()
-  
+
   const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null))
-  
+
   for (let i = 0; i <= str1.length; i++) matrix[0][i] = i
   for (let j = 0; j <= str2.length; j++) matrix[j][0] = j
-  
+
   for (let j = 1; j <= str2.length; j++) {
     for (let i = 1; i <= str1.length; i++) {
       const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1
@@ -266,7 +266,7 @@ const getEditDistance = () => {
       )
     }
   }
-  
+
   return matrix[str2.length][str1.length]
 }
 </script>
@@ -513,11 +513,11 @@ const getEditDistance = () => {
   .entities-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .similarity-metrics {
     grid-template-columns: 1fr;
   }
-  
+
   .overlap-metrics {
     flex-direction: column;
     gap: 10px;

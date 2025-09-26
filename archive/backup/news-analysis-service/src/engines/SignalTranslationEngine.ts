@@ -90,7 +90,7 @@ export class SignalTranslationEngine {
   ) {
     this.db = db;
     this.config = config;
-    
+
     this.validateConfig(config);
   }
 
@@ -149,10 +149,10 @@ export class SignalTranslationEngine {
 
       // 1. 分析主要信号
       const primarySignal = this.analyzePrimarySignal(input);
-      
+
       // 2. 分析市场上下文
       const marketContext = this.analyzeMarketContext(input);
-      
+
       // 3. 生成推荐
       const recommendations = this.generateRecommendations(input, primarySignal);
 
@@ -181,13 +181,13 @@ export class SignalTranslationEngine {
    */
   private analyzePrimarySignal(input: SignalInput): any {
     const { zScore, anomalyType } = input;
-    
+
     // 确定信号强度
     const strength = this.determineSignalStrength(Math.abs(zScore));
-    
+
     // 根据异常类型和Z分数选择翻译规则
     const rule = this.findMatchingRule(anomalyType, zScore);
-    
+
     if (!rule) {
       // 使用默认规则
       return this.createDefaultSignal(anomalyType, zScore, strength);
@@ -212,7 +212,7 @@ export class SignalTranslationEngine {
    */
   private analyzeMarketContext(input: SignalInput): any {
     const { context } = input;
-    
+
     return {
       overallState: this.analyzeOverallMarketState(context),
       sectorRotation: this.analyzeSectorRotation(context),
@@ -225,7 +225,7 @@ export class SignalTranslationEngine {
    */
   private analyzeOverallMarketState(context: any): string {
     const { sentiment, newsCount } = context;
-    
+
     if (sentiment > 0.7 && newsCount > 10) {
       return '市场情绪高涨，消息面活跃';
     } else if (sentiment > 0.3 && newsCount > 5) {
@@ -244,7 +244,7 @@ export class SignalTranslationEngine {
    */
   private analyzeSectorRotation(context: any): string {
     const { sectorPerformance } = context;
-    
+
     if (sectorPerformance > 0.05) {
       return '板块表现强势，资金流入明显';
     } else if (sectorPerformance > 0.02) {
@@ -263,9 +263,9 @@ export class SignalTranslationEngine {
    */
   private analyzeRiskAppetite(context: any): string {
     const { sentiment, sectorPerformance } = context;
-    
+
     const riskScore = (sentiment + sectorPerformance) / 2;
-    
+
     if (riskScore > 0.5) {
       return '风险偏好高涨，投资者情绪乐观';
     } else if (riskScore > 0.2) {
@@ -329,7 +329,7 @@ export class SignalTranslationEngine {
    */
   private determineSignalStrength(absZScore: number): 'extreme' | 'strong' | 'moderate' | 'weak' {
     const { zScore } = this.config.thresholds;
-    
+
     if (absZScore >= zScore.extreme) {
       return 'extreme';
     } else if (absZScore >= zScore.strong) {
@@ -347,7 +347,7 @@ export class SignalTranslationEngine {
   private findMatchingRule(anomalyType: string, zScore: number): TranslationRule | null {
     return this.config.translationRules.find(rule => {
       const { condition } = rule;
-      return condition.signalType === anomalyType && 
+      return condition.signalType === anomalyType &&
              this.evaluateCondition(zScore, condition.operator, condition.threshold);
     }) || null;
   }
@@ -434,10 +434,10 @@ export class SignalTranslationEngine {
       moderate: 0.70,
       weak: 0.50
     };
-    
+
     const baseConfidence = Math.min(absZScore / 3, 1); // 基于Z分数的置信度
     const strengthBonus = strengthMultiplier[strength] || 0.5;
-    
+
     return Math.min(baseConfidence * strengthBonus, 0.95);
   }
 

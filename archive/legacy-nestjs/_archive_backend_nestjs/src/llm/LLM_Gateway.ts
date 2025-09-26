@@ -3,9 +3,9 @@
  * 首席风险官/成本控制官视角的军事化AI军团管理
  */
 
-import { 
-  selectModelForTask, 
-  TASK_MODEL_MAPPING, 
+import {
+  selectModelForTask,
+  TASK_MODEL_MAPPING,
   AI_FORCE_STRUCTURE,
   batchOptimizer,
   BatchRequest,
@@ -115,7 +115,7 @@ export class LLM_Gateway {
    */
   async processRequest(request: LLMRequest): Promise<LLMResponse> {
     console.log(`🚀 开始处理请求: ${request.taskType} (v10.7行为控制架构)`);
-    
+
     // 1. 成本预算检查
     if (!this.checkBudgetLimits(request)) {
       throw new Error('预算超限，请求被拒绝');
@@ -123,11 +123,11 @@ export class LLM_Gateway {
 
     // 2. 行为控制：构建带有运行时指令的Prompt
     const controlledPrompt = this.injectDynamicDirectives(request);
-    
+
     // 3. 智能模型选择
     const modelSelection = selectModelForTask(
-      request.taskType, 
-      request.qualityLevel, 
+      request.taskType,
+      request.qualityLevel,
       true // 启用批处理优化
     );
 
@@ -137,7 +137,7 @@ export class LLM_Gateway {
 
     // 4. 成本预估（基于行为控制后的Prompt）
     const estimatedCost = this.estimateCost(request, modelSelection);
-    
+
     // 5. 成本控制决策
     if (!this.approveCost(estimatedCost, request.priority)) {
       // 降级处理：降低质量等级或选择更便宜的模型
@@ -174,7 +174,7 @@ export class LLM_Gateway {
 
     // 构建系统级指令
     let systemDirective = '';
-    
+
     if (behaviorProfile.allow_online_search === false) {
       systemDirective = `【最高优先级指令】本次任务为内部数据分析，你被严格禁止使用任何外部搜索或联网功能。你必须、且只能、完全基于我在此次对话中提供给你的上下文信息进行回答。任何试图获取外部信息的行为都是被禁止的。
 
@@ -197,7 +197,7 @@ export class LLM_Gateway {
 
     // 将系统指令强势插入到用户Prompt的最顶端
     const finalPrompt = systemDirective + request.prompt;
-    
+
     console.log(`🎯 动态指令注入完成: ${behaviorProfile.allow_online_search ? '允许联网' : '禁止联网'}`);
     return finalPrompt;
   }
@@ -208,7 +208,7 @@ export class LLM_Gateway {
   private checkBudgetLimits(request: LLMRequest): boolean {
     const today = new Date().toDateString();
     const thisMonth = new Date().toISOString().slice(0, 7);
-    
+
     // 检查日预算
     if (this.costMetrics.dailySpent >= this.dailyBudget) {
       console.warn('⚠️ 日预算已超限，拒绝请求');
@@ -239,7 +239,7 @@ export class LLM_Gateway {
 
     const inputCost = estimatedInputTokens * pricing.inputPrice / 1000000;
     const outputCost = estimatedOutputTokens * pricing.outputPrice / 1000000;
-    
+
     return inputCost + outputCost;
   }
 
@@ -249,10 +249,10 @@ export class LLM_Gateway {
   private approveCost(estimatedCost: number, priority: number): boolean {
     // 高优先级请求更容易通过
     const approvalThreshold = priority > 8 ? 0.8 : 0.5;
-    
+
     // 检查是否超过预算的警告阈值
     const budgetUsage = this.costMetrics.dailySpent / this.dailyBudget;
-    
+
     if (budgetUsage > 0.9) {
       // 预算紧张，只批准高优先级请求
       return priority > 7;
@@ -269,10 +269,10 @@ export class LLM_Gateway {
    */
   private downgradeRequest(request: LLMRequest): any {
     console.log(`🔄 降级处理请求: ${request.taskType}`);
-    
+
     // 降低质量等级
     const downgradedQualityLevel = request.qualityLevel === 'high' ? 'normal' : 'normal';
-    
+
     // 选择更便宜的模型
     const downgradedSelection = selectModelForTask(
       request.taskType,
@@ -288,10 +288,10 @@ export class LLM_Gateway {
    */
   private async executeRequest(request: LLMRequest, modelSelection: any): Promise<LLMResponse> {
     const startTime = Date.now();
-    
+
     // 获取控制后的Prompt
     const controlledPrompt = this.injectDynamicDirectives(request);
-    
+
     // 检查是否支持批处理
     if (modelSelection.enableBatch) {
       return this.executeBatchRequest(request, modelSelection, controlledPrompt);
@@ -305,7 +305,7 @@ export class LLM_Gateway {
    */
   private async executeBatchRequest(request: LLMRequest, modelSelection: any, controlledPrompt: string): Promise<LLMResponse> {
     console.log(`🚀 批处理请求: ${request.taskType} -> ${modelSelection.model}`);
-    
+
     const batchRequest: BatchRequest = {
       id: request.id,
       taskType: request.taskType,
@@ -317,7 +317,7 @@ export class LLM_Gateway {
 
     // 添加到批处理队列
     const batchId = await batchOptimizer.addToBatch(batchRequest);
-    
+
     // 模拟批处理执行（实际应该等待批处理完成）
     const response: LLMResponse = {
       id: request.id,
@@ -344,10 +344,10 @@ export class LLM_Gateway {
    */
   private async executeImmediateRequest(request: LLMRequest, modelSelection: any, controlledPrompt: string): Promise<LLMResponse> {
     console.log(`⚡ 立即执行请求: ${request.taskType} -> ${modelSelection.model}`);
-    
+
     // 模拟API调用
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-    
+
     const response: LLMResponse = {
       id: request.id,
       content: `立即响应: ${controlledPrompt.substring(0, 100)}...`,
@@ -376,13 +376,13 @@ export class LLM_Gateway {
     this.costMetrics.monthlySpent += response.cost;
     this.costMetrics.totalRequests += 1;
     this.costMetrics.averageCostPerRequest = this.costMetrics.dailySpent / this.costMetrics.totalRequests;
-    
+
     // 更新按任务类型的成本
     if (!this.costMetrics.costByTaskType[response.model]) {
       this.costMetrics.costByTaskType[response.model] = 0;
     }
     this.costMetrics.costByTaskType[response.model] += response.cost;
-    
+
     // 更新按模型的成本
     if (!this.costMetrics.costByModel[response.model]) {
       this.costMetrics.costByModel[response.model] = 0;
@@ -477,7 +477,7 @@ export class LLM_Gateway {
 
     const totalTasks = onlineTasks.length + offlineTasks.length;
     const onlineRatio = onlineTasks.length / totalTasks;
-    
+
     let riskAssessment = '';
     if (onlineRatio > 0.5) {
       riskAssessment = '⚠️ 高风险：超过50%的任务允许联网，可能导致成本失控';

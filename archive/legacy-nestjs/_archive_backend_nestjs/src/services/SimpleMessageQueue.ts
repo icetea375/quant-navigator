@@ -97,7 +97,7 @@ export class SimpleMessageQueue {
     }
 
     this.isRunning = true;
-    
+
     if (this.config.enabled) {
       // 启动任务处理循环
       this.processingInterval = setInterval(() => {
@@ -117,7 +117,7 @@ export class SimpleMessageQueue {
     }
 
     this.isRunning = false;
-    
+
     if (this.processingInterval) {
       clearInterval(this.processingInterval);
       this.processingInterval = null;
@@ -159,9 +159,9 @@ export class SimpleMessageQueue {
     if (!this.queues.has(type)) {
       this.queues.set(type, []);
     }
-    
+
     this.queues.get(type)!.push(task);
-    
+
     // 按优先级排序
     this.queues.get(type)!.sort((a, b) => b.priority - a.priority);
 
@@ -198,10 +198,10 @@ export class SimpleMessageQueue {
    */
   private findExecutableTask(tasks: Task[]): Task | null {
     const now = Date.now();
-    
+
     for (let i = 0; i < tasks.length; i++) {
       const task = tasks[i];
-      
+
       // 检查任务是否已调度
       if (task.scheduledAt > now) {
         continue;
@@ -237,12 +237,12 @@ export class SimpleMessageQueue {
     try {
       // 执行任务处理函数
       const result = await this.processTask(task);
-      
+
       // 任务成功完成
       task.status = 'completed';
       task.completedAt = Date.now();
       task.result = result;
-      
+
       this.completedTasks.set(task.id, task);
       this.runningTasks.delete(task.id);
 
@@ -259,13 +259,13 @@ export class SimpleMessageQueue {
         task.scheduledAt = Date.now() + this.config.retryDelay * Math.pow(2, task.retryCount - 1); // 指数退避
         this.queues.get(queueType)!.push(task);
         this.runningTasks.delete(task.id);
-        
+
         console.log(`Task ${task.id} failed, retrying (${task.retryCount}/${task.maxRetries})`);
       } else {
         // 任务失败，移到死信队列
         task.status = 'failed';
         task.completedAt = Date.now();
-        
+
         this.completedTasks.set(task.id, task);
         this.runningTasks.delete(task.id);
 
@@ -333,7 +333,7 @@ export class SimpleMessageQueue {
     for (const task of this.completedTasks.values()) {
       totalTasks++;
       completedTasks++;
-      
+
       if (task.status === 'failed') {
         failedTasks++;
       } else if (task.status === 'cancelled') {

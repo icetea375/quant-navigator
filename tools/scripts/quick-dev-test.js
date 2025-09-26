@@ -20,7 +20,7 @@ console.log('\n📁 检查项目结构...');
 
 const requiredFiles = [
   'main_workflow.py',
-  'qwen_analyzer.py', 
+  'qwen_analyzer.py',
   'doubao_analyzer.py',
   'backend/src/api/dual-brain-api.ts',
   'frontend/src/views/DualBrainArbitrationDashboard.vue',
@@ -52,21 +52,21 @@ console.log('\n⚙️ 检查配置文件...');
 try {
   const configPath = path.join(__dirname, '..', 'config', 'services', 'llm.json');
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  
+
   // 检查双脑配置
   if (config.providers['qwen-plus'] && config.providers['doubao-seed-1-6']) {
     console.log('✅ LLM配置文件包含双脑配置');
   } else {
     console.log('❌ LLM配置文件缺少双脑配置');
   }
-  
+
   // 检查任务映射
   if (config.task_mapping['mda_extraction'] && config.task_mapping['realtime_sentiment_analysis']) {
     console.log('✅ 任务映射配置正确');
   } else {
     console.log('❌ 任务映射配置不完整');
   }
-  
+
 } catch (error) {
   console.log('❌ 配置文件检查失败:', error.message);
 }
@@ -81,7 +81,7 @@ pythonFiles.forEach(file => {
   try {
     const filePath = path.join(__dirname, '..', file);
     const content = fs.readFileSync(filePath, 'utf8');
-    
+
     // 简单的语法检查
     if (content.includes('class ') && content.includes('def ')) {
       console.log(`✅ ${file} - 语法检查通过`);

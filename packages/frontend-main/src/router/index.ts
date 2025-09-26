@@ -34,6 +34,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
+        name: 'PrivateDefault',
         redirect: '/private/assistant'
       },
       {

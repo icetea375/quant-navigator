@@ -10,8 +10,8 @@
     <div class="pending-cases-section">
       <h2>📋 待仲裁案件</h2>
       <div class="cases-grid">
-        <div 
-          v-for="case in pendingCases" 
+        <div
+          v-for="case in pendingCases"
           :key="case.id"
           class="case-card"
           :class="{ 'selected': selectedCase?.id === case.id }"
@@ -56,7 +56,7 @@
               <span class="confidence">{{ qwenReport?.confidence_score || 0 }}%</span>
             </div>
           </div>
-          
+
           <div class="report-content">
             <!-- 执行摘要 -->
             <div class="report-section">
@@ -70,8 +70,8 @@
             <div class="report-section">
               <h4>🔍 关键发现</h4>
               <div class="findings-list">
-                <div 
-                  v-for="(finding, index) in qwenReport?.key_findings || []" 
+                <div
+                  v-for="(finding, index) in qwenReport?.key_findings || []"
                   :key="index"
                   class="finding-item"
                 >
@@ -87,8 +87,8 @@
                 <div class="score-item">
                   <span class="score-label">完整性</span>
                   <div class="score-bar">
-                    <div 
-                      class="score-fill" 
+                    <div
+                      class="score-fill"
                       :style="{ width: (qwenReport?.mda_scores?.completeness_score || 0) + '%' }"
                     ></div>
                   </div>
@@ -97,8 +97,8 @@
                 <div class="score-item">
                   <span class="score-label">一致性</span>
                   <div class="score-bar">
-                    <div 
-                      class="score-fill" 
+                    <div
+                      class="score-fill"
                       :style="{ width: (qwenReport?.mda_scores?.consistency_score || 0) + '%' }"
                     ></div>
                   </div>
@@ -126,15 +126,15 @@
               <span class="confidence">{{ doubaoReport?.sentiment_analysis?.confidence_level * 100 || 0 }}%</span>
             </div>
           </div>
-          
+
           <div class="report-content">
             <!-- 情绪分析 -->
             <div class="report-section">
               <h4>😊 情绪分析</h4>
               <div class="sentiment-score">
                 <div class="sentiment-gauge">
-                  <div 
-                    class="gauge-fill" 
+                  <div
+                    class="gauge-fill"
                     :class="getSentimentClass(doubaoReport?.sentiment_analysis?.sentiment_score)"
                     :style="{ width: Math.abs(doubaoReport?.sentiment_analysis?.sentiment_score || 0) + '%' }"
                   ></div>
@@ -147,8 +147,8 @@
             <div class="report-section">
               <h4>⚠️ 风险因素</h4>
               <div class="risk-factors">
-                <div 
-                  v-for="(risk, index) in doubaoReport?.sentiment_analysis?.risk_factors || []" 
+                <div
+                  v-for="(risk, index) in doubaoReport?.sentiment_analysis?.risk_factors || []"
                   :key="index"
                   class="risk-item"
                 >
@@ -176,8 +176,8 @@
             <div class="report-section">
               <h4>⚡ 实时事件影响</h4>
               <div class="real-time-events">
-                <div 
-                  v-for="(event, index) in doubaoReport?.sentiment_analysis?.real_time_events || []" 
+                <div
+                  v-for="(event, index) in doubaoReport?.sentiment_analysis?.real_time_events || []"
                   :key="index"
                   class="event-item"
                 >
@@ -204,8 +204,8 @@
           <div class="metric-item">
             <span class="metric-label">投资建议一致性</span>
             <div class="metric-bar">
-              <div 
-                class="metric-fill" 
+              <div
+                class="metric-fill"
                 :style="{ width: getRecommendationConsistency() + '%' }"
               ></div>
             </div>
@@ -214,8 +214,8 @@
           <div class="metric-item">
             <span class="metric-label">风险认知差异</span>
             <div class="metric-bar">
-              <div 
-                class="metric-fill" 
+              <div
+                class="metric-fill"
                 :style="{ width: getRiskDifference() + '%' }"
               ></div>
             </div>
@@ -236,39 +236,39 @@
               <option value="SELL">卖出 (SELL)</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label>置信度评估</label>
-            <input 
-              type="range" 
-              min="0" 
-              max="100" 
+            <input
+              type="range"
+              min="0"
+              max="100"
               v-model="arbitrationDecision.confidenceLevel"
               class="confidence-slider"
             />
             <span class="confidence-display">{{ arbitrationDecision.confidenceLevel }}%</span>
           </div>
-          
+
           <div class="form-group">
             <label>仲裁理由</label>
-            <textarea 
+            <textarea
               v-model="arbitrationDecision.reasoning"
               placeholder="请详细说明您的仲裁理由..."
               rows="4"
             ></textarea>
           </div>
-          
+
           <div class="form-group">
             <label>关键分歧点</label>
-            <textarea 
+            <textarea
               v-model="arbitrationDecision.keyDisagreements"
               placeholder="记录两个AI分析的关键分歧点..."
               rows="3"
             ></textarea>
           </div>
-          
+
           <div class="form-actions">
-            <button 
+            <button
               @click="submitArbitrationDecision"
               class="submit-btn"
               :disabled="!isDecisionValid"
@@ -377,12 +377,12 @@ const loadPendingCases = async () => {
 const selectCase = async (case: PendingCase) => {
   selectedCase.value = case
   loading.value = true
-  
+
   try {
     // 加载Qwen报告
     const qwenResponse = await fetch(`/api/reports/${case.qwen_report_id}`)
     qwenReport.value = await qwenResponse.json()
-    
+
     // 加载豆包报告
     const doubaoResponse = await fetch(`/api/reports/${case.doubao_report_id}`)
     doubaoReport.value = await doubaoResponse.json()
@@ -401,25 +401,25 @@ const getSentimentClass = (score: number) => {
 
 const getRecommendationConsistency = () => {
   if (!qwenReport.value || !doubaoReport.value) return 0
-  
+
   const qwenRec = qwenReport.value.investment_recommendation
   const doubaoRec = doubaoReport.value.investment_implications.position_recommendation
-  
+
   return qwenRec === doubaoRec ? 100 : 0
 }
 
 const getRiskDifference = () => {
   if (!qwenReport.value || !doubaoReport.value) return 0
-  
+
   const qwenRisk = qwenReport.value.mda_scores?.completeness_score || 0
   const doubaoRisk = Math.abs(doubaoReport.value.sentiment_analysis?.sentiment_score || 0)
-  
+
   return Math.abs(qwenRisk - doubaoRisk)
 }
 
 const submitArbitrationDecision = async () => {
   if (!selectedCase.value) return
-  
+
   loading.value = true
   try {
     const response = await fetch(`/api/arbitration/${selectedCase.value.id}/decision`, {
@@ -429,7 +429,7 @@ const submitArbitrationDecision = async () => {
       },
       body: JSON.stringify(arbitrationDecision)
     })
-    
+
     if (response.ok) {
       // 重新加载案件列表
       await loadPendingCases()
@@ -951,11 +951,11 @@ onMounted(() => {
   .dual-report-comparison {
     grid-template-columns: 1fr;
   }
-  
+
   .decision-form {
     grid-template-columns: 1fr;
   }
-  
+
   .consensus-comparison {
     grid-template-columns: 1fr;
   }

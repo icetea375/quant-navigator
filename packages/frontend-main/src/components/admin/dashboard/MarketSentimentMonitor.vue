@@ -2,7 +2,7 @@
   <div class="market-sentiment-monitor">
     <h3>😊 市场情绪监控</h3>
     <p class="description">实时监控市场情绪变化，为仲裁决策提供情绪面参考</p>
-    
+
     <div class="monitor-content">
       <!-- 情绪指标概览 -->
       <div class="sentiment-overview">
@@ -15,7 +15,7 @@
             </div>
             <div class="metric-description">{{ getSentimentDescription(sentimentData.overallSentiment) }}</div>
           </div>
-          
+
           <div class="metric-card">
             <div class="metric-title">恐慌指数 (VIX)</div>
             <div class="metric-value" :class="getVIXClass(sentimentData.vix)">
@@ -23,7 +23,7 @@
             </div>
             <div class="metric-description">{{ getVIXDescription(sentimentData.vix) }}</div>
           </div>
-          
+
           <div class="metric-card">
             <div class="metric-title">贪婪指数</div>
             <div class="metric-value" :class="getGreedClass(sentimentData.greedIndex)">
@@ -33,7 +33,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 情绪来源分析 -->
       <div class="sentiment-sources">
         <h4>🔍 情绪来源分析</h4>
@@ -47,7 +47,7 @@
               {{ getTrendText(sentimentData.newsTrend) }}
             </div>
           </div>
-          
+
           <div class="source-card">
             <div class="source-title">社交媒体</div>
             <div class="source-score" :class="getScoreClass(sentimentData.socialSentiment)">
@@ -57,7 +57,7 @@
               {{ getTrendText(sentimentData.socialTrend) }}
             </div>
           </div>
-          
+
           <div class="source-card">
             <div class="source-title">分析师观点</div>
             <div class="source-score" :class="getScoreClass(sentimentData.analystSentiment)">
@@ -67,7 +67,7 @@
               {{ getTrendText(sentimentData.analystTrend) }}
             </div>
           </div>
-          
+
           <div class="source-card">
             <div class="source-title">机构资金</div>
             <div class="source-score" :class="getScoreClass(sentimentData.institutionalSentiment)">
@@ -79,13 +79,13 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 情绪事件追踪 -->
       <div class="sentiment-events">
         <h4>📰 情绪事件追踪</h4>
         <div class="events-timeline">
-          <div 
-            v-for="(event, index) in sentimentEvents" 
+          <div
+            v-for="(event, index) in sentimentEvents"
             :key="index"
             class="event-item"
             :class="event.impact"
@@ -97,8 +97,8 @@
               <div class="event-impact">
                 影响程度: {{ event.impactLevel }}/10
                 <div class="impact-bar">
-                  <div 
-                    class="impact-fill" 
+                  <div
+                    class="impact-fill"
                     :style="{ width: (event.impactLevel * 10) + '%' }"
                   ></div>
                 </div>
@@ -110,7 +110,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 情绪预测 -->
       <div class="sentiment-prediction">
         <h4>🔮 情绪预测</h4>
@@ -119,11 +119,11 @@
             <h5>未来7天情绪预测</h5>
             <div class="chart-container">
               <div class="prediction-line">
-                <div 
-                  v-for="(point, index) in sentimentPrediction" 
+                <div
+                  v-for="(point, index) in sentimentPrediction"
                   :key="index"
                   class="prediction-point"
-                  :style="{ 
+                  :style="{
                     left: (index * 14.28) + '%',
                     bottom: (point.value * 2) + 'px'
                   }"
@@ -137,7 +137,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="prediction-summary">
             <h5>预测摘要</h5>
             <div class="summary-item">
@@ -303,9 +303,9 @@ const getPredictionClass = (value: number) => {
 }
 
 const formatTime = (time: Date) => {
-  return time.toLocaleTimeString('zh-CN', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
+  return time.toLocaleTimeString('zh-CN', {
+    hour: '2-digit',
+    minute: '2-digit'
   })
 }
 
@@ -662,16 +662,16 @@ onMounted(() => {
   .sources-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .prediction-content {
     grid-template-columns: 1fr;
   }
-  
+
   .event-item {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .event-time {
     min-width: auto;
   }

@@ -1,11 +1,11 @@
 import React from 'react';
 import { Card, Spin, Alert, Button, Tooltip } from 'antd';
-import { 
-  ReloadOutlined, 
-  FullscreenOutlined, 
+import {
+  ReloadOutlined,
+  FullscreenOutlined,
   FullscreenExitOutlined,
   CloseOutlined,
-  InfoCircleOutlined 
+  InfoCircleOutlined
 } from '@ant-design/icons';
 import { DataPanelContainerProps } from '../../types/arbitration';
 import './DataPanelContainer.css';
@@ -13,7 +13,7 @@ import './DataPanelContainer.css';
 /**
  * 数据面板容器组件
  * 为所有数据面板提供统一的外壳和交互功能
- * 
+ *
  * 核心特性：
  * 1. 统一的标题栏和操作按钮
  * 2. 加载状态和错误处理
@@ -129,11 +129,11 @@ const DataPanelContainer: React.FC<DataPanelContainerProps> = ({
     if (error) {
       return renderError();
     }
-    
+
     if (loading) {
       return renderLoading();
     }
-    
+
     return (
       <div className="data-panel-content">
         {children}
@@ -147,8 +147,8 @@ const DataPanelContainer: React.FC<DataPanelContainerProps> = ({
       title={renderHeader()}
       size="small"
       bordered={false}
-      bodyStyle={{ 
-        padding: 0, 
+      bodyStyle={{
+        padding: 0,
         height: '100%',
         display: 'flex',
         flexDirection: 'column'

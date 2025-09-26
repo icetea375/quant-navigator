@@ -3,7 +3,7 @@
  * 为三大智能引擎提供专门的数据访问接口
  */
 
-import { 
+import {
   QuantSignalDataSource,
   HotspotIntelligenceDataSource,
   AttributionDataSource,

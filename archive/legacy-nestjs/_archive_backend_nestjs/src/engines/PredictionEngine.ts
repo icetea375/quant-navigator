@@ -1,13 +1,13 @@
 /**
  * PredictionEngine - 预测引擎
- * 
+ *
  * 系统定位: "首席策略师"和"Alpha发现引擎"
  * 核心目标: 预测未来 - 通过对3年历史数据的深度学习，为市场上的每一个标的，
  * 输出一个关于其未来短期收益的概率性预测
- * 
+ *
  * 技术架构: 三层分层预测模型
  * - 基础层 (Layer 1): LightGBM - 处理结构化数据
- * - 增强层 (Layer 2): FinBERT - 处理文本情感分析  
+ * - 增强层 (Layer 2): FinBERT - 处理文本情感分析
  * - 决策层 (Layer 3): Llama 3 8B - 综合决策
  */
 
@@ -31,7 +31,7 @@ export interface PredictionEngineConfig extends BaseEngineConfig {
       bagging_freq: number;
     };
   };
-  
+
   // 增强层配置
   layer2: {
     enabled: boolean;
@@ -39,7 +39,7 @@ export interface PredictionEngineConfig extends BaseEngineConfig {
     maxLength: number;
     batchSize: number;
   };
-  
+
   // 决策层配置
   layer3: {
     enabled: boolean;
@@ -47,14 +47,14 @@ export interface PredictionEngineConfig extends BaseEngineConfig {
     maxTokens: number;
     temperature: number;
   };
-  
+
   // 预测配置
   prediction: {
     targetDays: number; // 预测未来N个交易日
     confidenceThreshold: number; // 置信度阈值
     maxStocks: number; // 最大预测股票数量
   };
-  
+
   // 数据配置
   data: {
     lookbackDays: number; // 回看天数
@@ -81,7 +81,7 @@ export interface TrainingSample {
   targetCode: string;
   targetName: string;
   targetLevel: number;
-  
+
   // 数值特征
   zScorePrice: number;
   zScoreRelative: number;
@@ -89,17 +89,17 @@ export interface TrainingSample {
   priceChange1d: number;
   priceChange5d: number;
   priceChange20d: number;
-  
+
   // 文本特征
   newsTitles: string[];
   announcementTitles: string[];
   marketContext: string;
-  
+
   // 目标标签
   futureReturn5d: number;
   futureReturn10d: number;
   futureReturn20d: number;
-  
+
   // 元数据
   createdAt: Date;
   updatedAt: Date;
@@ -109,15 +109,15 @@ export class PredictionEngine extends BaseEngine {
   private config: PredictionEngineConfig;
   private db: DatabaseConnection;
   private logger: Logger;
-  
+
   // 模型实例
   private layer1Model: any = null; // LightGBM模型
   private layer2Model: any = null; // FinBERT模型
   private layer3Model: any = null; // Llama 3模型
-  
+
   // 模型版本
   private currentModelVersion: string = 'v1.0.0';
-  
+
   constructor(db: DatabaseConnection, logger: Logger, config: PredictionEngineConfig) {
     super(config);
     this.db = db;
@@ -131,18 +131,18 @@ export class PredictionEngine extends BaseEngine {
   async initialize(): Promise<void> {
     try {
       this.logger.info('Initializing PredictionEngine...');
-      
+
       // 验证配置
       if (!this.validateConfig()) {
         throw new Error('Invalid PredictionEngine configuration');
       }
-      
+
       // 加载模型
       await this.loadModels();
-      
+
       // 验证数据库连接
       await this.validateDatabaseConnection();
-      
+
       this.logger.info('PredictionEngine initialized successfully');
     } catch (error) {
       this.logger.error('Failed to initialize PredictionEngine:', error);
@@ -156,33 +156,33 @@ export class PredictionEngine extends BaseEngine {
   async generatePrediction(tradeDate: string, targetCodes?: string[]): Promise<PredictionResult[]> {
     try {
       this.logger.info(`Generating predictions for date: ${tradeDate}`);
-      
+
       // 1. 加载特征数据
       const featureData = await this.loadFeatureData(tradeDate, targetCodes);
-      
+
       // 2. 加载文本数据
       const textData = await this.loadTextData(tradeDate, targetCodes);
-      
+
       // 3. 执行三层预测
       const predictions: PredictionResult[] = [];
-      
+
       for (const stockCode of featureData.keys()) {
         try {
           const features = featureData.get(stockCode);
           const texts = textData.get(stockCode) || [];
-          
+
           // 基础层预测
           const p1 = await this.predictLayer1(features);
-          
+
           // 增强层预测
           const p2 = await this.predictLayer2(texts);
-          
+
           // 决策层预测
           const pFinal = await this.predictLayer3(p1, p2, features, texts, stockCode, tradeDate);
-          
+
           // 计算置信度
           const confidence = this.calculateConfidence(p1, p2, pFinal);
-          
+
           // 创建预测结果
           const prediction: PredictionResult = {
             predictionId: this.generatePredictionId(stockCode, tradeDate),
@@ -195,21 +195,21 @@ export class PredictionEngine extends BaseEngine {
             modelVersion: this.currentModelVersion,
             createdAt: new Date()
           };
-          
+
           predictions.push(prediction);
-          
+
         } catch (error) {
           this.logger.error(`Failed to predict for ${stockCode}:`, error);
           // 继续处理下一个股票
         }
       }
-      
+
       // 4. 保存预测结果
       await this.savePredictions(predictions);
-      
+
       this.logger.info(`Generated ${predictions.length} predictions for ${tradeDate}`);
       return predictions;
-      
+
     } catch (error) {
       this.logger.error('Failed to generate predictions:', error);
       throw error;
@@ -222,30 +222,30 @@ export class PredictionEngine extends BaseEngine {
   async trainModels(trainingData: TrainingSample[]): Promise<void> {
     try {
       this.logger.info(`Training models with ${trainingData.length} samples`);
-      
+
       // 1. 准备训练数据
       const { features, texts, targets } = this.prepareTrainingData(trainingData);
-      
+
       // 2. 训练基础层模型
       if (this.config.layer1.enabled) {
         await this.trainLayer1(features, targets);
       }
-      
+
       // 3. 训练增强层模型
       if (this.config.layer2.enabled) {
         await this.trainLayer2(texts, targets);
       }
-      
+
       // 4. 训练决策层模型
       if (this.config.layer3.enabled) {
         await this.trainLayer3(features, texts, targets);
       }
-      
+
       // 5. 更新模型版本
       this.currentModelVersion = this.generateModelVersion();
-      
+
       this.logger.info('Model training completed successfully');
-      
+
     } catch (error) {
       this.logger.error('Failed to train models:', error);
       throw error;
@@ -258,17 +258,17 @@ export class PredictionEngine extends BaseEngine {
   async getPredictions(tradeDate: string, targetCode?: string): Promise<PredictionResult[]> {
     try {
       const query = `
-        SELECT * FROM daily_predictions 
-        WHERE trade_date = $1 
+        SELECT * FROM daily_predictions
+        WHERE trade_date = $1
         ${targetCode ? 'AND target_code = $2' : ''}
         ORDER BY p_final_prediction DESC
       `;
-      
+
       const params = targetCode ? [tradeDate, targetCode] : [tradeDate];
       const result = await this.db.query(query, params);
-      
+
       return result.rows.map(row => this.mapRowToPredictionResult(row));
-      
+
     } catch (error) {
       this.logger.error('Failed to get predictions:', error);
       throw error;
@@ -281,20 +281,20 @@ export class PredictionEngine extends BaseEngine {
   async getModelPerformance(): Promise<any> {
     try {
       const query = `
-        SELECT 
+        SELECT
           model_version,
           COUNT(*) as prediction_count,
           AVG(confidence_score) as avg_confidence,
           STDDEV(p_final_prediction) as prediction_stddev
-        FROM daily_predictions 
+        FROM daily_predictions
         WHERE created_at >= NOW() - INTERVAL '30 days'
         GROUP BY model_version
         ORDER BY model_version DESC
       `;
-      
+
       const result = await this.db.query(query);
       return result.rows;
-      
+
     } catch (error) {
       this.logger.error('Failed to get model performance:', error);
       throw error;

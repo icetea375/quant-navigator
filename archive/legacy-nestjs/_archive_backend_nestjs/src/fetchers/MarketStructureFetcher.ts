@@ -39,7 +39,7 @@ export class MarketStructureFetcher {
   public async getChipDistribution(tsCode: string, tradeDate?: string): Promise<ChipDistributionData[]> {
     try {
       const cacheKey = `chip_dist_${tsCode}_${tradeDate || 'latest'}`;
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -82,7 +82,7 @@ export class MarketStructureFetcher {
   public async getAuctionData(tsCode?: string, tradeDate?: string): Promise<AuctionData[]> {
     try {
       const cacheKey = `auction_${tsCode || 'all'}_${tradeDate || 'latest'}`;
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -194,7 +194,7 @@ export class MarketStructureFetcher {
   }> {
     try {
       const chipData = await this.getChipDistribution(tsCode, tradeDate);
-      
+
       if (chipData.length === 0) {
         throw new Error('No chip distribution data available');
       }
@@ -202,7 +202,7 @@ export class MarketStructureFetcher {
       // 计算分析指标
       const avgCost = chipData.reduce((sum, item) => sum + (item.ma_cost || 0), 0) / chipData.length;
       const winnerRate = chipData.reduce((sum, item) => sum + (item.winner_rate || 0), 0) / chipData.length;
-      
+
       // 计算筹码集中度（基于价格分布的标准差）
       const prices = chipData.map(item => item.price);
       const avgPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
@@ -238,7 +238,7 @@ export class MarketStructureFetcher {
    */
   private async makeRequest(apiName: string, params: any): Promise<any> {
     const axios = require('axios');
-    
+
     try {
       const response = await axios.post('http://api.tushare.pro', params, {
         timeout: 30000,

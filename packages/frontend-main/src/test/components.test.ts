@@ -112,7 +112,7 @@ describe('Auth Component', () => {
     const authStore = useAuthStore()
     authStore.user = mockUser
     authStore.isAuthenticated = true
-    
+
     await wrapper.vm.$nextTick()
     expect(wrapper.text()).toContain('Welcome, testuser!')
   })
@@ -166,7 +166,7 @@ describe('Market Component', () => {
       totalPages: 1
     }
     marketStore.loading.publicBriefing = false
-    
+
     await wrapper.vm.$nextTick()
     expect(wrapper.text()).toContain('今日市场快报')
     expect(wrapper.text()).toContain('新能源板块')
@@ -236,7 +236,7 @@ describe('Form Component', () => {
         password: 'password123'
       }
     })
-    
+
     await wrapper.find('form').trigger('submit')
     expect(wrapper.emitted('submit')).toBeTruthy()
     expect(wrapper.emitted('submit')[0][0]).toEqual({
@@ -245,4 +245,3 @@ describe('Form Component', () => {
     })
   })
 })
-

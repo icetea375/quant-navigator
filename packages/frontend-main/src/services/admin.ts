@@ -1,5 +1,5 @@
 import { request } from './http'
-import type { 
+import type {
   SystemStatusResponse,
   DataPipelineLogResponse,
   AIEngineStatsResponse,

@@ -1,7 +1,7 @@
 import { request } from './http'
-import type { 
-  MarketBriefingResponse, 
-  HotspotAttributionResponse 
+import type {
+  MarketBriefingResponse,
+  HotspotAttributionResponse
 } from '@/types/api'
 
 // 公共API服务 - 符合文档规范

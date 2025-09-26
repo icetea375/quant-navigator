@@ -1,6 +1,6 @@
 /**
  * QuantSignalEngine - 量化信号引擎
- * 
+ *
  * 功能：
  * 1. 计算基础量化信号（个体Z分数）
  * 2. 计算复杂量化信号（宏观风险、市场风格等）
@@ -81,11 +81,11 @@ export class QuantSignalEngine {
 
       // 创建索引
       await this.db.query(`
-        CREATE INDEX IF NOT EXISTS idx_quant_signals_stock_date 
+        CREATE INDEX IF NOT EXISTS idx_quant_signals_stock_date
         ON quant_signals(stock_code, signal_date)
       `);
       await this.db.query(`
-        CREATE INDEX IF NOT EXISTS idx_quant_signals_date 
+        CREATE INDEX IF NOT EXISTS idx_quant_signals_date
         ON quant_signals(signal_date)
       `);
 
@@ -173,8 +173,8 @@ export class QuantSignalEngine {
     try {
       const result = await this.db.query(`
         SELECT trade_date, close, volume, amount, pct_chg
-        FROM daily_basic 
-        WHERE ts_code = $1 
+        FROM daily_basic
+        WHERE ts_code = $1
         AND trade_date >= CURRENT_DATE - INTERVAL '${this.config.lookbackPeriod} days'
         ORDER BY trade_date ASC
       `, [stockCode]);
@@ -229,7 +229,7 @@ export class QuantSignalEngine {
 
       // 计算Beta
       const beta = this.calculateBeta(stockReturns, marketReturns);
-      
+
       // 计算宏观风险Z分数
       const macroRisk = beta * this.calculateMarketVolatility(marketReturns);
       return this.normalizeToZScore(macroRisk, stockReturns);
@@ -288,7 +288,7 @@ export class QuantSignalEngine {
 
       // 组合成量化指纹
       const fingerprint = (rsi + macd + bollinger + volume) / 4;
-      
+
       return this.normalizeToZScore(fingerprint, this.calculateReturns(data));
 
     } catch (error) {
@@ -304,8 +304,8 @@ export class QuantSignalEngine {
     try {
       const result = await this.db.query(`
         SELECT trade_date, close
-        FROM daily_basic 
-        WHERE ts_code = $1 
+        FROM daily_basic
+        WHERE ts_code = $1
         AND trade_date >= CURRENT_DATE - INTERVAL '${this.config.lookbackPeriod} days'
         ORDER BY trade_date ASC
         LIMIT $2
@@ -427,7 +427,7 @@ export class QuantSignalEngine {
     const prices = data.map(d => d.close);
     const ema12 = this.calculateEMA(prices, 12);
     const ema26 = this.calculateEMA(prices, 26);
-    
+
     return ema12 - ema26;
   }
 
@@ -497,13 +497,13 @@ export class QuantSignalEngine {
   private async saveBasicSignal(stockCode: string, individualZScore: number): Promise<void> {
     try {
       const today = new Date().toISOString().split('T')[0];
-      
+
       await this.db.query(`
-        INSERT INTO quant_signals 
+        INSERT INTO quant_signals
         (stock_code, signal_date, individual_z_score)
         VALUES ($1, $2, $3)
-        ON CONFLICT (stock_code, signal_date) 
-        DO UPDATE SET 
+        ON CONFLICT (stock_code, signal_date)
+        DO UPDATE SET
           individual_z_score = EXCLUDED.individual_z_score,
           updated_at = CURRENT_TIMESTAMP
       `, [stockCode, today, individualZScore]);
@@ -525,24 +525,24 @@ export class QuantSignalEngine {
   }): Promise<void> {
     try {
       const today = new Date().toISOString().split('T')[0];
-      
+
       await this.db.query(`
-        INSERT INTO quant_signals 
+        INSERT INTO quant_signals
         (stock_code, signal_date, individual_z_score, macro_risk_z_score, market_style_z_score, quant_fingerprint_z_score)
         VALUES ($1, $2, $3, $4, $5, $6)
-        ON CONFLICT (stock_code, signal_date) 
-        DO UPDATE SET 
+        ON CONFLICT (stock_code, signal_date)
+        DO UPDATE SET
           individual_z_score = EXCLUDED.individual_z_score,
           macro_risk_z_score = EXCLUDED.macro_risk_z_score,
           market_style_z_score = EXCLUDED.market_style_z_score,
           quant_fingerprint_z_score = EXCLUDED.quant_fingerprint_z_score,
           updated_at = CURRENT_TIMESTAMP
       `, [
-        stockCode, 
-        today, 
-        signals.individual_z_score, 
-        signals.macro_risk_z_score, 
-        signals.market_style_z_score, 
+        stockCode,
+        today,
+        signals.individual_z_score,
+        signals.macro_risk_z_score,
+        signals.market_style_z_score,
         signals.quant_fingerprint_z_score
       ]);
 
@@ -558,9 +558,9 @@ export class QuantSignalEngine {
   async getLatestSignals(stockCode: string): Promise<QuantSignal | null> {
     try {
       const result = await this.db.query(`
-        SELECT * FROM quant_signals 
-        WHERE stock_code = $1 
-        ORDER BY signal_date DESC 
+        SELECT * FROM quant_signals
+        WHERE stock_code = $1
+        ORDER BY signal_date DESC
         LIMIT 1
       `, [stockCode]);
 
@@ -577,8 +577,8 @@ export class QuantSignalEngine {
   async getSignalsByDate(date: string): Promise<QuantSignal[]> {
     try {
       const result = await this.db.query(`
-        SELECT * FROM quant_signals 
-        WHERE signal_date = $1 
+        SELECT * FROM quant_signals
+        WHERE signal_date = $1
         ORDER BY stock_code
       `, [date]);
 

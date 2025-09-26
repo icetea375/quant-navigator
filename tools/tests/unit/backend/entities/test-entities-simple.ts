@@ -197,7 +197,7 @@ describe('Entity Classes Basic Structure', () => {
         it('GeneratedReports应该与HumanFeedbackLoop有关联关系', () => {
             const report = new GeneratedReports();
             const feedback = new HumanFeedbackLoop();
-            
+
             // 测试关联关系
             expect(report).toHaveProperty('feedbacks');
             expect(feedback).toHaveProperty('report');

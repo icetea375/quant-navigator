@@ -64,7 +64,7 @@ CREATE INDEX idx_timeline_archive_logs_date ON timeline_archive_logs(archive_dat
 
 -- 5. 创建监控视图
 CREATE VIEW v_timeline_capacity_status AS
-SELECT 
+SELECT
     tc.id,
     tc.category_name,
     tc.category_type,
@@ -72,7 +72,7 @@ SELECT
     tc.max_events,
     tc.archive_threshold,
     ROUND(tc.current_events_count * 100.0 / tc.max_events, 2) as usage_percentage,
-    CASE 
+    CASE
         WHEN tc.current_events_count > tc.max_events THEN 'over_capacity'
         WHEN tc.current_events_count > tc.archive_threshold THEN 'near_capacity'
         ELSE 'normal'
@@ -82,7 +82,7 @@ SELECT
 FROM timeline_categories tc;
 
 CREATE VIEW v_timeline_archive_summary AS
-SELECT 
+SELECT
     timeline_category,
     COUNT(*) as total_archived,
     MIN(archived_at) as first_archive,
@@ -92,7 +92,7 @@ FROM timeline_events_archive
 GROUP BY timeline_category;
 
 CREATE VIEW v_timeline_events_by_category AS
-SELECT 
+SELECT
     timeline_category,
     COUNT(*) as total_events,
     SUM(CASE WHEN is_archived = 0 THEN 1 ELSE 0 END) as active_events,
@@ -104,7 +104,7 @@ GROUP BY timeline_category;
 
 -- 6. 初始化容量监控数据
 INSERT OR IGNORE INTO timeline_capacity_monitor (category_id, category_name, category_type, current_count, max_capacity, usage_percentage)
-SELECT 
+SELECT
     id,
     category_name,
     category_type,
@@ -115,4 +115,3 @@ FROM timeline_categories;
 
 -- 7. 更新数据库版本
 PRAGMA user_version = 24;
-

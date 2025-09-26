@@ -16,13 +16,13 @@ import { ChipDistribution } from '../entities/chip-distribution.entity';
 import { HumanFeedbackLoop } from '../entities/human-feedback-loop.entity';
 
 // 导入接口定义
-import { 
-  ArbitrationCaseData, 
-  RawTextData, 
-  FinancialSnapshot, 
+import {
+  ArbitrationCaseData,
+  RawTextData,
+  FinancialSnapshot,
   QuantSignals as QuantSignalsData,
-  FlowAndChipsData, 
-  HistoricalArbitrations 
+  FlowAndChipsData,
+  HistoricalArbitrations
 } from '../interfaces/arbitration.interface';
 
 @Injectable()
@@ -58,7 +58,7 @@ export class ArbitrationDataAggregatorService {
     includePanels?: string[]
   ): Promise<ArbitrationCaseData> {
     this.logger.log(`开始聚合仲裁案例数据: ${caseId}`);
-    
+
     const [stockCode, date] = caseId.split('_');
     if (!stockCode || !date) {
       throw new NotFoundException('无效的案例ID格式');
@@ -74,17 +74,17 @@ export class ArbitrationDataAggregatorService {
 
     // 默认包含所有面板
     const panels = includePanels || [
-      'raw_text', 
-      'financial_snapshot', 
-      'quant_signals', 
-      'flow_and_chips', 
+      'raw_text',
+      'financial_snapshot',
+      'quant_signals',
+      'flow_and_chips',
       'historical_arbitrations'
     ];
 
     try {
       // 并行获取所有面板数据
       const panelPromises = [];
-      
+
       if (panels.includes('raw_text')) {
         panelPromises.push(this.getRawTextData(caseId));
       }
@@ -102,7 +102,7 @@ export class ArbitrationDataAggregatorService {
       }
 
       const panelResults = await Promise.all(panelPromises);
-      
+
       const result: ArbitrationCaseData = {
         case_id: caseId,
         stock_code: stockCode,
@@ -118,7 +118,7 @@ export class ArbitrationDataAggregatorService {
 
       // 缓存结果（5分钟）
       await this.cacheManager.set(cacheKey, result, 300000);
-      
+
       this.logger.log(`仲裁案例数据聚合完成: ${caseId}`);
       return result;
 
@@ -133,10 +133,10 @@ export class ArbitrationDataAggregatorService {
    */
   async getRawTextData(caseId: string): Promise<RawTextData> {
     const [stockCode, date] = caseId.split('_');
-    
+
     const [events, reports] = await Promise.all([
       this.eventsRepository.find({
-        where: { 
+        where: {
           stock_code: stockCode,
           event_date: new Date(date)
         },
@@ -144,7 +144,7 @@ export class ArbitrationDataAggregatorService {
         take: 20
       }),
       this.reportsRepository.find({
-        where: { 
+        where: {
           stock_code: stockCode,
           report_date: new Date(date)
         },
@@ -203,20 +203,20 @@ export class ArbitrationDataAggregatorService {
   async getQuantSignals(stockCode: string, date: string): Promise<QuantSignalsData> {
     const [stockSignals, marketSignals, mdaFactors] = await Promise.all([
       this.quantRepository.find({
-        where: { 
+        where: {
           stock_code: stockCode,
           signal_date: new Date(date),
           signal_type: 'stock'
         }
       }),
       this.quantRepository.find({
-        where: { 
+        where: {
           signal_date: new Date(date),
           signal_type: 'market'
         }
       }),
       this.quantRepository.find({
-        where: { 
+        where: {
           stock_code: stockCode,
           signal_date: new Date(date),
           signal_type: 'mda'
@@ -246,7 +246,7 @@ export class ArbitrationDataAggregatorService {
   async getFlowAndChipsData(stockCode: string, date: string): Promise<FlowAndChipsData> {
     const [moneyFlow, topList, chipDist] = await Promise.all([
       this.flowRepository.find({
-        where: { 
+        where: {
           stock_code: stockCode,
           flow_date: new Date(date)
         },
@@ -254,13 +254,13 @@ export class ArbitrationDataAggregatorService {
         take: 5
       }),
       this.topListRepository.findOne({
-        where: { 
+        where: {
           stock_code: stockCode,
           list_date: new Date(date)
         }
       }),
       this.chipRepository.findOne({
-        where: { 
+        where: {
           stock_code: stockCode,
           dist_date: new Date(date)
         }
@@ -297,7 +297,7 @@ export class ArbitrationDataAggregatorService {
   async getHistoricalArbitrations(stockCode: string, industry: string): Promise<HistoricalArbitrations> {
     const [sameCompany, sameIndustry] = await Promise.all([
       this.feedbackRepository.find({
-        where: { 
+        where: {
           stock_code: stockCode,
           created_at: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) // 过去一年
         },
@@ -305,7 +305,7 @@ export class ArbitrationDataAggregatorService {
         take: 10
       }),
       this.feedbackRepository.find({
-        where: { 
+        where: {
           industry: industry,
           created_at: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)
         },
@@ -339,13 +339,13 @@ export class ArbitrationDataAggregatorService {
     // 简单的关键词高亮实现
     const keywords = ['增长', '下降', '超预期', '不及预期', '利好', '利空'];
     const highlighted = [];
-    
+
     for (const keyword of keywords) {
       if (content.includes(keyword)) {
         highlighted.push(keyword);
       }
     }
-    
+
     return highlighted;
   }
 
@@ -372,14 +372,14 @@ export class ArbitrationDataAggregatorService {
   private organizePanelData(panels: string[], results: any[]): any {
     const organizedData = {};
     let resultIndex = 0;
-    
+
     for (const panel of panels) {
       if (resultIndex < results.length) {
         organizedData[panel] = results[resultIndex];
         resultIndex++;
       }
     }
-    
+
     return organizedData;
   }
 }

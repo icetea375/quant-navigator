@@ -25,16 +25,16 @@ export class ConfigMigrationService {
 
       // 迁移归因规则
       await this.migrateAttributionRules(result);
-      
+
       // 迁移事件标签
       await this.migrateEventTags(result);
-      
+
       // 迁移Prompt模板
       await this.migratePromptTemplates(result);
-      
+
       // 迁移股票宇宙规则
       await this.migrateUniverseRules(result);
-      
+
       // 迁移预测特征
       await this.migratePredictionFeatures(result);
 
@@ -54,7 +54,7 @@ export class ConfigMigrationService {
   private async migrateAttributionRules(result: ConfigMigrationResult): Promise<void> {
     try {
       const filePath = path.join(process.cwd(), 'config', 'attribution_rules.json');
-      
+
       if (!fs.existsSync(filePath)) {
         this.logger.warn('attribution_rules.json not found, skipping migration');
         return;
@@ -92,7 +92,7 @@ export class ConfigMigrationService {
   private async migrateEventTags(result: ConfigMigrationResult): Promise<void> {
     try {
       const filePath = path.join(process.cwd(), 'config', 'event_tags.json');
-      
+
       if (!fs.existsSync(filePath)) {
         this.logger.warn('event_tags.json not found, skipping migration');
         return;
@@ -131,7 +131,7 @@ export class ConfigMigrationService {
     try {
       // 这里可以扫描prompt模板文件目录
       const promptDir = path.join(process.cwd(), 'config', 'prompts');
-      
+
       if (!fs.existsSync(promptDir)) {
         this.logger.warn('prompts directory not found, skipping migration');
         return;
@@ -176,7 +176,7 @@ export class ConfigMigrationService {
   private async migrateUniverseRules(result: ConfigMigrationResult): Promise<void> {
     try {
       const filePath = path.join(process.cwd(), 'config', 'universe_rules.json');
-      
+
       if (!fs.existsSync(filePath)) {
         this.logger.warn('universe_rules.json not found, skipping migration');
         return;
@@ -214,7 +214,7 @@ export class ConfigMigrationService {
   private async migratePredictionFeatures(result: ConfigMigrationResult): Promise<void> {
     try {
       const filePath = path.join(process.cwd(), 'config', 'prediction_features.json');
-      
+
       if (!fs.existsSync(filePath)) {
         this.logger.warn('prediction_features.json not found, skipping migration');
         return;
@@ -244,7 +244,7 @@ export class ConfigMigrationService {
   async validateMigration(): Promise<boolean> {
     try {
       const configs = await this.configService.getAllConfigs();
-      
+
       // 检查是否有配置被迁移
       if (configs.length === 0) {
         this.logger.warn('No configs found after migration');

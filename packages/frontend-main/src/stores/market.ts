@@ -9,14 +9,14 @@ export const useMarketStore = defineStore('market', () => {
   const preMarketEvents = ref<MarketEvent[]>([])
   const postMarketHotspots = ref<HotspotAttribution[]>([])
   const marketOverview = ref<any>(null)
-  
+
   // 私人数据
   const myBriefing = ref<MarketBriefing | null>(null)
   const myAttributions = ref<HotspotAttribution[]>([])
   const stockPools = ref<StockPool[]>([])
   const portfolioOverview = ref<any>(null)
   const aiAdvice = ref<any>(null)
-  
+
   // 加载状态
   const loading = ref({
     marketBriefing: false,
@@ -252,13 +252,13 @@ export const useMarketStore = defineStore('market', () => {
   // 刷新所有数据
   const refreshAllData = async () => {
     const promises = []
-    
+
     // 刷新公共数据
     promises.push(loadMarketBriefing())
     promises.push(loadPreMarketEvents())
     promises.push(loadPostMarketHotspots())
     promises.push(loadMarketOverview())
-    
+
     // 刷新私人数据（如果已登录）
     const token = localStorage.getItem('token')
     if (token) {
@@ -267,7 +267,7 @@ export const useMarketStore = defineStore('market', () => {
       promises.push(loadStockPools())
       promises.push(loadPortfolioOverview())
     }
-    
+
     try {
       await Promise.allSettled(promises)
     } catch (error) {
@@ -301,12 +301,12 @@ export const useMarketStore = defineStore('market', () => {
     aiAdvice,
     loading,
     pagination,
-    
+
     // 计算属性
     hasMarketData,
     hasPersonalData,
     totalStockPools,
-    
+
     // 公共数据方法
     loadMarketBriefing,
     loadPreMarketEvents,
@@ -314,23 +314,22 @@ export const useMarketStore = defineStore('market', () => {
     loadMarketOverview,
     searchStocks,
     getStockDetails,
-    
+
     // 私人数据方法
     loadMyBriefing,
     loadMyAttributions,
     loadStockPools,
     loadPortfolioOverview,
     getAIAdvice,
-    
+
     // 股票池管理
     createStockPool,
     updateStockPool,
     deleteStockPool,
     getStockPoolDetails,
-    
+
     // 工具方法
     refreshAllData,
     clearAllData,
   }
 })
-

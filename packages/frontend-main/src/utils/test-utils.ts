@@ -139,7 +139,7 @@ export const waitForVueUpdate = async (wrapper: VueWrapper) => {
 // 模拟localStorage
 export const mockLocalStorage = () => {
   const store: Record<string, string> = {}
-  
+
   return {
     getItem: vi.fn((key: string) => store[key] || null),
     setItem: vi.fn((key: string, value: string) => {
@@ -252,7 +252,7 @@ export const testAssertions = {
 export const setupTestEnvironment = () => {
   // 设置全局测试变量
   global.vi = global.vi || {}
-  
+
   // 模拟console方法
   global.console = {
     ...console,
@@ -292,13 +292,13 @@ export const setupTestEnvironment = () => {
 export const cleanupTestEnvironment = () => {
   // 清理DOM
   document.body.innerHTML = ''
-  
+
   // 清理localStorage
   localStorage.clear()
-  
+
   // 清理sessionStorage
   sessionStorage.clear()
-  
+
   // 重置所有mock
   vi.clearAllMocks()
 }
@@ -335,4 +335,3 @@ export const testSuite = {
     })
   },
 }
-

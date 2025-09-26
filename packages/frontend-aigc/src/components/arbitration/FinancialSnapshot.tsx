@@ -11,7 +11,7 @@ const { Option } = Select;
 /**
  * 财务数据快照组件
  * 展示过去8个季度的核心财务指标，支持趋势可视化
- * 
+ *
  * 核心特性：
  * 1. 核心财务指标展示
  * 2. 趋势图表可视化
@@ -43,11 +43,11 @@ const FinancialSnapshot: React.FC<FinancialSnapshotProps> = ({
   // 获取当前期间数据
   const currentData = useMemo(() => {
     if (data.length === 0) return null;
-    
+
     if (selectedPeriod === 'latest') {
       return data[0];
     }
-    
+
     return data.find(item => item.reportPeriod === selectedPeriod) || data[0];
   }, [data, selectedPeriod]);
 
@@ -360,16 +360,16 @@ const FinancialSnapshot: React.FC<FinancialSnapshotProps> = ({
     <div className="financial-snapshot">
       {renderToolbar()}
       <Divider />
-      
+
       <div className="financial-content">
         {renderCoreMetrics()}
-        
+
         <Divider />
-        
+
         {renderTrendChart()}
-        
+
         <Divider />
-        
+
         <Row gutter={[16, 16]}>
           <Col span={12}>
             {renderProfitabilityMetrics()}

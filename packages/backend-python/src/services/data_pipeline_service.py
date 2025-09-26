@@ -420,26 +420,26 @@ class DataPipelineService:
     async def save_financial_factors(self, financial_factors: dict[str, Any]) -> bool:
         """
         保存财务因子到数据库
-        
+
         Args:
             financial_factors: 财务因子数据
-            
+
         Returns:
             是否保存成功
         """
         self.logger.info(f"开始保存财务因子: {financial_factors.get('stock_code', 'unknown')}")
-        
+
         try:
             # 这里应该实现数据库保存逻辑
             # 为了遵循测试宪法，我们只模拟外部边界（数据库）
             # 实际的数据库操作应该通过依赖注入的数据库服务来完成
-            
+
             # 模拟数据库保存操作
             await self._persist_financial_factors(financial_factors)
-            
+
             self.logger.info("财务因子保存成功")
             return True
-            
+
         except Exception as e:
             self.logger.error(f"保存财务因子失败: {e}")
             raise Exception(f"财务因子保存失败: {e}") from e
@@ -447,22 +447,22 @@ class DataPipelineService:
     async def save_super_financial_factors(self, super_factors: dict[str, Any]) -> bool:
         """
         保存超级财务因子到数据库
-        
+
         Args:
             super_factors: 超级财务因子数据
-            
+
         Returns:
             是否保存成功
         """
         self.logger.info(f"开始保存超级财务因子: {super_factors.get('stock_code', 'unknown')}")
-        
+
         try:
             # 模拟数据库保存操作
             await self._persist_super_financial_factors(super_factors)
-            
+
             self.logger.info("超级财务因子保存成功")
             return True
-            
+
         except Exception as e:
             self.logger.error(f"保存超级财务因子失败: {e}")
             raise Exception(f"超级财务因子保存失败: {e}") from e
@@ -470,7 +470,7 @@ class DataPipelineService:
     async def _persist_financial_factors(self, financial_factors: dict[str, Any]) -> None:
         """
         持久化财务因子到数据库
-        
+
         Args:
             financial_factors: 财务因子数据
         """
@@ -478,7 +478,7 @@ class DataPipelineService:
         # 为了测试目的，我们模拟一个简单的保存操作
         import asyncio
         await asyncio.sleep(0.01)  # 模拟数据库操作延迟
-        
+
         # 验证必要字段
         required_fields = ["stock_code", "trade_date", "pe_ratio", "pb_ratio"]
         for field in required_fields:
@@ -488,7 +488,7 @@ class DataPipelineService:
     async def _persist_super_financial_factors(self, super_factors: dict[str, Any]) -> None:
         """
         持久化超级财务因子到数据库
-        
+
         Args:
             super_factors: 超级财务因子数据
         """
@@ -496,7 +496,7 @@ class DataPipelineService:
         # 为了测试目的，我们模拟一个简单的保存操作
         import asyncio
         await asyncio.sleep(0.01)  # 模拟数据库操作延迟
-        
+
         # 验证必要字段
         required_fields = ["stock_code", "trade_date", "overall_score", "value_score"]
         for field in required_fields:

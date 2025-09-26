@@ -20,7 +20,7 @@ describe('Stress Tests', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
-    
+
     httpClient = TestHelpers.createHttpClient(app);
   });
 
@@ -31,7 +31,7 @@ describe('Stress Tests', () => {
   describe('Peak Load Stress Test', () => {
     it('should handle peak concurrent users', async () => {
       const peakUsers = 500;
-      const requests = Array(peakUsers).fill(null).map((_, i) => 
+      const requests = Array(peakUsers).fill(null).map((_, i) =>
         httpClient
           .get('/api/v1/health')
           .timeout(10000)
@@ -52,7 +52,7 @@ describe('Stress Tests', () => {
     it('should handle burst traffic', async () => {
       // 模拟突发流量：短时间内大量请求
       const burstSize = 100;
-      const burstRequests = Array(burstSize).fill(null).map(() => 
+      const burstRequests = Array(burstSize).fill(null).map(() =>
         httpClient
           .post('/api/v1/quant-signals/calculate')
           .send({
@@ -77,7 +77,7 @@ describe('Stress Tests', () => {
   describe('Data Volume Stress Test', () => {
     it('should handle large dataset processing', async () => {
       const largeSymbols = Array(100).fill(null).map((_, i) => `00000${i + 1}.SZ`);
-      
+
       const startTime = Date.now();
       const response = await httpClient
         .post('/api/v1/quant-signals/calculate')
@@ -96,15 +96,15 @@ describe('Stress Tests', () => {
 
     it('should handle bulk configuration operations', async () => {
       const bulkConfigs = TestHelpers.generateTestData('configs', 200);
-      
+
       const startTime = Date.now();
-      const requests = bulkConfigs.map(config => 
+      const requests = bulkConfigs.map(config =>
         httpClient
           .post('/api/v1/admin/configs')
           .send(config)
           .timeout(10000)
       );
-      
+
       const results = await Promise.allSettled(requests);
       const endTime = Date.now();
 
@@ -119,9 +119,9 @@ describe('Stress Tests', () => {
   describe('Memory Stress Test', () => {
     it('should handle memory-intensive operations', async () => {
       const initialMemory = process.memoryUsage();
-      
+
       // 执行内存密集型操作
-      const memoryIntensiveRequests = Array(50).fill(null).map(() => 
+      const memoryIntensiveRequests = Array(50).fill(null).map(() =>
         httpClient
           .post('/api/v1/data-pipeline/start')
           .send({
@@ -134,7 +134,7 @@ describe('Stress Tests', () => {
 
       const results = await Promise.allSettled(memoryIntensiveRequests);
       const finalMemory = process.memoryUsage();
-      
+
       const memoryIncrease = finalMemory.heapUsed - initialMemory.heapUsed;
       const successful = results.filter(r => r.status === 'fulfilled').length;
 
@@ -150,16 +150,16 @@ describe('Stress Tests', () => {
       }
 
       const memoryBefore = process.memoryUsage();
-      
+
       // 执行大量操作
-      const requests = Array(100).fill(null).map(() => 
+      const requests = Array(100).fill(null).map(() =>
         httpClient
           .get('/api/v1/admin/configs')
           .timeout(5000)
       );
 
       await Promise.allSettled(requests);
-      
+
       // 等待垃圾回收
       await TestHelpers.wait(2000);
       if (global.gc) {
@@ -176,7 +176,7 @@ describe('Stress Tests', () => {
 
   describe('CPU Stress Test', () => {
     it('should handle CPU-intensive calculations', async () => {
-      const cpuIntensiveRequests = Array(20).fill(null).map(() => 
+      const cpuIntensiveRequests = Array(20).fill(null).map(() =>
         httpClient
           .post('/api/v1/predictions/train')
           .send({
@@ -201,7 +201,7 @@ describe('Stress Tests', () => {
 
   describe('Network Stress Test', () => {
     it('should handle network latency and timeouts', async () => {
-      const requests = Array(100).fill(null).map(() => 
+      const requests = Array(100).fill(null).map(() =>
         httpClient
           .get('/api/v1/health')
           .timeout(2000) // 2秒超时
@@ -212,7 +212,7 @@ describe('Stress Tests', () => {
       const endTime = Date.now();
 
       const successful = results.filter(r => r.status === 'fulfilled').length;
-      const timedOut = results.filter(r => 
+      const timedOut = results.filter(r =>
         r.status === 'rejected' && r.reason?.code === 'ECONNABORTED'
       ).length;
 
@@ -224,7 +224,7 @@ describe('Stress Tests', () => {
   describe('System Recovery Test', () => {
     it('should recover from system overload', async () => {
       // 1. 先进行高负载测试
-      const overloadRequests = Array(200).fill(null).map(() => 
+      const overloadRequests = Array(200).fill(null).map(() =>
         httpClient
           .post('/api/v1/quant-signals/calculate')
           .send({
@@ -252,7 +252,7 @@ describe('Stress Tests', () => {
   describe('Resource Exhaustion Test', () => {
     it('should handle resource exhaustion gracefully', async () => {
       // 模拟资源耗尽的情况
-      const resourceExhaustingRequests = Array(1000).fill(null).map(() => 
+      const resourceExhaustingRequests = Array(1000).fill(null).map(() =>
         httpClient
           .post('/api/v1/data-pipeline/start')
           .send({
@@ -264,7 +264,7 @@ describe('Stress Tests', () => {
       );
 
       const results = await Promise.allSettled(resourceExhaustingRequests);
-      
+
       // 系统应该优雅地处理资源耗尽
       const successful = results.filter(r => r.status === 'fulfilled').length;
       const rejected = results.filter(r => r.status === 'rejected').length;
@@ -275,4 +275,3 @@ describe('Stress Tests', () => {
     });
   });
 });
-

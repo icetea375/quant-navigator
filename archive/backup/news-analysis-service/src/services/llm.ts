@@ -1,9 +1,9 @@
 import axios, { AxiosResponse } from 'axios';
 import { DatabaseConnection } from '../database/connection';
 import { WebSocketService } from './websocket';
-import { 
-  UNIFIED_LLM_CONFIG, 
-  LLMProvider, 
+import {
+  UNIFIED_LLM_CONFIG,
+  LLMProvider,
   LLMOptions as SharedLLMOptions,
   LLMResponse as SharedLLMResponse,
   getAvailableProviders,
@@ -82,7 +82,7 @@ export class LLMServiceManager {
     if (this.initialized) {
       return;
     }
-    
+
     await this.initializeServices();
     this.initialized = true;
   }
@@ -90,12 +90,12 @@ export class LLMServiceManager {
   private initializeServices(): void {
     try {
       console.log('🔧 开始初始化LLM服务（统一化配置）...');
-      
+
       // 重新获取配置，确保环境变量已加载
       const availableProviders = getAvailableProviders();
       console.log('🔍 获取到的提供商数量:', availableProviders.length);
       console.log('🔍 提供商列表:', availableProviders.map(p => p.name));
-      
+
       // 如果没有可用的提供商，尝试重新加载配置
       if (availableProviders.length === 0) {
         console.log('⚠️ 没有可用的提供商，尝试重新加载配置...');
@@ -105,10 +105,10 @@ export class LLMServiceManager {
         console.log('HUNYUAN_API_KEY:', process.env.HUNYUAN_API_KEY ? '已设置' : '未设置');
         console.log('GOOGLE_API_KEY:', process.env.GOOGLE_API_KEY ? '已设置' : '未设置');
       }
-      
+
       availableProviders.forEach(provider => {
         console.log(`🚀 初始化${provider.name}服务...`);
-        
+
         try {
           // 使用英文名称作为服务名，便于后续调用
           const serviceName = this.getServiceNameFromProvider(provider);
@@ -126,9 +126,9 @@ export class LLMServiceManager {
           console.log(`❌ ${provider.name}服务初始化失败:`, errorMessage);
         }
       });
-      
+
       console.log(`🔧 LLM服务初始化完成，总服务数: ${this.services.size}`);
-      
+
       // 输出服务状态摘要
       const availableServices = this.getAvailableServices();
       console.log('📊 可用服务摘要:', {
@@ -136,7 +136,7 @@ export class LLMServiceManager {
         available: availableServices.length,
         services: availableServices.map(s => s.name)
       });
-      
+
     } catch (error) {
       console.error('❌ 初始化LLM服务失败:', error);
     }
@@ -154,21 +154,21 @@ export class LLMServiceManager {
 
   public selectBestService(requirements: LLMRequirements): LLMService | null {
     const availableServices = this.getAvailableServices();
-    
+
     if (availableServices.length === 0) return null;
-    
+
     // 根据任务类型选择最佳提供商
     const taskType = this.getTaskTypeFromRequirements(requirements);
     const selectedProvider = selectProviderForTask(taskType);
-    
+
     if (selectedProvider) {
       // 查找对应的服务
-      const service = availableServices.find(s => 
+      const service = availableServices.find(s =>
         s.name.toLowerCase() === selectedProvider.name.toLowerCase()
       );
       if (service) return service;
     }
-    
+
     // 回退到原有逻辑
     const rankedServices = this.rankServices(availableServices, requirements);
     return rankedServices.length > 0 ? rankedServices[0] || null : null;
@@ -192,11 +192,11 @@ export class LLMServiceManager {
     if (requirements.priority === 'urgent' || requirements.priority === 'high') {
       return 'fast_processing';
     }
-    
+
     if (requirements.maxTokens && requirements.maxTokens > 3000) {
       return 'data_analysis';
     }
-    
+
     // 默认为通用任务
     return 'general';
   }
@@ -207,18 +207,18 @@ export class LLMServiceManager {
       const priorityOrder = { urgent: 4, high: 3, normal: 2, low: 1 };
       const aPriority = priorityOrder[requirements.priority || 'normal'] || 2;
       const bPriority = priorityOrder[requirements.priority || 'normal'] || 2;
-      
+
       if (aPriority !== bPriority) {
         return bPriority - aPriority;
       }
-      
+
       // 根据最大token数排序
       if (requirements.maxTokens) {
         const aTokens = Math.min(a.maxTokens, requirements.maxTokens);
         const bTokens = Math.min(b.maxTokens, requirements.maxTokens);
         return bTokens - aTokens;
       }
-      
+
       return 0;
     });
   }
@@ -227,7 +227,7 @@ export class LLMServiceManager {
     try {
       const service = this.services.get(serviceName);
       if (!service) return false;
-      
+
       const startTime = Date.now();
       const response = await axios.get(`${service.baseUrl}/health`, {
         timeout: service.timeout,
@@ -235,13 +235,13 @@ export class LLMServiceManager {
           'Authorization': `Bearer ${service.apiKey}`
         }
       });
-      
+
       const responseTime = Date.now() - startTime;
       const isHealthy = response.status === 200;
-      
+
       this.healthStatus.set(serviceName, isHealthy);
       await this.updateServiceStatus(serviceName, isHealthy, responseTime);
-      
+
       return isHealthy;
     } catch (error) {
       this.healthStatus.set(serviceName, false);
@@ -251,17 +251,17 @@ export class LLMServiceManager {
   }
 
   private async updateServiceStatus(
-    serviceName: string, 
-    isHealthy: boolean, 
+    serviceName: string,
+    isHealthy: boolean,
     responseTime?: number
   ): Promise<void> {
     const db = this.db.getConnection();
     const now = Date.now();
-    
+
     const status = isHealthy ? 'healthy' : 'unhealthy';
-    
+
     db.prepare(`
-      INSERT OR REPLACE INTO llm_service_status 
+      INSERT OR REPLACE INTO llm_service_status
       (service_name, status, last_check, response_time, error_count, success_count, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
@@ -288,8 +288,8 @@ export class LLMServiceManager {
   }
 
   public async callLLM(
-    serviceName: string, 
-    prompt: string, 
+    serviceName: string,
+    prompt: string,
     options: LLMOptions = {}
   ): Promise<LLMResponse> {
     const service = this.services.get(serviceName);
@@ -308,19 +308,19 @@ export class LLMServiceManager {
     });
 
     let lastError: Error | null = null;
-    
+
     // 减少重试次数，加快调试
     const maxAttempts = 1; // 只尝试1次，加快调试
-    
+
     // 首先尝试指定的服务
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         console.log(`🤖 调用${serviceName}服务 (第${attempt}次尝试)...`);
         console.log(`🌐 请求URL: ${service.baseUrl}/chat/completions`);
-        
+
         const response = await this.makeRequest(service, prompt, options);
         await this.updateServiceStatus(serviceName, true);
-        
+
         console.log(`✅ ${serviceName}服务调用成功`);
         console.log(`📊 响应统计:`, {
           contentLength: response.content?.length || 0,
@@ -328,14 +328,14 @@ export class LLMServiceManager {
           promptTokens: response.usage?.promptTokens || 0,
           completionTokens: response.usage?.completionTokens || 0
         });
-        
+
         return response;
       } catch (error) {
         lastError = error as Error;
         console.error(`❌ ${serviceName}服务第${attempt}次调用失败:`);
         console.error(`   错误类型: ${error instanceof Error ? error.constructor.name : typeof error}`);
         console.error(`   错误消息: ${error instanceof Error ? error instanceof Error ? error.message : String(error) : String(error)}`);
-        
+
         // 如果是HTTP错误，显示更多详情
         if (error && typeof error === 'object' && 'response' in error) {
           const httpError = error as any;
@@ -344,11 +344,11 @@ export class LLMServiceManager {
           console.error(`   响应头:`, httpError.response?.headers);
           console.error(`   响应数据:`, httpError.response?.data);
         }
-        
+
         if (error instanceof Error && error.stack) {
           console.error(`   错误堆栈: ${error.stack}`);
         }
-        
+
         if (attempt < maxAttempts) {
           // 固定1秒延迟，加快调试
           const delay = 1000;
@@ -357,7 +357,7 @@ export class LLMServiceManager {
         }
       }
     }
-    
+
     // 如果指定服务失败，尝试使用备份服务
     console.log(`🔄 ${serviceName}服务调用失败，尝试使用备份服务...`);
     return await this.callBackupLLM(prompt, options, lastError);
@@ -378,7 +378,7 @@ export class LLMServiceManager {
 
     const serviceName = selectedProvider.name.toLowerCase();
     const mergedOptions = { ...getDefaultOptions(), ...options };
-    
+
     try {
       const response = await this.callLLM(serviceName, prompt, {
         maxTokens: mergedOptions.maxTokens,
@@ -406,56 +406,56 @@ export class LLMServiceManager {
    * 调用备份LLM服务
    */
   private async callBackupLLM(
-    prompt: string, 
-    options: LLMOptions, 
+    prompt: string,
+    options: LLMOptions,
     originalError: Error | null
   ): Promise<LLMResponse> {
     // 定义备份服务优先级：腾讯混元 > 其他可用服务
     const backupServices = ['hunyuan'];
     const availableServices = this.getAvailableServices();
-    
+
     // 过滤出可用的备份服务
-    const healthyBackupServices = backupServices.filter(name => 
+    const healthyBackupServices = backupServices.filter(name =>
       availableServices.some(service => service.name === name && this.healthStatus.get(name))
     );
-    
+
     if (healthyBackupServices.length === 0) {
       // 如果没有健康的备份服务，尝试任何可用的服务
-      const fallbackServices = availableServices.filter(service => 
+      const fallbackServices = availableServices.filter(service =>
         this.healthStatus.get(service.name)
       );
-      
+
       if (fallbackServices.length === 0) {
         const errorMessage = originalError instanceof Error ? originalError.message : '未知错误';
         throw new Error(`所有LLM服务都不可用，原始错误: ${errorMessage}`);
       }
-      
+
       const fallbackService = fallbackServices[0];
       if (fallbackService) {
         console.log(`🔄 使用备用服务: ${fallbackService.name}`);
         return await this.makeRequest(fallbackService, prompt, options);
       }
     }
-    
+
     // 尝试备份服务
     for (const backupServiceName of healthyBackupServices) {
       try {
         const backupService = this.services.get(backupServiceName);
         if (!backupService) continue;
-        
+
         console.log(`🔄 尝试备份服务: ${backupServiceName}`);
         const response = await this.makeRequest(backupService, prompt, options);
         await this.updateServiceStatus(backupServiceName, true);
         console.log(`✅ 备份服务 ${backupServiceName} 调用成功`);
         return response;
-        
+
       } catch (error) {
         console.log(`❌ 备份服务 ${backupServiceName} 调用失败:`, error instanceof Error ? error instanceof Error ? error.message : String(error) : '未知错误');
         await this.updateServiceStatus(backupServiceName, false, undefined);
         continue;
       }
     }
-    
+
     // 如果所有备份服务都失败，抛出错误
     const errorMessage = originalError instanceof Error ? originalError.message : '未知错误';
     throw new Error(`所有LLM服务都失败，原始错误: ${errorMessage}`);
@@ -466,16 +466,16 @@ export class LLMServiceManager {
     // 使用传入的timeout选项，如果没有则使用服务的默认timeout
     const timeout = options.timeout || service.timeout;
     const timeoutId = setTimeout(() => controller.abort(), timeout);
-    
+
     console.log(`🔧 准备发送请求到 ${service.name}:`);
     console.log(`   URL: ${service.baseUrl}/chat/completions`);
     console.log(`   超时时间: ${timeout}ms`);
     console.log(`   最大令牌数: ${options.maxTokens || service.maxTokens}`);
     console.log(`   温度: ${options.temperature || 0.3}`);
-    
+
     try {
       let response: AxiosResponse;
-      
+
       switch (service.name) {
         case 'hunyuan':
           console.log(`🔄 调用混元API...`);
@@ -495,30 +495,30 @@ export class LLMServiceManager {
         default:
           throw new Error(`不支持的LLM服务: ${service.name}`);
       }
-      
+
       clearTimeout(timeoutId);
-      
+
       console.log(`📡 收到响应:`, {
         status: response.status,
         statusText: response.statusText,
         headers: response.headers,
         dataKeys: Object.keys(response.data || {})
       });
-      
+
       if (response.status !== 200) {
         console.error(`❌ API返回错误状态码: ${response.status}`);
         console.error(`   状态文本: ${response.statusText}`);
         console.error(`   响应数据:`, response.data);
         throw new Error(`LLM API错误: ${response.status} ${response.statusText}`);
       }
-      
+
       const parsedResponse = this.parseResponse(service.name, response.data);
       console.log(`✅ 响应解析成功:`, {
         contentLength: parsedResponse.content?.length || 0,
         model: parsedResponse.model,
         finishReason: parsedResponse.finishReason
       });
-      
+
       return parsedResponse;
     } catch (error) {
       console.error(`❌ makeRequest 失败:`, error);
@@ -532,7 +532,7 @@ export class LLMServiceManager {
     // 豆包API使用火山引擎签名认证方式，启用搜索功能
     const timestamp = Math.floor(Date.now() / 1000);
     const nonce = Math.random().toString(36).substring(2);
-    
+
     // 构建请求体，启用深度思考模式
     const requestBody = {
       model: 'doubao-seed-1-6-250615', // 使用可用的模型，通过reasoning参数启用深度思考
@@ -546,7 +546,7 @@ export class LLMServiceManager {
       reasoning_effort: "high", // 启用深度思考
       reasoning_mode: "auto"    // 自动推理模式
     };
-    
+
     // 构建签名字符串
     const stringToSign = [
       'POST',
@@ -555,10 +555,10 @@ export class LLMServiceManager {
       nonce,
       JSON.stringify(requestBody)
     ].join('\n');
-    
+
     // 使用API Key作为签名密钥（简化处理）
     const signature = this.generateSignature(stringToSign, service.apiKey);
-    
+
     return axios.post(`${service.baseUrl}/chat/completions`, requestBody, {
       headers: {
         'Authorization': `Bearer ${service.apiKey}`,
@@ -596,7 +596,7 @@ export class LLMServiceManager {
 
   private parseResponse(serviceName: string, data: any): LLMResponse {
     console.log(`🔍 解析${serviceName}响应:`, JSON.stringify(data, null, 2));
-    
+
     try {
       switch (serviceName) {
         case 'doubao':
@@ -618,7 +618,7 @@ export class LLMServiceManager {
           if (!data.choices || !data.choices[0] || !data.choices[0].message) {
             throw new Error(`腾讯混元响应格式错误: ${JSON.stringify(data)}`);
           }
-          
+
           const message = data.choices[0].message;
           // 混元API可能返回reasoning_content而不是content
           let content = message.content;
@@ -626,12 +626,12 @@ export class LLMServiceManager {
             content = message.reasoning_content;
             console.log('⚠️ 混元API返回reasoning_content而不是content，使用reasoning_content');
           }
-          
+
           if (!content) {
             console.warn('⚠️ 混元API返回的content和reasoning_content都为空');
             content = '无法生成内容';
           }
-          
+
           return {
             content: content,
             usage: {
@@ -660,7 +660,7 @@ export class LLMServiceManager {
   public async getServiceStatus(): Promise<LLMServiceStatus[]> {
     const db = this.db.getConnection();
     const rows = db.prepare('SELECT * FROM llm_service_status ORDER BY updated_at DESC').all();
-    
+
     return rows.map((row: any) => ({
       serviceName: row.service_name,
       status: row.status as 'healthy' | 'unhealthy' | 'degraded' | 'unknown',
@@ -676,11 +676,11 @@ export class LLMServiceManager {
   public async analyzeNews(data: any): Promise<any> {
     const analysisId = data.analysisId;
     const analysisType = data.analysisType || 'standard';
-    
+
     try {
       // 根据分析类型设置智能超时
       const timeoutConfig = this.getTimeoutConfig(analysisType);
-      
+
       // 推送初始进度
       this.wsService.sendProgress(analysisId, {
         analysisId,
@@ -692,7 +692,7 @@ export class LLMServiceManager {
 
       // 构建用户提示词
       const userPrompt = this.buildUserPrompt(data, analysisType);
-      
+
       // 推送进度更新
       this.wsService.sendProgress(analysisId, {
         analysisId,
@@ -720,7 +720,7 @@ export class LLMServiceManager {
 
       // 构建分析结果
       const result = this.buildAnalysisResult(data, response, analysisType);
-      
+
       // 推送完成进度
       this.wsService.sendProgress(analysisId, {
         analysisId,
@@ -740,14 +740,14 @@ export class LLMServiceManager {
       return result;
     } catch (error) {
       console.error(`❌ 分析执行失败: ${analysisId}`, error);
-      
+
       // 推送错误结果
       this.wsService.sendResult(analysisId, {
         analysisId,
         status: 'failed',
         error: error instanceof Error ? error instanceof Error ? error.message : String(error) : '未知错误'
       });
-      
+
       throw error;
     }
   }
@@ -811,7 +811,7 @@ export class LLMServiceManager {
 3. 简要影响分析
 
 请用中文回答，结构清晰，内容简洁。`;
-      
+
       case 'standard':
         return `${basePrompt}
 
@@ -822,7 +822,7 @@ export class LLMServiceManager {
 4. 未来趋势预测
 
 请用中文回答，结构清晰，内容专业。`;
-      
+
       case 'deep':
         return `${basePrompt}
 
@@ -835,7 +835,7 @@ export class LLMServiceManager {
 6. 投资建议参考
 
 请用中文回答，结构清晰，内容深入专业。`;
-      
+
       default:
         return `${basePrompt}
 

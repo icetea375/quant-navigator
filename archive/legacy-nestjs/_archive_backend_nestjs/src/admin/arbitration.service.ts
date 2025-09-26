@@ -99,7 +99,7 @@ export class ArbitrationService {
    * 更新仲裁案件状态
    */
   async updateArbitrationCaseStatus(
-    caseId: string, 
+    caseId: string,
     statusUpdate: ArbitrationStatusUpdate
   ): Promise<ArbitrationCase> {
     const caseEntity = await this.arbitrationCaseRepository.findOne({
@@ -182,7 +182,7 @@ export class ArbitrationService {
     averageProcessingTime: number;
   }> {
     const totalCases = await this.arbitrationCaseRepository.count();
-    
+
     const [pendingCases, arbitratedCases, ignoredCases] = await Promise.all([
       this.arbitrationCaseRepository.count({ where: { status: 'PENDING_HUMAN' } }),
       this.arbitrationCaseRepository.count({ where: { status: 'ARBITRATED' } }),

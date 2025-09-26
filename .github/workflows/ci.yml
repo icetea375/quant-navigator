@@ -221,7 +221,7 @@ jobs:
       - name: Start services
         run: |
           # Start Python backend
-          cd packages/backend && python -m uvicorn src.main:app --host 0.0.0.0 --port 8000 &
+          cd packages/backend-python && python -m uvicorn src.main:app --host 0.0.0.0 --port 8000 &
           BACKEND_PID=$!
 
           # Start frontend

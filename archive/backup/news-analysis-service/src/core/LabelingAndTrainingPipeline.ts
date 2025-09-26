@@ -94,10 +94,10 @@ export abstract class LabelingAndTrainingPipeline extends BaseService {
       id: taskId,
       createdAt: Date.now()
     };
-    
+
     this.taskQueue.push(fullTask);
     this.taskQueue.sort((a, b) => b.priority - a.priority);
-    
+
     logger.info(`Added labeling task: ${taskId} (type: ${task.type})`);
     return taskId;
   }
@@ -108,13 +108,13 @@ export abstract class LabelingAndTrainingPipeline extends BaseService {
   public async processLabelingTasks(): Promise<LabelingResult[]> {
     const results: LabelingResult[] = [];
     const batchSize = Math.min(this.config.dataProcessing.batchSize, this.taskQueue.length);
-    
+
     for (let i = 0; i < batchSize; i++) {
       const task = this.taskQueue.shift();
       if (!task) break;
-      
+
       this.activeTasks.add(task.id);
-      
+
       try {
         const result = await this.processLabelingTask(task);
         results.push(result);
@@ -129,7 +129,7 @@ export abstract class LabelingAndTrainingPipeline extends BaseService {
         this.activeTasks.delete(task.id);
       }
     }
-    
+
     return results;
   }
 
@@ -147,19 +147,19 @@ export abstract class LabelingAndTrainingPipeline extends BaseService {
     batchSize: number = 100
   ): Promise<TrainingSample[]> {
     const samples: TrainingSample[] = [];
-    
+
     for (let i = 0; i < inputData.length; i += batchSize) {
       const batch = inputData.slice(i, i + batchSize);
       const batchSamples = await this.processBatchForTraining(batch, taskType);
       samples.push(...batchSamples);
     }
-    
+
     // 保存到数据库
     await this.saveTrainingSamples(samples);
-    
+
     this.trainingSamples.push(...samples);
     logger.info(`Generated ${samples.length} training samples for ${taskType}`);
-    
+
     return samples;
   }
 
@@ -184,30 +184,30 @@ export abstract class LabelingAndTrainingPipeline extends BaseService {
     }
 
     const startTime = Date.now();
-    
+
     try {
       // 数据预处理
       const processedData = await this.preprocessTrainingData(samples);
-      
+
       // 数据分割
       const { trainData, validationData, testData } = this.splitData(
         processedData,
         this.config.training.validationSplit,
         this.config.training.testSplit
       );
-      
+
       // 训练模型
       const model = await this.executeTraining(modelType, trainData, validationData, config);
-      
+
       // 评估模型
       const metrics = await this.evaluateModel(model, testData);
-      
+
       // 保存模型
       await this.saveModel(modelType, model, metrics);
-      
+
       const processingTime = Date.now() - startTime;
       logger.info(`Model training completed in ${processingTime}ms`, { metrics });
-      
+
       return metrics;
     } catch (error) {
       logger.error('Model training failed:', error);
@@ -245,11 +245,11 @@ export abstract class LabelingAndTrainingPipeline extends BaseService {
   ): { trainData: any[]; validationData: any[]; testData: any[] } {
     const shuffled = [...data].sort(() => Math.random() - 0.5);
     const total = shuffled.length;
-    
+
     const testSize = Math.floor(total * testSplit);
     const validationSize = Math.floor(total * validationSplit);
     const trainSize = total - testSize - validationSize;
-    
+
     return {
       trainData: shuffled.slice(0, trainSize),
       validationData: shuffled.slice(trainSize, trainSize + validationSize),
@@ -262,14 +262,14 @@ export abstract class LabelingAndTrainingPipeline extends BaseService {
    */
   protected async saveTrainingSamples(samples: TrainingSample[]): Promise<void> {
     if (samples.length === 0) return;
-    
-    const values = samples.map(sample => 
+
+    const values = samples.map(sample =>
       `('${sample.id}', '${sample.type}', '${JSON.stringify(sample.features)}', '${JSON.stringify(sample.target)}', '${JSON.stringify(sample.metadata)}', ${sample.createdAt})`
     ).join(',');
-    
+
     await this.db.query(`
-      INSERT INTO ${this.config.storage.samplesTable} 
-      (id, type, features, target, metadata, created_at) 
+      INSERT INTO ${this.config.storage.samplesTable}
+      (id, type, features, target, metadata, created_at)
       VALUES ${values}
       ON CONFLICT (id) DO UPDATE SET
         features = EXCLUDED.features,
@@ -287,10 +287,10 @@ export abstract class LabelingAndTrainingPipeline extends BaseService {
     metrics: ModelMetrics
   ): Promise<void> {
     const modelId = `model_${modelType}_${Date.now()}`;
-    
+
     await this.db.query(`
-      INSERT INTO ${this.config.storage.modelsTable} 
-      (id, type, model_data, metrics, created_at) 
+      INSERT INTO ${this.config.storage.modelsTable}
+      (id, type, model_data, metrics, created_at)
       VALUES ($1, $2, $3, $4, $5)
     `, [
       modelId,
@@ -299,7 +299,7 @@ export abstract class LabelingAndTrainingPipeline extends BaseService {
       JSON.stringify(metrics),
       new Date()
     ]);
-    
+
     logger.info(`Model saved: ${modelId}`);
   }
 
@@ -338,19 +338,19 @@ export abstract class LabelingAndTrainingPipeline extends BaseService {
   public async cleanupExpiredData(olderThanDays: number = 30): Promise<void> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
-    
+
     // 清理过期的训练样本
     await this.db.query(`
-      DELETE FROM ${this.config.storage.samplesTable} 
+      DELETE FROM ${this.config.storage.samplesTable}
       WHERE created_at < $1
     `, [cutoffDate]);
-    
+
     // 清理过期的模型
     await this.db.query(`
-      DELETE FROM ${this.config.storage.modelsTable} 
+      DELETE FROM ${this.config.storage.modelsTable}
       WHERE created_at < $1
     `, [cutoffDate]);
-    
+
     logger.info(`Cleaned up data older than ${olderThanDays} days`);
   }
 

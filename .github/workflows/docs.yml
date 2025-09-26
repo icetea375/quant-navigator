@@ -1,0 +1,59 @@
+name: Documentation Update
+
+on:
+  push:
+    paths:
+      - 'docs/**/*.md'
+      - 'scripts/update_docs_index.py'
+      - 'scripts/update_docs_index.sh'
+  workflow_dispatch:
+
+jobs:
+  update-docs-index:
+    name: Update Documentation Index
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Update documentation index
+        run: |
+          python3 scripts/update_docs_index.py
+      
+      - name: Check for changes
+        id: verify-changed-files
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Commit changes
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs/README.md
+          git commit -m "docs: auto-update documentation index [skip ci]"
+          git push
+      
+      - name: Summary
+        run: |
+          echo "## 📚 Documentation Index Update" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Documentation index has been updated automatically." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Document Statistics:" >> $GITHUB_STEP_SUMMARY
+          echo "- Core Development Docs: $(find docs -name "开发文档第*章*.md" | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "- Architecture Docs: $(find docs -name "架构设计*.md" | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "- Project Management Docs: $(find docs -name "*.md" | grep -E "(ADR|API_CHANGELOG|LINTING_PHILOSOPHY|测试宪法)" | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "- Completion Reports: $(find docs -name "v*_完成报告.md" | wc -l)" >> $GITHUB_STEP_SUMMARY

@@ -1,7 +1,7 @@
 /**
  * 仲裁相关类型定义
  * v10.1 仲裁界面升级版
- * 
+ *
  * 为仲裁仪表盘提供完整的TypeScript类型定义
  */
 
@@ -87,7 +87,7 @@ export interface FinancialSnapshot {
   reportPeriod: 'Q1' | 'Q2' | 'Q3' | 'Q4' | 'annual';
   fiscalYear: number;
   status: 'draft' | 'published' | 'revised' | 'archived';
-  
+
   // 核心财务指标
   revenue: number;
   revenueGrowthRate: number;
@@ -99,23 +99,23 @@ export interface FinancialSnapshot {
   rdExpenses: number;
   rdRatio: number;
   contractLiabilities: number;
-  
+
   // 资产负债指标
   totalAssets: number;
   totalLiabilities: number;
   netAssets: number;
   debtToAssetRatio: number;
-  
+
   // 盈利能力指标
   roe: number;
   roa: number;
   eps: number;
   bookValuePerShare: number;
-  
+
   // 成长性指标
   revenueCagr3y: number;
   profitCagr3y: number;
-  
+
   // 数据质量
   dataCompletenessScore: number;
   dataSource: string;
@@ -129,36 +129,36 @@ export interface QuantSignalsData {
   signalDate: string;
   signalType: 'individual' | 'market' | 'macro' | 'style' | 'industry';
   status: 'active' | 'expired' | 'cancelled' | 'archived';
-  
+
   // 个股信号
   returnZScore: number;
   volumeZScore: number;
   momentumZScore: number;
   volatilityZScore: number;
-  
+
   // 市场背景信号
   macroRiskZScore: number;
   marketStyleZScore: number;
   industryRotationZScore: number;
   conceptZScore: number;
-  
+
   // 管理层可信度因子
   mdaFulfillmentRate: number;
   managementCredibilityScore: number;
   disclosureQualityScore: number;
   financialTransparencyScore: number;
-  
+
   // 技术分析信号
   rsi: number;
   macdSignal: number;
   bollingerPosition: number;
   maSignal: number;
-  
+
   // 综合评分
   overallSignalStrength: number;
   signalConfidence: number;
   validityDays: number;
-  
+
   // 元数据
   modelVersion: string;
   calculationParams: Record<string, any>;

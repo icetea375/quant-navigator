@@ -5,11 +5,11 @@
  */
 
 import { SimpleTushareDataSource } from '../services/SimpleTushareDataSource';
-import { 
-  ThsConceptData, 
+import {
+  ThsConceptData,
   ThsConceptMemberData,
   DcConceptData,
-  DcConceptMemberData 
+  DcConceptMemberData
 } from '../interfaces/DataPipelineV15Interfaces';
 import { BaseErrorHandler } from '../utils/BaseErrorHandler';
 
@@ -49,7 +49,7 @@ export class ConceptFetcher {
   public async getThsConcepts(tradeDate?: string): Promise<ThsConceptData[]> {
     try {
       const cacheKey = `ths_concepts_${tradeDate || 'latest'}`;
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -104,7 +104,7 @@ export class ConceptFetcher {
   public async getThsConceptMembers(conceptCode?: string, tradeDate?: string): Promise<ThsConceptMemberData[]> {
     try {
       const cacheKey = `ths_concept_members_${conceptCode || 'all'}_${tradeDate || 'latest'}`;
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -156,7 +156,7 @@ export class ConceptFetcher {
   public async getDcConcepts(tradeDate?: string): Promise<DcConceptData[]> {
     try {
       const cacheKey = `dc_concepts_${tradeDate || 'latest'}`;
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -211,7 +211,7 @@ export class ConceptFetcher {
   public async getDcConceptMembers(conceptCode?: string, tradeDate?: string): Promise<DcConceptMemberData[]> {
     try {
       const cacheKey = `dc_concept_members_${conceptCode || 'all'}_${tradeDate || 'latest'}`;
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -321,9 +321,9 @@ export class ConceptFetcher {
     try {
       const thsConcepts = this.config.sources.ths ? await this.getThsConcepts(tradeDate) : [];
       const dcConcepts = this.config.sources.dc ? await this.getDcConcepts(tradeDate) : [];
-      
+
       const allConcepts = [...thsConcepts, ...dcConcepts];
-      
+
       // 获取成分股数据来计算热度
       const conceptStats = new Map<string, {
         concept_name: string;
@@ -335,13 +335,13 @@ export class ConceptFetcher {
 
       for (const concept of allConcepts) {
         try {
-          const members = concept.source === 'THS' 
+          const members = concept.source === 'THS'
             ? await this.getThsConceptMembers(concept.concept_code, tradeDate)
             : await this.getDcConceptMembers(concept.concept_code, tradeDate);
 
           const totalWeight = members.reduce((sum, member) => sum + (member.weight || 0), 0);
           const avgWeight = members.length > 0 ? totalWeight / members.length : 0;
-          
+
           // 简化的热度计算：基于成分股数量和平均权重
           const hotScore = members.length * 0.6 + avgWeight * 0.4;
 
@@ -422,7 +422,7 @@ export class ConceptFetcher {
    */
   private async makeRequest(apiName: string, params: any): Promise<any> {
     const axios = require('axios');
-    
+
     try {
       const response = await axios.post('http://api.tushare.pro', params, {
         timeout: 30000,

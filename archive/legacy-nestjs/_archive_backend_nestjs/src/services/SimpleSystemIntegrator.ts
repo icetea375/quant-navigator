@@ -103,7 +103,7 @@ export class SimpleSystemIntegrator {
     this.redis = redis;
     this.config = config;
     this.metrics = this.initializeMetrics();
-    
+
     this.validateConfig(config);
     this.initializeServices();
   }
@@ -539,7 +539,7 @@ export class SimpleSystemIntegrator {
     try {
       // 按相反顺序关闭服务
       const serviceNames = Array.from(this.services.keys()).reverse();
-      
+
       for (const name of serviceNames) {
         const service = this.services.get(name);
         if (service && typeof service.stop === 'function') {
@@ -606,11 +606,11 @@ export class SimpleSystemIntegrator {
    */
   private validateConfig(config: SystemIntegratorConfig): void {
     BaseConfigValidator.validate(config, ['enabled', 'services', 'startup', 'shutdown']);
-    
+
     if (config.startup.startupTimeout <= 0) {
       throw new Error('startupTimeout must be greater than 0');
     }
-    
+
     if (config.shutdown.shutdownTimeout <= 0) {
       throw new Error('shutdownTimeout must be greater than 0');
     }
@@ -663,7 +663,7 @@ export class SimpleSystemIntegrator {
       if (typeof service.stop === 'function') {
         await service.stop();
       }
-      
+
       if (typeof service.start === 'function') {
         await service.start();
       }

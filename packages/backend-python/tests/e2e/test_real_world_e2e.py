@@ -59,40 +59,40 @@ class TestRealWorldE2E:
     async def test_core_data_pipeline_workflow_real_world(self, real_tushare_fetcher, real_data_pipeline_service, stable_test_data):
         """
         核心数据管道工作流的真实世界测试
-        
+
         这是我们的"黄金路径"测试：
         1. 从真实Tushare API获取数据
         2. 通过DataPipelineService处理
         3. 验证数据质量和一致性
-        
+
         注意：这个测试可能会因为网络或API问题偶尔失败
         如果失败，请人工判断是外部问题还是代码问题
         """
         print(f"\n🚀 开始真实世界E2E测试: {stable_test_data['stock_code']} - {stable_test_data['trade_date']}")
-        
+
         try:
             # 步骤1: 从真实Tushare API获取数据
             print("📡 从真实Tushare API获取数据...")
             start_time = time.time()
-            
+
             raw_data = await real_data_pipeline_service.fetch_tushare_data(
-                stable_test_data["stock_code"], 
+                stable_test_data["stock_code"],
                 stable_test_data["trade_date"]
             )
-            
+
             api_time = time.time() - start_time
             print(f"✅ API调用完成，耗时: {api_time:.2f}秒")
-            
+
             # 验证API返回的数据结构
             assert "stock_basic" in raw_data, "缺少股票基本信息"
             assert "daily_basic" in raw_data, "缺少日度基本面数据"
             assert "daily" in raw_data, "缺少日度行情数据"
-            
+
             # 验证数据不为空
             assert len(raw_data["stock_basic"]) > 0, "股票基本信息为空"
             assert len(raw_data["daily_basic"]) > 0, "日度基本面数据为空"
             assert len(raw_data["daily"]) > 0, "日度行情数据为空"
-            
+
             # 步骤2: 提取财务因子
             print("🔧 提取财务因子...")
             financial_factors = await real_data_pipeline_service.extract_financial_factors(
@@ -100,49 +100,49 @@ class TestRealWorldE2E:
                 stable_test_data["trade_date"],
                 raw_data
             )
-            
+
             # 验证财务因子的合理性（银行股的特征）
             assert financial_factors["stock_code"] == stable_test_data["stock_code"]
             assert financial_factors["trade_date"] == stable_test_data["trade_date"]
-            
+
             # 验证PE和PB在合理范围内（银行股特征）
             pe_ratio = financial_factors["pe_ratio"]
             pb_ratio = financial_factors["pb_ratio"]
-            
+
             print(f"📊 财务指标: PE={pe_ratio:.2f}, PB={pb_ratio:.2f}")
-            
+
             # 银行股的PE和PB通常较低
             assert stable_test_data["expected_pe_range"][0] <= pe_ratio <= stable_test_data["expected_pe_range"][1], \
                 f"PE比率 {pe_ratio} 超出银行股合理范围 {stable_test_data['expected_pe_range']}"
-            
+
             assert stable_test_data["expected_pb_range"][0] <= pb_ratio <= stable_test_data["expected_pb_range"][1], \
                 f"PB比率 {pb_ratio} 超出银行股合理范围 {stable_test_data['expected_pb_range']}"
-            
+
             # 步骤3: 计算超级财务因子
             print("🧮 计算超级财务因子...")
             super_factors = await real_data_pipeline_service.calculate_super_financial_factors(financial_factors)
-            
+
             # 验证超级财务因子的合理性
             assert "overall_score" in super_factors
             assert "value_score" in super_factors
             assert "calculated_at" in super_factors
-            
+
             overall_score = super_factors["overall_score"]
             print(f"🎯 综合评分: {overall_score:.2f}")
-            
+
             # 评分应该在合理范围内
             assert 0 <= overall_score <= 100, f"综合评分 {overall_score} 超出合理范围"
-            
+
             # 步骤4: 验证数据一致性
             print("🔍 验证数据一致性...")
             assert super_factors["stock_code"] == financial_factors["stock_code"]
             assert super_factors["trade_date"] == financial_factors["trade_date"]
             assert super_factors["pe_ratio"] == financial_factors["pe_ratio"]
             assert super_factors["pb_ratio"] == financial_factors["pb_ratio"]
-            
+
             total_time = time.time() - start_time
             print(f"🎉 真实世界E2E测试完成！总耗时: {total_time:.2f}秒")
-            
+
             # 输出关键指标供人工审查
             print(f"\n📋 关键指标摘要:")
             print(f"   股票代码: {financial_factors['stock_code']}")
@@ -151,7 +151,7 @@ class TestRealWorldE2E:
             print(f"   PB比率: {pb_ratio:.2f}")
             print(f"   综合评分: {overall_score:.2f}")
             print(f"   总耗时: {total_time:.2f}秒")
-            
+
         except Exception as e:
             print(f"\n❌ 真实世界E2E测试失败: {e}")
             print(f"🔍 请人工判断失败原因:")
@@ -169,11 +169,11 @@ class TestRealWorldE2E:
     async def test_data_pipeline_error_handling_real_world(self, real_data_pipeline_service):
         """
         真实世界错误处理测试
-        
+
         测试我们的系统在遇到真实API错误时的表现
         """
         print("\n🚀 开始真实世界错误处理测试")
-        
+
         # 测试无效股票代码
         try:
             await real_data_pipeline_service.fetch_tushare_data("INVALID.SH", "20230101")
@@ -181,7 +181,7 @@ class TestRealWorldE2E:
         except Exception as e:
             print(f"✅ 无效股票代码正确抛出异常: {e}")
             assert "API调用失败" in str(e) or "股票代码" in str(e)
-        
+
         # 测试无效日期格式
         try:
             await real_data_pipeline_service.fetch_tushare_data("601398.SH", "invalid-date")
@@ -196,34 +196,34 @@ class TestRealWorldE2E:
     async def test_system_performance_real_world(self, real_tushare_fetcher, real_data_pipeline_service, stable_test_data):
         """
         真实世界性能测试
-        
+
         验证系统在真实环境下的性能表现
         """
         print("\n🚀 开始真实世界性能测试")
-        
+
         start_time = time.time()
-        
+
         # 执行完整流程
         raw_data = await real_data_pipeline_service.fetch_tushare_data(
-            stable_test_data["stock_code"], 
+            stable_test_data["stock_code"],
             stable_test_data["trade_date"]
         )
-        
+
         financial_factors = await real_data_pipeline_service.extract_financial_factors(
             stable_test_data["stock_code"],
             stable_test_data["trade_date"],
             raw_data
         )
-        
+
         super_factors = await real_data_pipeline_service.calculate_super_financial_factors(financial_factors)
-        
+
         total_time = time.time() - start_time
-        
+
         print(f"⏱️ 真实世界性能测试完成，总耗时: {total_time:.2f}秒")
-        
+
         # 性能要求：整个流程应该在30秒内完成
         assert total_time < 30.0, f"性能测试失败：总耗时 {total_time:.2f}秒 超过30秒限制"
-        
+
         print(f"✅ 性能测试通过：{total_time:.2f}秒 < 30秒")
 
 

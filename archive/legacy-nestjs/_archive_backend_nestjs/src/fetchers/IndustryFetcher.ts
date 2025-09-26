@@ -5,11 +5,11 @@
  */
 
 import { SimpleTushareDataSource } from '../services/SimpleTushareDataSource';
-import { 
-  ShenwanIndustryData, 
+import {
+  ShenwanIndustryData,
   ShenwanIndustryMemberData,
   CiticIndustryData,
-  CiticIndustryMemberData 
+  CiticIndustryMemberData
 } from '../interfaces/DataPipelineV15Interfaces';
 import { BaseErrorHandler } from '../utils/BaseErrorHandler';
 
@@ -46,7 +46,7 @@ export class IndustryFetcher {
   public async getShenwanIndustryClassification(): Promise<ShenwanIndustryData[]> {
     try {
       const cacheKey = 'shenwan_industry_classification';
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -95,7 +95,7 @@ export class IndustryFetcher {
   public async getShenwanIndustryMembers(industryCode?: string): Promise<ShenwanIndustryMemberData[]> {
     try {
       const cacheKey = `shenwan_industry_members_${industryCode || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -149,7 +149,7 @@ export class IndustryFetcher {
   public async getCiticIndustryClassification(): Promise<CiticIndustryData[]> {
     try {
       const cacheKey = 'citic_industry_classification';
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -198,7 +198,7 @@ export class IndustryFetcher {
   public async getCiticIndustryMembers(industryCode?: string): Promise<CiticIndustryMemberData[]> {
     try {
       const cacheKey = `citic_industry_members_${industryCode || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -313,7 +313,7 @@ export class IndustryFetcher {
     level3: any[];
   }> {
     try {
-      const classification = source === 'Shenwan' 
+      const classification = source === 'Shenwan'
         ? await this.getShenwanIndustryClassification()
         : await this.getCiticIndustryClassification();
 
@@ -347,7 +347,7 @@ export class IndustryFetcher {
       if (this.config.sources.shenwan) {
         try {
           const shenwanMembers = await this.getShenwanIndustryMembers();
-          results.shenwan = shenwanMembers.filter(member => 
+          results.shenwan = shenwanMembers.filter(member =>
             member.stock_code === stockCode && member.is_current
           );
         } catch (error) {
@@ -358,7 +358,7 @@ export class IndustryFetcher {
       if (this.config.sources.citic) {
         try {
           const citicMembers = await this.getCiticIndustryMembers();
-          results.citic = citicMembers.filter(member => 
+          results.citic = citicMembers.filter(member =>
             member.stock_code === stockCode && member.is_current
           );
         } catch (error) {
@@ -392,7 +392,7 @@ export class IndustryFetcher {
    */
   private async makeRequest(apiName: string, params: any): Promise<any> {
     const axios = require('axios');
-    
+
     try {
       const response = await axios.post('http://api.tushare.pro', params, {
         timeout: 30000,

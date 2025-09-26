@@ -1,6 +1,6 @@
 import { request } from './http'
-import type { 
-  StockPoolResponse, 
+import type {
+  StockPoolResponse,
   StockPoolItemResponse,
   MyBriefingResponse,
   MyAttributionResponse
@@ -9,7 +9,7 @@ import type {
 // 私人API服务 - 符合文档规范
 export const privateApi = {
   // ========== 股票池管理 ==========
-  
+
   // 获取所有股票池
   getStockPools: (): Promise<StockPoolResponse[]> => {
     return request.get<StockPoolResponse[]>('/private/stock-pools', {

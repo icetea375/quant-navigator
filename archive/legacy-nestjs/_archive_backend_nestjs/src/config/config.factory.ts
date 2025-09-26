@@ -3,7 +3,7 @@ import { AppConfig } from './config.module';
 
 /**
  * 配置工厂 - 提供类型安全的配置获取方法
- * 
+ *
  * 职责：
  * 1. 封装ConfigService的复杂调用
  * 2. 提供类型安全的配置访问

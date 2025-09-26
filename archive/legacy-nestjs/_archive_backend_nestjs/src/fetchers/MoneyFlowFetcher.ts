@@ -39,7 +39,7 @@ export class MoneyFlowFetcher {
   public async getStockMoneyFlow(tsCode?: string, tradeDate?: string): Promise<MoneyFlowData[]> {
     try {
       const cacheKey = `stock_money_flow_${tsCode || 'all'}_${tradeDate || 'latest'}`;
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -85,7 +85,7 @@ export class MoneyFlowFetcher {
   public async getSectorMoneyFlow(sectorCode?: string, tradeDate?: string): Promise<SectorMoneyFlowData[]> {
     try {
       const cacheKey = `sector_money_flow_${sectorCode || 'all'}_${tradeDate || 'latest'}`;
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -186,10 +186,10 @@ export class MoneyFlowFetcher {
   }> {
     try {
       const stockFlows = await this.getStockMoneyFlow(undefined, tradeDate);
-      
+
       // 按净流入金额排序
       const sortedByNetInflow = [...stockFlows].sort((a, b) => (b.net_mf_amount || 0) - (a.net_mf_amount || 0));
-      
+
       return {
         netInflowTop: sortedByNetInflow.slice(0, limit),
         netOutflowTop: sortedByNetInflow.slice(-limit).reverse()
@@ -206,7 +206,7 @@ export class MoneyFlowFetcher {
    */
   private async makeRequest(apiName: string, params: any): Promise<any> {
     const axios = require('axios');
-    
+
     try {
       const response = await axios.post('http://api.tushare.pro', params, {
         timeout: 30000,

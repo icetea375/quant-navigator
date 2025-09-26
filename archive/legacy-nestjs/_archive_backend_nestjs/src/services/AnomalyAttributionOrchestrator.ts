@@ -86,17 +86,17 @@ export class AnomalyAttributionOrchestrator {
    */
   private async getConfigFromDatabase(): Promise<Partial<OrchestratorConfig>> {
     const query = `
-      SELECT config_name, config_value, config_type 
-      FROM orchestrator_config 
+      SELECT config_name, config_value, config_type
+      FROM orchestrator_config
       WHERE is_active = true
     `;
-    
+
       const rows = await this.db.query(query);
     const config: Partial<OrchestratorConfig> = {};
-    
+
     for (const row of rows) {
       const { config_name, config_value, config_type } = row;
-      
+
       switch (config_name) {
         case 'z_score_threshold':
           config.z_score_threshold = parseFloat(config_value);
@@ -118,7 +118,7 @@ export class AnomalyAttributionOrchestrator {
           break;
       }
     }
-    
+
     return config;
   }
 
@@ -128,10 +128,10 @@ export class AnomalyAttributionOrchestrator {
   async triggerDailyAnalysis(date?: string): Promise<{ task_id: string; message: string }> {
     const analysisDate = date || new Date().toISOString().split('T')[0];
     const taskId = `attribution_task_${Date.now()}`;
-    
+
     try {
       this.logger.info('Starting daily anomaly analysis', { taskId, analysisDate });
-      
+
       // 检查是否已存在当天的焦点
       const existingFocus = await this.getFocusOfTheDay(analysisDate);
       if (existingFocus && 'focus_id' in existingFocus && existingFocus.focus_id) {
@@ -144,7 +144,7 @@ export class AnomalyAttributionOrchestrator {
 
       // 执行倒金字塔过滤逻辑
       const focus = await this.executeInvertedPyramidFilter(analysisDate);
-      
+
       if (focus) {
         // 保存焦点到数据库
         await this.saveFocusToDatabase(focus);
@@ -210,7 +210,7 @@ export class AnomalyAttributionOrchestrator {
       ORDER BY ABS(z_score) DESC
       LIMIT 1
     `;
-    
+
     const rows = await this.db.query(query, [analysisDate]);
     const row = rows[0];
     if (row) {
@@ -236,7 +236,7 @@ export class AnomalyAttributionOrchestrator {
       ORDER BY ABS(z_score) DESC
       LIMIT 1
     `;
-    
+
     const rows = await this.db.query(query, [analysisDate]);
     const row = rows[0];
     if (row) {
@@ -263,7 +263,7 @@ export class AnomalyAttributionOrchestrator {
       ORDER BY ABS(z_score) DESC
       LIMIT 1
     `;
-    
+
     const rows = await this.db.query(query, [analysisDate]);
     const row = rows[0];
     if (row) {
@@ -290,7 +290,7 @@ export class AnomalyAttributionOrchestrator {
       ORDER BY ABS(z_score) DESC
       LIMIT 1
     `;
-    
+
     const rows = await this.db.query(query, [analysisDate]);
     const row = rows[0];
     if (row) {
@@ -311,7 +311,7 @@ export class AnomalyAttributionOrchestrator {
    */
   private createFocusFromAnomaly(anomaly: AnomalyData, analysisDate: string, priority: number): AnomalyFocus {
     const focusId = `focus_${analysisDate.replace(/-/g, '')}`;
-    
+
     return {
       focus_id: focusId,
       detection_date: analysisDate,
@@ -337,7 +337,7 @@ export class AnomalyAttributionOrchestrator {
        z_score_value, z_score_type, news_search_status, attribution_status, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    
+
     await this.db.execute(query, [
       focus.focus_id,
       focus.detection_date,
@@ -362,10 +362,10 @@ export class AnomalyAttributionOrchestrator {
         SELECT * FROM daily_anomaly_focus
         WHERE detection_date = ?
       `;
-      
+
       const rows = await this.db.query(query, [date]);
       const row = rows[0];
-      
+
       if (row) {
         return {
           focus_id: row.focus_id,
@@ -402,43 +402,43 @@ export class AnomalyAttributionOrchestrator {
     try {
       const setClause = [];
       const values = [];
-      
+
       if (updates.news_search_status) {
         setClause.push('news_search_status = ?');
         values.push(updates.news_search_status);
       }
-      
+
       if (updates.attribution_status) {
         setClause.push('attribution_status = ?');
         values.push(updates.attribution_status);
       }
-      
+
       if (updates.news_api_request_id) {
         setClause.push('news_api_request_id = ?');
         values.push(updates.news_api_request_id);
       }
-      
+
       if (updates.attribution_result_id) {
         setClause.push('attribution_result_id = ?');
         values.push(updates.attribution_result_id);
       }
-      
+
       setClause.push('updated_at = ?');
       values.push(new Date().toISOString());
       values.push(focusId);
-      
+
       const query = `
         UPDATE daily_anomaly_focus
         SET ${setClause.join(', ')}
         WHERE focus_id = ?
       `;
-      
+
       await this.db.execute(query, values);
-      
+
       // 返回更新后的焦点
       const updatedFocus = await this.getFocusById(focusId);
       this.logger.info('Focus status updated', { focusId, updates });
-      
+
       return updatedFocus;
     } catch (error) {
       BaseErrorHandler.handle(error, 'AnomalyAttributionOrchestrator');
@@ -454,13 +454,13 @@ export class AnomalyAttributionOrchestrator {
       SELECT * FROM daily_anomaly_focus
       WHERE focus_id = ?
     `;
-    
+
     const rows = await this.db.query(query, [focusId]);
     const row = rows[0];
     if (!row) {
       throw new Error(`Focus not found: ${focusId}`);
     }
-    
+
     return {
       focus_id: row.focus_id,
       detection_date: row.detection_date,
@@ -492,10 +492,10 @@ export class AnomalyAttributionOrchestrator {
   async updateConfig(newConfig: Partial<OrchestratorConfig>): Promise<void> {
     try {
       BaseConfigValidator.validate({ enabled: true, ...newConfig }, Object.keys(newConfig));
-      
+
       // 更新内存配置
       this.config = { ...this.config, ...newConfig };
-      
+
       // 更新数据库配置
       for (const [key, value] of Object.entries(newConfig)) {
         const query = `
@@ -505,7 +505,7 @@ export class AnomalyAttributionOrchestrator {
         `;
         await this.db.execute(query, [String(value), key]);
       }
-      
+
       this.logger.info('Orchestrator config updated', { newConfig });
     } catch (error) {
       BaseErrorHandler.handle(error, 'AnomalyAttributionOrchestrator');

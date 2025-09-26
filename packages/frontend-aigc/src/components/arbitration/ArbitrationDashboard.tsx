@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Layout, Row, Col, Card, Typography, Button, Space, message, Spin, Alert } from 'antd';
-import { 
-  ReloadOutlined, 
-  SaveOutlined, 
+import {
+  ReloadOutlined,
+  SaveOutlined,
   SettingOutlined,
   FullscreenOutlined,
   FullscreenExitOutlined
@@ -25,7 +25,7 @@ const { Title, Text } = Typography;
 /**
  * 仲裁仪表盘主组件
  * 集成所有数据面板，提供完整的仲裁决策支持
- * 
+ *
  * 核心特性：
  * 1. 动态可定制布局
  * 2. 一次性并行数据加载

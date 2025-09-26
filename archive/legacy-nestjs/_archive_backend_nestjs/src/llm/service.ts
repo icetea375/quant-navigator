@@ -111,20 +111,20 @@ export class LLMErrorHandler {
     backoffMs: number = 1000
   ): Promise<T> {
     let lastError: Error | null = null;
-    
+
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         return await operation();
       } catch (error) {
         lastError = error as Error;
-        
+
         if (attempt < maxRetries) {
           const delay = backoffMs * Math.pow(2, attempt - 1);
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
     }
-    
+
     throw lastError || new Error('操作失败');
   }
 
@@ -136,7 +136,7 @@ export class LLMErrorHandler {
    */
   static handleError(error: Error, context: string): LLMResponse {
     const errorMessage = `LLM调用失败 (${context}): ${error instanceof Error ? error.message : String(error)}`;
-    
+
     return {
       content: `抱歉，AI服务暂时不可用，请稍后重试。错误信息: ${errorMessage}`,
       usage: {
@@ -165,7 +165,7 @@ export class LLMErrorHandler {
       'server error',
       'temporary'
     ];
-    
+
     const errorMessage = error instanceof Error ? error.message : String(error).toLowerCase();
     return retryableErrors.some(keyword => errorMessage.includes(keyword));
   }
@@ -296,7 +296,7 @@ export class LLMHealthChecker {
   static async checkProvider(service: LLMService): Promise<HealthStatus> {
     const provider = service.getProvider();
     const now = Date.now();
-    
+
     // 检查缓存
     const cached = this.healthCache.get(provider);
     if (cached && (now - cached.lastCheck) < this.cacheTimeout) {
@@ -309,7 +309,7 @@ export class LLMHealthChecker {
     try {
       const isHealthy = await service.healthCheck();
       const responseTime = Date.now() - startTime;
-      
+
       status = {
         provider,
         status: isHealthy ? 'healthy' : 'unhealthy',
@@ -346,14 +346,14 @@ export class LLMHealthChecker {
     uptime: number;
   }> {
     const healthStatuses = await this.checkAllProviders(services);
-    
+
     const healthyServices = healthStatuses.filter(s => s.status === 'healthy').length;
     const unhealthyServices = healthStatuses.length - healthyServices;
-    
+
     const responseTimes = healthStatuses
       .filter(s => s.responseTime !== undefined)
       .map(s => s.responseTime!);
-    
+
     const averageResponseTime = responseTimes.length > 0
       ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
       : 0;

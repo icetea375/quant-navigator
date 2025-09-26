@@ -190,14 +190,14 @@
   .dashboard-sidebar {
     width: 200px !important;
   }
-  
+
   .header-content {
     flex-direction: column;
     align-items: flex-start;
     height: auto;
     padding: 8px 0;
   }
-  
+
   .header-right {
     margin-top: 8px;
     width: 100%;
@@ -212,7 +212,7 @@
     z-index: 1000;
     height: 100%;
   }
-  
+
   .dashboard-main {
     width: 100% !important;
   }

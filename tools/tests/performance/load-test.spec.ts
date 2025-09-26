@@ -20,7 +20,7 @@ describe('Load Tests', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
-    
+
     httpClient = TestHelpers.createHttpClient(app);
   });
 
@@ -31,7 +31,7 @@ describe('Load Tests', () => {
   describe('API Load Tests', () => {
     it('should handle concurrent configuration requests', async () => {
       const concurrentRequests = 50;
-      const requests = Array(concurrentRequests).fill(null).map((_, i) => 
+      const requests = Array(concurrentRequests).fill(null).map((_, i) =>
         httpClient
           .get('/api/v1/admin/configs')
           .expect(200)
@@ -51,7 +51,7 @@ describe('Load Tests', () => {
     });
 
     it('should handle high-frequency data pipeline requests', async () => {
-      const requests = Array(20).fill(null).map((_, i) => 
+      const requests = Array(20).fill(null).map((_, i) =>
         httpClient
           .post('/api/v1/data-pipeline/start')
           .send({
@@ -74,7 +74,7 @@ describe('Load Tests', () => {
 
     it('should handle quant signal calculation load', async () => {
       const symbols = ['000001.SZ', '000002.SZ', '600000.SH', '600036.SH'];
-      const requests = Array(10).fill(null).map(() => 
+      const requests = Array(10).fill(null).map(() =>
         httpClient
           .post('/api/v1/quant-signals/calculate')
           .send({
@@ -98,7 +98,7 @@ describe('Load Tests', () => {
   describe('Database Load Tests', () => {
     it('should handle concurrent database queries', async () => {
       const concurrentQueries = 100;
-      const queries = Array(concurrentQueries).fill(null).map(() => 
+      const queries = Array(concurrentQueries).fill(null).map(() =>
         httpClient
           .get('/api/v1/admin/configs')
           .query({ type: 'database' })
@@ -117,7 +117,7 @@ describe('Load Tests', () => {
 
     it('should handle bulk data operations', async () => {
       const configs = TestHelpers.generateTestData('configs', 50);
-      const requests = configs.map(config => 
+      const requests = configs.map(config =>
         httpClient
           .post('/api/v1/admin/configs')
           .send(config)
@@ -138,9 +138,9 @@ describe('Load Tests', () => {
   describe('Memory Usage Tests', () => {
     it('should not exceed memory limits during heavy load', async () => {
       const initialMemory = process.memoryUsage();
-      
+
       // 执行大量操作
-      const requests = Array(100).fill(null).map(() => 
+      const requests = Array(100).fill(null).map(() =>
         httpClient
           .post('/api/v1/quant-signals/calculate')
           .send({
@@ -150,10 +150,10 @@ describe('Load Tests', () => {
       );
 
       await Promise.allSettled(requests);
-      
+
       const finalMemory = process.memoryUsage();
       const memoryIncrease = finalMemory.heapUsed - initialMemory.heapUsed;
-      
+
       // 内存增长不应超过100MB
       expect(memoryIncrease).toBeLessThan(100 * 1024 * 1024);
     });
@@ -162,7 +162,7 @@ describe('Load Tests', () => {
   describe('Response Time Tests', () => {
     it('should maintain response times under load', async () => {
       const responseTimes: number[] = [];
-      
+
       for (let i = 0; i < 20; i++) {
         const startTime = Date.now();
         await httpClient.get('/api/v1/health');
@@ -182,7 +182,7 @@ describe('Load Tests', () => {
 
   describe('Error Rate Tests', () => {
     it('should maintain low error rate under load', async () => {
-      const requests = Array(200).fill(null).map(() => 
+      const requests = Array(200).fill(null).map(() =>
         httpClient
           .get('/api/v1/admin/configs')
           .catch(() => ({ status: 'rejected' }))
@@ -196,4 +196,3 @@ describe('Load Tests', () => {
     });
   });
 });
-

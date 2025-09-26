@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Card, Row, Col, Statistic, Progress, Tag, Tooltip, Typography, Divider, Tabs } from 'antd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, Area, AreaChart } from 'recharts';
-import { 
-  MoneyCollectOutlined, 
-  TrendingUpOutlined, 
+import {
+  MoneyCollectOutlined,
+  TrendingUpOutlined,
   TrendingDownOutlined,
   InfoCircleOutlined,
-  ThunderboltOutlined 
+  ThunderboltOutlined
 } from '@ant-design/icons';
 import { FlowAndChipsViewerProps, FlowAndChipsData, MoneyFlowData, ChipDistributionData } from '../../types/arbitration';
 import './FlowAndChipsViewer.css';
@@ -17,7 +17,7 @@ const { TabPane } = Tabs;
 /**
  * 资金流向与筹码分布组件
  * 展示资金流向、龙虎榜和筹码分布数据
- * 
+ *
  * 核心特性：
  * 1. 资金流向可视化
  * 2. 龙虎榜数据展示
@@ -65,7 +65,7 @@ const FlowAndChipsViewer: React.FC<FlowAndChipsViewerProps> = ({
   // 获取资金流向趋势数据
   const flowTrendData = useMemo(() => {
     if (!flowData) return [];
-    
+
     return [
       { period: '5日均值', value: flowData.avgNetInflow5d },
       { period: '10日均值', value: flowData.avgNetInflow10d },
@@ -244,17 +244,17 @@ const FlowAndChipsViewer: React.FC<FlowAndChipsViewerProps> = ({
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="price" />
                   <YAxis />
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value, name) => [
                       name === 'quantity' ? `${value}万股` : `${(value * 100).toFixed(1)}%`,
                       name === 'quantity' ? '筹码数量' : '筹码比例'
                     ]}
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="quantity" 
-                    stroke="#1890ff" 
-                    fill="#1890ff" 
+                  <Area
+                    type="monotone"
+                    dataKey="quantity"
+                    stroke="#1890ff"
+                    fill="#1890ff"
                     fillOpacity={0.6}
                   />
                 </AreaChart>
@@ -286,9 +286,9 @@ const FlowAndChipsViewer: React.FC<FlowAndChipsViewerProps> = ({
                       </Row>
                       <div className="cost-concentration">
                         <Text type="secondary">集中度: </Text>
-                        <Progress 
-                          percent={item.costConcentration * 100} 
-                          size="small" 
+                        <Progress
+                          percent={item.costConcentration * 100}
+                          size="small"
                           strokeColor="#1890ff"
                         />
                       </div>
@@ -332,8 +332,8 @@ const FlowAndChipsViewer: React.FC<FlowAndChipsViewerProps> = ({
               <div className="analysis-item">
                 <Text strong>筹码集中度</Text>
                 <div className="analysis-value">
-                  <Progress 
-                    percent={analysis.chipConcentration * 100} 
+                  <Progress
+                    percent={analysis.chipConcentration * 100}
                     size="small"
                     strokeColor="#1890ff"
                   />

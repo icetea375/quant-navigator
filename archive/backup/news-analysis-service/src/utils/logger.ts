@@ -33,7 +33,7 @@ export const logger = winston.createLogger({
     new winston.transports.Console({
       format: consoleFormat
     }),
-    
+
     // 文件输出
     new winston.transports.File({
       filename: process.env['LOG_FILE_PATH'] || './logs/app.log',
@@ -41,7 +41,7 @@ export const logger = winston.createLogger({
       maxFiles: 5,
       tailable: true
     }),
-    
+
     // 错误日志单独文件
     new winston.transports.File({
       filename: path.join(logDir, 'error.log'),
@@ -78,7 +78,7 @@ export const logLevels = {
 // 创建请求日志中间件
 export const requestLogger = (req: any, res: any, next: any) => {
   const start = Date.now();
-  
+
   res.on('finish', () => {
     const duration = Date.now() - start;
     const logData = {
@@ -89,14 +89,14 @@ export const requestLogger = (req: any, res: any, next: any) => {
       ip: req.ip,
       userAgent: req.get('User-Agent')
     };
-    
+
     if (res.statusCode >= 400) {
       logger.warn('HTTP请求', logData);
     } else {
       logger.info('HTTP请求', logData);
     }
   });
-  
+
   next();
 };
 

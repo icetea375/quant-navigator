@@ -59,7 +59,7 @@ export abstract class BaseEngine extends BaseService {
     return await this.executeTask(`process_${taskId}`, async () => {
       this.engineStats.processedTasks++;
       this.engineStats.queueSize = this.taskQueue.length;
-      
+
       const startTime = Date.now();
       try {
         const result = await task();
@@ -90,7 +90,7 @@ export abstract class BaseEngine extends BaseService {
     while (this.taskQueue.length > 0 && this.activeTasks.size < this.config.processing.maxConcurrentTasks) {
       const { id, task } = this.taskQueue.shift()!;
       this.activeTasks.add(id);
-      
+
       this.processTask(id, task).finally(() => {
         this.activeTasks.delete(id);
       });
@@ -101,10 +101,10 @@ export abstract class BaseEngine extends BaseService {
    * 更新引擎统计信息
    */
   private updateEngineStats(success: boolean, processingTime: number, error?: string): void {
-    this.engineStats.averageProcessingTime = 
-      (this.engineStats.averageProcessingTime * (this.engineStats.processedTasks - 1) + processingTime) / 
+    this.engineStats.averageProcessingTime =
+      (this.engineStats.averageProcessingTime * (this.engineStats.processedTasks - 1) + processingTime) /
       this.engineStats.processedTasks;
-    
+
     if (error) {
       this.engineStats.lastError = error;
     }

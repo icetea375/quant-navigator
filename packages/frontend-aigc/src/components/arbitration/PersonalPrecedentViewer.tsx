@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { List, Card, Tag, Tooltip, Typography, Divider, Button, Space, Rate, Progress } from 'antd';
-import { 
-  HistoryOutlined, 
-  StarOutlined, 
-  CheckCircleOutlined, 
+import {
+  HistoryOutlined,
+  StarOutlined,
+  CheckCircleOutlined,
   CloseCircleOutlined,
   InfoCircleOutlined,
   EyeOutlined,
@@ -17,7 +17,7 @@ const { Text, Paragraph, Title } = Typography;
 /**
  * 历史仲裁记录组件
  * 展示过去一年中的历史仲裁判决，支持智能筛选和对比
- * 
+ *
  * 核心特性：
  * 1. 历史判决记录展示
  * 2. 智能相似案例推荐
@@ -49,11 +49,11 @@ const PersonalPrecedentViewer: React.FC<PersonalPrecedentViewerProps> = ({
   // 过滤数据
   const filteredData = useMemo(() => {
     let filtered = data;
-    
+
     if (filterType !== 'all') {
       filtered = filtered.filter(item => item.feedbackType === filterType);
     }
-    
+
     // 排序
     filtered.sort((a, b) => {
       switch (sortBy) {
@@ -67,7 +67,7 @@ const PersonalPrecedentViewer: React.FC<PersonalPrecedentViewerProps> = ({
           return 0;
       }
     });
-    
+
     return filtered;
   }, [data, filterType, sortBy]);
 
@@ -149,7 +149,7 @@ const PersonalPrecedentViewer: React.FC<PersonalPrecedentViewerProps> = ({
               </Text>
             </div>
           </div>
-          
+
           <div className="precedent-content">
             <Paragraph
               ellipsis={{ rows: 2, expandable: true, symbol: '展开' }}
@@ -157,7 +157,7 @@ const PersonalPrecedentViewer: React.FC<PersonalPrecedentViewerProps> = ({
             >
               {precedent.originalSummary}
             </Paragraph>
-            
+
             {precedent.feedbackComment && (
               <div className="precedent-comment">
                 <Text type="secondary">反馈: </Text>
@@ -165,7 +165,7 @@ const PersonalPrecedentViewer: React.FC<PersonalPrecedentViewerProps> = ({
               </div>
             )}
           </div>
-          
+
           <div className="precedent-footer">
             <div className="precedent-scores">
               <Space>
@@ -188,7 +188,7 @@ const PersonalPrecedentViewer: React.FC<PersonalPrecedentViewerProps> = ({
                 </Tooltip>
               </Space>
             </div>
-            
+
             <div className="precedent-actions">
               <Button
                 type="link"
@@ -256,9 +256,9 @@ const PersonalPrecedentViewer: React.FC<PersonalPrecedentViewerProps> = ({
             />
           </Col>
         </Row>
-        
+
         <Divider />
-        
+
         <div className="rating-distribution">
           <Text strong>评级分布</Text>
           <div className="rating-bars">
@@ -321,9 +321,9 @@ const PersonalPrecedentViewer: React.FC<PersonalPrecedentViewerProps> = ({
         >
           质量审核
         </Button>
-        
+
         <Divider type="vertical" />
-        
+
         <Text strong>排序:</Text>
         <Button
           type={sortBy === 'date' ? 'primary' : 'default'}
@@ -373,13 +373,13 @@ const PersonalPrecedentViewer: React.FC<PersonalPrecedentViewerProps> = ({
   return (
     <div className="personal-precedent-viewer">
       {renderStatistics()}
-      
+
       <Divider />
-      
+
       {renderToolbar()}
-      
+
       <Divider />
-      
+
       <div className="precedent-list">
         <List
           dataSource={filteredData}

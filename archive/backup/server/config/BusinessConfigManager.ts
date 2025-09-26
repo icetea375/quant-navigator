@@ -65,7 +65,7 @@ export class BusinessConfigManager extends EventEmitter {
   // 加载配置文件
   private loadConfig(type: string, filename: string): boolean {
     const configPath = path.join(this.configDir, filename)
-    
+
     try {
       if (!fs.existsSync(configPath)) {
         this.createDefaultConfig(type, filename)
@@ -74,7 +74,7 @@ export class BusinessConfigManager extends EventEmitter {
 
       const data = fs.readFileSync(configPath, 'utf8')
       const config = JSON.parse(data)
-      
+
       // 验证配置
       if (this.validateConfig(type, config)) {
         this.configs.set(type, config)
@@ -182,7 +182,7 @@ export class BusinessConfigManager extends EventEmitter {
 
     const configPath = path.join(this.configDir, filename)
     const defaultConfig = defaultConfigs[type] || {}
-    
+
     fs.writeFileSync(
       configPath,
       JSON.stringify(defaultConfig, null, 2),
@@ -248,21 +248,21 @@ export class BusinessConfigManager extends EventEmitter {
   // 配置变更回调
   private onConfigChange(type: string, filename: string) {
     console.log(`🔄 检测到${type}配置变更，正在重新加载...`)
-    
+
     const previousConfig = this.previousConfigs.get(type)
     const beforeConfig = previousConfig ? JSON.parse(JSON.stringify(previousConfig)) : null
-    
+
     if (this.loadConfig(type, filename)) {
       const afterConfig = this.configs.get(type)
-      
+
       // 记录配置变更日志
       this.logConfigChange(type, beforeConfig, afterConfig, 'reload')
-      
+
       // 清除相关缓存
       this.clearRelatedCache(type)
       this.emit('configUpdated', { type, config: afterConfig })
       console.log(`✅ ${type}配置已热重载`)
-      
+
       // 更新之前的配置
       this.previousConfigs.set(type, JSON.parse(JSON.stringify(afterConfig)))
     } else {
@@ -320,7 +320,7 @@ export class BusinessConfigManager extends EventEmitter {
   ) {
     try {
       const changes = this.calculateConfigChanges(beforeConfig, afterConfig)
-      
+
       configLogger.logConfigChange({
         configType,
         action,
@@ -340,17 +340,17 @@ export class BusinessConfigManager extends EventEmitter {
     if (!before && !after) {
       return { before: null, after: null, fields: [] }
     }
-    
+
     if (!before) {
       return { before: null, after, fields: ['all'] }
     }
-    
+
     if (!after) {
       return { before, after: null, fields: ['all'] }
     }
 
     const changedFields: string[] = []
-    
+
     // 简单的字段变更检测
     if (JSON.stringify(before) !== JSON.stringify(after)) {
       changedFields.push('content')
@@ -386,7 +386,7 @@ export class BusinessConfigManager extends EventEmitter {
         this.onConfigChange(type, filename)
       }
     })
-    
+
     this.watchers.set(filename, watcher)
     console.log(`👀 开始监听配置文件: ${filename}`)
   }

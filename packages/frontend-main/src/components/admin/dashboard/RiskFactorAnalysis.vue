@@ -2,7 +2,7 @@
   <div class="risk-factor-analysis">
     <h3>⚠️ 风险因子分析</h3>
     <p class="description">全面分析各类风险因子，为仲裁决策提供风险控制依据</p>
-    
+
     <div class="analysis-content">
       <!-- 风险概览 -->
       <div class="risk-overview">
@@ -15,7 +15,7 @@
             </div>
             <div class="summary-score">{{ riskData.overallRisk }}/100</div>
           </div>
-          
+
           <div class="summary-card">
             <div class="summary-title">风险变化趋势</div>
             <div class="summary-value" :class="getTrendClass(riskData.riskTrend)">
@@ -23,7 +23,7 @@
             </div>
             <div class="summary-score">{{ riskData.riskChange }}%</div>
           </div>
-          
+
           <div class="summary-card">
             <div class="summary-title">关键风险数量</div>
             <div class="summary-value">{{ riskData.criticalRisks }}</div>
@@ -31,13 +31,13 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 风险分类分析 -->
       <div class="risk-categories">
         <h4>🔍 风险分类分析</h4>
         <div class="categories-grid">
-          <div 
-            v-for="(category, index) in riskCategories" 
+          <div
+            v-for="(category, index) in riskCategories"
             :key="index"
             class="category-card"
             :class="getCategoryClass(category.level)"
@@ -49,24 +49,24 @@
                 {{ getLevelText(category.level) }}
               </div>
             </div>
-            
+
             <div class="category-content">
               <div class="risk-score">
                 <span class="score-label">风险评分:</span>
                 <span class="score-value">{{ category.score }}/100</span>
                 <div class="score-bar">
-                  <div 
-                    class="score-fill" 
+                  <div
+                    class="score-fill"
                     :style="{ width: category.score + '%' }"
                   ></div>
                 </div>
               </div>
-              
+
               <div class="risk-factors">
                 <div class="factors-title">主要风险因子:</div>
                 <div class="factors-list">
-                  <span 
-                    v-for="(factor, factorIndex) in category.factors" 
+                  <span
+                    v-for="(factor, factorIndex) in category.factors"
                     :key="factorIndex"
                     class="factor-tag"
                     :class="getFactorClass(factor.impact)"
@@ -75,7 +75,7 @@
                   </span>
                 </div>
               </div>
-              
+
               <div class="risk-description">
                 {{ category.description }}
               </div>
@@ -83,13 +83,13 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 风险事件追踪 -->
       <div class="risk-events">
         <h4>📰 风险事件追踪</h4>
         <div class="events-list">
-          <div 
-            v-for="(event, index) in riskEvents" 
+          <div
+            v-for="(event, index) in riskEvents"
             :key="index"
             class="event-card"
             :class="event.severity"
@@ -100,7 +100,7 @@
                 {{ getSeverityText(event.severity) }}
               </div>
             </div>
-            
+
             <div class="event-content">
               <div class="event-description">{{ event.description }}</div>
               <div class="event-meta">
@@ -109,7 +109,7 @@
                 <span class="event-impact">影响度: {{ event.impact }}/10</span>
               </div>
             </div>
-            
+
             <div class="event-actions">
               <button class="action-btn primary">查看详情</button>
               <button class="action-btn secondary">标记处理</button>
@@ -117,13 +117,13 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 风险预警 -->
       <div class="risk-alerts">
         <h4>🚨 风险预警</h4>
         <div class="alerts-list">
-          <div 
-            v-for="(alert, index) in riskAlerts" 
+          <div
+            v-for="(alert, index) in riskAlerts"
             :key="index"
             class="alert-item"
             :class="alert.type"
@@ -140,13 +140,13 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 风险缓解建议 -->
       <div class="risk-mitigation">
         <h4>💡 风险缓解建议</h4>
         <div class="mitigation-suggestions">
-          <div 
-            v-for="(suggestion, index) in mitigationSuggestions" 
+          <div
+            v-for="(suggestion, index) in mitigationSuggestions"
             :key="index"
             class="suggestion-card"
             :class="suggestion.priority"
@@ -157,7 +157,7 @@
                 {{ getPriorityText(suggestion.priority) }}
               </div>
             </div>
-            
+
             <div class="suggestion-content">
               <div class="suggestion-description">{{ suggestion.description }}</div>
               <div class="suggestion-actions">
@@ -408,7 +408,7 @@ const getPriorityText = (priority: string) => {
 }
 
 const formatTime = (time: Date) => {
-  return time.toLocaleString('zh-CN', { 
+  return time.toLocaleString('zh-CN', {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
@@ -950,21 +950,21 @@ onMounted(() => {
   .mitigation-suggestions {
     grid-template-columns: 1fr;
   }
-  
+
   .event-meta {
     flex-direction: column;
     gap: 5px;
   }
-  
+
   .event-actions {
     flex-direction: column;
   }
-  
+
   .alert-item {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .alert-actions {
     margin-top: 10px;
   }

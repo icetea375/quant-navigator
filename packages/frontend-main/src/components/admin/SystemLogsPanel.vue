@@ -17,15 +17,15 @@
         导出日志
       </el-button>
     </div>
-    
+
     <div class="logs-container">
       <div v-if="filteredLogs.length === 0" class="empty-logs">
         <el-empty description="暂无日志数据" />
       </div>
-      
+
       <div v-else class="logs-list">
-        <div 
-          v-for="log in filteredLogs" 
+        <div
+          v-for="log in filteredLogs"
           :key="log.id"
           class="log-item"
           :class="log.level"
@@ -39,13 +39,13 @@
             <div class="log-time">{{ formatTime(log.timestamp) }}</div>
             <div class="log-source">{{ log.source }}</div>
           </div>
-          
+
           <div class="log-content">
             <div class="log-message">{{ log.message }}</div>
             <div v-if="log.details" class="log-details">
-              <el-button 
-                type="text" 
-                size="small" 
+              <el-button
+                type="text"
+                size="small"
                 @click="toggleDetails(log.id)"
               >
                 {{ expandedLogs.includes(log.id) ? '隐藏详情' : '显示详情' }}
@@ -58,7 +58,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="logs-pagination">
       <el-pagination
         v-model:current-page="currentPage"
@@ -110,7 +110,7 @@ const filteredLogs = computed(() => {
   // 按关键词搜索
   if (searchKeyword.value) {
     const keyword = searchKeyword.value.toLowerCase()
-    filtered = filtered.filter(log => 
+    filtered = filtered.filter(log =>
       log.message.toLowerCase().includes(keyword) ||
       log.source.toLowerCase().includes(keyword) ||
       log.details?.toLowerCase().includes(keyword)
@@ -132,7 +132,7 @@ const totalLogs = computed(() => {
 
   if (searchKeyword.value) {
     const keyword = searchKeyword.value.toLowerCase()
-    filtered = filtered.filter(log => 
+    filtered = filtered.filter(log =>
       log.message.toLowerCase().includes(keyword) ||
       log.source.toLowerCase().includes(keyword) ||
       log.details?.toLowerCase().includes(keyword)
@@ -171,10 +171,10 @@ const clearLogs = () => {
 }
 
 const exportLogs = () => {
-  const logText = logs.value.map(log => 
+  const logText = logs.value.map(log =>
     `[${formatTime(log.timestamp)}] ${log.level.toUpperCase()} [${log.source}] ${log.message}`
   ).join('\n')
-  
+
   const blob = new Blob([logText], { type: 'text/plain' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
@@ -182,7 +182,7 @@ const exportLogs = () => {
   a.download = `system-logs-${dayjs().format('YYYY-MM-DD-HH-mm-ss')}.txt`
   a.click()
   URL.revokeObjectURL(url)
-  
+
   ElMessage.success('日志导出成功')
 }
 
@@ -212,12 +212,12 @@ const generateMockLogs = () => {
   ]
 
   const mockLogs: LogEntry[] = []
-  
+
   for (let i = 0; i < 100; i++) {
     const level = levels[Math.floor(Math.random() * levels.length)]
     const source = sources[Math.floor(Math.random() * sources.length)]
     const message = messages[Math.floor(Math.random() * messages.length)]
-    
+
     mockLogs.push({
       id: `log-${i}`,
       level,
@@ -227,7 +227,7 @@ const generateMockLogs = () => {
       details: level === 'error' ? `错误详情: ${message}\n堆栈信息: Error at line ${Math.floor(Math.random() * 1000)}\n调用链: main -> process -> handle` : undefined
     })
   }
-  
+
   logs.value = mockLogs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 }
 
@@ -367,26 +367,25 @@ onMounted(() => {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .logs-controls .el-input {
     width: 100% !important;
     margin-right: 0 !important;
     margin-bottom: 10px;
   }
-  
+
   .log-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .log-time {
     order: 1;
   }
-  
+
   .log-source {
     order: 2;
   }
 }
 </style>
-

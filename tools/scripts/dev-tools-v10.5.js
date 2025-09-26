@@ -34,7 +34,7 @@ class DevToolsV10_5 {
    */
   checkEnvironment() {
     console.log('🔍 检查开发环境...');
-    
+
     const checks = [
       {
         name: 'Node.js版本',
@@ -97,7 +97,7 @@ class DevToolsV10_5 {
         } else {
           result = await check.check();
         }
-        
+
         if (result) {
           console.log(`✅ ${check.name}: 通过`);
         } else {
@@ -118,7 +118,7 @@ class DevToolsV10_5 {
    */
   async runMigration() {
     console.log('🚀 运行数据库迁移...');
-    
+
     try {
       const migrationScript = path.join(__dirname, 'migrate-database-v10.5.js');
       execSync(`node ${migrationScript} migrate`, { stdio: 'inherit' });
@@ -134,29 +134,29 @@ class DevToolsV10_5 {
    */
   runTests() {
     console.log('🧪 运行测试套件...');
-    
+
     try {
       // 运行单元测试
       console.log('📝 运行单元测试...');
-      execSync('npm test -- --testPathPattern=unit', { 
+      execSync('npm test -- --testPathPattern=unit', {
         stdio: 'inherit',
-        cwd: this.projectRoot 
+        cwd: this.projectRoot
       });
-      
+
       // 运行集成测试
       console.log('🔗 运行集成测试...');
-      execSync('npm test -- --testPathPattern=integration', { 
+      execSync('npm test -- --testPathPattern=integration', {
         stdio: 'inherit',
-        cwd: this.projectRoot 
+        cwd: this.projectRoot
       });
-      
+
       // 运行双脑分析测试
       console.log('🧠 运行双脑分析测试...');
-      execSync('npm test -- --testPathPattern=dual-brain', { 
+      execSync('npm test -- --testPathPattern=dual-brain', {
         stdio: 'inherit',
-        cwd: this.projectRoot 
+        cwd: this.projectRoot
       });
-      
+
       console.log('✅ 所有测试通过');
     } catch (error) {
       console.error('❌ 测试失败:', error.message);
@@ -169,7 +169,7 @@ class DevToolsV10_5 {
    */
   startDevServers() {
     console.log('🚀 启动开发服务器...');
-    
+
     try {
       // 启动后端服务
       console.log('🔧 启动后端服务...');
@@ -178,7 +178,7 @@ class DevToolsV10_5 {
         stdio: 'pipe',
         detached: true
       });
-      
+
       // 启动前端服务
       console.log('🎨 启动前端服务...');
       const frontendProcess = execSync('npm run dev', {
@@ -186,11 +186,11 @@ class DevToolsV10_5 {
         stdio: 'pipe',
         detached: true
       });
-      
+
       console.log('✅ 开发服务器启动完成');
       console.log('📱 前端地址: http://localhost:3000');
       console.log('🔧 后端地址: http://localhost:8000');
-      
+
     } catch (error) {
       console.error('❌ 启动开发服务器失败:', error.message);
       throw error;
@@ -202,10 +202,10 @@ class DevToolsV10_5 {
    */
   generateAPIDocs() {
     console.log('📚 生成API文档...');
-    
+
     try {
       const apiDocPath = path.join(this.projectRoot, 'docs/api-docs-v10.5.md');
-      
+
       const apiDocs = `# API文档 - v10.5双脑分治架构
 
 ## 双脑分析API
@@ -275,7 +275,7 @@ GET /api/dual-brain/performance
 
       fs.writeFileSync(apiDocPath, apiDocs);
       console.log('✅ API文档生成完成:', apiDocPath);
-      
+
     } catch (error) {
       console.error('❌ 生成API文档失败:', error.message);
       throw error;
@@ -287,7 +287,7 @@ GET /api/dual-brain/performance
    */
   async monitorPerformance() {
     console.log('📊 启动性能监控...');
-    
+
     try {
       // 检查数据库性能
       const mysql = await import('mysql2/promise');
@@ -305,10 +305,10 @@ GET /api/dual-brain/performance
 
       // 获取表大小
       const [tables] = await connection.execute(`
-        SELECT 
+        SELECT
           table_name,
           ROUND(((data_length + index_length) / 1024 / 1024), 2) AS 'Size (MB)'
-        FROM information_schema.TABLES 
+        FROM information_schema.TABLES
         WHERE table_schema = '${this.config.database.database}'
         ORDER BY (data_length + index_length) DESC
       `);
@@ -320,7 +320,7 @@ GET /api/dual-brain/performance
 
       await connection.end();
       console.log('✅ 性能监控完成');
-      
+
     } catch (error) {
       console.error('❌ 性能监控失败:', error.message);
       throw error;
@@ -332,7 +332,7 @@ GET /api/dual-brain/performance
    */
   cleanup() {
     console.log('🧹 清理开发环境...');
-    
+
     try {
       // 清理临时文件
       const tempDirs = ['node_modules/.cache', 'dist', 'build'];
@@ -355,7 +355,7 @@ GET /api/dual-brain/performance
       });
 
       console.log('✅ 环境清理完成');
-      
+
     } catch (error) {
       console.error('❌ 环境清理失败:', error.message);
       throw error;

@@ -1,7 +1,7 @@
 /**
  * 数据一致性检查服务
  * 检查三级体系数据的一致性和完整性
- * 
+ *
  * 作者: AI Assistant
  * 创建时间: 2025-01-17
  * 版本: 1.0
@@ -14,7 +14,7 @@ import { SimpleMonitor } from './SimpleMonitor';
 // 类型定义
 interface ConsistencyIssue {
   id: string;
-  type: 'orphaned_secondary_index' | 'orphaned_leading_stock' | 'invalid_etf_mapping' | 
+  type: 'orphaned_secondary_index' | 'orphaned_leading_stock' | 'invalid_etf_mapping' |
         'invalid_news_index_relation' | 'invalid_news_stock_relation' | 'missing_primary_index' |
         'duplicate_mapping' | 'invalid_confidence_score' | 'missing_relation_type';
   severity: 'low' | 'medium' | 'high' | 'critical';
@@ -146,7 +146,7 @@ export class SimpleDataConsistencyChecker {
       `;
 
       const results = await this.db.query(query);
-      
+
       for (const row of results) {
         issues.push({
           id: `orphaned_secondary_${row.index_code}`,
@@ -182,7 +182,7 @@ export class SimpleDataConsistencyChecker {
       `;
 
       const results = await this.db.query(query);
-      
+
       for (const row of results) {
         issues.push({
           id: `orphaned_stock_${row.stock_code}`,
@@ -219,7 +219,7 @@ export class SimpleDataConsistencyChecker {
       `;
 
       const results = await this.db.query(query);
-      
+
       for (const row of results) {
         issues.push({
           id: `invalid_etf_mapping_${row.etf_code}_${row.index_code}`,
@@ -256,7 +256,7 @@ export class SimpleDataConsistencyChecker {
       `;
 
       const results = await this.db.query(query);
-      
+
       for (const row of results) {
         issues.push({
           id: `invalid_news_index_${row.news_id}_${row.index_code}`,
@@ -292,7 +292,7 @@ export class SimpleDataConsistencyChecker {
       `;
 
       const results = await this.db.query(query);
-      
+
       for (const row of results) {
         issues.push({
           id: `invalid_news_stock_${row.news_id}_${row.stock_code}`,
@@ -329,7 +329,7 @@ export class SimpleDataConsistencyChecker {
       `;
 
       const results = await this.db.query(query);
-      
+
       for (const row of results) {
         issues.push({
           id: `missing_primary_index_${row.primary_index_code}`,
@@ -366,7 +366,7 @@ export class SimpleDataConsistencyChecker {
       `;
 
       const etfResults = await this.db.query(etfQuery);
-      
+
       for (const row of etfResults) {
         issues.push({
           id: `duplicate_etf_mapping_${row.etf_code}_${row.index_code}`,
@@ -402,7 +402,7 @@ export class SimpleDataConsistencyChecker {
       `;
 
       const newsIndexResults = await this.db.query(newsIndexQuery);
-      
+
       for (const row of newsIndexResults) {
         issues.push({
           id: `invalid_confidence_news_index_${row.news_id}_${row.index_code}`,
@@ -424,7 +424,7 @@ export class SimpleDataConsistencyChecker {
       `;
 
       const newsStockResults = await this.db.query(newsStockQuery);
-      
+
       for (const row of newsStockResults) {
         issues.push({
           id: `invalid_confidence_news_stock_${row.news_id}_${row.stock_code}`,
@@ -460,7 +460,7 @@ export class SimpleDataConsistencyChecker {
       `;
 
       const newsIndexResults = await this.db.query(newsIndexQuery);
-      
+
       for (const row of newsIndexResults) {
         issues.push({
           id: `missing_relation_type_news_index_${row.news_id}_${row.index_code}`,
@@ -482,7 +482,7 @@ export class SimpleDataConsistencyChecker {
       `;
 
       const newsStockResults = await this.db.query(newsStockQuery);
-      
+
       for (const row of newsStockResults) {
         issues.push({
           id: `missing_relation_type_news_stock_${row.news_id}_${row.stock_code}`,
@@ -520,7 +520,7 @@ export class SimpleDataConsistencyChecker {
     for (const issue of autoFixableIssues) {
       try {
         const success = await this.fixIssue(issue);
-        
+
         if (success) {
           fixResult.fixedIssues++;
           fixResult.details.push({
@@ -620,10 +620,10 @@ export class SimpleDataConsistencyChecker {
   private async fixDuplicateMapping(issue: ConsistencyIssue): Promise<boolean> {
     const record = issue.affectedRecords[0];
     const query = `
-      DELETE FROM etf_index_mapping 
-      WHERE etf_code = ? AND index_code = ? 
+      DELETE FROM etf_index_mapping
+      WHERE etf_code = ? AND index_code = ?
       AND id NOT IN (
-        SELECT MIN(id) FROM etf_index_mapping 
+        SELECT MIN(id) FROM etf_index_mapping
         WHERE etf_code = ? AND index_code = ?
       )
     `;
@@ -637,7 +637,7 @@ export class SimpleDataConsistencyChecker {
   private async fixInvalidConfidenceScore(issue: ConsistencyIssue): Promise<boolean> {
     const record = issue.affectedRecords[0];
     const fixedScore = Math.max(0, Math.min(1, record.confidence_score));
-    
+
     if (issue.id.includes('news_index')) {
       const query = `UPDATE news_index_relations SET confidence_score = ? WHERE news_id = ? AND index_code = ?`;
       await this.db.query(query, [fixedScore, record.news_id, record.index_code]);
@@ -645,7 +645,7 @@ export class SimpleDataConsistencyChecker {
       const query = `UPDATE news_stock_relations SET confidence_score = ? WHERE news_id = ? AND stock_code = ?`;
       await this.db.query(query, [fixedScore, record.news_id, record.stock_code]);
     }
-    
+
     return true;
   }
 
@@ -655,7 +655,7 @@ export class SimpleDataConsistencyChecker {
   private async fixMissingRelationType(issue: ConsistencyIssue): Promise<boolean> {
     const record = issue.affectedRecords[0];
     const defaultType = issue.id.includes('news_index') ? 'indirect' : 'company';
-    
+
     if (issue.id.includes('news_index')) {
       const query = `UPDATE news_index_relations SET relation_type = ? WHERE news_id = ? AND index_code = ?`;
       await this.db.query(query, [defaultType, record.news_id, record.index_code]);
@@ -663,7 +663,7 @@ export class SimpleDataConsistencyChecker {
       const query = `UPDATE news_stock_relations SET relation_type = ? WHERE news_id = ? AND stock_code = ?`;
       await this.db.query(query, [defaultType, record.news_id, record.stock_code]);
     }
-    
+
     return true;
   }
 

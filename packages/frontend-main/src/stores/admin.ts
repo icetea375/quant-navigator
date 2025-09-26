@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { adminApi } from '@/services/admin'
-import type { 
-  SystemStatus, 
-  DataPipelineStatus, 
-  AIEngineStatus, 
-  SystemConfig, 
-  LogEntry 
+import type {
+  SystemStatus,
+  DataPipelineStatus,
+  AIEngineStatus,
+  SystemConfig,
+  LogEntry
 } from '@/types/api'
 
 export const useAdminStore = defineStore('admin', () => {
@@ -16,7 +16,7 @@ export const useAdminStore = defineStore('admin', () => {
   const aiEnginesStatus = ref<AIEngineStatus[]>([])
   const systemConfig = ref<SystemConfig | null>(null)
   const logs = ref<LogEntry[]>([])
-  
+
   // 加载状态
   const loading = ref({
     systemStatus: false,
@@ -34,8 +34,8 @@ export const useAdminStore = defineStore('admin', () => {
   // 计算属性
   const isSystemHealthy = computed(() => {
     if (!systemStatus.value) return false
-    return systemStatus.value.isRunning && 
-           systemStatus.value.errorCount === 0 && 
+    return systemStatus.value.isRunning &&
+           systemStatus.value.errorCount === 0 &&
            systemStatus.value.cpuUsage < 80 &&
            systemStatus.value.memoryUsage < 85
   })
@@ -349,7 +349,7 @@ export const useAdminStore = defineStore('admin', () => {
       loadSystemConfig(),
       loadLogs(),
     ]
-    
+
     try {
       await Promise.allSettled(promises)
     } catch (error) {
@@ -366,46 +366,46 @@ export const useAdminStore = defineStore('admin', () => {
     logs,
     loading,
     pagination,
-    
+
     // 计算属性
     isSystemHealthy,
     criticalIssues,
-    
+
     // 系统状态方法
     loadSystemStatus,
     updateSystemStatus,
     restartSystem,
     stopSystem,
     getHealthCheck,
-    
+
     // 数据管道方法
     loadDataPipelineStatus,
     startDataPipeline,
     stopDataPipeline,
     restartDataPipeline,
     getPipelineMetrics,
-    
+
     // AI引擎方法
     loadAIEnginesStatus,
     startAIEngine,
     stopAIEngine,
     restartAIEngine,
     getEngineMetrics,
-    
+
     // 配置管理方法
     loadSystemConfig,
     updateSystemConfig,
     resetSystemConfig,
     exportConfig,
     importConfig,
-    
+
     // 日志管理方法
     loadLogs,
     searchLogs,
     clearLogs,
     exportLogs,
     getLogStats,
-    
+
     // 工具方法
     refreshAllData,
   }

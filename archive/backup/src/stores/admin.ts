@@ -50,7 +50,7 @@ export const useAdminStore = defineStore('admin', () => {
     badReviews: 0,
     averageRating: 0
   })
-  
+
   const currentFilters = ref<any>({})
   const pagination = ref({
     page: 1,
@@ -71,7 +71,7 @@ export const useAdminStore = defineStore('admin', () => {
     try {
       currentFilters.value = { ...filters }
       pagination.value.page = 1
-      
+
       const params = new URLSearchParams({
         ...filters,
         limit: pagination.value.limit.toString(),
@@ -90,7 +90,7 @@ export const useAdminStore = defineStore('admin', () => {
       }
 
       const data = await response.json()
-      
+
       if (data.success) {
         reports.value = data.data.reports
         pagination.value.total = data.data.total
@@ -108,7 +108,7 @@ export const useAdminStore = defineStore('admin', () => {
     try {
       const nextPage = pagination.value.page + 1
       const offset = (nextPage - 1) * pagination.value.limit
-      
+
       const params = new URLSearchParams({
         ...currentFilters.value,
         limit: pagination.value.limit.toString(),
@@ -127,7 +127,7 @@ export const useAdminStore = defineStore('admin', () => {
       }
 
       const data = await response.json()
-      
+
       if (data.success) {
         reports.value.push(...data.data.reports)
         pagination.value.page = nextPage
@@ -155,7 +155,7 @@ export const useAdminStore = defineStore('admin', () => {
       }
 
       const data = await response.json()
-      
+
       if (data.success) {
         selectedReport.value = data.data
       } else {
@@ -183,17 +183,17 @@ export const useAdminStore = defineStore('admin', () => {
       }
 
       const data = await response.json()
-      
+
       if (data.success) {
         // 更新本地状态
         const reportIndex = reports.value.findIndex(r => r.reportId === feedback.reportId)
         if (reportIndex !== -1) {
           reports.value[reportIndex].feedbackStatus = feedback.rating.toLowerCase()
         }
-        
+
         // 刷新统计
         await fetchStats()
-        
+
         return data.data
       } else {
         throw new Error(data.error || '提交反馈失败')
@@ -218,7 +218,7 @@ export const useAdminStore = defineStore('admin', () => {
       }
 
       const data = await response.json()
-      
+
       if (data.success) {
         stats.value = data.data
       } else {
@@ -256,11 +256,11 @@ export const useAdminStore = defineStore('admin', () => {
     stats,
     currentFilters,
     pagination,
-    
+
     // 计算属性
     pendingCount,
     accuracyRate,
-    
+
     // 方法
     fetchReports,
     loadMoreReports,

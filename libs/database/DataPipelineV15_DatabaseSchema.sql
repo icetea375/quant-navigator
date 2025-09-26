@@ -17,7 +17,7 @@ CREATE TABLE industry_classification (
     update_date DATE NOT NULL COMMENT '更新日期',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     INDEX idx_industry_code (industry_code),
     INDEX idx_level (level),
     INDEX idx_source (source),
@@ -38,14 +38,14 @@ CREATE TABLE industry_members (
     source ENUM('Shenwan', 'Citic') NOT NULL COMMENT '数据源',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     INDEX idx_industry_code (industry_code),
     INDEX idx_stock_code (stock_code),
     INDEX idx_is_current (is_current),
     INDEX idx_source (source),
     INDEX idx_in_date (in_date),
     UNIQUE KEY uk_industry_stock (industry_code, stock_code, in_date),
-    
+
     FOREIGN KEY (industry_code) REFERENCES industry_classification(industry_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='行业成分股表 - 存储股票与申万/中信行业的映射关系';
@@ -65,7 +65,7 @@ CREATE TABLE daily_concepts (
     hot_score DECIMAL(10,4) NULL COMMENT '热度评分',
     member_count INT DEFAULT 0 COMMENT '成分股数量',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     INDEX idx_trade_date (trade_date),
     INDEX idx_concept_code (concept_code),
     INDEX idx_source (source),
@@ -85,7 +85,7 @@ CREATE TABLE daily_concept_members (
     hot_rank INT NULL COMMENT '热度排名',
     source ENUM('THS', 'DC') NOT NULL COMMENT '数据源',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     INDEX idx_trade_date (trade_date),
     INDEX idx_concept_code (concept_code),
     INDEX idx_stock_code (stock_code),
@@ -113,7 +113,7 @@ CREATE TABLE index_daily_metrics (
     turnover_rate DECIMAL(10,4) NULL COMMENT '换手率',
     market_cap DECIMAL(20,4) NULL COMMENT '总市值',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     INDEX idx_ts_code (ts_code),
     INDEX idx_trade_date (trade_date),
     UNIQUE KEY uk_code_date (ts_code, trade_date)
@@ -136,7 +136,7 @@ CREATE TABLE market_daily_stats (
     limit_up_count INT DEFAULT 0 COMMENT '涨停家数',
     limit_down_count INT DEFAULT 0 COMMENT '跌停家数',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     INDEX idx_trade_date (trade_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='沪深市场每日交易统计表';
@@ -151,7 +151,7 @@ CREATE TABLE index_components (
     trade_date DATE NOT NULL COMMENT '交易日期',
     is_new BOOLEAN DEFAULT FALSE COMMENT '是否新纳入',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     INDEX idx_ts_code (ts_code),
     INDEX idx_stock_code (stock_code),
     INDEX idx_trade_date (trade_date),
@@ -178,7 +178,7 @@ CREATE TABLE long_form_news (
     related_stocks JSON NULL COMMENT '相关股票',
     related_concepts JSON NULL COMMENT '相关概念',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     INDEX idx_news_id (news_id),
     INDEX idx_publish_time (publish_time),
     INDEX idx_source (source),
@@ -201,7 +201,7 @@ CREATE TABLE news_broadcast (
     related_stocks JSON NULL COMMENT '相关股票',
     related_concepts JSON NULL COMMENT '相关概念',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     INDEX idx_broadcast_id (broadcast_id),
     INDEX idx_date (date),
     INDEX idx_importance_score (importance_score)
@@ -224,7 +224,7 @@ CREATE TABLE e_interaction (
     sentiment_score DECIMAL(5,2) DEFAULT 0 COMMENT '情感评分',
     related_concepts JSON NULL COMMENT '相关概念',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     INDEX idx_interaction_id (interaction_id),
     INDEX idx_stock_code (stock_code),
     INDEX idx_question_time (question_time),
@@ -242,7 +242,7 @@ COMMENT='e互动问答表';
 -- 注意：MySQL 8.0+ 支持，需要根据实际版本调整
 
 -- daily_concept_members 表按日期分区
--- ALTER TABLE daily_concept_members 
+-- ALTER TABLE daily_concept_members
 -- PARTITION BY RANGE (TO_DAYS(trade_date)) (
 --     PARTITION p202501 VALUES LESS THAN (TO_DAYS('2025-02-01')),
 --     PARTITION p202502 VALUES LESS THAN (TO_DAYS('2025-03-01')),
@@ -256,7 +256,7 @@ COMMENT='e互动问答表';
 
 -- QuantSignalEngine 数据源视图 (骨架)
 CREATE VIEW v_quant_signal_data AS
-SELECT 
+SELECT
     ic.industry_code,
     ic.industry_name,
     ic.level,
@@ -272,7 +272,7 @@ WHERE im.is_current = TRUE;
 
 -- HotspotIntelligenceEngine 数据源视图 (神经)
 CREATE VIEW v_hotspot_intelligence_data AS
-SELECT 
+SELECT
     dc.trade_date,
     dc.concept_code,
     dc.concept_name,
@@ -284,13 +284,13 @@ SELECT
     dcm.weight,
     dcm.hot_rank as member_hot_rank
 FROM daily_concepts dc
-LEFT JOIN daily_concept_members dcm ON dc.concept_code = dcm.concept_code 
+LEFT JOIN daily_concept_members dcm ON dc.concept_code = dcm.concept_code
     AND dc.trade_date = dcm.trade_date
 WHERE dc.trade_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY); -- 最近7天数据
 
 -- AI_Attribution_Core 数据源视图 (双重融合)
 CREATE VIEW v_attribution_data AS
-SELECT 
+SELECT
     -- 骨架数据
     ic.industry_code,
     ic.industry_name as industry_name,
@@ -298,31 +298,31 @@ SELECT
     im.stock_code,
     im.stock_name,
     im.weight as industry_weight,
-    
+
     -- 神经数据
     dc.concept_code,
     dc.concept_name,
     dc.hot_rank as concept_hot_rank,
     dc.hot_score as concept_hot_score,
     dcm.weight as concept_weight,
-    
+
     -- 文本数据
     lfn.title as news_title,
     lfn.importance_score as news_importance,
     lfn.sentiment_score as news_sentiment,
     lfn.related_concepts as news_concepts,
-    
+
     -- 市场数据
     mds.total_market_cap,
     mds.avg_pe,
     mds.limit_up_count,
     mds.limit_down_count
-    
+
 FROM industry_members im
 LEFT JOIN industry_classification ic ON im.industry_code = ic.industry_code
-LEFT JOIN daily_concept_members dcm ON im.stock_code = dcm.stock_code 
+LEFT JOIN daily_concept_members dcm ON im.stock_code = dcm.stock_code
     AND dcm.trade_date = CURDATE()
-LEFT JOIN daily_concepts dc ON dcm.concept_code = dc.concept_code 
+LEFT JOIN daily_concepts dc ON dcm.concept_code = dc.concept_code
     AND dcm.trade_date = dc.trade_date
 LEFT JOIN long_form_news lfn ON lfn.related_stocks LIKE CONCAT('%"', im.stock_code, '"%')
     AND DATE(lfn.publish_time) = CURDATE()
@@ -342,18 +342,18 @@ BEGIN
         ROLLBACK;
         RESIGNAL;
     END;
-    
+
     START TRANSACTION;
-    
+
     -- 删除30天前的概念数据
-    DELETE FROM daily_concepts 
+    DELETE FROM daily_concepts
     WHERE trade_date < DATE_SUB(CURDATE(), INTERVAL 30 DAY);
-    
-    DELETE FROM daily_concept_members 
+
+    DELETE FROM daily_concept_members
     WHERE trade_date < DATE_SUB(CURDATE(), INTERVAL 30 DAY);
-    
+
     COMMIT;
-    
+
     SELECT CONCAT('Cleaned concept data older than ', DATE_SUB(CURDATE(), INTERVAL 30 DAY)) as result;
 END //
 DELIMITER ;
@@ -367,16 +367,16 @@ BEGIN
         ROLLBACK;
         RESIGNAL;
     END;
-    
+
     START TRANSACTION;
-    
+
     -- 更新有剔除日期的成分股状态
-    UPDATE industry_members 
-    SET is_current = FALSE 
+    UPDATE industry_members
+    SET is_current = FALSE
     WHERE out_date IS NOT NULL AND out_date <= CURDATE();
-    
+
     COMMIT;
-    
+
     SELECT CONCAT('Updated industry member status at ', NOW()) as result;
 END //
 DELIMITER ;
@@ -391,14 +391,14 @@ CREATE TRIGGER tr_update_concept_member_count
 AFTER INSERT ON daily_concept_members
 FOR EACH ROW
 BEGIN
-    UPDATE daily_concepts 
+    UPDATE daily_concepts
     SET member_count = (
-        SELECT COUNT(*) 
-        FROM daily_concept_members 
-        WHERE concept_code = NEW.concept_code 
+        SELECT COUNT(*)
+        FROM daily_concept_members
+        WHERE concept_code = NEW.concept_code
         AND trade_date = NEW.trade_date
     )
-    WHERE concept_code = NEW.concept_code 
+    WHERE concept_code = NEW.concept_code
     AND trade_date = NEW.trade_date;
 END //
 DELIMITER ;
@@ -423,7 +423,7 @@ DELIMITER ;
 
 -- 从现有表迁移数据到新表结构
 -- INSERT INTO industry_classification (industry_code, industry_name, level, parent_code, source, update_date)
--- SELECT DISTINCT 
+-- SELECT DISTINCT
 --     industry_code,
 --     industry_name,
 --     'L2' as level,

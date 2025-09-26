@@ -172,7 +172,7 @@ export class ConfigController {
     try {
       this.logger.log('Getting config statistics');
       const configs = await this.configService.getAllConfigs();
-      
+
       const stats = {
         total: configs.length,
         byType: {},

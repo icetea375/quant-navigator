@@ -85,7 +85,7 @@ export interface FinancialSnapshot {
   reportPeriod: string;
   fiscalYear: number;
   status: string;
-  
+
   // 核心财务指标
   revenue: number;
   revenueGrowthRate: number;
@@ -97,23 +97,23 @@ export interface FinancialSnapshot {
   rdExpenses: number;
   rdRatio: number;
   contractLiabilities: number;
-  
+
   // 资产负债指标
   totalAssets: number;
   totalLiabilities: number;
   netAssets: number;
   debtToAssetRatio: number;
-  
+
   // 盈利能力指标
   roe: number;
   roa: number;
   eps: number;
   bookValuePerShare: number;
-  
+
   // 成长性指标
   revenueCagr3y: number;
   profitCagr3y: number;
-  
+
   // 数据质量
   dataCompletenessScore: number;
   dataSource: string;
@@ -127,36 +127,36 @@ export interface QuantSignalsData {
   signalDate: string;
   signalType: string;
   status: string;
-  
+
   // 个股信号
   returnZScore: number;
   volumeZScore: number;
   momentumZScore: number;
   volatilityZScore: number;
-  
+
   // 市场背景信号
   macroRiskZScore: number;
   marketStyleZScore: number;
   industryRotationZScore: number;
   conceptZScore: number;
-  
+
   // 管理层可信度因子
   mdaFulfillmentRate: number;
   managementCredibilityScore: number;
   disclosureQualityScore: number;
   financialTransparencyScore: number;
-  
+
   // 技术分析信号
   rsi: number;
   macdSignal: number;
   bollingerPosition: number;
   maSignal: number;
-  
+
   // 综合评分
   overallSignalStrength: number;
   signalConfidence: number;
   validityDays: number;
-  
+
   // 元数据
   modelVersion: string;
   calculationParams: object;
@@ -197,7 +197,7 @@ export interface FlowAndChipsData {
     dataUpdatedAt: string;
     metadata?: object;
   };
-  
+
   // 龙虎榜数据
   topList: {
     listId: string;
@@ -230,7 +230,7 @@ export interface FlowAndChipsData {
     dataUpdatedAt: string;
     metadata?: object;
   }[];
-  
+
   // 筹码分布数据
   chipDistribution: {
     distributionId: string;

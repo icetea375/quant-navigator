@@ -37,7 +37,7 @@ export enum FeedbackStatus {
 export class HumanFeedbackLoop {
     // 添加索引签名以支持动态属性访问
     [key: string]: any;
-    
+
     @PrimaryGeneratedColumn('uuid')
     feedback_id: string;
 
@@ -400,7 +400,7 @@ export class HumanFeedbackLoop {
         this.status = FeedbackStatus.PENDING;
         // 设置默认优先级
         this.priority = 1;
-        
+
         // 初始化所有必填字段
         this.feedback_id = '';
         this.feedback_type = FeedbackType.ARBITRATION;
@@ -413,7 +413,7 @@ export class HumanFeedbackLoop {
         this.used_for_training = false;
         this.created_at = new Date();
         this.updated_at = new Date();
-        
+
         // 初始化所有可为空字段
         this.report_id = null;
         this.stock_code = null;

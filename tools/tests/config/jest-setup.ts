@@ -45,16 +45,16 @@ global.testUtils = {
         ...overrides
       }
     };
-    
+
     return baseData[type] || overrides;
   },
-  
+
   // 等待异步操作
   waitFor: (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
-  
+
   // 创建Mock函数
   createMock: (implementation?: any) => jest.fn(implementation),
-  
+
   // 创建Mock对象
   createMockObject: (methods: string[]) => {
     const mockObj: any = {};

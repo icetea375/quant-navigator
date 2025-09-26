@@ -85,16 +85,16 @@ export class MonitoringSystem {
 
     try {
       logger.info('Starting monitoring system...');
-      
+
       // 初始化数据库表
       await this.initializeDatabase();
-      
+
       // 加载告警规则
       await this.loadAlertRules();
-      
+
       // 启动定期任务
       this.startPeriodicTasks();
-      
+
       this.isRunning = true;
       logger.info('Monitoring system started successfully');
     } catch (error) {
@@ -128,12 +128,12 @@ export class MonitoringSystem {
     if (!this.metrics.has(metric.name)) {
       this.metrics.set(metric.name, []);
     }
-    
+
     this.metrics.get(metric.name)!.push(metric);
-    
+
     // 检查告警规则
     this.checkAlertRules(metric);
-    
+
     logger.debug(`Metric recorded: ${metric.name} = ${metric.value}`);
   }
 
@@ -181,7 +181,7 @@ export class MonitoringSystem {
    */
   public updateServiceHealth(serviceName: string, health: ServiceHealth): void {
     this.healthChecks.set(serviceName, health);
-    
+
     // 记录健康指标
     this.setGauge('service_health', health.status === 'healthy' ? 1 : 0, { service: serviceName });
     this.setGauge('service_response_time', health.metrics.responseTime, { service: serviceName });
@@ -209,17 +209,17 @@ export class MonitoringSystem {
   public getMetrics(name?: string, timeRange?: { start: number; end: number }): MetricData[] {
     if (name) {
       const metrics = this.metrics.get(name) || [];
-      return timeRange ? 
+      return timeRange ?
         metrics.filter(m => m.timestamp >= timeRange.start && m.timestamp <= timeRange.end) :
         metrics;
     }
-    
+
     const allMetrics: MetricData[] = [];
     for (const metrics of this.metrics.values()) {
       allMetrics.push(...metrics);
     }
-    
-    return timeRange ? 
+
+    return timeRange ?
       allMetrics.filter(m => m.timestamp >= timeRange.start && m.timestamp <= timeRange.end) :
       allMetrics;
   }
@@ -238,12 +238,12 @@ export class MonitoringSystem {
   private checkAlertRules(metric: MetricData): void {
     for (const rule of this.alertRules.values()) {
       if (!rule.enabled) continue;
-      
+
       // 检查冷却期
       if (rule.lastTriggered && Date.now() - rule.lastTriggered < rule.cooldown * 1000) {
         continue;
       }
-      
+
       // 检查条件
       if (this.evaluateCondition(rule.condition, metric)) {
         this.triggerAlert(rule, metric);
@@ -258,15 +258,15 @@ export class MonitoringSystem {
     // 简单的条件评估，实际项目中可以使用更复杂的表达式引擎
     const conditions = condition.split(' ');
     if (conditions.length !== 3) return false;
-    
+
     const [field, operator, threshold] = conditions;
     const value = field === 'value' ? metric.value : metric.tags[field];
-    
+
     if (value === undefined) return false;
-    
+
     const numValue = parseFloat(value);
     const numThreshold = parseFloat(threshold);
-    
+
     switch (operator) {
       case '>': return numValue > numThreshold;
       case '>=': return numValue >= numThreshold;
@@ -291,12 +291,12 @@ export class MonitoringSystem {
       serviceName: metric.tags.service || 'unknown',
       resolved: false
     };
-    
+
     this.alerts.set(alert.id, alert);
     rule.lastTriggered = Date.now();
-    
+
     logger.warn(`Alert triggered: ${alert.message}`);
-    
+
     // 这里可以添加告警通知逻辑，如发送邮件、短信等
   }
 
@@ -336,7 +336,7 @@ export class MonitoringSystem {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    
+
     // 创建告警表
     await this.db.query(`
       CREATE TABLE IF NOT EXISTS alerts (
@@ -378,7 +378,7 @@ export class MonitoringSystem {
         cooldown: 600
       }
     ];
-    
+
     for (const rule of defaultRules) {
       this.alertRules.set(rule.id, rule);
     }
@@ -392,7 +392,7 @@ export class MonitoringSystem {
     setInterval(async () => {
       await this.saveMetricsToDatabase();
     }, 5 * 60 * 1000);
-    
+
     // 每1分钟检查服务健康状态
     setInterval(async () => {
       await this.checkServiceHealth();
@@ -406,19 +406,19 @@ export class MonitoringSystem {
     try {
       const allMetrics = this.getMetrics();
       if (allMetrics.length === 0) return;
-      
-      const values = allMetrics.map(metric => 
+
+      const values = allMetrics.map(metric =>
         `('${metric.name}', ${metric.value}, ${metric.timestamp}, '${JSON.stringify(metric.tags)}', '${metric.type}')`
       ).join(',');
-      
+
       await this.db.query(`
-        INSERT INTO metrics (name, value, timestamp, tags, type) 
+        INSERT INTO metrics (name, value, timestamp, tags, type)
         VALUES ${values}
       `);
-      
+
       // 清空内存中的指标
       this.metrics.clear();
-      
+
       logger.debug(`Saved ${allMetrics.length} metrics to database`);
     } catch (error) {
       logger.error('Failed to save metrics to database:', error);

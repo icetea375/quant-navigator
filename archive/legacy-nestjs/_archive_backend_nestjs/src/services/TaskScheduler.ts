@@ -76,7 +76,7 @@ export class TaskScheduler {
     this.maxConcurrentTasks = 5;
     this.isRunning = false;
     this.taskProcessors = new Map();
-    
+
     this.startHealthChecks();
     this.startCleanup();
   }
@@ -86,19 +86,19 @@ export class TaskScheduler {
    */
   public async addTask(task: Omit<AnalysisTask, 'taskId' | 'status' | 'createdAt' | 'retryCount' | 'metadata'>): Promise<string> {
     const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-    
+
     // 获取轮数配置
     const roundRecommendation = this.getRoundRecommendation(task);
-    
+
     // 选择LLM策略
     const llmStrategy = this.selectLLMStrategy(roundRecommendation.recommendedRounds, task.taskType);
-    
+
     // 估算成本
     const estimatedCost = this.estimateCostForTask(task, roundRecommendation.recommendedRounds);
-    
+
     // 获取工具配置
     const tools = getToolsForTaskType(task.taskType);
-    
+
     const fullTask: AnalysisTask = {
       ...task,
       taskId,
@@ -125,12 +125,12 @@ export class TaskScheduler {
 
     // 根据优先级插入队列
     this.insertTaskByPriority(fullTask);
-    
+
     console.log(`📋 任务已添加到队列: ${taskId} (${task.taskType}, 优先级: ${task.priority})`);
-    
+
     // 启动任务处理
     this.processTasks();
-    
+
     return taskId;
   }
 
@@ -140,10 +140,10 @@ export class TaskScheduler {
   private getRoundRecommendation(task: Omit<AnalysisTask, 'taskId' | 'status' | 'createdAt' | 'retryCount' | 'metadata'>): TaskRoundRecommendation {
     // 根据优先级确定质量要求
     const qualityRequirement = this.getQualityRequirementFromPriority(task.priority);
-    
+
     // 根据数据源确定成本约束
     const costConstraint = this.getCostConstraintFromDataSource(task.dataSource);
-    
+
     return roundConfigManager.getRecommendedRounds(
       task.taskType,
       qualityRequirement,
@@ -194,9 +194,9 @@ export class TaskScheduler {
   private insertTaskByPriority(task: AnalysisTask): void {
     const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
     const taskPriority = priorityOrder[task.priority];
-    
+
     let insertIndex = this.taskQueue.pending.length;
-    
+
     for (let i = 0; i < this.taskQueue.pending.length; i++) {
       const existingPriority = priorityOrder[this.taskQueue.pending[i].priority];
       if (taskPriority < existingPriority) {
@@ -204,7 +204,7 @@ export class TaskScheduler {
         break;
       }
     }
-    
+
     this.taskQueue.pending.splice(insertIndex, 0, task);
   }
 
@@ -248,7 +248,7 @@ export class TaskScheduler {
 
       // 执行任务
       const result = await processor(task);
-      
+
       // 任务完成
       task.status = 'completed';
       task.completedAt = Date.now();
@@ -256,12 +256,12 @@ export class TaskScheduler {
 
       // 移动到完成队列
       this.moveTaskToCompleted(task);
-      
+
       console.log(`✅ 任务完成: ${task.taskId} (耗时: ${task.completedAt - task.startedAt!}ms)`);
 
     } catch (error) {
       console.error(`❌ 任务执行失败: ${task.taskId}`, error);
-      
+
       // 重试逻辑
       if (task.retryCount < task.maxRetries) {
         task.retryCount++;
@@ -301,7 +301,7 @@ export class TaskScheduler {
    */
   private moveTaskToCompleted(task: AnalysisTask): void {
     this.taskQueue.completed.push(task);
-    
+
     // 限制完成队列大小
     if (this.taskQueue.completed.length > 1000) {
       this.taskQueue.completed.shift();
@@ -313,7 +313,7 @@ export class TaskScheduler {
    */
   private moveTaskToFailed(task: AnalysisTask): void {
     this.taskQueue.failed.push(task);
-    
+
     // 限制失败队列大小
     if (this.taskQueue.failed.length > 100) {
       this.taskQueue.failed.shift();
@@ -330,7 +330,7 @@ export class TaskScheduler {
       ...this.taskQueue.completed,
       ...this.taskQueue.failed
     ];
-    
+
     return allTasks.find(task => task.taskId === taskId) || null;
   }
 
@@ -349,9 +349,9 @@ export class TaskScheduler {
       running: this.taskQueue.running.length,
       completed: this.taskQueue.completed.length,
       failed: this.taskQueue.failed.length,
-      total: this.taskQueue.pending.length + 
-             this.taskQueue.running.length + 
-             this.taskQueue.completed.length + 
+      total: this.taskQueue.pending.length +
+             this.taskQueue.running.length +
+             this.taskQueue.completed.length +
              this.taskQueue.failed.length
     };
   }
@@ -361,17 +361,17 @@ export class TaskScheduler {
    */
   public cleanupExpiredTasks(maxAge: number = 24 * 60 * 60 * 1000): void {
     const now = Date.now();
-    
+
     // 清理完成的任务
     this.taskQueue.completed = this.taskQueue.completed.filter(
       task => now - task.completedAt! < maxAge
     );
-    
+
     // 清理失败的任务
     this.taskQueue.failed = this.taskQueue.failed.filter(
       task => now - task.completedAt! < maxAge
     );
-    
+
     console.log('🧹 清理过期任务完成');
   }
 
@@ -421,7 +421,7 @@ export class TaskScheduler {
       'timeline_build': 180000,
       'model_adjustment': 150000
     };
-    
+
     const base = baseTime[taskType as keyof typeof baseTime] || 150000;
     return Math.round(base * rounds);
   }
@@ -463,7 +463,7 @@ export class TaskScheduler {
       rounds,
       'medium'
     );
-    
+
     return estimation.cost;
   }
 
@@ -499,7 +499,7 @@ export class TaskScheduler {
 
     // 检查是否有长时间运行的任务
     const now = Date.now();
-    const longRunningTasks = this.taskQueue.running.filter(task => 
+    const longRunningTasks = this.taskQueue.running.filter(task =>
       task.startedAt && (now - task.startedAt) > 300000 // 5分钟
     );
 
@@ -539,7 +539,7 @@ export class TaskScheduler {
   getDetailedMetrics(): any {
     const stats = this.getQueueStats();
     const healthStatus = this.getHealthStatus();
-    
+
     return {
       timestamp: Date.now(),
       queue: stats,
@@ -574,10 +574,10 @@ export class TaskScheduler {
     if (maxTasks <= 0) {
       throw new Error('maxConcurrentTasks must be positive');
     }
-    
+
     this.maxConcurrentTasks = maxTasks;
     console.log(`🔧 最大并发任务数调整为: ${maxTasks}`);
-    
+
     // 如果当前运行的任务数超过新的限制，停止处理新任务
     if (this.taskQueue.running.length >= maxTasks) {
       this.isRunning = true;
@@ -635,7 +635,7 @@ export class TaskScheduler {
 
     // 添加到待处理队列
     this.insertTaskByPriority(task);
-    
+
     console.log(`🔄 失败任务已重启: ${taskId}`);
     return true;
   }
@@ -648,12 +648,12 @@ export class TaskScheduler {
       clearInterval(this.healthCheckInterval);
       this.healthCheckInterval = null;
     }
-    
+
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
     }
-    
+
     this.isRunning = false;
     console.log('🛑 任务调度器已销毁');
   }

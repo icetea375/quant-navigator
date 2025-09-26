@@ -6,13 +6,13 @@
         <el-tag type="success" size="small">实时更新</el-tag>
       </div>
     </template>
-    
+
     <div class="briefing-content">
       <div class="summary-section">
         <h4>今日市场概览</h4>
         <p class="summary-text">{{ briefing.summary || '正在加载市场数据...' }}</p>
       </div>
-      
+
       <div class="stats-grid">
         <div class="stat-item">
           <div class="stat-value">{{ briefing.events?.length || 0 }}</div>
@@ -31,7 +31,7 @@
           <div class="stat-label">正面影响</div>
         </div>
       </div>
-      
+
       <div class="update-time">
         <el-icon><Clock /></el-icon>
         <span>最后更新: {{ formatTime(briefing.date) }}</span>
@@ -161,10 +161,9 @@ onMounted(() => {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .stat-value {
     font-size: 24px;
   }
 }
 </style>
-

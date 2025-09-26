@@ -39,7 +39,7 @@ class TestDataPipelineRealDatabaseIntegration:
     def setup_test_tables(self, test_db_connection):
         """创建测试表"""
         cursor = test_db_connection.cursor()
-        
+
         # 创建财务因子表
         cursor.execute("""
             CREATE TABLE financial_factors (
@@ -70,7 +70,7 @@ class TestDataPipelineRealDatabaseIntegration:
                 UNIQUE(stock_code, trade_date)
             )
         """)
-        
+
         # 创建超级财务因子表
         cursor.execute("""
             CREATE TABLE super_financial_factors (
@@ -107,7 +107,7 @@ class TestDataPipelineRealDatabaseIntegration:
                 UNIQUE(stock_code, trade_date)
             )
         """)
-        
+
         test_db_connection.commit()
 
     @pytest.fixture
@@ -197,9 +197,9 @@ class TestDataPipelineRealDatabaseIntegration:
         """真实保存财务因子到数据库"""
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        
+
         cursor.execute("""
-            INSERT OR REPLACE INTO financial_factors 
+            INSERT OR REPLACE INTO financial_factors
             (stock_code, trade_date, pe_ratio, pb_ratio, ps_ratio, dividend_yield,
              market_cap, turnover_rate, volume_ratio, float_market_cap, total_shares,
              float_shares, free_shares, open_price, high_price, low_price, close_price,
@@ -229,7 +229,7 @@ class TestDataPipelineRealDatabaseIntegration:
             financial_factors["volume"],
             financial_factors["amount"]
         ))
-        
+
         conn.commit()
         conn.close()
 
@@ -237,9 +237,9 @@ class TestDataPipelineRealDatabaseIntegration:
         """真实保存超级财务因子到数据库"""
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        
+
         cursor.execute("""
-            INSERT OR REPLACE INTO super_financial_factors 
+            INSERT OR REPLACE INTO super_financial_factors
             (stock_code, trade_date, pe_ratio, pb_ratio, ps_ratio, dividend_yield,
              market_cap, turnover_rate, volume_ratio, float_market_cap, total_shares,
              float_shares, free_shares, open_price, high_price, low_price, close_price,
@@ -277,7 +277,7 @@ class TestDataPipelineRealDatabaseIntegration:
             super_factors["overall_score"],
             super_factors["calculated_at"]
         ))
-        
+
         conn.commit()
         conn.close()
 
@@ -285,21 +285,21 @@ class TestDataPipelineRealDatabaseIntegration:
         """验证财务因子是否正确保存到数据库"""
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        
+
         cursor.execute("""
             SELECT stock_code, trade_date, pe_ratio, pb_ratio, ps_ratio, dividend_yield,
                    market_cap, turnover_rate, volume_ratio, float_market_cap, total_shares,
                    float_shares, free_shares, open_price, high_price, low_price, close_price,
                    pre_close, price_change, price_change_pct, volume, amount
-            FROM financial_factors 
+            FROM financial_factors
             WHERE stock_code = ? AND trade_date = ?
         """, (expected_data["stock_code"], expected_data["trade_date"]))
-        
+
         result = cursor.fetchone()
         conn.close()
-        
+
         assert result is not None, "财务因子数据未找到"
-        
+
         # 验证数据一致性
         assert result[0] == expected_data["stock_code"]
         assert result[1] == expected_data["trade_date"]
@@ -328,7 +328,7 @@ class TestDataPipelineRealDatabaseIntegration:
         """验证超级财务因子是否正确保存到数据库"""
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        
+
         cursor.execute("""
             SELECT stock_code, trade_date, pe_ratio, pb_ratio, ps_ratio, dividend_yield,
                    market_cap, turnover_rate, volume_ratio, float_market_cap, total_shares,
@@ -336,21 +336,21 @@ class TestDataPipelineRealDatabaseIntegration:
                    pre_close, price_change, price_change_pct, volume, amount,
                    value_score, growth_score, profitability_score, financial_health_score,
                    overall_score, calculated_at
-            FROM super_financial_factors 
+            FROM super_financial_factors
             WHERE stock_code = ? AND trade_date = ?
         """, (expected_data["stock_code"], expected_data["trade_date"]))
-        
+
         result = cursor.fetchone()
         conn.close()
-        
+
         assert result is not None, "超级财务因子数据未找到"
-        
+
         # 验证基础数据一致性
         assert result[0] == expected_data["stock_code"]
         assert result[1] == expected_data["trade_date"]
         assert result[2] == expected_data["pe_ratio"]
         assert result[3] == expected_data["pb_ratio"]
-        
+
         # 验证评分数据一致性
         assert result[22] == expected_data["value_score"]
         assert result[23] == expected_data["growth_score"]
@@ -365,7 +365,7 @@ class TestDataPipelineRealDatabaseIntegration:
         """测试将财务因子保存到真实数据库"""
         # 使用真实数据库保存
         self._save_financial_factors_to_db(data_pipeline_service.db_path, sample_financial_factors)
-        
+
         # 验证数据是否正确保存
         self._verify_financial_factors_in_db(data_pipeline_service.db_path, sample_financial_factors)
 
@@ -373,7 +373,7 @@ class TestDataPipelineRealDatabaseIntegration:
         """测试将超级财务因子保存到真实数据库"""
         # 使用真实数据库保存
         self._save_super_financial_factors_to_db(data_pipeline_service.db_path, sample_super_financial_factors)
-        
+
         # 验证数据是否正确保存
         self._verify_super_financial_factors_in_db(data_pipeline_service.db_path, sample_super_financial_factors)
 
@@ -381,68 +381,68 @@ class TestDataPipelineRealDatabaseIntegration:
         """测试数据库约束和唯一性"""
         # 第一次保存
         self._save_financial_factors_to_db(data_pipeline_service.db_path, sample_financial_factors)
-        
+
         # 修改数据后再次保存（应该更新而不是插入）
         modified_data = sample_financial_factors.copy()
         modified_data["pe_ratio"] = 20.0
         modified_data["pb_ratio"] = 3.0
-        
+
         self._save_financial_factors_to_db(data_pipeline_service.db_path, modified_data)
-        
+
         # 验证数据已更新
         self._verify_financial_factors_in_db(data_pipeline_service.db_path, modified_data)
-        
+
         # 验证只有一条记录
         conn = sqlite3.connect(data_pipeline_service.db_path)
         cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM financial_factors WHERE stock_code = ? AND trade_date = ?", 
+        cursor.execute("SELECT COUNT(*) FROM financial_factors WHERE stock_code = ? AND trade_date = ?",
                       (sample_financial_factors["stock_code"], sample_financial_factors["trade_date"]))
         count = cursor.fetchone()[0]
         conn.close()
-        
+
         assert count == 1, "应该只有一条记录，因为使用了UNIQUE约束"
 
     def test_database_transaction_rollback(self, data_pipeline_service, sample_financial_factors, setup_test_tables):
         """测试数据库事务回滚"""
         conn = sqlite3.connect(data_pipeline_service.db_path)
         cursor = conn.cursor()
-        
+
         try:
             # 开始事务
             cursor.execute("BEGIN TRANSACTION")
-            
+
             # 插入数据
             cursor.execute("""
-                INSERT INTO financial_factors 
+                INSERT INTO financial_factors
                 (stock_code, trade_date, pe_ratio, pb_ratio)
                 VALUES (?, ?, ?, ?)
             """, (sample_financial_factors["stock_code"], sample_financial_factors["trade_date"],
                   sample_financial_factors["pe_ratio"], sample_financial_factors["pb_ratio"]))
-            
+
             # 故意引发错误
             cursor.execute("INSERT INTO non_existent_table VALUES (1)")
-            
+
         except sqlite3.OperationalError:
             # 回滚事务
             cursor.execute("ROLLBACK")
             conn.close()
-            
+
             # 验证数据未保存
             conn = sqlite3.connect(data_pipeline_service.db_path)
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM financial_factors WHERE stock_code = ? AND trade_date = ?", 
+            cursor.execute("SELECT COUNT(*) FROM financial_factors WHERE stock_code = ? AND trade_date = ?",
                           (sample_financial_factors["stock_code"], sample_financial_factors["trade_date"]))
             count = cursor.fetchone()[0]
             conn.close()
-            
+
             assert count == 0, "事务回滚后数据应该未保存"
 
     def test_database_performance_with_multiple_records(self, data_pipeline_service, setup_test_tables):
         """测试数据库性能（多条记录）"""
         import time
-        
+
         start_time = time.time()
-        
+
         # 插入100条记录
         for i in range(100):
             data = {
@@ -470,17 +470,18 @@ class TestDataPipelineRealDatabaseIntegration:
                 "amount": 10000000 + i * 100000
             }
             self._save_financial_factors_to_db(data_pipeline_service.db_path, data)
-        
+
         end_time = time.time()
-        
+
         # 验证性能（100条记录应该在合理时间内完成）
         assert (end_time - start_time) < 5.0, f"插入100条记录耗时过长: {end_time - start_time:.3f}秒"
-        
+
         # 验证数据完整性
         conn = sqlite3.connect(data_pipeline_service.db_path)
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM financial_factors")
         count = cursor.fetchone()[0]
         conn.close()
-        
+
         assert count == 100, f"应该插入100条记录，实际插入{count}条"
+

@@ -12,9 +12,9 @@ export class BaseErrorHandler {
   static handle(error: unknown, context: string): void {
     // 将unknown类型转换为Error类型
     const errorObj = error instanceof Error ? error : new Error(String(error));
-    
+
     console.error(`[${context}] Error:`, errorObj.message);
-    
+
     // 根据错误类型进行不同处理
     if (errorObj.message.includes('timeout')) {
       // 超时错误处理

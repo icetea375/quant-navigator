@@ -26,7 +26,7 @@ export enum EventStatus {
 export class ProcessedEvents {
     // 添加索引签名以支持动态属性访问
     [key: string]: any;
-    
+
     @PrimaryGeneratedColumn('uuid')
     event_id: string;
 

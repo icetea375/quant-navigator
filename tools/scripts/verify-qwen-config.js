@@ -35,7 +35,7 @@ const configContent = fs.readFileSync(configPath, 'utf8');
 // 检查是否包含通义千问3个模型的配置
 const qwenModels = [
   'qwenMax',
-  'qwenPlus', 
+  'qwenPlus',
   'qwenFlash'
 ];
 

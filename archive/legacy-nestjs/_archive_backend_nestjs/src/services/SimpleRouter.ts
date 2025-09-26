@@ -97,7 +97,7 @@ export class SimpleRouter {
   async handleRequest(req: any, res: any): Promise<void> {
     const startTime = Date.now();
     const requestId = this.generateRequestId();
-    
+
     try {
       // 记录请求日志
       this.logger.info('Request received', {
@@ -111,7 +111,7 @@ export class SimpleRouter {
       // 查找路由
       const route = this.findRoute(req.path, req.method);
       if (!route) {
-        res.status(404).json({ 
+        res.status(404).json({
           error: 'Route not found',
           requestId,
           timestamp: new Date().toISOString()
@@ -123,7 +123,7 @@ export class SimpleRouter {
       if (route.auth) {
         const authResult = await this.checkAuthentication(req);
         if (!authResult.valid) {
-          res.status(401).json({ 
+          res.status(401).json({
             error: 'Unauthorized',
             message: authResult.message,
             requestId,
@@ -138,7 +138,7 @@ export class SimpleRouter {
       if (route.rateLimit) {
         const rateLimitResult = await this.checkRateLimit(req, route);
         if (!rateLimitResult.allowed) {
-          res.status(429).json({ 
+          res.status(429).json({
             error: 'Rate limit exceeded',
             retryAfter: rateLimitResult.retryAfter,
             requestId,
@@ -151,7 +151,7 @@ export class SimpleRouter {
       // 负载均衡选择上游
       const upstream = this.loadBalancer.selectUpstream(route.upstreams);
       if (!upstream) {
-        res.status(503).json({ 
+        res.status(503).json({
           error: 'Service unavailable',
           requestId,
           timestamp: new Date().toISOString()
@@ -161,7 +161,7 @@ export class SimpleRouter {
 
       // 转发请求
       const response = await this.forwardRequest(req, res, upstream, route);
-      
+
       // 记录响应日志
       const duration = Date.now() - startTime;
       this.logger.info('Request completed', {
@@ -176,7 +176,7 @@ export class SimpleRouter {
     } catch (error) {
       const duration = Date.now() - startTime;
       BaseErrorHandler.handle(error, 'SimpleRouter');
-      
+
       this.logger.error('Request failed', {
         requestId,
         method: req.method,
@@ -185,7 +185,7 @@ export class SimpleRouter {
         duration
       });
 
-      res.status(500).json({ 
+      res.status(500).json({
         error: 'Internal server error',
         requestId,
         timestamp: new Date().toISOString()
@@ -224,7 +224,7 @@ export class SimpleRouter {
   private async checkRateLimit(req: any, route: Route): Promise<{ allowed: boolean; retryAfter?: number }> {
     const clientId = this.getClientId(req);
     const limit = route.rateLimit || this.config.rateLimit.global;
-    
+
     return await this.rateLimiter.checkLimit(clientId, limit);
   }
 
@@ -253,7 +253,7 @@ export class SimpleRouter {
     const http = require('http');
     const https = require('https');
     const url = require('url');
-    
+
     const upstreamUrl = new url.URL(upstream);
     const isHttps = upstreamUrl.protocol === 'https:';
     const client = isHttps ? https : http;
@@ -276,7 +276,7 @@ export class SimpleRouter {
         Object.keys(proxyRes.headers).forEach(key => {
           res.setHeader(key, proxyRes.headers[key]);
         });
-        
+
         proxyRes.pipe(res);
         resolve(proxyRes);
       });
@@ -473,7 +473,7 @@ export class SimpleLoadBalancer {
   }
 
   selectUpstream(upstreams: string[]): string | null {
-    const healthyUpstreams = upstreams.filter(upstream => 
+    const healthyUpstreams = upstreams.filter(upstream =>
       this.upstreamHealth.get(upstream) !== false
     );
 
@@ -570,16 +570,16 @@ export class SimpleRateLimiter {
     try {
       const key = `rate_limit:${clientId}`;
       const current = await this.redis.incr(key);
-      
+
       if (current === 1) {
         await this.redis.expire(key, limit.window);
       }
-      
+
       if (current > limit.requests) {
         const ttl = await this.redis.ttl(key);
-        return { 
-          allowed: false, 
-          retryAfter: ttl > 0 ? ttl : limit.window 
+        return {
+          allowed: false,
+          retryAfter: ttl > 0 ? ttl : limit.window
         };
       }
 

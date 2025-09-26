@@ -1,0 +1,209 @@
+"""
+测试配置文件 - 量化导航仪后端测试"宪法"
+所有测试夹具(fixtures)和测试配置都在这里定义
+"""
+
+import asyncio
+import pytest
+import httpx
+from typing import AsyncGenerator, Generator
+from unittest.mock import Mock, AsyncMock
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from fastapi.testclient import TestClient
+
+# 导入应用
+from src.main import app
+from src.database.connection import get_db
+from src.core.config import settings
+
+
+@pytest.fixture(scope="session")
+def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
+    """创建事件循环"""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture
+def test_client() -> TestClient:
+    """FastAPI测试客户端"""
+    return TestClient(app)
+
+
+@pytest.fixture
+async def async_client() -> AsyncGenerator[httpx.AsyncClient, None]:
+    """异步HTTP客户端"""
+    async with httpx.AsyncClient(app=app, base_url="http://test") as client:
+        yield client
+
+
+@pytest.fixture
+def mock_database():
+    """模拟数据库"""
+    # 创建内存SQLite数据库用于测试
+    engine = create_engine("sqlite:///:memory:", echo=False)
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+    def override_get_db():
+        try:
+            db = TestingSessionLocal()
+            yield db
+        finally:
+            db.close()
+
+    app.dependency_overrides[get_db] = override_get_db
+    yield TestingSessionLocal
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def mock_llm_service():
+    """模拟LLM服务"""
+    mock = Mock()
+    mock.analyze_fact = AsyncMock(return_value={
+        "analysis": "测试分析结果",
+        "confidence": 0.85,
+        "reasoning": "测试推理过程"
+    })
+    mock.analyze_sentiment = AsyncMock(return_value={
+        "sentiment": "positive",
+        "score": 0.7,
+        "reasoning": "测试情感分析"
+    })
+    return mock
+
+
+@pytest.fixture
+def mock_data_pipeline():
+    """模拟数据管道"""
+    mock = Mock()
+    mock.fetch_market_data = AsyncMock(return_value=pd.DataFrame({
+        'date': ['2025-01-26'],
+        'symbol': ['000001.SZ'],
+        'close': [10.5],
+        'volume': [1000000]
+    }))
+    mock.process_news_data = AsyncMock(return_value=pd.DataFrame({
+        'date': ['2025-01-26'],
+        'title': ['测试新闻'],
+        'content': ['测试内容'],
+        'source': ['测试来源']
+    }))
+    return mock
+
+
+@pytest.fixture
+def sample_arbitration_case():
+    """示例仲裁案件数据"""
+    return {
+        "case_id": "test_case_001",
+        "report_type": "fact_analysis",
+        "target_code": "000001.SZ",
+        "qwen_analysis": {
+            "analysis": "Qwen分析结果",
+            "confidence": 0.8,
+            "reasoning": "Qwen推理过程"
+        },
+        "doubao_analysis": {
+            "sentiment": "positive",
+            "score": 0.7,
+            "reasoning": "豆包情感分析"
+        },
+        "disagreement_score": 0.3,
+        "status": "pending",
+        "created_at": "2025-01-26T10:00:00Z"
+    }
+
+
+@pytest.fixture
+def sample_report():
+    """示例报告数据"""
+    return {
+        "report_id": "test_report_001",
+        "report_type": "daily_analysis",
+        "target_code": "000001.SZ",
+        "report_date": "2025-01-26",
+        "content": "测试报告内容",
+        "status": "completed",
+        "created_at": "2025-01-26T10:00:00Z"
+    }
+
+
+@pytest.fixture
+def mock_redis():
+    """模拟Redis连接"""
+    mock = Mock()
+    mock.get = Mock(return_value=None)
+    mock.set = Mock(return_value=True)
+    mock.delete = Mock(return_value=True)
+    mock.exists = Mock(return_value=False)
+    return mock
+
+
+@pytest.fixture
+def mock_config():
+    """模拟配置"""
+    return {
+        "database": {
+            "url": "sqlite:///:memory:",
+            "echo": False
+        },
+        "redis": {
+            "url": "redis://localhost:6379/0"
+        },
+        "llm": {
+            "qwen": {
+                "api_key": "test_key",
+                "model": "qwen-turbo"
+            },
+            "doubao": {
+                "api_key": "test_key",
+                "model": "doubao-pro"
+            }
+        },
+        "api": {
+            "host": "0.0.0.0",
+            "port": 8000,
+            "debug": True
+        }
+    }
+
+
+# 测试数据工厂
+@pytest.fixture
+def arbitration_case_factory():
+    """仲裁案件数据工厂"""
+    def _create_case(**kwargs):
+        default_case = {
+            "case_id": f"case_{kwargs.get('case_id', '001')}",
+            "report_type": kwargs.get('report_type', 'fact_analysis'),
+            "target_code": kwargs.get('target_code', '000001.SZ'),
+            "qwen_analysis": kwargs.get('qwen_analysis', {}),
+            "doubao_analysis": kwargs.get('doubao_analysis', {}),
+            "disagreement_score": kwargs.get('disagreement_score', 0.0),
+            "status": kwargs.get('status', 'pending'),
+            "created_at": kwargs.get('created_at', '2025-01-26T10:00:00Z')
+        }
+        default_case.update(kwargs)
+        return default_case
+    return _create_case
+
+
+@pytest.fixture
+def report_factory():
+    """报告数据工厂"""
+    def _create_report(**kwargs):
+        default_report = {
+            "report_id": f"report_{kwargs.get('report_id', '001')}",
+            "report_type": kwargs.get('report_type', 'daily_analysis'),
+            "target_code": kwargs.get('target_code', '000001.SZ'),
+            "report_date": kwargs.get('report_date', '2025-01-26'),
+            "content": kwargs.get('content', '测试报告内容'),
+            "status": kwargs.get('status', 'completed'),
+            "created_at": kwargs.get('created_at', '2025-01-26T10:00:00Z')
+        }
+        default_report.update(kwargs)
+        return default_report
+    return _create_report

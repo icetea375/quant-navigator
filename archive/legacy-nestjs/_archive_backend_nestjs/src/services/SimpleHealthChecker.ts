@@ -69,11 +69,11 @@ export class SimpleHealthChecker {
     }
 
     this.isRunning = true;
-    
+
     if (this.config.enabled) {
       // 立即执行一次检查
       await this.performHealthChecks();
-      
+
       // 设置定期检查
       this.intervalId = setInterval(() => {
         this.performHealthChecks();
@@ -92,7 +92,7 @@ export class SimpleHealthChecker {
     }
 
     this.isRunning = false;
-    
+
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
@@ -106,16 +106,16 @@ export class SimpleHealthChecker {
    */
   private async performHealthChecks(): Promise<void> {
     const results: HealthStatus[] = [];
-    
+
     for (const service of this.config.services) {
       try {
         const status = await this.checkService(service);
         results.push(status);
         this.healthStatuses.set(service.name, status);
-        
+
         // 检查状态变化并发送告警
         this.checkStatusChange(service.name, status);
-        
+
       } catch (error) {
         BaseErrorHandler.handle(error, 'SimpleHealthChecker');
         const errorStatus: HealthStatus = {
@@ -140,7 +140,7 @@ export class SimpleHealthChecker {
    */
   private async checkService(service: HealthService): Promise<HealthStatus> {
     const startTime = Date.now();
-    
+
     try {
       let isHealthy = false;
       let responseTime = 0;
@@ -155,14 +155,14 @@ export class SimpleHealthChecker {
           error = httpResult.error;
           details = httpResult.details;
           break;
-          
+
         case 'tcp':
           const tcpResult = await this.checkTcpService(service);
           isHealthy = tcpResult.isHealthy;
           responseTime = tcpResult.responseTime;
           error = tcpResult.error;
           break;
-          
+
         case 'database':
           const dbResult = await this.checkDatabaseService(service);
           isHealthy = dbResult.isHealthy;
@@ -170,7 +170,7 @@ export class SimpleHealthChecker {
           error = dbResult.error;
           details = dbResult.details;
           break;
-          
+
         case 'redis':
           const redisResult = await this.checkRedisService(service);
           isHealthy = redisResult.isHealthy;
@@ -178,7 +178,7 @@ export class SimpleHealthChecker {
           error = redisResult.error;
           details = redisResult.details;
           break;
-          
+
         default:
           throw new Error(`Unsupported service type: ${service.type}`);
       }
@@ -214,21 +214,21 @@ export class SimpleHealthChecker {
   }> {
     const axios = require('axios');
     const startTime = Date.now();
-    
+
     try {
       const response = await axios.get(service.url, {
         timeout: service.timeout,
         validateStatus: (status: number) => status < 500 // 只把5xx当作错误
       });
-      
+
       const responseTime = Date.now() - startTime;
-      const isHealthy = service.expectedStatus ? 
-        response.status === service.expectedStatus : 
+      const isHealthy = service.expectedStatus ?
+        response.status === service.expectedStatus :
         response.status < 400;
-      
+
       // 检查预期响应内容
       if (service.expectedResponse && response.data) {
-        const responseText = typeof response.data === 'string' ? 
+        const responseText = typeof response.data === 'string' ?
           response.data : JSON.stringify(response.data);
         if (!responseText.includes(service.expectedResponse)) {
           return {
@@ -239,7 +239,7 @@ export class SimpleHealthChecker {
           };
         }
       }
-      
+
       return {
         isHealthy,
         responseTime,
@@ -249,7 +249,7 @@ export class SimpleHealthChecker {
           headers: response.headers
         }
       };
-      
+
     } catch (error) {
       return {
         isHealthy: false,
@@ -269,10 +269,10 @@ export class SimpleHealthChecker {
   }> {
     const net = require('net');
     const startTime = Date.now();
-    
+
     return new Promise((resolve) => {
       const socket = new net.Socket();
-      
+
       const timeout = setTimeout(() => {
         socket.destroy();
         resolve({
@@ -281,7 +281,7 @@ export class SimpleHealthChecker {
           error: 'Connection timeout'
         });
       }, service.timeout);
-      
+
       socket.connect(service.url, () => {
         clearTimeout(timeout);
         socket.destroy();
@@ -290,7 +290,7 @@ export class SimpleHealthChecker {
           responseTime: Date.now() - startTime
         });
       });
-      
+
       socket.on('error', (error) => {
         clearTimeout(timeout);
         resolve({
@@ -312,7 +312,7 @@ export class SimpleHealthChecker {
     details?: Record<string, any>;
   }> {
     const startTime = Date.now();
-    
+
     try {
       // 这里需要根据实际数据库实现
       // 简化实现，假设数据库连接正常
@@ -340,7 +340,7 @@ export class SimpleHealthChecker {
     details?: Record<string, any>;
   }> {
     const startTime = Date.now();
-    
+
     try {
       // 这里需要根据实际Redis实现
       // 简化实现，假设Redis连接正常
@@ -367,7 +367,7 @@ export class SimpleHealthChecker {
     }
 
     const previousStatus = this.healthStatuses.get(serviceName);
-    
+
     if (!previousStatus) {
       // 首次检查，不发送告警
       return;
@@ -379,7 +379,7 @@ export class SimpleHealthChecker {
         this.sendRecoveryAlert(serviceName, currentStatus);
       }
     }
-    
+
     // 服务从健康变为不健康
     if (previousStatus.status === 'healthy' && currentStatus.status === 'unhealthy') {
       if (this.config.alerting.alertOnFailure) {
@@ -439,7 +439,7 @@ export class SimpleHealthChecker {
     const totalServices = statuses.length;
     const healthyServices = statuses.filter(s => s.status === 'healthy').length;
     const unhealthyServices = statuses.filter(s => s.status === 'unhealthy').length;
-    
+
     let overall: 'healthy' | 'unhealthy' | 'degraded';
     if (unhealthyServices === 0) {
       overall = 'healthy';

@@ -548,4 +548,3 @@ config.global.mocks.$loadingDirective = {
   show: vi.fn(),
   hide: vi.fn(),
 }
-

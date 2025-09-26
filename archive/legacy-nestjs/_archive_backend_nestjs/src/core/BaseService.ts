@@ -49,7 +49,7 @@ export abstract class BaseService {
     this.db = db;
     this.redis = redis;
     this.config = config;
-    
+
     this.validateConfig(config);
   }
 
@@ -131,10 +131,10 @@ export abstract class BaseService {
       this.stats.failedRequests++;
       this.stats.lastError = error;
     }
-    
+
     this.stats.lastRun = new Date().toISOString();
-    this.stats.averageResponseTime = 
-      (this.stats.averageResponseTime * (this.stats.totalRequests - 1) + responseTime) / 
+    this.stats.averageResponseTime =
+      (this.stats.averageResponseTime * (this.stats.totalRequests - 1) + responseTime) /
       this.stats.totalRequests;
   }
 

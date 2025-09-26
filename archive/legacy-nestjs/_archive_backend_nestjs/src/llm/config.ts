@@ -281,15 +281,15 @@ export const AI_FORCE_STRUCTURE = {
     principle: '非必要，不动用',
     usage: '只用于对系统最终输出质量有决定性影响的极少数核心任务'
   },
-  
-  // 第二梯队：战术核心部队 (Tactical Force)  
+
+  // 第二梯队：战术核心部队 (Tactical Force)
   TACTICAL_FORCE: {
     models: ['qwen3-plus', 'doubao-seed-1-6-250615', 'hunyuan-t1-latest'],
     characteristics: '能力与成本的甜点，性价比极高',
     principle: '主力军',
     usage: '承担系统中绝大部分的常规分析和内容生成任务'
   },
-  
+
   // 第三梯队：快速反应部队 (Rapid-Response Force)
   RAPID_RESPONSE_FORCE: {
     models: ['qwen3-flash', 'doubao-seed-1-6-flash-250615', 'hunyuan-turbo-latest'],
@@ -315,7 +315,7 @@ export const TASK_MODEL_MAPPING = {
       high: 'doubao-seed-1-6-250615'
     }
   },
-  
+
   // 事件链构建 - 严谨的"历史学家"
   'event_chain_building': {
     description: '事件链构建，中等偏高复杂度',
@@ -328,7 +328,7 @@ export const TASK_MODEL_MAPPING = {
       high: 'hunyuan-t1-latest'
     }
   },
-  
+
   // 新闻重要性评分(第一层) - 快速的"标签员"
   'news_classification': {
     description: '新闻重要性评分第一层标签分类，低复杂度，海量',
@@ -341,7 +341,7 @@ export const TASK_MODEL_MAPPING = {
       high: 'doubao-seed-1-6-flash-250615'
     }
   },
-  
+
   // 新闻重要性评分(第二层) - 需要市场知识的"分析师"
   'news_importance_analysis': {
     description: '新闻重要性评分第二层预期差分析，高复杂度',
@@ -354,7 +354,7 @@ export const TASK_MODEL_MAPPING = {
       high: 'hunyuan-t1-latest'
     }
   },
-  
+
   // 归因-学习闭环诊断 - 能自我反思的"AI模型诊断专家"
   'attribution_diagnosis': {
     description: '归因-学习闭环诊断，高复杂度，需要联网',
@@ -367,7 +367,7 @@ export const TASK_MODEL_MAPPING = {
       high: 'doubao-seed-1-6-pro-250615'
     }
   },
-  
+
   // 红队AI挑战者 - 富有想象力的"怀疑论者"
   'red_team_challenger': {
     description: '红队AI挑战者，高复杂度，需要联网',
@@ -380,7 +380,7 @@ export const TASK_MODEL_MAPPING = {
       high: 'doubao-seed-1-6-pro-250615'
     }
   },
-  
+
   // 最终预测(CIO) - 权衡多种可能的"首席决策官"
   'final_prediction': {
     description: '最终预测CIO决策，最高复杂度',
@@ -409,7 +409,7 @@ export function selectModelForTask(
   }
 
   const selectedModel = qualityLevel === 'high' ? taskConfig.qualityLevels.high : taskConfig.qualityLevels.normal;
-  
+
   // 查找模型对应的提供商
   let provider = '';
   for (const [providerKey, providerConfig] of Object.entries(UNIFIED_LLM_CONFIG)) {
@@ -450,13 +450,13 @@ export function getDefaultOptions(): LLMOptions {
  */
 export function validateConfig(): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
-  
+
   // 检查是否有可用的提供商
   const availableProviders = getAvailableProviders();
   if (availableProviders.length === 0) {
     errors.push('没有可用的LLM提供商，请检查环境变量配置');
   }
-  
+
   // 检查每个提供商的配置
   Object.entries(UNIFIED_LLM_CONFIG).forEach(([key, provider]) => {
     if (provider.enabled) {
@@ -468,7 +468,7 @@ export function validateConfig(): { valid: boolean; errors: string[] } {
       }
     }
   });
-  
+
   return {
     valid: errors.length === 0,
     errors
@@ -495,7 +495,7 @@ export function getConfigSummary(): {
 } {
   const providers = Object.values(UNIFIED_LLM_CONFIG);
   const availableProviders = providers.filter(p => p.enabled);
-  
+
   return {
     totalProviders: providers.length,
     availableProviders: availableProviders.length,
@@ -588,11 +588,11 @@ export function getModelPricingComparison(): Array<{
       Object.entries(provider.modelPricing).forEach(([model, pricing]) => {
         const inputPrice = 1000000 / pricing.inputTokensPerYuan;
         const outputPrice = 1000000 / pricing.outputTokensPerYuan;
-        
+
         let costLevel: 'high' | 'medium' | 'low' = 'medium';
         if (inputPrice <= 0.2) costLevel = 'low';
         else if (inputPrice >= 0.5) costLevel = 'high';
-        
+
         modelPricing.push({
           provider: provider.name,
           model,
@@ -662,8 +662,8 @@ export class BatchOptimizer {
       return this.executeImmediate(request);
     }
 
-    const selectedModel = request.qualityLevel === 'high' 
-      ? taskConfig.qualityLevels.high 
+    const selectedModel = request.qualityLevel === 'high'
+      ? taskConfig.qualityLevels.high
       : taskConfig.qualityLevels.normal;
 
     if (!this.queues[selectedModel]) {
@@ -696,7 +696,7 @@ export class BatchOptimizer {
 
     // 清空队列
     this.queues[model] = [];
-    
+
     // 清除定时器
     if (this.timers[model]) {
       clearTimeout(this.timers[model]);
@@ -708,7 +708,7 @@ export class BatchOptimizer {
 
     // 执行批处理请求
     const results = await this.executeBatch(model, requests);
-    
+
     return results;
   }
 
@@ -719,13 +719,13 @@ export class BatchOptimizer {
     // 这里应该调用实际的批处理API
     // 对于支持Batch的提供商（千问、Gemini），使用50%的价格
     console.log(`🚀 执行批处理: ${model}, 请求数量: ${requests.length}, 成本优化: 50%`);
-    
+
     // 模拟批处理执行
     const results = requests.map(req => req.id);
-    
+
     // 记录成本节省
     this.logCostSavings(model, requests.length);
-    
+
     return results;
   }
 
@@ -751,7 +751,7 @@ export class BatchOptimizer {
    */
   getBatchStats(): { [model: string]: { queueSize: number; totalProcessed: number } } {
     const stats: { [model: string]: { queueSize: number; totalProcessed: number } } = {};
-    
+
     Object.keys(this.queues).forEach(model => {
       stats[model] = {
         queueSize: this.queues[model].length,

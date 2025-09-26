@@ -77,9 +77,9 @@ export class SimpleDualLLMCollaborationSystem {
     this.db = db;
     this.redis = redis;
     this.config = config;
-    
+
     this.validateConfig(config);
-    
+
     // 初始化各个协调器
     this.collaborationCoordinator = new SimpleLLMCollaborationCoordinator(
       db, redis, config.collaboration
@@ -90,7 +90,7 @@ export class SimpleDualLLMCollaborationSystem {
     this.webSearchCoordinator = new SimpleWebSearchCoordinator(
       db, redis, config.webSearch
     );
-    
+
     this.initializeTables();
     this.initializeTools();
   }
@@ -375,14 +375,14 @@ export class SimpleDualLLMCollaborationSystem {
       for (let i = 0; i < workflow.steps.length; i++) {
         const step = workflow.steps[i];
         workflow.currentStep = i;
-        
+
         try {
           await this.executeWorkflowStep(workflow, step);
         } catch (error) {
           logger.error(`Step ${step.id} failed:`, error);
           step.status = 'failed';
           step.error = error instanceof Error ? error.message : String(error);
-          
+
           // 根据配置决定是否继续
           if (!this.config.workflow.enableFailover) {
             workflow.status = 'failed';
@@ -426,19 +426,19 @@ export class SimpleDualLLMCollaborationSystem {
         case 'llm_collaboration':
           await this.executeLLMCollaborationStep(workflow, step);
           break;
-        
+
         case 'tool_call':
           await this.executeToolCallStep(workflow, step);
           break;
-        
+
         case 'web_search':
           await this.executeWebSearchStep(workflow, step);
           break;
-        
+
         case 'data_processing':
           await this.executeDataProcessingStep(workflow, step);
           break;
-        
+
         default:
           throw new Error(`Unknown step type: ${step.type}`);
       }
@@ -463,7 +463,7 @@ export class SimpleDualLLMCollaborationSystem {
       );
 
       const results = await this.collaborationCoordinator.executeCollaborationTask(collaborationTask.id);
-      
+
       if (results.length > 0) {
         step.output = results[0].result;
         step.provider = results[0].provider;
@@ -483,7 +483,7 @@ export class SimpleDualLLMCollaborationSystem {
     try {
       const { toolId, parameters } = step.input;
       const result = await this.toolCallCoordinator.executeToolCallSync(toolId, parameters);
-      
+
       step.output = result;
     } catch (error) {
       logger.error('Tool call step failed:', error);
@@ -498,7 +498,7 @@ export class SimpleDualLLMCollaborationSystem {
     try {
       const { query, type, ...parameters } = step.input;
       const results = await this.webSearchCoordinator.searchSync(query, type, parameters);
-      
+
       step.output = results;
     } catch (error) {
       logger.error('Web search step failed:', error);
@@ -512,20 +512,20 @@ export class SimpleDualLLMCollaborationSystem {
   private async executeDataProcessingStep(workflow: WorkflowTask, step: WorkflowStep): Promise<void> {
     try {
       const { step: processType } = step.input;
-      
+
       switch (processType) {
         case 'result_integration':
           step.output = await this.integrateResults(workflow);
           break;
-        
+
         case 'priority_ranking':
           step.output = await this.rankByPriority(workflow);
           break;
-        
+
         case 'event_collection':
           step.output = await this.collectEvents(workflow);
           break;
-        
+
         default:
           step.output = { processed: true, type: processType };
       }
@@ -542,7 +542,7 @@ export class SimpleDualLLMCollaborationSystem {
     const results = workflow.steps
       .filter(step => step.status === 'completed' && step.output)
       .map(step => step.output);
-    
+
     return {
       integrated: true,
       results,
@@ -558,14 +558,14 @@ export class SimpleDualLLMCollaborationSystem {
     const results = workflow.steps
       .filter(step => step.status === 'completed' && step.output)
       .map(step => step.output);
-    
+
     // 简单的优先级排序逻辑
     const ranked = results.sort((a, b) => {
       const scoreA = a.importance_score || a.priority || 0;
       const scoreB = b.importance_score || b.priority || 0;
       return scoreB - scoreA;
     });
-    
+
     return {
       ranked: true,
       results: ranked,
@@ -579,7 +579,7 @@ export class SimpleDualLLMCollaborationSystem {
    */
   private async collectEvents(workflow: WorkflowTask): Promise<any> {
     const events = workflow.input.events || [];
-    
+
     return {
       collected: true,
       events,
@@ -594,13 +594,13 @@ export class SimpleDualLLMCollaborationSystem {
   private calculateWorkflowConfidence(workflow: WorkflowTask): number {
     const completedSteps = workflow.steps.filter(step => step.status === 'completed');
     if (completedSteps.length === 0) return 0;
-    
+
     const totalConfidence = completedSteps.reduce((sum, step) => {
       // 从步骤输出中提取置信度
       const confidence = step.output?.confidence || 0.5;
       return sum + confidence;
     }, 0);
-    
+
     return totalConfidence / completedSteps.length;
   }
 
@@ -817,11 +817,11 @@ export class SimpleDualLLMCollaborationSystem {
         .filter(workflow => workflow.status === 'completed').length;
       const failedWorkflows = Array.from(this.activeWorkflows.values())
         .filter(workflow => workflow.status === 'failed').length;
-      
+
       const collaborationStats = await this.collaborationCoordinator.getStats();
       const toolCallStats = await this.toolCallCoordinator.getStats();
       const webSearchStats = await this.webSearchCoordinator.getStats();
-      
+
       return {
         workflows: {
           total: totalWorkflows,

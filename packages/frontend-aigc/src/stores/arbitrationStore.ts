@@ -5,7 +5,7 @@ import { ArbitrationState, ArbitrationActions, ArbitrationCaseData, ArbitrationD
 /**
  * 仲裁状态管理Store
  * 使用Zustand管理仲裁仪表盘的状态
- * 
+ *
  * 核心特性：
  * 1. 状态集中管理
  * 2. 持久化存储
@@ -65,20 +65,20 @@ export const useArbitrationStore = create<ArbitrationStore>()(
         // 获取案例数据
         fetchCaseData: async (caseId: string) => {
           const { setLoading, setError, setCaseData } = get();
-          
+
           try {
             setLoading(true);
             setError(null);
 
             // 模拟API调用
             const response = await fetch(`/api/v1/admin/arbitration-cases/${caseId}`);
-            
+
             if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
-            
+
             if (data.success) {
               setCaseData(data.data);
             } else {
@@ -95,7 +95,7 @@ export const useArbitrationStore = create<ArbitrationStore>()(
         // 提交仲裁决策
         submitArbitration: async (decision: ArbitrationDecision) => {
           const { setLoading, setError } = get();
-          
+
           try {
             setLoading(true);
             setError(null);
@@ -108,13 +108,13 @@ export const useArbitrationStore = create<ArbitrationStore>()(
               },
               body: JSON.stringify(decision),
             });
-            
+
             if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
-            
+
             if (!data.success) {
               throw new Error(data.message || 'Failed to submit arbitration');
             }

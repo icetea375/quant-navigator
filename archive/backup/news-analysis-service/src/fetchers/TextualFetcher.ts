@@ -5,10 +5,10 @@
  */
 
 import { SimpleTushareDataSource } from '../services/SimpleTushareDataSource';
-import { 
-  LongFormNewsData, 
+import {
+  LongFormNewsData,
   NewsBroadcastData,
-  EInteractionData 
+  EInteractionData
 } from '../interfaces/DataPipelineV15Interfaces';
 import { BaseErrorHandler } from '../utils/BaseErrorHandler';
 
@@ -50,7 +50,7 @@ export class TextualFetcher {
   public async getLongFormNews(startDate?: string, endDate?: string): Promise<LongFormNewsData[]> {
     try {
       const cacheKey = `long_form_news_${startDate || 'all'}_${endDate || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -117,7 +117,7 @@ export class TextualFetcher {
   public async getNewsBroadcast(startDate?: string, endDate?: string): Promise<NewsBroadcastData[]> {
     try {
       const cacheKey = `news_broadcast_${startDate || 'all'}_${endDate || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -146,8 +146,8 @@ export class TextualFetcher {
       const broadcastData = data.filter((item: any) => {
         const title = (item.title || '').toLowerCase();
         const content = (item.content || '').toLowerCase();
-        return title.includes('新闻联播') || 
-               title.includes('央视新闻') || 
+        return title.includes('新闻联播') ||
+               title.includes('央视新闻') ||
                content.includes('新闻联播') ||
                item.src === 'CCTV';
       });
@@ -185,7 +185,7 @@ export class TextualFetcher {
   public async getEInteraction(stockCode?: string, startDate?: string, endDate?: string): Promise<EInteractionData[]> {
     try {
       const cacheKey = `e_interaction_${stockCode || 'all'}_${startDate || 'all'}_${endDate || 'all'}`;
-      
+
       // 检查缓存
       if (this.config.cache.enabled) {
         const cached = this.getCachedData(cacheKey);
@@ -217,8 +217,8 @@ export class TextualFetcher {
       const interactionData = data.filter((item: any) => {
         const title = (item.title || '').toLowerCase();
         const content = (item.content || '').toLowerCase();
-        return title.includes('互动') || 
-               title.includes('问答') || 
+        return title.includes('互动') ||
+               title.includes('问答') ||
                content.includes('投资者') ||
                content.includes('董秘') ||
                item.src === 'e互动';
@@ -408,7 +408,7 @@ export class TextualFetcher {
     let score = 0;
     const title = (item.title || '').toLowerCase();
     const content = (item.content || '').toLowerCase();
-    
+
     // 基于关键词的重要性评分
     const importantKeywords = ['重大', '重要', '政策', '监管', '财报', '业绩', '并购', '重组'];
     importantKeywords.forEach(keyword => {
@@ -416,10 +416,10 @@ export class TextualFetcher {
         score += 10;
       }
     });
-    
+
     // 基于内容长度的评分
     score += Math.min(content.length / 1000, 20);
-    
+
     return Math.min(score, 100);
   }
 
@@ -428,23 +428,23 @@ export class TextualFetcher {
     let score = 50;
     const title = (item.title || '').toLowerCase();
     const content = (item.content || '').toLowerCase();
-    
+
     if (title.includes('重要') || content.includes('重要')) score += 20;
     if (title.includes('政策') || content.includes('政策')) score += 15;
     if (title.includes('经济') || content.includes('经济')) score += 10;
-    
+
     return Math.min(score, 100);
   }
 
   private calculateInteractionImportance(item: any): number {
     let score = 20;
     const content = (item.content || '').toLowerCase();
-    
+
     // 基于问答内容的重要性评分
     if (content.includes('业绩') || content.includes('财报')) score += 20;
     if (content.includes('重大') || content.includes('重要')) score += 15;
     if (content.includes('合作') || content.includes('投资')) score += 10;
-    
+
     return Math.min(score, 100);
   }
 
@@ -452,20 +452,20 @@ export class TextualFetcher {
     // 简化的情感分析：基于关键词
     const positiveKeywords = ['利好', '上涨', '增长', '盈利', '成功', '突破'];
     const negativeKeywords = ['利空', '下跌', '下降', '亏损', '失败', '风险'];
-    
+
     let positiveCount = 0;
     let negativeCount = 0;
-    
+
     positiveKeywords.forEach(keyword => {
       if (content.includes(keyword)) positiveCount++;
     });
-    
+
     negativeKeywords.forEach(keyword => {
       if (content.includes(keyword)) negativeCount++;
     });
-    
+
     if (positiveCount + negativeCount === 0) return 0;
-    
+
     return ((positiveCount - negativeCount) / (positiveCount + negativeCount)) * 100;
   }
 
@@ -482,13 +482,13 @@ export class TextualFetcher {
     const conceptKeywords = ['AI', '人工智能', '新能源', '芯片', '医药', '军工', '环保', '5G', '区块链'];
     const text = (title + ' ' + content).toLowerCase();
     const concepts: string[] = [];
-    
+
     conceptKeywords.forEach(keyword => {
       if (text.includes(keyword.toLowerCase())) {
         concepts.push(keyword);
       }
     });
-    
+
     return concepts;
   }
 
@@ -542,7 +542,7 @@ export class TextualFetcher {
    */
   private async makeRequest(apiName: string, params: any): Promise<any> {
     const axios = require('axios');
-    
+
     try {
       const response = await axios.post('http://api.tushare.pro', params, {
         timeout: 30000,

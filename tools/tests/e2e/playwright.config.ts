@@ -8,39 +8,39 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   // 测试目录
   testDir: './e2e',
-  
+
   // 全局超时设置
   timeout: 30 * 1000,
   expect: {
     timeout: 10 * 1000,
   },
-  
+
   // 失败重试
   retries: process.env.CI ? 2 : 0,
-  
+
   // 并发工作进程
   workers: process.env.CI ? 1 : undefined,
-  
+
   // 报告配置
   reporter: [
     ['html'],
     ['json', { outputFile: 'test-results/e2e-results.json' }],
     ['junit', { outputFile: 'test-results/e2e-results.xml' }]
   ],
-  
+
   // 全局测试配置
   use: {
     // 基础URL
     baseURL: process.env.E2E_BASE_URL || 'http://localhost:3000',
-    
+
     // 浏览器上下文选项
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    
+
     // 网络配置
     ignoreHTTPSErrors: true,
-    
+
     // 用户代理
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   },

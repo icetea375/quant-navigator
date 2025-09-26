@@ -145,7 +145,7 @@ describe('QuantSignals Entity Validation', () => {
 
     describe('评分字段校验 (0-1范围)', () => {
         const scoreFields = [
-            'mda_fulfillment_rate', 'management_credibility_score', 
+            'mda_fulfillment_rate', 'management_credibility_score',
             'disclosure_quality_score', 'financial_transparency_score',
             'bollinger_position', 'signal_confidence'
         ];
@@ -324,7 +324,7 @@ describe('QuantSignals Entity Validation', () => {
 
         it('应该接受边界值的评分字段', async () => {
             const scoreFields = [
-                'mda_fulfillment_rate', 'management_credibility_score', 
+                'mda_fulfillment_rate', 'management_credibility_score',
                 'disclosure_quality_score', 'financial_transparency_score',
                 'bollinger_position', 'overall_signal_strength', 'signal_confidence'
             ];

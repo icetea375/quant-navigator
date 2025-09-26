@@ -1,0 +1,60 @@
+name: Docstring质量检查
+
+on:
+  pull_request:
+    paths:
+      - 'packages/backend-python/src/**/*.py'
+      - 'tools/scripts/check_docstring_quality.py'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/backend-python/src/**/*.py'
+
+jobs:
+  docstring-quality-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+      
+    - name: 设置Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r packages/backend-python/requirements.txt
+        
+    - name: 运行Docstring质量检查
+      run: |
+        python tools/scripts/check_docstring_quality.py --path packages/backend-python/src --output docstring_quality_report.md
+        
+    - name: 上传质量报告
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: docstring-quality-report
+        path: docstring_quality_report.md
+        
+    - name: 评论PR
+      if: failure() && github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('docstring_quality_report.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `## ❌ Docstring质量检查失败
+            
+            ${report}
+            
+            **要求**: 所有docstring必须解释"为什么"，不能是空洞模板。
+            **行动**: 请修复质量问题后重新提交。`
+          });

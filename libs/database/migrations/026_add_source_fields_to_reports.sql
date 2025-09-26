@@ -38,11 +38,11 @@ CREATE TABLE IF NOT EXISTS arbitration_cases (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     completed_at TIMESTAMP NULL DEFAULT NULL COMMENT '完成时间',
-    
+
     INDEX idx_stock_date (stock_code, trade_date),
     INDEX idx_status (status),
     INDEX idx_created_at (created_at),
-    
+
     FOREIGN KEY (qwen_report_id) REFERENCES generated_reports(id),
     FOREIGN KEY (doubao_report_id) REFERENCES generated_reports(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='仲裁案件表';
@@ -58,11 +58,11 @@ CREATE TABLE IF NOT EXISTS report_comparisons (
     conflict_level ENUM('low', 'medium', 'high') DEFAULT 'low' COMMENT '冲突等级',
     human_override TEXT DEFAULT NULL COMMENT '人类覆盖决策',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    
+
     INDEX idx_arbitration_case (arbitration_case_id),
     INDEX idx_comparison_type (comparison_type),
     INDEX idx_conflict_level (conflict_level),
-    
+
     FOREIGN KEY (arbitration_case_id) REFERENCES arbitration_cases(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='报告对比分析表';
 
@@ -78,15 +78,15 @@ CREATE TABLE IF NOT EXISTS analyzer_performance (
     human_rating INT DEFAULT NULL COMMENT '人类评分(1-5)',
     error_message TEXT DEFAULT NULL COMMENT '错误信息',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    
+
     INDEX idx_analyzer_type (analyzer_type),
     INDEX idx_stock_date (stock_code, trade_date),
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='分析器性能统计表';
 
 -- 更新现有数据的source字段
-UPDATE generated_reports 
-SET source = 'legacy_analysis' 
+UPDATE generated_reports
+SET source = 'legacy_analysis'
 WHERE source = 'unknown' OR source IS NULL;
 
 -- 为source字段添加索引
@@ -105,12 +105,12 @@ ALTER TABLE generated_reports
 ADD CONSTRAINT chk_analysis_quality CHECK (analysis_quality IN ('low', 'medium', 'high'));
 
 -- 插入示例数据
-INSERT INTO arbitration_cases (stock_code, trade_date, qwen_report_id, doubao_report_id, status) 
+INSERT INTO arbitration_cases (stock_code, trade_date, qwen_report_id, doubao_report_id, status)
 VALUES ('000001', '2025-01-17', 'qwen_001', 'doubao_001', 'pending_arbitration');
 
 -- 创建视图：待仲裁案件概览
 CREATE VIEW v_pending_arbitration AS
-SELECT 
+SELECT
     ac.id,
     ac.stock_code,
     ac.trade_date,
@@ -129,7 +129,7 @@ ORDER BY ac.created_at DESC;
 
 -- 创建视图：分析器性能统计
 CREATE VIEW v_analyzer_performance AS
-SELECT 
+SELECT
     analyzer_type,
     COUNT(*) as total_analyses,
     AVG(processing_time_ms) as avg_processing_time,

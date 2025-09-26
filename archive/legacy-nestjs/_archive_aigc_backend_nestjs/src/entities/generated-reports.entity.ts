@@ -29,7 +29,7 @@ export enum ReportStatus {
 export class GeneratedReports {
     // 添加索引签名以支持动态属性访问
     [key: string]: any;
-    
+
     @PrimaryGeneratedColumn('uuid')
     report_id: string;
 
@@ -222,7 +222,7 @@ export class GeneratedReports {
         this.version = '1.0';
         // 设置默认创建者
         this.created_by = 'ai_system';
-        
+
         // 初始化所有必填字段
         this.report_id = '';
         this.report_type = ReportType.ATTRIBUTION_ANALYSIS;
@@ -233,7 +233,7 @@ export class GeneratedReports {
         this.content = '';
         this.created_at = new Date();
         this.updated_at = new Date();
-        
+
         // 初始化所有可为空字段
         this.confidence_score = null;
         this.quality_score = null;

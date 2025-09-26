@@ -127,13 +127,13 @@
       <div class="terms-content">
         <h4>1. 服务条款</h4>
         <p>欢迎使用量化导航仪平台。通过注册和使用我们的服务，您同意遵守以下条款和条件。</p>
-        
+
         <h4>2. 账户责任</h4>
         <p>您有责任保护您的账户安全，包括密码的保密性。您同意对在您账户下发生的所有活动负责。</p>
-        
+
         <h4>3. 服务使用</h4>
         <p>我们的服务仅供个人投资参考使用，不构成投资建议。投资有风险，请谨慎决策。</p>
-        
+
         <h4>4. 隐私保护</h4>
         <p>我们重视您的隐私，会按照隐私政策保护您的个人信息。</p>
       </div>
@@ -147,13 +147,13 @@
       <div class="privacy-content">
         <h4>1. 信息收集</h4>
         <p>我们收集您主动提供的信息，如注册信息、投资偏好等。</p>
-        
+
         <h4>2. 信息使用</h4>
         <p>我们使用收集的信息来提供个性化服务，改善用户体验。</p>
-        
+
         <h4>3. 信息保护</h4>
         <p>我们采用行业标准的安全措施保护您的个人信息。</p>
-        
+
         <h4>4. 信息共享</h4>
         <p>我们不会向第三方出售或分享您的个人信息，除非法律要求。</p>
       </div>
@@ -223,7 +223,7 @@ const handleRegister = async () => {
         email: registerForm.email,
         password: registerForm.password
       })
-      
+
       if (result.success) {
         ElMessage.success('注册成功')
         router.push('/private')
@@ -378,14 +378,13 @@ const handleRegister = async () => {
     grid-template-columns: 1fr;
     max-width: 400px;
   }
-  
+
   .register-illustration {
     display: none;
   }
-  
+
   .register-form {
     padding: 40px 30px;
   }
 }
 </style>
-

@@ -104,7 +104,7 @@ export class SimplePerformanceOptimizer {
     this.redis = redis;
     this.config = config;
     this.metrics = this.initializeMetrics();
-    
+
     this.validateConfig(config);
   }
 
@@ -317,7 +317,7 @@ export class SimplePerformanceOptimizer {
 
       if (memoryUsageMB > this.config.memory.memoryThreshold) {
         logger.info(`内存使用过高 (${memoryUsageMB.toFixed(2)}MB)，执行垃圾回收`);
-        
+
         if (global.gc) {
           global.gc();
           logger.info('✅ 垃圾回收完成');
@@ -337,10 +337,10 @@ export class SimplePerformanceOptimizer {
     try {
       // 分析表统计信息
       await this.analyzeTableStatistics();
-      
+
       // 优化索引
       await this.optimizeIndexes();
-      
+
       // 清理过期数据
       await this.cleanupExpiredData();
 
@@ -380,7 +380,7 @@ export class SimplePerformanceOptimizer {
     try {
       // 检查索引使用情况
       const indexUsageQuery = `
-        SELECT 
+        SELECT
           schemaname,
           tablename,
           indexname,
@@ -392,10 +392,10 @@ export class SimplePerformanceOptimizer {
       `;
 
       const results = await this.db.query(indexUsageQuery);
-      
+
       // 找出未使用的索引
       const unusedIndexes = results.filter(row => row.idx_scan === 0);
-      
+
       if (unusedIndexes.length > 0) {
         logger.warn(`发现 ${unusedIndexes.length} 个未使用的索引`);
         // 这里可以添加删除未使用索引的逻辑
@@ -417,7 +417,7 @@ export class SimplePerformanceOptimizer {
 
       // 清理过期的新闻数据
       await this.db.query(`
-        DELETE FROM news_items 
+        DELETE FROM news_items
         WHERE created_at < ? AND processed = 1
       `, [cutoffDate.toISOString()]);
 
@@ -448,7 +448,7 @@ export class SimplePerformanceOptimizer {
     try {
       // 预加载热点数据
       const hotData = await this.getHotData();
-      
+
       for (const item of hotData) {
         await this.redis.setex(`cache:${item.key}`, this.config.caching.cacheTTL, JSON.stringify(item.value));
       }
@@ -490,7 +490,7 @@ export class SimplePerformanceOptimizer {
     try {
       // 这里可以添加查询优化逻辑
       // 例如：添加适当的索引提示、优化JOIN顺序等
-      
+
       let optimizedQuery = query;
 
       // 添加查询提示
@@ -604,11 +604,11 @@ export class SimplePerformanceOptimizer {
    */
   private validateConfig(config: PerformanceOptimizerConfig): void {
     BaseConfigValidator.validate(config, ['enabled', 'caching', 'database', 'memory', 'network', 'monitoring']);
-    
+
     if (config.caching.cacheSize <= 0) {
       throw new Error('cacheSize must be greater than 0');
     }
-    
+
     if (config.database.maxConnections <= 0) {
       throw new Error('maxConnections must be greater than 0');
     }

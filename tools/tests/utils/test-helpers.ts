@@ -53,8 +53,8 @@ export class TestHelpers {
    */
   static validateApiResponse(response: any, expectedFields: string[]): boolean {
     if (!response.body) return false;
-    
-    return expectedFields.every(field => 
+
+    return expectedFields.every(field =>
       response.body.hasOwnProperty(field)
     );
   }
@@ -63,8 +63,8 @@ export class TestHelpers {
    * 验证错误响应
    */
   static validateErrorResponse(response: any): boolean {
-    return response.status >= 400 && 
-           response.body && 
+    return response.status >= 400 &&
+           response.body &&
            (response.body.error || response.body.message);
   }
 
@@ -74,11 +74,11 @@ export class TestHelpers {
   private static generateStockPriceData(count: number): any[] {
     const data = [];
     const symbols = ['000001.SZ', '000002.SZ', '600000.SH', '600036.SH'];
-    
+
     for (let i = 0; i < count; i++) {
       const symbol = symbols[i % symbols.length];
       const basePrice = 10 + Math.random() * 90;
-      
+
       data.push({
         ts_code: symbol,
         trade_date: this.generateRandomDate(),
@@ -90,7 +90,7 @@ export class TestHelpers {
         amount: Math.floor(Math.random() * 10000000)
       });
     }
-    
+
     return data;
   }
 
@@ -106,7 +106,7 @@ export class TestHelpers {
       '技术突破创新',
       '合作项目签约'
     ];
-    
+
     for (let i = 0; i < count; i++) {
       data.push({
         id: i + 1,
@@ -117,7 +117,7 @@ export class TestHelpers {
         sentiment: Math.random() > 0.5 ? 'positive' : 'negative'
       });
     }
-    
+
     return data;
   }
 
@@ -128,7 +128,7 @@ export class TestHelpers {
     const data = [];
     const types = ['database', 'api', 'cache', 'logging'];
     const keys = ['host', 'port', 'timeout', 'retry_count'];
-    
+
     for (let i = 0; i < count; i++) {
       data.push({
         id: i + 1,
@@ -141,7 +141,7 @@ export class TestHelpers {
         updatedAt: new Date()
       });
     }
-    
+
     return data;
   }
 
@@ -192,4 +192,3 @@ export class TestHelpers {
     };
   }
 }
-

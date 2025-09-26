@@ -1,7 +1,7 @@
 /**
  * 查询缓存管理器
  * 提供多级查询缓存和缓存优化功能
- * 
+ *
  * 作者: AI Assistant
  * 创建时间: 2025-01-17
  * 版本: 1.0
@@ -57,13 +57,13 @@ export class SimpleQueryCache {
   private db: DatabaseConnection;
   private monitor: SimpleMonitor;
   private config: CacheConfig;
-  
+
   // L1缓存（内存）
   private l1Cache: Map<string, CacheEntry> = new Map();
-  
+
   // L2缓存（Redis或数据库）
   private l2Cache: Map<string, CacheEntry> = new Map();
-  
+
   // 缓存统计
   private stats: CacheStats = {
     hits: 0,
@@ -76,14 +76,14 @@ export class SimpleQueryCache {
     evictions: 0,
     lastCleanup: new Date()
   };
-  
+
   // 清理定时器
   private cleanupTimer: NodeJS.Timeout | null = null;
 
   constructor(db: DatabaseConnection, monitor: SimpleMonitor, config: Partial<CacheConfig> = {}) {
     this.db = db;
     this.monitor = monitor;
-    
+
     // 默认配置
     this.config = {
       maxSize: 100 * 1024 * 1024, // 100MB
@@ -96,7 +96,7 @@ export class SimpleQueryCache {
       l2Size: 90 * 1024 * 1024, // 90MB
       ...config
     };
-    
+
     this.startCleanupTimer();
   }
 
@@ -126,7 +126,7 @@ export class SimpleQueryCache {
   async get(queryKey: QueryCacheKey): Promise<any | null> {
     try {
       const cacheKey = this.generateCacheKey(queryKey);
-      
+
       // 先检查L1缓存
       if (this.config.enableL1Cache) {
         const l1Entry = this.l1Cache.get(cacheKey);
@@ -135,12 +135,12 @@ export class SimpleQueryCache {
           this.stats.l1Hits++;
           this.stats.hits++;
           this.updateHitRate();
-          
+
           this.monitor.recordMetric('cache_l1_hit', 1, { table: queryKey.table });
           return l1Entry.data;
         }
       }
-      
+
       // 检查L2缓存
       if (this.config.enableL2Cache) {
         const l2Entry = this.l2Cache.get(cacheKey);
@@ -149,24 +149,24 @@ export class SimpleQueryCache {
           this.stats.l2Hits++;
           this.stats.hits++;
           this.updateHitRate();
-          
+
           // 将L2数据提升到L1
           if (this.config.enableL1Cache && l2Entry.size <= this.config.l1Size) {
             this.setL1Cache(cacheKey, l2Entry);
           }
-          
+
           this.monitor.recordMetric('cache_l2_hit', 1, { table: queryKey.table });
           return l2Entry.data;
         }
       }
-      
+
       // 缓存未命中
       this.stats.misses++;
       this.updateHitRate();
-      
+
       this.monitor.recordMetric('cache_miss', 1, { table: queryKey.table });
       return null;
-      
+
     } catch (error) {
       BaseErrorHandler.handle(error, 'SimpleQueryCache.get');
       this.monitor.recordMetric('cache_error', 1);
@@ -182,7 +182,7 @@ export class SimpleQueryCache {
       const cacheKey = this.generateCacheKey(queryKey);
       const size = this.calculateSize(data);
       const entryTtl = ttl || this.config.defaultTtl;
-      
+
       const entry: CacheEntry = {
         key: cacheKey,
         data: data,
@@ -193,33 +193,33 @@ export class SimpleQueryCache {
         size: size,
         tags: tags
       };
-      
+
       // 检查是否应该缓存
       if (!this.shouldCache(entry)) {
         return;
       }
-      
+
       // 清理空间
       await this.makeSpace(entry);
-      
+
       // 设置到L1缓存
       if (this.config.enableL1Cache && size <= this.config.l1Size) {
         this.setL1Cache(cacheKey, entry);
       }
-      
+
       // 设置到L2缓存
       if (this.config.enableL2Cache) {
         this.setL2Cache(cacheKey, entry);
       }
-      
+
       this.stats.entryCount++;
       this.stats.totalSize += size;
-      
-      this.monitor.recordMetric('cache_set', 1, { 
+
+      this.monitor.recordMetric('cache_set', 1, {
         table: queryKey.table,
         size: size.toString()
       });
-      
+
     } catch (error) {
       BaseErrorHandler.handle(error, 'SimpleQueryCache.set');
       this.monitor.recordMetric('cache_error', 1);
@@ -232,7 +232,7 @@ export class SimpleQueryCache {
   async delete(queryKey: QueryCacheKey): Promise<void> {
     try {
       const cacheKey = this.generateCacheKey(queryKey);
-      
+
       // 从L1缓存删除
       if (this.l1Cache.has(cacheKey)) {
         const entry = this.l1Cache.get(cacheKey);
@@ -242,7 +242,7 @@ export class SimpleQueryCache {
         }
         this.l1Cache.delete(cacheKey);
       }
-      
+
       // 从L2缓存删除
       if (this.l2Cache.has(cacheKey)) {
         const entry = this.l2Cache.get(cacheKey);
@@ -252,9 +252,9 @@ export class SimpleQueryCache {
         }
         this.l2Cache.delete(cacheKey);
       }
-      
+
       this.monitor.recordMetric('cache_delete', 1, { table: queryKey.table });
-      
+
     } catch (error) {
       BaseErrorHandler.handle(error, 'SimpleQueryCache.delete');
       this.monitor.recordMetric('cache_error', 1);
@@ -266,7 +266,7 @@ export class SimpleQueryCache {
    */
   async deleteByTags(tags: string[]): Promise<number> {
     let deletedCount = 0;
-    
+
     try {
       // 删除L1缓存中的匹配条目
       for (const [key, entry] of this.l1Cache.entries()) {
@@ -277,7 +277,7 @@ export class SimpleQueryCache {
           deletedCount++;
         }
       }
-      
+
       // 删除L2缓存中的匹配条目
       for (const [key, entry] of this.l2Cache.entries()) {
         if (tags.some(tag => entry.tags.includes(tag))) {
@@ -287,14 +287,14 @@ export class SimpleQueryCache {
           deletedCount++;
         }
       }
-      
+
       this.monitor.recordMetric('cache_delete_by_tags', deletedCount, { tags: tags.join(',') });
-      
+
     } catch (error) {
       BaseErrorHandler.handle(error, 'SimpleQueryCache.deleteByTags');
       this.monitor.recordMetric('cache_error', 1);
     }
-    
+
     return deletedCount;
   }
 
@@ -305,7 +305,7 @@ export class SimpleQueryCache {
     try {
       this.l1Cache.clear();
       this.l2Cache.clear();
-      
+
       this.stats = {
         hits: 0,
         misses: 0,
@@ -317,9 +317,9 @@ export class SimpleQueryCache {
         evictions: 0,
         lastCleanup: new Date()
       };
-      
+
       this.monitor.recordMetric('cache_clear', 1);
-      
+
     } catch (error) {
       BaseErrorHandler.handle(error, 'SimpleQueryCache.clear');
       this.monitor.recordMetric('cache_error', 1);
@@ -332,14 +332,14 @@ export class SimpleQueryCache {
   async warmup(queries: Array<{ queryKey: QueryCacheKey; data: any; ttl?: number }>): Promise<void> {
     try {
       console.log(`开始预热缓存，共 ${queries.length} 个查询...`);
-      
+
       for (const { queryKey, data, ttl } of queries) {
         await this.set(queryKey, data, ttl, ['warmup']);
       }
-      
+
       console.log('缓存预热完成');
       this.monitor.recordMetric('cache_warmup', queries.length);
-      
+
     } catch (error) {
       BaseErrorHandler.handle(error, 'SimpleQueryCache.warmup');
       this.monitor.recordMetric('cache_error', 1);
@@ -365,7 +365,7 @@ export class SimpleQueryCache {
    */
   updateConfig(newConfig: Partial<CacheConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    
+
     // 如果清理间隔改变，重新设置定时器
     if (newConfig.cleanupInterval) {
       this.stopCleanupTimer();
@@ -405,12 +405,12 @@ export class SimpleQueryCache {
     if (entry.size > this.config.maxSize) {
       return false;
     }
-    
+
     // 检查条目数限制
     if (this.stats.entryCount >= this.config.maxEntries) {
       return false;
     }
-    
+
     return true;
   }
 
@@ -422,10 +422,10 @@ export class SimpleQueryCache {
     if (this.stats.totalSize + newEntry.size <= this.config.maxSize) {
       return;
     }
-    
+
     // 清理过期条目
     await this.cleanupExpired();
-    
+
     // 如果仍然需要空间，使用LRU策略
     if (this.stats.totalSize + newEntry.size > this.config.maxSize) {
       await this.evictLRU(newEntry.size);
@@ -440,7 +440,7 @@ export class SimpleQueryCache {
     if (this.getL1CacheSize() + entry.size > this.config.l1Size) {
       this.evictL1LRU(entry.size);
     }
-    
+
     this.l1Cache.set(key, entry);
   }
 
@@ -452,7 +452,7 @@ export class SimpleQueryCache {
     if (this.getL2CacheSize() + entry.size > this.config.l2Size) {
       this.evictL2LRU(entry.size);
     }
-    
+
     this.l2Cache.set(key, entry);
   }
 
@@ -483,7 +483,7 @@ export class SimpleQueryCache {
    */
   private async cleanupExpired(): Promise<void> {
     const now = Date.now();
-    
+
     // 清理L1缓存
     for (const [key, entry] of this.l1Cache.entries()) {
       if (!this.isValidEntry(entry)) {
@@ -492,7 +492,7 @@ export class SimpleQueryCache {
         this.stats.entryCount--;
       }
     }
-    
+
     // 清理L2缓存
     for (const [key, entry] of this.l2Cache.entries()) {
       if (!this.isValidEntry(entry)) {
@@ -512,19 +512,19 @@ export class SimpleQueryCache {
       ...Array.from(this.l1Cache.entries()).map(([key, entry]) => ({ key, entry, level: 'l1' })),
       ...Array.from(this.l2Cache.entries()).map(([key, entry]) => ({ key, entry, level: 'l2' }))
     ];
-    
+
     allEntries.sort((a, b) => a.entry.lastAccessed - b.entry.lastAccessed);
-    
+
     let freedSize = 0;
     for (const { key, entry, level } of allEntries) {
       if (freedSize >= requiredSize) break;
-      
+
       if (level === 'l1') {
         this.l1Cache.delete(key);
       } else {
         this.l2Cache.delete(key);
       }
-      
+
       freedSize += entry.size;
       this.stats.totalSize -= entry.size;
       this.stats.entryCount--;
@@ -539,11 +539,11 @@ export class SimpleQueryCache {
     const entries = Array.from(this.l1Cache.entries())
       .map(([key, entry]) => ({ key, entry }))
       .sort((a, b) => a.entry.lastAccessed - b.entry.lastAccessed);
-    
+
     let freedSize = 0;
     for (const { key, entry } of entries) {
       if (freedSize >= requiredSize) break;
-      
+
       this.l1Cache.delete(key);
       freedSize += entry.size;
     }
@@ -556,11 +556,11 @@ export class SimpleQueryCache {
     const entries = Array.from(this.l2Cache.entries())
       .map(([key, entry]) => ({ key, entry }))
       .sort((a, b) => a.entry.lastAccessed - b.entry.lastAccessed);
-    
+
     let freedSize = 0;
     for (const { key, entry } of entries) {
       if (freedSize >= requiredSize) break;
-      
+
       this.l2Cache.delete(key);
       freedSize += entry.size;
     }

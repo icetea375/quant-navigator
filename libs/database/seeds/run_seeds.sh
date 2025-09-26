@@ -47,7 +47,7 @@ check_db_connection() {
 run_sql_file() {
     local file=$1
     local description=$2
-    
+
     if [ -f "$file" ]; then
         log_info "执行: $description"
         PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -f "$file"
@@ -65,19 +65,19 @@ run_sql_file() {
 # 主函数
 main() {
     log_info "开始执行数据库种子数据初始化..."
-    
+
     # 检查数据库连接
     check_db_connection
-    
+
     # 获取脚本所在目录
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    
+
     # 按顺序执行种子数据脚本
     run_sql_file "$SCRIPT_DIR/01_system_configs.sql" "系统配置数据"
     run_sql_file "$SCRIPT_DIR/02_industry_classification.sql" "行业分类数据"
     run_sql_file "$SCRIPT_DIR/03_users.sql" "用户管理数据"
     run_sql_file "$SCRIPT_DIR/04_sample_data.sql" "示例数据"
-    
+
     log_info "数据库种子数据初始化完成！"
     log_info "系统已准备就绪，可以启动应用服务"
 }

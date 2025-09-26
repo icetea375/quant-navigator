@@ -349,12 +349,12 @@ const handleAddNew = () => {
 
 const handleSave = async () => {
   try {
-    const url = selectedConfig.value 
+    const url = selectedConfig.value
       ? `/api/v1/admin/configs/${selectedConfig.value.configId}`
       : '/api/v1/admin/configs'
-    
+
     const method = selectedConfig.value ? 'PUT' : 'POST'
-    
+
     const response = await fetch(url, {
       method,
       headers: {
@@ -368,11 +368,11 @@ const handleSave = async () => {
         isActive: editForm.isActive,
       }),
     })
-    
+
     if (!response.ok) {
       throw new Error('Failed to save config')
     }
-    
+
     success.value = selectedConfig.value ? '配置更新成功' : '配置创建成功'
     editDialogOpen.value = false
     loadConfigs()

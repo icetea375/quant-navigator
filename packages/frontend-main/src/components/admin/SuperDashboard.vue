@@ -1,12 +1,12 @@
 <template>
   <div class="super-dashboard">
     <h2>📊 超级仪表盘</h2>
-    
+
     <!-- Tab选项卡式关联信息聚合区 -->
     <div class="dashboard-tabs">
       <div class="tab-header">
-        <button 
-          v-for="(tab, index) in tabs" 
+        <button
+          v-for="(tab, index) in tabs"
           :key="index"
           :class="['tab-button', { active: activeTab === index }]"
           @click="activeTab = index"
@@ -15,45 +15,45 @@
           <span class="tab-label">{{ tab.label }}</span>
         </button>
       </div>
-      
+
       <div class="tab-content">
         <!-- 原始文本探索器 -->
         <div v-if="activeTab === 0" class="tab-panel">
-          <RawTextExplorer 
+          <RawTextExplorer
             :stockCode="stockCode"
             :reportDate="reportDate"
             :qwenReport="qwenReport"
             :doubaoReport="doubaoReport"
           />
         </div>
-        
+
         <!-- 财务快照 -->
         <div v-if="activeTab === 1" class="tab-panel">
-          <FinancialSnapshot 
+          <FinancialSnapshot
             :stockCode="stockCode"
             :reportDate="reportDate"
           />
         </div>
-        
+
         <!-- 技术指标分析 -->
         <div v-if="activeTab === 2" class="tab-panel">
-          <TechnicalAnalysis 
+          <TechnicalAnalysis
             :stockCode="stockCode"
             :reportDate="reportDate"
           />
         </div>
-        
+
         <!-- 市场情绪监控 -->
         <div v-if="activeTab === 3" class="tab-panel">
-          <MarketSentimentMonitor 
+          <MarketSentimentMonitor
             :stockCode="stockCode"
             :reportDate="reportDate"
           />
         </div>
-        
+
         <!-- 风险因子分析 -->
         <div v-if="activeTab === 4" class="tab-panel">
-          <RiskFactorAnalysis 
+          <RiskFactorAnalysis
             :stockCode="stockCode"
             :reportDate="reportDate"
             :arbitrationCase="arbitrationCase"

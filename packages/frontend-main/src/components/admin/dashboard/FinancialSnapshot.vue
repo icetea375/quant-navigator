@@ -2,7 +2,7 @@
   <div class="financial-snapshot">
     <h3>💰 财务快照</h3>
     <p class="description">基于最新财务数据的深度分析，为仲裁决策提供财务依据</p>
-    
+
     <div class="snapshot-content">
       <!-- 财务指标概览 -->
       <div class="financial-overview">
@@ -18,7 +18,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="metric-card profit">
             <div class="metric-icon">📈</div>
             <div class="metric-content">
@@ -29,7 +29,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="metric-card assets">
             <div class="metric-icon">🏦</div>
             <div class="metric-content">
@@ -40,7 +40,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="metric-card debt">
             <div class="metric-icon">📉</div>
             <div class="metric-content">
@@ -53,7 +53,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 盈利能力分析 -->
       <div class="profitability-analysis">
         <h4>💹 盈利能力分析</h4>
@@ -61,41 +61,41 @@
           <div class="metric-item">
             <span class="metric-label">毛利率</span>
             <div class="metric-bar">
-              <div 
-                class="metric-fill" 
+              <div
+                class="metric-fill"
                 :style="{ width: Math.min((financialData.grossMargin || 0) * 2, 100) + '%' }"
               ></div>
             </div>
             <span class="metric-value">{{ financialData.grossMargin || 0 }}%</span>
           </div>
-          
+
           <div class="metric-item">
             <span class="metric-label">净利率</span>
             <div class="metric-bar">
-              <div 
-                class="metric-fill" 
+              <div
+                class="metric-fill"
                 :style="{ width: Math.min((financialData.netMargin || 0) * 5, 100) + '%' }"
               ></div>
             </div>
             <span class="metric-value">{{ financialData.netMargin || 0 }}%</span>
           </div>
-          
+
           <div class="metric-item">
             <span class="metric-label">ROE</span>
             <div class="metric-bar">
-              <div 
-                class="metric-fill" 
+              <div
+                class="metric-fill"
                 :style="{ width: Math.min((financialData.roe || 0) * 2, 100) + '%' }"
               ></div>
             </div>
             <span class="metric-value">{{ financialData.roe || 0 }}%</span>
           </div>
-          
+
           <div class="metric-item">
             <span class="metric-label">ROA</span>
             <div class="metric-bar">
-              <div 
-                class="metric-fill" 
+              <div
+                class="metric-fill"
                 :style="{ width: Math.min((financialData.roa || 0) * 3, 100) + '%' }"
               ></div>
             </div>
@@ -103,7 +103,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 财务健康度评估 -->
       <div class="financial-health">
         <h4>🏥 财务健康度评估</h4>
@@ -115,7 +115,7 @@
             </div>
             <div class="score-description">基于流动比率和速动比率</div>
           </div>
-          
+
           <div class="score-card">
             <div class="score-title">偿债能力评分</div>
             <div class="score-circle" :class="getScoreClass(financialData.solvencyScore)">
@@ -123,7 +123,7 @@
             </div>
             <div class="score-description">基于资产负债率和利息保障倍数</div>
           </div>
-          
+
           <div class="score-card">
             <div class="score-title">盈利能力评分</div>
             <div class="score-circle" :class="getScoreClass(financialData.profitabilityScore)">
@@ -131,7 +131,7 @@
             </div>
             <div class="score-description">基于ROE、ROA和净利率</div>
           </div>
-          
+
           <div class="score-card">
             <div class="score-title">成长性评分</div>
             <div class="score-circle" :class="getScoreClass(financialData.growthScore)">
@@ -141,13 +141,13 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 财务风险提示 -->
       <div class="financial-risks">
         <h4>⚠️ 财务风险提示</h4>
         <div class="risk-list">
-          <div 
-            v-for="(risk, index) in financialRisks" 
+          <div
+            v-for="(risk, index) in financialRisks"
             :key="index"
             class="risk-item"
             :class="risk.level"
@@ -160,7 +160,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 财务趋势分析 -->
       <div class="financial-trends">
         <h4>📈 财务趋势分析</h4>
@@ -174,7 +174,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="trend-chart">
             <h5>利润趋势</h5>
             <div class="chart-placeholder">
@@ -586,17 +586,17 @@ onMounted(() => {
   .trend-charts {
     grid-template-columns: 1fr;
   }
-  
+
   .metric-card {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .metric-item {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .metric-label {
     min-width: auto;
   }

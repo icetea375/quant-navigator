@@ -20,7 +20,7 @@ describe('Workflow E2E Tests', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
-    
+
     httpClient = TestHelpers.createHttpClient(app);
   });
 
@@ -279,4 +279,3 @@ describe('Workflow E2E Tests', () => {
     });
   });
 });
-

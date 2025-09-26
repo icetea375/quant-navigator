@@ -338,7 +338,6 @@ const data = await publicApi.getMarketBriefing({
 
 ---
 
-**更新时间**: 2024年1月  
-**版本**: v1.0.0  
+**更新时间**: 2024年1月
+**版本**: v1.0.0
 **维护者**: 开发团队
-

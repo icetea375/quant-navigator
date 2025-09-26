@@ -221,4 +221,3 @@ export const request = {
 }
 
 export default api
-

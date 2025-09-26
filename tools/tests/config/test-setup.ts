@@ -15,7 +15,7 @@ process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret';
 const globalTestConfig = {
   // 测试超时时间
   testTimeout: 30000,
-  
+
   // 数据库配置
   database: {
     host: 'localhost',
@@ -24,14 +24,14 @@ const globalTestConfig = {
     password: 'test',
     database: 'quant_navigator_test'
   },
-  
+
   // Redis配置
   redis: {
     host: 'localhost',
     port: 6379,
     db: 1
   },
-  
+
   // 测试数据配置
   testData: {
     historicalDataStart: '2021-01-01',
@@ -51,4 +51,3 @@ logger.log(`Redis: ${globalTestConfig.redis.host}:${globalTestConfig.redis.port}
 
 // 导出配置供测试使用
 export { globalTestConfig };
-

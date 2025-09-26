@@ -3,7 +3,7 @@
 
 -- 插入归因规则配置
 INSERT INTO system_configs (config_key, config_type, config_value, description, is_active, created_at, updated_at)
-VALUES 
+VALUES
 ('attribution_rules', 'ATTRIBUTION_RULE', '{
   "version": "1.1",
   "description": "精益归因流水线事件标签知识库 - 支持非开发人员维护的外部化配置",
@@ -85,7 +85,7 @@ ON CONFLICT (config_key) DO NOTHING;
 
 -- 插入事件标签配置
 INSERT INTO system_configs (config_key, config_type, config_value, description, is_active, created_at, updated_at)
-VALUES 
+VALUES
 ('event_tags', 'EVENT_TAG', '{
   "version": "2.1",
   "description": "公告重要性评分算法事件标签知识库 - 支持非开发人员维护的外部化配置",
@@ -137,7 +137,7 @@ ON CONFLICT (config_key) DO NOTHING;
 
 -- 插入MD&A验证Prompt模板
 INSERT INTO system_configs (config_key, config_type, config_value, description, is_active, created_at, updated_at)
-VALUES 
+VALUES
 ('mda_verification_prompts', 'PROMPT_TEMPLATE', '{
   "version": "1.0",
   "description": "管理层履约记录审查官 - MD&A验证Prompt模板库",
@@ -158,7 +158,7 @@ ON CONFLICT (config_key) DO NOTHING;
 
 -- 插入事件链构建Prompt模板
 INSERT INTO system_configs (config_key, config_type, config_value, description, is_active, created_at, updated_at)
-VALUES 
+VALUES
 ('event_chain_building_prompts', 'PROMPT_TEMPLATE', '{
   "version": "1.0",
   "description": "历史学家与逻辑学家 - 事件链构建Prompt模板库",
@@ -178,7 +178,7 @@ ON CONFLICT (config_key) DO NOTHING;
 
 -- 插入预测生成Prompt模板
 INSERT INTO system_configs (config_key, config_type, config_value, description, is_active, created_at, updated_at)
-VALUES 
+VALUES
 ('prediction_generation_prompts', 'PROMPT_TEMPLATE', '{
   "version": "1.0",
   "description": "首席投资官 (CIO) - 预测生成Prompt模板库",
@@ -197,7 +197,7 @@ ON CONFLICT (config_key) DO NOTHING;
 
 -- 插入反事实验证Prompt模板
 INSERT INTO system_configs (config_key, config_type, config_value, description, is_active, created_at, updated_at)
-VALUES 
+VALUES
 ('counterfactual_validation_prompts', 'PROMPT_TEMPLATE', '{
   "version": "1.0",
   "description": "魔鬼代言人 - 反事实验证Prompt模板库",
@@ -216,7 +216,7 @@ ON CONFLICT (config_key) DO NOTHING;
 
 -- 插入系统基础配置
 INSERT INTO system_configs (config_key, config_type, config_value, description, is_active, created_at, updated_at)
-VALUES 
+VALUES
 ('system_settings', 'SYSTEM_CONFIG', '{
   "version": "1.0",
   "anomaly_thresholds": {

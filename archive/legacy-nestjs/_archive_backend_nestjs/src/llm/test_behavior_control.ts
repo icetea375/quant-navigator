@@ -20,7 +20,7 @@ async function testBehaviorControl() {
   // 2. 测试具体任务的行为配置
   console.log('\n🔍 2. 测试具体任务的行为配置:');
   const testTasks = ['mda_extraction', 'red_team_challenger', 'final_prediction'];
-  
+
   testTasks.forEach(taskType => {
     const config = llmGateway.getTaskBehaviorConfig(taskType);
     if (config) {

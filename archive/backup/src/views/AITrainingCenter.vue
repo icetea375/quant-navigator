@@ -39,13 +39,13 @@
       <!-- 左侧报告列表 -->
       <div class="left-panel">
         <!-- 筛选栏 -->
-        <FilterBar 
+        <FilterBar
           @filter-change="handleFilterChange"
           :loading="loading"
         />
-        
+
         <!-- 报告列表 -->
-        <ReportList 
+        <ReportList
           :reports="reports"
           :loading="loading"
           :selected-report-id="selectedReportId"
@@ -56,7 +56,7 @@
 
       <!-- 右侧标注面板 -->
       <div class="right-panel">
-        <AnnotationPanel 
+        <AnnotationPanel
           :report="selectedReport"
           :loading="reportLoading"
           @feedback-submit="handleFeedbackSubmit"
@@ -244,7 +244,7 @@ onMounted(async () => {
     grid-template-columns: 1fr;
     height: auto;
   }
-  
+
   .left-panel,
   .right-panel {
     min-height: 500px;

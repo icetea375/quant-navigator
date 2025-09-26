@@ -46,13 +46,13 @@
             <el-breadcrumb-item>{{ currentPageTitle }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
-        
+
         <div class="header-right">
           <el-button type="text" @click="$router.push('/market-radar')">
-            <el-icon><Radar /></el-icon>
+            <el-icon><Monitor /></el-icon>
             市场雷达
           </el-button>
-          
+
           <el-dropdown>
             <el-button type="text">
               <el-avatar :size="32" :src="userAvatar">
@@ -147,9 +147,9 @@ import { ref, computed, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { 
-  TrendCharts, Expand, Fold, User, DataAnalysis, Radar, 
-  ArrowDown, Setting, SwitchButton 
+import {
+  TrendCharts, Expand, Fold, User, DataAnalysis, Monitor,
+  ArrowDown, Setting, SwitchButton
 } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 
@@ -199,7 +199,7 @@ const handleLogout = async () => {
       cancelButtonText: '取消',
       type: 'warning'
     })
-    
+
     authStore.logout()
     ElMessage.success('已退出登录')
     router.push('/')
@@ -335,18 +335,17 @@ onMounted(() => {
     transform: translateX(-100%);
     transition: transform 0.3s ease;
   }
-  
+
   .sidebar:not(.collapsed) {
     transform: translateX(0);
   }
-  
+
   .main-container {
     width: 100%;
   }
-  
+
   .user-name {
     display: none;
   }
 }
 </style>
-

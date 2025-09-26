@@ -7,12 +7,15 @@ import pytest
 import asyncio
 import os
 from typing import AsyncGenerator, Generator
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 # 设置测试环境变量
-os.environ['NODE_ENV'] = 'test'
-os.environ['DATABASE_URL'] = 'postgresql://postgres:testpass@localhost:5432/quant_navigator_test'
-os.environ['REDIS_URL'] = 'redis://localhost:6379/1'
+os.environ["NODE_ENV"] = "test"
+os.environ["DATABASE_URL"] = (
+    "postgresql://postgres:testpass@localhost:5432/quant_navigator_test"
+)
+os.environ["REDIS_URL"] = "redis://localhost:6379/1"
+
 
 @pytest.fixture(scope="session")
 def event_loop() -> Generator:
@@ -21,6 +24,7 @@ def event_loop() -> Generator:
     yield loop
     loop.close()
 
+
 @pytest.fixture
 async def test_db() -> AsyncGenerator:
     """测试数据库连接 - 遵循TDD原则，先有测试用例"""
@@ -28,11 +32,13 @@ async def test_db() -> AsyncGenerator:
     # 然后才实现具体的数据库连接逻辑
     yield Mock()  # 临时Mock，等待测试用例定义接口
 
+
 @pytest.fixture
 async def test_redis() -> AsyncGenerator:
     """测试Redis连接 - 遵循TDD原则"""
     # 这里应该先有测试用例验证Redis连接
     yield Mock()  # 临时Mock，等待测试用例定义接口
+
 
 @pytest.fixture
 def mock_llm_service():
@@ -42,18 +48,17 @@ def mock_llm_service():
     mock.call_llm.return_value = "Mock LLM response"
     return mock
 
+
 @pytest.fixture
 def test_data():
     """测试数据工厂 - 遵循TDD原则"""
     # 这里应该先有测试用例定义需要什么样的测试数据
-    return {
-        'stock_code': '000001',
-        'date': '2025-01-17',
-        'test_scenarios': []
-    }
+    return {"stock_code": "000001", "date": "2025-01-17", "test_scenarios": []}
+
 
 # 测试标记
 pytest_plugins = []
+
 
 def pytest_configure(config):
     """pytest配置 - 遵循TDD原则"""
@@ -64,6 +69,7 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "slow: 慢速测试")
     config.addinivalue_line("markers", "database: 需要数据库的测试")
     config.addinivalue_line("markers", "llm: LLM相关测试")
+
 
 def pytest_collection_modifyitems(config, items):
     """修改测试收集 - 遵循TDD原则"""

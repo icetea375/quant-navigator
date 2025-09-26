@@ -40,7 +40,7 @@ export class SimpleDistributedLockManager {
     this.redis = redis;
     this.config = config;
     this.ownerId = this.generateOwnerId();
-    
+
     this.validateConfig(config);
   }
 
@@ -54,7 +54,7 @@ export class SimpleDistributedLockManager {
     }
 
     this.isRunning = true;
-    
+
     // 启动死锁检测
     if (this.config.enableDeadlockDetection) {
       this.deadlockDetectionInterval = setInterval(() => {
@@ -72,7 +72,7 @@ export class SimpleDistributedLockManager {
     if (!this.isRunning) return;
 
     this.isRunning = false;
-    
+
     if (this.deadlockDetectionInterval) {
       clearInterval(this.deadlockDetectionInterval);
       this.deadlockDetectionInterval = undefined;
@@ -97,7 +97,7 @@ export class SimpleDistributedLockManager {
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
         // 尝试获取锁
         const acquired = await this.redis.set(lockKey, lockValue, 'PX', lockTtl, 'NX');
-        
+
         if (acquired === 'OK') {
           const lockInfo: LockInfo = {
             key: lockKey,
@@ -109,10 +109,10 @@ export class SimpleDistributedLockManager {
           };
 
           this.activeLocks.set(key, lockInfo);
-          
+
           // 启动锁续期
           this.startLockRenewal(key, lockInfo);
-          
+
           logger.debug(`🔒 锁已获取: ${key} (TTL: ${lockTtl}ms)`);
           return true;
         }
@@ -144,7 +144,7 @@ export class SimpleDistributedLockManager {
       }
 
       const lockKey = this.getLockKey(key);
-      
+
       // 使用Lua脚本确保原子性
       const luaScript = `
         if redis.call("get", KEYS[1]) == ARGV[1] then
@@ -155,7 +155,7 @@ export class SimpleDistributedLockManager {
       `;
 
       const result = await this.redis.eval(luaScript, 1, lockKey, lockInfo.value);
-      
+
       if (result === 1) {
         this.activeLocks.delete(key);
         logger.debug(`🔓 锁已释放: ${key}`);
@@ -213,13 +213,13 @@ export class SimpleDistributedLockManager {
     try {
       const lockKey = this.getLockKey(key);
       const result = await this.redis.del(lockKey);
-      
+
       if (result === 1) {
         this.activeLocks.delete(key);
         logger.warn(`🔓 锁被强制释放: ${key}`);
         return true;
       }
-      
+
       return false;
     } catch (error) {
       BaseErrorHandler.handle(error, 'SimpleDistributedLockManager');
@@ -232,13 +232,13 @@ export class SimpleDistributedLockManager {
    */
   async releaseAllLocks(): Promise<number> {
     let releasedCount = 0;
-    
+
     for (const key of this.activeLocks.keys()) {
       if (await this.releaseLock(key)) {
         releasedCount++;
       }
     }
-    
+
     logger.info(`🔓 已释放 ${releasedCount} 个锁`);
     return releasedCount;
   }
@@ -248,7 +248,7 @@ export class SimpleDistributedLockManager {
    */
   private startLockRenewal(key: string, lockInfo: LockInfo): void {
     const renewalInterval = Math.min(lockInfo.ttl / 3, 30000); // 每1/3 TTL或30秒续期一次
-    
+
     const renewalTimer = setInterval(async () => {
       try {
         if (!this.activeLocks.has(key)) {
@@ -276,7 +276,7 @@ export class SimpleDistributedLockManager {
   private async renewLock(key: string, lockInfo: LockInfo): Promise<boolean> {
     try {
       const lockKey = this.getLockKey(key);
-      
+
       // 使用Lua脚本确保原子性
       const luaScript = `
         if redis.call("get", KEYS[1]) == ARGV[1] then
@@ -287,12 +287,12 @@ export class SimpleDistributedLockManager {
       `;
 
       const result = await this.redis.eval(luaScript, 1, lockKey, lockInfo.value, lockInfo.ttl);
-      
+
       if (result === 1) {
         lockInfo.expiresAt = Date.now() + lockInfo.ttl;
         return true;
       }
-      
+
       return false;
     } catch (error) {
       BaseErrorHandler.handle(error, 'SimpleDistributedLockManager');
@@ -367,7 +367,7 @@ export class SimpleDistributedLockManager {
    */
   private validateConfig(config: DistributedLockConfig): void {
     BaseConfigValidator.validate(config, ['enabled', 'defaultTtl', 'maxTtl']);
-    
+
     if (config.defaultTtl <= 0) {
       throw new Error('defaultTtl must be positive');
     }
@@ -392,7 +392,7 @@ export class SimpleDistributedLockManager {
     const now = Date.now();
     const activeLocks = this.activeLocks.size;
     const expiredLocks = Array.from(this.activeLocks.values()).filter(lock => now > lock.expiresAt).length;
-    
+
     return {
       active: activeLocks,
       expired: expiredLocks,
@@ -450,9 +450,9 @@ export class SimpleDistributedLockManager {
    * 使用锁执行函数（带超时）
    */
   async withLockTimeout<T>(
-    key: string, 
-    fn: () => Promise<T>, 
-    ttl?: number, 
+    key: string,
+    fn: () => Promise<T>,
+    ttl?: number,
     timeout?: number
   ): Promise<T> {
     const acquired = await this.acquireLock(key, ttl);
@@ -464,7 +464,7 @@ export class SimpleDistributedLockManager {
       if (timeout) {
         return await Promise.race([
           fn(),
-          new Promise<never>((_, reject) => 
+          new Promise<never>((_, reject) =>
             setTimeout(() => reject(new Error('Lock operation timeout')), timeout)
           )
         ]);

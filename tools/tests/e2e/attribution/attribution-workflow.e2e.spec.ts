@@ -27,13 +27,13 @@ test.describe('异常事件归因流程E2E测试', () => {
   test.beforeEach(async ({ browser }: { browser: any }) => {
     // 创建新的浏览器页面
     page = await browser.newPage();
-    
+
     // 设置视口大小
     await page.setViewportSize({ width: 1920, height: 1080 });
-    
+
     // 导航到事件归因页面
     await page.goto(`${BASE_URL}/admin/events/attribution`);
-    
+
     // 等待页面加载完成
     await page.waitForLoadState('networkidle');
   });
@@ -59,7 +59,7 @@ test.describe('异常事件归因流程E2E测试', () => {
 
     // 步骤4: 点击事件进入详情页面
     await page.locator('[data-testid="event-item"]').first().click();
-    
+
     // 步骤5: 验证事件详情显示
     await expect(page.locator('[data-testid="event-detail"]')).toBeVisible();
     await expect(page.locator('[data-testid="event-content"]')).toContainText(testEvent.content);
@@ -140,7 +140,7 @@ test.describe('异常事件归因流程E2E测试', () => {
     // 点击导出按钮
     const downloadPromise = page.waitForEvent('download');
     await page.locator('[data-testid="export-report-button"]').click();
-    
+
     // 验证下载开始
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toMatch(/attribution-report-.*\.pdf/);
@@ -181,9 +181,9 @@ async function createTestEvent(page: Page) {
   const response = await page.request.post(`${API_BASE_URL}/api/events`, {
     data: testEvent
   });
-  
+
   expect(response.ok()).toBeTruthy();
-  
+
   // 等待事件出现在列表中
   await page.waitForSelector('[data-testid="event-item"]', { timeout: 10000 });
 }

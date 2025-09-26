@@ -48,37 +48,37 @@
       <!-- 标注表单 -->
       <div class="annotation-form">
         <h4>专家标注</h4>
-        
+
         <form @submit.prevent="handleSubmit">
           <!-- 质量评级 -->
           <div class="form-group">
             <label class="form-label">质量评级 *</label>
             <div class="rating-options">
               <label class="rating-option good">
-                <input 
-                  type="radio" 
-                  v-model="feedback.rating" 
+                <input
+                  type="radio"
+                  v-model="feedback.rating"
                   value="GOOD"
                   required
                 />
                 <span class="rating-icon">🟢</span>
                 <span class="rating-text">准确</span>
               </label>
-              
+
               <label class="rating-option partial">
-                <input 
-                  type="radio" 
-                  v-model="feedback.rating" 
+                <input
+                  type="radio"
+                  v-model="feedback.rating"
                   value="PARTIAL"
                 />
                 <span class="rating-icon">🟠</span>
                 <span class="rating-text">部分准确</span>
               </label>
-              
+
               <label class="rating-option bad">
-                <input 
-                  type="radio" 
-                  v-model="feedback.rating" 
+                <input
+                  type="radio"
+                  v-model="feedback.rating"
                   value="BAD"
                 />
                 <span class="rating-icon">🔴</span>
@@ -92,36 +92,36 @@
             <label class="form-label">错误类型</label>
             <div class="error-types">
               <label class="error-type-option">
-                <input 
-                  type="checkbox" 
-                  v-model="feedback.errorTypes" 
+                <input
+                  type="checkbox"
+                  v-model="feedback.errorTypes"
                   value="MISSING_KEY_INFO"
                 />
                 <span>遗漏关键信息</span>
               </label>
-              
+
               <label class="error-type-option">
-                <input 
-                  type="checkbox" 
-                  v-model="feedback.errorTypes" 
+                <input
+                  type="checkbox"
+                  v-model="feedback.errorTypes"
                   value="FACTUAL_ERROR"
                 />
                 <span>事实判断错误</span>
               </label>
-              
+
               <label class="error-type-option">
-                <input 
-                  type="checkbox" 
-                  v-model="feedback.errorTypes" 
+                <input
+                  type="checkbox"
+                  v-model="feedback.errorTypes"
                   value="CAUSAL_FALLACY"
                 />
                 <span>因果逻辑混乱</span>
               </label>
-              
+
               <label class="error-type-option">
-                <input 
-                  type="checkbox" 
-                  v-model="feedback.errorTypes" 
+                <input
+                  type="checkbox"
+                  v-model="feedback.errorTypes"
                   value="EXPRESSION_POOR"
                 />
                 <span>表达方式不佳</span>
@@ -132,7 +132,7 @@
           <!-- 专家意见 -->
           <div class="form-group">
             <label class="form-label">专家意见 *</label>
-            <textarea 
+            <textarea
               v-model="feedback.correctReasonText"
               placeholder="请提供正确的分析或改进建议..."
               rows="4"
@@ -143,15 +143,15 @@
 
           <!-- 提交按钮 -->
           <div class="form-actions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               @click="resetForm"
               class="btn btn-secondary"
             >
               重置
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               :disabled="submitting"
               class="btn btn-primary"
             >
@@ -259,10 +259,10 @@ const formatMarkdown = (markdown: string) => {
 
 const getEvidenceItems = () => {
   if (!props.report?.evidencePayload) return []
-  
+
   const evidence = props.report.evidencePayload
   const items = []
-  
+
   if (evidence.attributionFactors) {
     items.push({
       type: '归因因子',
@@ -270,7 +270,7 @@ const getEvidenceItems = () => {
       content: JSON.stringify(evidence.attributionFactors, null, 2)
     })
   }
-  
+
   if (evidence.supportingEvidence) {
     items.push({
       type: '支持证据',
@@ -278,7 +278,7 @@ const getEvidenceItems = () => {
       content: JSON.stringify(evidence.supportingEvidence, null, 2)
     })
   }
-  
+
   return items
 }
 </script>
@@ -574,15 +574,15 @@ const getEvidenceItems = () => {
   .rating-options {
     flex-direction: column;
   }
-  
+
   .error-types {
     grid-template-columns: 1fr;
   }
-  
+
   .form-actions {
     flex-direction: column;
   }
-  
+
   .btn {
     width: 100%;
   }

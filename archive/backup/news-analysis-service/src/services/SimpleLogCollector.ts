@@ -1,7 +1,7 @@
 /**
  * 简单日志收集器
  * 提供基础的日志记录功能
- * 
+ *
  * @author AI Assistant
  * @created 2025-01-17
  * @version 2.0.0
@@ -63,7 +63,7 @@ export class SimpleLogCollector {
       averageLogSize: 0,
       lastLogTime: 0
     };
-    
+
     this.validateConfig(config);
     this.startBufferFlush();
   }
@@ -173,7 +173,7 @@ export class SimpleLogCollector {
     const timestamp = new Date(logEntry.timestamp).toISOString();
     const prefix = `[${timestamp}] [${logEntry.level.toUpperCase()}] [${logEntry.service}]`;
     const metaStr = logEntry.meta ? JSON.stringify(logEntry.meta, null, 2) : '';
-    
+
     switch (logEntry.level) {
       case 'info':
         console.log(`${prefix} ${logEntry.message}`, metaStr);
@@ -203,18 +203,18 @@ export class SimpleLogCollector {
   private updateMetrics(logEntry: LogEntry): void {
     this.metrics.totalLogs++;
     this.metrics.lastLogTime = logEntry.timestamp;
-    
+
     // 按级别统计
     this.metrics.logsByLevel[logEntry.level] = (this.metrics.logsByLevel[logEntry.level] || 0) + 1;
-    
+
     // 按服务统计
     this.metrics.logsByService[logEntry.service] = (this.metrics.logsByService[logEntry.service] || 0) + 1;
-    
+
     // 计算错误率
     const totalLogs = this.metrics.totalLogs;
     const errorLogs = this.metrics.logsByLevel.error || 0;
     this.metrics.errorRate = totalLogs > 0 ? errorLogs / totalLogs : 0;
-    
+
     // 计算平均日志大小
     const logSize = JSON.stringify(logEntry).length;
     this.metrics.averageLogSize = (this.metrics.averageLogSize * (totalLogs - 1) + logSize) / totalLogs;
@@ -284,15 +284,15 @@ export class SimpleLogCollector {
    */
   private validateConfig(config: LogConfig): void {
     BaseConfigValidator.validateRequired(config, ['logLevel', 'enableDatabase', 'enableConsole']);
-    
+
     if (config.maxFileSize <= 0) {
       throw new Error('maxFileSize must be positive');
     }
-    
+
     if (config.maxFiles <= 0) {
       throw new Error('maxFiles must be positive');
     }
-    
+
     if (config.retentionDays <= 0) {
       throw new Error('retentionDays must be positive');
     }
@@ -347,7 +347,7 @@ export class SimpleLogCollector {
       clearInterval(this.flushInterval);
       this.flushInterval = null;
     }
-    
+
     // 刷新剩余的日志
     this.flushBuffer();
   }

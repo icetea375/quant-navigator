@@ -20,7 +20,7 @@ const testCase = {
     reasoning: '基于技术分析，该股票具有上涨潜力'
   },
   doubaoReport: {
-    recommendation: '看跌', 
+    recommendation: '看跌',
     confidence: 72,
     reasoning: '市场情绪偏悲观，存在下行风险'
   }
@@ -32,13 +32,13 @@ test.describe('仲裁工作流E2E测试', () => {
   test.beforeEach(async ({ browser }) => {
     // 创建新的浏览器页面
     page = await browser.newPage();
-    
+
     // 设置视口大小
     await page.setViewportSize({ width: 1920, height: 1080 });
-    
+
     // 导航到仲裁仪表盘
     await page.goto(`${BASE_URL}/admin/governance/arbitration`);
-    
+
     // 等待页面加载完成
     await page.waitForLoadState('networkidle');
   });
@@ -64,7 +64,7 @@ test.describe('仲裁工作流E2E测试', () => {
 
     // 步骤4: 点击案件进入详情页面
     await page.locator('[data-testid="case-card"]').first().click();
-    
+
     // 步骤5: 验证双报告对比区域显示
     await expect(page.locator('[data-testid="comparison-section"]')).toBeVisible();
     await expect(page.locator('[data-testid="qwen-report"]')).toBeVisible();
@@ -158,9 +158,9 @@ async function createTestArbitrationCase(page: Page) {
       trade_date: testCase.tradeDate
     }
   });
-  
+
   expect(response.ok()).toBeTruthy();
-  
+
   // 等待案件出现在列表中
   await page.waitForSelector('[data-testid="case-card"]', { timeout: 10000 });
 }
@@ -168,13 +168,13 @@ async function createTestArbitrationCase(page: Page) {
 async function fillArbitrationForm(page: Page) {
   // 选择最终推荐
   await page.locator('[data-testid="final-recommendation-看涨"]').click();
-  
+
   // 填写置信度
   await page.locator('[data-testid="confidence-level-input"]').fill('85');
-  
+
   // 填写推理过程
   await page.locator('[data-testid="reasoning-textarea"]').fill('基于综合分析，该股票具有上涨潜力');
-  
+
   // 填写关键分歧
   await page.locator('[data-testid="key-disagreements-textarea"]').fill('技术面与情绪面存在分歧');
 }

@@ -205,11 +205,11 @@ onMounted(() => {
   .page-header h1 {
     font-size: 28px;
   }
-  
+
   .page-header p {
     font-size: 16px;
   }
-  
+
   .card-header {
     flex-direction: column;
     gap: 10px;
@@ -217,4 +217,3 @@ onMounted(() => {
   }
 }
 </style>
-

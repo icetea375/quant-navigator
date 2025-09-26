@@ -41,7 +41,7 @@ export class TestDataManager {
    */
   async createDataset(name: string, type: 'historical' | 'mock' | 'fixture', data: any[]): Promise<string> {
     const datasetId = `dataset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const dataset: TestDataset = {
       id: datasetId,
       name,
@@ -85,11 +85,11 @@ export class TestDataManager {
    */
   async createHistoricalDataset(config: HistoricalDataConfig): Promise<string> {
     this.logger.log(`创建历史数据测试集: ${config.startDate} - ${config.endDate}`);
-    
+
     // 这里可以添加真实的历史数据获取逻辑
     // 目前创建模拟数据
     const mockData = this.generateMockHistoricalData(config);
-    
+
     return await this.createDataset(
       `historical_${config.startDate}_${config.endDate}`,
       'historical',
@@ -121,20 +121,20 @@ export class TestDataManager {
     isValid: boolean;
   }> {
     const { data } = dataset;
-    
+
     // 检查数据完整性
     const completeness = data.length > 0 ? 1 : 0;
-    
+
     // 检查数据准确性（简单验证）
     const accuracy = this.calculateAccuracy(data);
-    
+
     // 检查数据一致性
     const consistency = this.calculateConsistency(data);
-    
+
     const isValid = completeness > 0.95 && accuracy > 0.98 && consistency > 0.95;
-    
+
     this.logger.log(`数据质量验证: 完整性=${completeness}, 准确性=${accuracy}, 一致性=${consistency}`);
-    
+
     return { completeness, accuracy, consistency, isValid };
   }
 
@@ -143,13 +143,13 @@ export class TestDataManager {
    */
   async cleanup(): Promise<void> {
     this.datasets.clear();
-    
+
     // 清理临时文件
     const tempDir = path.join(this.dataDir, 'temp');
     if (fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
-    
+
     this.logger.log('测试数据清理完成');
   }
 
@@ -172,7 +172,7 @@ export class TestDataManager {
     const data = [];
     const startDate = new Date(config.startDate);
     const endDate = new Date(config.endDate);
-    
+
     for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
       if (d.getDay() !== 0 && d.getDay() !== 6) { // 排除周末
         config.symbols.forEach(symbol => {
@@ -189,7 +189,7 @@ export class TestDataManager {
         });
       }
     }
-    
+
     return data;
   }
 
@@ -203,4 +203,3 @@ export class TestDataManager {
     return data.length > 0 ? 0.98 : 0;
   }
 }
-

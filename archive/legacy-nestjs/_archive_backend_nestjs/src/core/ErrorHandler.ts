@@ -47,7 +47,7 @@ export class CustomError extends Error implements AppError {
     this.isOperational = isOperational;
     this.context = context;
     this.timestamp = new Date().toISOString();
-    
+
     Error.captureStackTrace(this, this.constructor);
   }
 }
@@ -201,7 +201,7 @@ export class ErrorHandler {
    */
   private formatErrorResponse(error: AppError, req: Request): any {
     const isDevelopment = process.env.NODE_ENV === 'development';
-    
+
     const response: any = {
       success: false,
       error: {
