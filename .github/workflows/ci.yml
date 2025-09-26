@@ -70,6 +70,13 @@ jobs:
 
       - name: Run Python unit tests with coverage gate
         run: |
+          # 创建虚拟环境
+          python -m venv venv
+          source venv/bin/activate
+          # 安装依赖
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          # 运行测试
           cd packages/backend-python
           python -m pytest --cov=src --cov-fail-under=85 --cov-branch --cov-report=term-missing --cov-report=xml
         env:
@@ -152,8 +159,13 @@ jobs:
         run: |
           # 运行TypeScript集成测试
           pnpm test:integration
-          # 运行Python测试和覆盖率门禁检查
-          cd packages/backend-python && poetry run pytest --cov=src --cov-fail-under=85 --cov-branch --cov-report=term-missing --cov-report=xml
+          # 创建虚拟环境并运行Python测试
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          cd packages/backend-python
+          python -m pytest --cov=src --cov-fail-under=85 --cov-branch --cov-report=term-missing --cov-report=xml
         env:
           DATABASE_URL: postgresql://postgres:testpass@localhost:5432/quant_navigator_test
           REDIS_URL: redis://localhost:6379
@@ -566,6 +578,9 @@ jobs:
 
       - name: Install dependencies
         run: |
+          # 创建虚拟环境
+          python -m venv venv
+          source venv/bin/activate
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-asyncio
@@ -574,6 +589,8 @@ jobs:
         env:
           TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
         run: |
+          # 激活虚拟环境
+          source venv/bin/activate
           echo "🚀 运行真实世界E2E测试..."
           echo "注意：这些测试会调用真实的Tushare API"
           echo "如果失败，请人工判断是外部问题还是代码问题"
