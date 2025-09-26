@@ -1,0 +1,44 @@
+[tool.ruff]
+# Ruff配置文件 - 遵循LINTING_PHILOSOPHY.md中的判例法
+# 每个配置都有对应的判例记录，详见docs/LINTING_PHILOSOPHY.md
+
+# 判例 L012: 目标Python版本
+target-version = "py39"
+
+# 判例 L013: 行长度限制
+line-length = 88
+
+# 判例 L001-L008: 启用的规则集合
+select = [
+    "E",      # pycodestyle errors (判例 L001)
+    "W",      # pycodestyle warnings (判例 L001)
+    "F",      # pyflakes (判例 L001)
+    "I",      # isort (判例 L002)
+    "B",      # flake8-bugbear (判例 L003)
+    "C4",     # flake8-comprehensions (判例 L003)
+    "UP",     # pyupgrade (判例 L004)
+    "ARG001", # unused-function-args (判例 L005)
+    "SIM",    # flake8-simplify (判例 L003)
+    "TCH",    # flake8-type-checking (判例 L006)
+    "Q",      # flake8-quotes (判例 L007)
+    "RUF",    # ruff-specific rules (判例 L008)
+]
+
+# 判例 L009-L011: 禁用的规则
+ignore = [
+    "E501",   # line too long, handled by formatter (判例 L009)
+    "B008",   # do not perform function calls in argument defaults (判例 L010)
+    "C901",   # too complex (判例 L011)
+]
+
+# 判例 L014-L015: 格式化配置
+[tool.ruff.format]
+quote-style = "double"      # 判例 L014
+indent-style = "space"      # 判例 L015
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+# 判例 L016-L017: 导入排序配置
+[tool.ruff.isort]
+known-first-party = ["src"]  # 判例 L016
+force-single-line = false    # 判例 L017
