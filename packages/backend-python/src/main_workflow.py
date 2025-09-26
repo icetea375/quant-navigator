@@ -23,10 +23,12 @@ sys.path.append(str(project_root))
 # 导入核心服务
 # 导入异常类
 from schemas.arbitration import AnalysisResult  # noqa: E402
+from services.arbitration_service import ArbitrationService  # noqa: E402
 from services.data_pipeline_service import DataPipelineService  # noqa: E402
 from services.llm_service import LLMService  # noqa: E402
 from services.meta_cognition_engine import MetaCognitionEngine  # noqa: E402
 from services.quant_signal_service import QuantSignalService  # noqa: E402
+from services.report_service import ReportService  # noqa: E402
 from src.exceptions.workflow_exceptions import (  # noqa: E402
     ArbitrationWorkflowError,
     LLMServiceError,
@@ -60,6 +62,10 @@ class MainWorkflow:
         self.data_pipeline = DataPipelineService(config)
         self.quant_engine = QuantSignalService(config)
         self.llm_service = LLMService(config)
+        
+        # 初始化仲裁和报告服务
+        self.arbitration_service = ArbitrationService()
+        self.report_service = ReportService()
 
         # 初始化元认知引擎
         self.meta_cognition_engine = MetaCognitionEngine(self.llm_service)
@@ -500,9 +506,33 @@ class MainWorkflow:
             保存结果
         """
         try:
-            # 这里应该调用数据库服务保存报告
-            # 暂时返回模拟结果
-            return {"id": f"{report_type}_{report.get('stock_code', 'unknown')}"}
+            from datetime import date
+            from schemas.reports import ReportCreate, ReportType
+            
+            # 将字符串类型转换为枚举
+            type_mapping = {
+                "qwen_fact_based": ReportType.FACT_ANALYSIS,
+                "doubao_sentiment_based": ReportType.SENTIMENT_ANALYSIS,
+                "daily_analysis": ReportType.DAILY_ANALYSIS,
+                "arbitration_case": ReportType.ARBITRATION_CASE
+            }
+            
+            report_type_enum = type_mapping.get(report_type, ReportType.DAILY_ANALYSIS)
+            
+            # 创建报告数据
+            report_data = ReportCreate(
+                report_type=report_type_enum,
+                target_code=report.get('stock_code'),
+                report_date=date.today(),
+                content=json.dumps(report, ensure_ascii=False, indent=2)
+            )
+            
+            # 调用ReportService保存报告
+            saved_report = await self.report_service.create_report(report_data)
+            
+            self.logger.info(f"报告保存成功: {saved_report.report_id}")
+            return {"id": saved_report.report_id, "report_id": saved_report.report_id}
+            
         except Exception as e:
             self.logger.error(f"保存报告失败: {e}")
             raise
@@ -523,9 +553,36 @@ class MainWorkflow:
             案件信息
         """
         try:
-            # 这里应该调用数据库服务创建仲裁案件
-            # 暂时返回模拟结果
-            return {"case_id": f"case_{stock_code}_{trade_date}"}
+            from schemas.arbitration import ArbitrationCaseCreate, AnalysisResult, SentimentAnalysis
+            
+            # 创建Qwen分析结果
+            qwen_analysis = AnalysisResult(
+                analysis=qwen_report.get('analysis', ''),
+                confidence=qwen_report.get('confidence', 0.0),
+                reasoning=qwen_report.get('reasoning', '')
+            )
+            
+            # 创建豆包情感分析结果
+            doubao_analysis = SentimentAnalysis(
+                sentiment=doubao_report.get('sentiment', 'neutral'),
+                score=doubao_report.get('score', 0.0),
+                reasoning=doubao_report.get('reasoning', '')
+            )
+            
+            # 创建仲裁案件数据
+            case_data = ArbitrationCaseCreate(
+                report_type="fact_analysis",
+                target_code=stock_code,
+                qwen_analysis=qwen_analysis,
+                doubao_analysis=doubao_analysis
+            )
+            
+            # 调用ArbitrationService创建案件
+            created_case = await self.arbitration_service.create_case(case_data)
+            
+            self.logger.info(f"仲裁案件创建成功: {created_case.case_id}")
+            return {"case_id": created_case.case_id, "case": created_case}
+            
         except Exception as e:
             self.logger.error(f"创建仲裁案件失败: {e}")
             raise

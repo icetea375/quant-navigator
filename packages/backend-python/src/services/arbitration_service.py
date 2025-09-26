@@ -10,6 +10,7 @@ from src.schemas.arbitration import (
     ArbitrationCase,
     ArbitrationCaseCreate,
     ArbitrationCaseUpdate,
+    ArbitrationStatus,
     SentimentAnalysis,
 )
 
@@ -39,7 +40,7 @@ class ArbitrationService:
                 reasoning="市场情绪积极，投资者信心较强",
             ),
             disagreement_score=0.3,
-            status="pending",
+            status=ArbitrationStatus.PENDING,
             created_at=datetime.now(),
         )
         self.cases[sample_case.case_id] = sample_case
@@ -56,7 +57,9 @@ class ArbitrationService:
         filtered_cases = list(self.cases.values())
 
         if status:
-            filtered_cases = [case for case in filtered_cases if case.status == status]
+            filtered_cases = [
+                case for case in filtered_cases if case.status.value == status
+            ]
 
         if target_code:
             filtered_cases = [
@@ -81,14 +84,28 @@ class ArbitrationService:
     async def create_case(self, case_data: ArbitrationCaseCreate) -> ArbitrationCase:
         """创建新的仲裁案件"""
         case_id = f"case_{len(self.cases) + 1:03d}"
+
+        # 计算分歧分数（基于Qwen和豆包分析的差异）
+        disagreement_score = 0.0
+        if case_data.qwen_analysis and case_data.doubao_analysis:
+            # 简单的分歧计算：基于置信度和情感得分的差异
+            confidence_diff = abs(
+                case_data.qwen_analysis.confidence - case_data.doubao_analysis.score
+            )
+            disagreement_score = min(confidence_diff * 2, 1.0)  # 限制在0-1之间
+
+        # 将Pydantic对象转换为字典以兼容Pydantic v2
+        qwen_analysis_dict = case_data.qwen_analysis.model_dump() if case_data.qwen_analysis else None
+        doubao_analysis_dict = case_data.doubao_analysis.model_dump() if case_data.doubao_analysis else None
+        
         case = ArbitrationCase(
             case_id=case_id,
             report_type=case_data.report_type,
             target_code=case_data.target_code,
-            qwen_analysis=case_data.qwen_analysis,
-            doubao_analysis=case_data.doubao_analysis,
-            disagreement_score=case_data.disagreement_score,
-            status="pending",
+            qwen_analysis=qwen_analysis_dict,
+            doubao_analysis=doubao_analysis_dict,
+            disagreement_score=disagreement_score,
+            status=ArbitrationStatus.PENDING,
             created_at=datetime.now(),
         )
         self.cases[case_id] = case
@@ -138,7 +155,9 @@ class ArbitrationService:
                 f"豆包情感得分: {case.doubao_analysis.score:.2f}",
                 f"分歧程度: {case.disagreement_score:.2f}",
             ],
-            "recommendation": "建议人工仲裁" if case.disagreement_score > 0.5 else "可自动处理",
+            "recommendation": "建议人工仲裁"
+            if case.disagreement_score > 0.5
+            else "可自动处理",
         }
 
         return summary
@@ -146,9 +165,23 @@ class ArbitrationService:
     async def get_statistics(self) -> Dict[str, Any]:
         """获取统计信息"""
         total_cases = len(self.cases)
-        pending_cases = len([case for case in self.cases.values() if case.status == "pending"])
-        completed_cases = len([case for case in self.cases.values() if case.status == "completed"])
-        high_disagreement = len([case for case in self.cases.values() if case.disagreement_score > 0.7])
+        pending_cases = len(
+            [
+                case
+                for case in self.cases.values()
+                if case.status == ArbitrationStatus.PENDING
+            ]
+        )
+        completed_cases = len(
+            [
+                case
+                for case in self.cases.values()
+                if case.status == ArbitrationStatus.RESOLVED
+            ]
+        )
+        high_disagreement = len(
+            [case for case in self.cases.values() if case.disagreement_score > 0.7]
+        )
 
         return {
             "total_cases": total_cases,
