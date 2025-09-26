@@ -52,7 +52,7 @@ repos:
     hooks:
       - id: pytest-cov
         name: pytest with coverage enforcement
-        entry: bash -c 'cd packages/backend && python -m pytest --cov=src --cov-fail-under=85 --cov-branch --cov-report=term-missing --cov-report=html'
+        entry: bash -c 'cd packages/backend-python && python -m pytest --cov=src --cov-fail-under=85 --cov-branch --cov-report=term-missing --cov-report=html'
         language: system
         types: [python]
         pass_filenames: false  # 确保每次都运行完整的测试套件
