@@ -64,6 +64,15 @@ jobs:
       - name: Run unit tests
         run: pnpm test:unit
 
+      - name: Run Python unit tests with coverage gate
+        run: |
+          cd packages/backend
+          python -m pytest --cov=src --cov-fail-under=85 --cov-branch --cov-report=term-missing --cov-report=xml
+        env:
+          DATABASE_URL: postgresql://postgres:testpass@localhost:5432/quant_navigator_test
+          REDIS_URL: redis://localhost:6379
+          NODE_ENV: test
+
       - name: Upload unit test results
         uses: actions/upload-artifact@v4
         if: always()
@@ -75,7 +84,7 @@ jobs:
   test-integration:
     name: Integration Tests
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:15
@@ -90,7 +99,7 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-      
+
       redis:
         image: redis:6-alpine
         options: >-
@@ -135,10 +144,14 @@ jobs:
         env:
           PGPASSWORD: testpass
 
-      - name: Run integration tests
-        run: pnpm test:integration
+      - name: Run Quality Assurance Suite
+        run: |
+          # 运行TypeScript集成测试
+          pnpm test:integration
+          # 运行Python测试和覆盖率门禁检查
+          cd packages/backend-python && poetry run pytest --cov=src --cov-fail-under=85 --cov-branch --cov-report=term-missing --cov-report=xml
         env:
-          继续jiDATABASE_URL: postgresql://postgres:testpass@localhost:5432/quant_navigator_test
+          DATABASE_URL: postgresql://postgres:testpass@localhost:5432/quant_navigator_test
           REDIS_URL: redis://localhost:6379
           NODE_ENV: test
 
@@ -154,7 +167,7 @@ jobs:
     name: End-to-End Tests
     runs-on: ubuntu-latest
     needs: [lint, test-unit, test-integration]
-    
+
     services:
       postgres:
         image: postgres:15
@@ -169,7 +182,7 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-      
+
       redis:
         image: redis:6-alpine
         options: >-
@@ -206,14 +219,14 @@ jobs:
           # Start Python backend
           cd packages/backend && python -m uvicorn src.main:app --host 0.0.0.0 --port 8000 &
           BACKEND_PID=$!
-          
+
           # Start frontend
           cd ../../packages/frontend-main && npm start &
           FRONTEND_PID=$!
-          
+
           # Wait for services to be ready
           sleep 30
-          
+
           # Check if services are running
           curl -f http://localhost:8000/health || exit 1
           curl -f http://localhost:3000 || exit 1
@@ -241,7 +254,7 @@ jobs:
     name: Test Coverage
     runs-on: ubuntu-latest
     needs: [test-unit, test-integration]
-    
+
     services:
       postgres:
         image: postgres:15
@@ -256,7 +269,7 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-      
+
       redis:
         image: redis:6-alpine
         options: >-
@@ -321,6 +334,7 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
+
 
   # 架构符合性扫描
   architecture-scan:
@@ -394,7 +408,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test-unit, test-integration]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+
     services:
       postgres:
         image: postgres:15
@@ -409,7 +423,7 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-      
+
       redis:
         image: redis:6-alpine
         options: >-
@@ -460,7 +474,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint, test-unit, test-integration, test-e2e, coverage, security]
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
-    
+
     environment:
       name: staging
       url: https://staging.quant-navigator.com
@@ -498,7 +512,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint, test-unit, test-integration, test-e2e, coverage, security, performance]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
+
     environment:
       name: production
       url: https://quant-navigator.com
@@ -536,7 +550,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint, test-unit, test-integration, test-e2e, coverage, security]
     if: always()
-    
+
     steps:
       - name: Notify success
         if: ${{ needs.lint.result == 'success' && needs.test-unit.result == 'success' && needs.test-integration.result == 'success' && needs.test-e2e.result == 'success' && needs.coverage.result == 'success' && needs.security.result == 'success' }}
