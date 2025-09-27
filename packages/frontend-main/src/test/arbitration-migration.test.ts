@@ -61,7 +61,11 @@ describe('仲裁功能迁移测试', () => {
         financialSnapshot: [],
         quantSignalDashboard: [],
         flowAndChipsViewer: {
-          moneyFlow: {} as any,
+          moneyFlow: {
+            netInflow: 0,
+            mainInflow: 0,
+            retailInflow: 0
+          },
           topList: [],
           chipDistribution: []
         },

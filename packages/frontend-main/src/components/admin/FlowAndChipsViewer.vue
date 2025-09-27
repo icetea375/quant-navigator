@@ -1,5 +1,8 @@
 <template>
-  <div class="flow-chips-viewer">
+  <div
+    class="flow-chips-viewer"
+    data-testid="flow-chips-viewer"
+  >
     <!-- 标签页切换 -->
     <el-tabs
       v-model="activeTab"
@@ -511,7 +514,8 @@ const getChipRatioColor = (ratio: number) => {
   return '#f56c6c';
 };
 
-const formatAmount = (amount: number) => {
+const formatAmount = (amount: number | undefined) => {
+  if (!amount && amount !== 0) return '0';
   if (amount >= 10000) {
     return (amount / 10000).toFixed(1) + '万';
   }

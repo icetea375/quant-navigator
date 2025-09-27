@@ -173,11 +173,30 @@ export const mockElementPlusComponents = () => {
     'el-form': { template: '<form><slot /></form>' },
     'el-form-item': { template: '<div><slot /></div>' },
     'el-card': { template: '<div class="el-card"><slot /></div>' },
-    'el-table': { template: '<table><slot /></table>' },
+    'el-table': {
+      template: '<table><slot /></table>',
+      props: ['data', 'columns']
+    },
+    'el-table-column': {
+      template: '<td><slot :row="{}" /></td>',
+      props: ['prop', 'label', 'width']
+    },
     'el-pagination': { template: '<div class="el-pagination"></div>' },
     'el-loading': { template: '<div v-if="loading">Loading...</div>' },
     'el-message': { template: '<div></div>' },
     'el-dialog': { template: '<div v-if="visible"><slot /></div>' },
+    'el-empty': {
+      template: '<div class="el-empty"><slot>{{ description }}</slot></div>',
+      props: ['description']
+    },
+    'el-alert': {
+      template: '<div class="el-alert" :class="type"><slot>{{ title }}</slot></div>',
+      props: ['type', 'title', 'show-icon', 'closable']
+    },
+    'el-statistic': {
+      template: '<div class="el-statistic"><div class="el-statistic__title">{{ title }}</div><div class="el-statistic__content">{{ value }}{{ suffix }}</div></div>',
+      props: ['title', 'value', 'suffix', 'precision']
+    },
   }
 }
 

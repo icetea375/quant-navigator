@@ -1,8 +1,11 @@
 <template>
-  <div class="quant-signal-dashboard">
+  <div
+    class="quant-signal-dashboard"
+    data-testid="quant-signal-dashboard"
+  >
     <!-- 信号概览 -->
     <div
-      v-if="latestSignal"
+      v-if="latestSignal && !loading"
       class="signal-overview"
     >
       <el-card class="overview-card">
@@ -44,7 +47,10 @@
     </div>
 
     <!-- 个股信号 -->
-    <div class="individual-signals">
+    <div
+      v-if="latestSignal && !loading"
+      class="individual-signals"
+    >
       <h4>个股信号</h4>
       <el-row :gutter="16">
         <el-col
@@ -66,7 +72,7 @@
               </el-tag>
             </div>
             <div class="signal-value">
-              <span class="value">{{ signal.value.toFixed(2) }}</span>
+              <span class="value">{{ (signal.value || 0).toFixed(2) }}</span>
               <el-icon
                 :color="getSignalDirectionColor(signal.value)"
                 class="direction-icon"
@@ -85,7 +91,10 @@
     </div>
 
     <!-- 市场背景信号 -->
-    <div class="market-signals">
+    <div
+      v-if="latestSignal && !loading"
+      class="market-signals"
+    >
       <h4>市场背景信号</h4>
       <el-row :gutter="16">
         <el-col
@@ -107,7 +116,7 @@
               </el-tag>
             </div>
             <div class="signal-value">
-              <span class="value">{{ signal.value.toFixed(2) }}</span>
+              <span class="value">{{ (signal.value || 0).toFixed(2) }}</span>
               <el-icon
                 :color="getSignalDirectionColor(signal.value)"
                 class="direction-icon"
@@ -126,7 +135,10 @@
     </div>
 
     <!-- 管理层可信度因子 -->
-    <div class="management-factors">
+    <div
+      v-if="latestSignal && !loading"
+      class="management-factors"
+    >
       <h4>管理层可信度因子</h4>
       <el-row :gutter="16">
         <el-col
@@ -152,7 +164,10 @@
     </div>
 
     <!-- 技术分析信号 -->
-    <div class="technical-signals">
+    <div
+      v-if="latestSignal && !loading"
+      class="technical-signals"
+    >
       <h4>技术分析信号</h4>
       <el-row :gutter="16">
         <el-col
@@ -168,7 +183,7 @@
               <span class="signal-name">{{ signal.name }}</span>
             </div>
             <div class="signal-value">
-              <span class="value">{{ signal.value.toFixed(2) }}</span>
+              <span class="value">{{ (signal.value || 0).toFixed(2) }}</span>
             </div>
             <el-progress
               :percentage="Math.min(Math.abs(signal.value) * 10, 100)"
@@ -182,7 +197,7 @@
 
     <!-- 雷达图 -->
     <div
-      v-if="latestSignal"
+      v-if="latestSignal && !loading"
       class="radar-chart"
     >
       <h4>多维度信号雷达图</h4>
@@ -198,7 +213,7 @@
 
     <!-- 空状态 -->
     <el-empty
-      v-if="!loading && data.length === 0"
+      v-if="!loading && (!props.data || props.data.length === 0)"
       description="暂无量化信号数据"
     />
 
@@ -252,6 +267,7 @@ use([
 
 // ==================== Props ====================
 const props = withDefaults(defineProps<QuantSignalDashboardProps>(), {
+  data: () => [],
   loading: false,
   error: null,
   onSignalHover: () => {},
@@ -260,17 +276,20 @@ const props = withDefaults(defineProps<QuantSignalDashboardProps>(), {
 
 // ==================== 计算属性 ====================
 const latestSignal = computed(() => {
-  return props.data.length > 0 ? props.data[0] : null;
+  if (!props.data || !Array.isArray(props.data) || props.data.length === 0) {
+    return null;
+  }
+  return props.data[0];
 });
 
 const individualSignals = computed(() => {
   if (!latestSignal.value) return [];
 
   return [
-    { name: '收益率Z分数', value: latestSignal.value.returnZScore },
-    { name: '成交量Z分数', value: latestSignal.value.volumeZScore },
-    { name: '动量Z分数', value: latestSignal.value.momentumZScore },
-    { name: '波动率Z分数', value: latestSignal.value.volatilityZScore }
+    { name: '收益率Z分数', value: latestSignal.value.returnZScore || 0 },
+    { name: '成交量Z分数', value: latestSignal.value.volumeZScore || 0 },
+    { name: '动量Z分数', value: latestSignal.value.momentumZScore || 0 },
+    { name: '波动率Z分数', value: latestSignal.value.volatilityZScore || 0 }
   ];
 });
 
@@ -278,10 +297,10 @@ const marketSignals = computed(() => {
   if (!latestSignal.value) return [];
 
   return [
-    { name: '宏观风险Z分数', value: latestSignal.value.macroRiskZScore },
-    { name: '市场风格Z分数', value: latestSignal.value.marketStyleZScore },
-    { name: '行业轮动Z分数', value: latestSignal.value.industryRotationZScore },
-    { name: '概念热度Z分数', value: latestSignal.value.conceptZScore }
+    { name: '宏观风险Z分数', value: latestSignal.value.macroRiskZScore || 0 },
+    { name: '市场风格Z分数', value: latestSignal.value.marketStyleZScore || 0 },
+    { name: '行业轮动Z分数', value: latestSignal.value.industryRotationZScore || 0 },
+    { name: '概念热度Z分数', value: latestSignal.value.conceptZScore || 0 }
   ];
 });
 
@@ -289,10 +308,10 @@ const managementFactors = computed(() => {
   if (!latestSignal.value) return [];
 
   return [
-    { name: 'MD&A履行率', value: latestSignal.value.mdaFulfillmentRate },
-    { name: '管理层可信度', value: latestSignal.value.managementCredibilityScore },
-    { name: '披露质量', value: latestSignal.value.disclosureQualityScore },
-    { name: '财务透明度', value: latestSignal.value.financialTransparencyScore }
+    { name: 'MD&A履行率', value: latestSignal.value.mdaFulfillmentRate || 0 },
+    { name: '管理层可信度', value: latestSignal.value.managementCredibilityScore || 0 },
+    { name: '披露质量', value: latestSignal.value.disclosureQualityScore || 0 },
+    { name: '财务透明度', value: latestSignal.value.financialTransparencyScore || 0 }
   ];
 });
 
@@ -300,10 +319,10 @@ const technicalSignals = computed(() => {
   if (!latestSignal.value) return [];
 
   return [
-    { name: 'RSI', value: latestSignal.value.rsi },
-    { name: 'MACD信号', value: latestSignal.value.macdSignal },
-    { name: '布林带位置', value: latestSignal.value.bollingerPosition },
-    { name: '均线信号', value: latestSignal.value.maSignal }
+    { name: 'RSI', value: latestSignal.value.rsi || 0 },
+    { name: 'MACD信号', value: latestSignal.value.macdSignal || 0 },
+    { name: '布林带位置', value: latestSignal.value.bollingerPosition || 0 },
+    { name: '均线信号', value: latestSignal.value.maSignal || 0 }
   ];
 });
 
@@ -313,12 +332,12 @@ const radarChartOption = computed(() => {
   const data = [
     {
       value: [
-        Math.abs(latestSignal.value.returnZScore),
-        Math.abs(latestSignal.value.volumeZScore),
-        Math.abs(latestSignal.value.momentumZScore),
-        Math.abs(latestSignal.value.volatilityZScore),
-        Math.abs(latestSignal.value.macroRiskZScore),
-        Math.abs(latestSignal.value.marketStyleZScore)
+        Math.abs(latestSignal.value.returnZScore || 0),
+        Math.abs(latestSignal.value.volumeZScore || 0),
+        Math.abs(latestSignal.value.momentumZScore || 0),
+        Math.abs(latestSignal.value.volatilityZScore || 0),
+        Math.abs(latestSignal.value.macroRiskZScore || 0),
+        Math.abs(latestSignal.value.marketStyleZScore || 0)
       ],
       name: '当前信号'
     }

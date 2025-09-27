@@ -160,7 +160,7 @@ global.URL.revokeObjectURL = vi.fn()
 const originalCreateElement = document.createElement
 document.createElement = vi.fn((tagName: string) => {
   if (tagName.toLowerCase() === 'canvas') {
-    return mockCanvas as any
+    return mockCanvas as HTMLCanvasElement
   }
   return originalCreateElement.call(document, tagName)
 })

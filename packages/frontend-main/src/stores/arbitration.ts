@@ -132,6 +132,7 @@ export const useArbitrationStore = defineStore('arbitration', () => {
       };
 
       setCaseData(mockData);
+      setCurrentCase(caseId);
     } catch (err) {
       setError(err instanceof Error ? err.message : '获取案例数据失败');
     } finally {
@@ -242,14 +243,14 @@ export const useArbitrationStore = defineStore('arbitration', () => {
 
   return {
     // 状态
-    currentCaseId: readonly(currentCaseId),
-    caseData: readonly(caseData),
-    loading: readonly(loading),
-    error: readonly(error),
-    layout: readonly(layout),
-    maximizedPanel: readonly(maximizedPanel),
-    tooltipData: readonly(tooltipData),
-    cases: readonly(cases),
+    currentCaseId,
+    caseData,
+    loading,
+    error,
+    layout,
+    maximizedPanel,
+    tooltipData,
+    cases,
 
     // 计算属性
     currentCase,

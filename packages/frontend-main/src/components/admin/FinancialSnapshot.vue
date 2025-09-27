@@ -1,5 +1,8 @@
 <template>
-  <div class="financial-snapshot">
+  <div
+    class="financial-snapshot"
+    data-testid="financial-snapshot"
+  >
     <!-- 期间选择器 -->
     <div class="period-selector">
       <el-select
@@ -17,7 +20,10 @@
     </div>
 
     <!-- 核心财务指标 -->
-    <div class="core-metrics">
+    <div
+      v-if="currentData && !loading"
+      class="core-metrics"
+    >
       <el-row :gutter="16">
         <el-col
           v-for="metric in coreMetrics"
@@ -54,7 +60,10 @@
     </div>
 
     <!-- 盈利能力指标 -->
-    <div class="profitability-metrics">
+    <div
+      v-if="currentData && !loading"
+      class="profitability-metrics"
+    >
       <h4>盈利能力指标</h4>
       <el-row :gutter="16">
         <el-col
@@ -78,7 +87,10 @@
     </div>
 
     <!-- 成长性指标 -->
-    <div class="growth-metrics">
+    <div
+      v-if="currentData && !loading"
+      class="growth-metrics"
+    >
       <h4>成长性指标</h4>
       <el-row :gutter="16">
         <el-col
@@ -102,7 +114,10 @@
     </div>
 
     <!-- 趋势图表 -->
-    <div class="trend-charts">
+    <div
+      v-if="currentData && !loading"
+      class="trend-charts"
+    >
       <h4>财务趋势分析</h4>
       <el-tabs v-model="activeChartTab">
         <el-tab-pane
@@ -142,7 +157,10 @@
     </div>
 
     <!-- 数据质量指标 -->
-    <div class="data-quality">
+    <div
+      v-if="currentData && !loading"
+      class="data-quality"
+    >
       <h4>数据质量</h4>
       <el-card>
         <el-progress
@@ -158,7 +176,7 @@
 
     <!-- 空状态 -->
     <el-empty
-      v-if="!loading && data.length === 0"
+      v-if="!loading && (!props.data || props.data.length === 0)"
       description="暂无财务数据"
     />
 
@@ -212,6 +230,7 @@ use([
 
 // ==================== Props ====================
 const props = withDefaults(defineProps<FinancialSnapshotProps>(), {
+  data: () => [],
   loading: false,
   error: null,
   onPeriodSelect: () => {},
@@ -224,7 +243,7 @@ const activeChartTab = ref('revenue');
 
 // ==================== 计算属性 ====================
 const currentData = computed(() => {
-  if (props.data.length === 0) return null;
+  if (!props.data || !Array.isArray(props.data) || props.data.length === 0) return null;
 
   if (selectedPeriod.value === 'latest') {
     return props.data[0];
@@ -234,6 +253,7 @@ const currentData = computed(() => {
 });
 
 const periodOptions = computed(() => {
+  if (!props.data || !Array.isArray(props.data)) return [];
   return props.data.map(item => ({
     value: item.reportPeriod,
     label: `${item.fiscalYear}${item.reportPeriod}`
@@ -320,6 +340,7 @@ const growthMetrics = computed(() => {
 });
 
 const trendData = computed(() => {
+  if (!props.data || !Array.isArray(props.data)) return [];
   return props.data.slice(0, 8).map(item => ({
     period: `${item.fiscalYear}${item.reportPeriod}`,
     revenue: item.revenue,

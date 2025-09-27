@@ -1,6 +1,6 @@
 // 原始文本浏览器组件测试
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { createTestWrapper } from '@/utils/test-utils'
+import { createTestWrapper, mockElementPlusComponents } from '@/utils/test-utils'
 import { useArbitrationStore } from '@/stores/arbitration'
 import RawTextExplorer from '../RawTextExplorer.vue'
 
@@ -33,6 +33,11 @@ describe('RawTextExplorer', () => {
     wrapper = createTestWrapper(RawTextExplorer, {
       props: {
         data: mockRawTextData
+      },
+      global: {
+        stubs: {
+          ...mockElementPlusComponents()
+        }
       }
     })
   })
@@ -105,6 +110,11 @@ describe('RawTextExplorer', () => {
     const emptyWrapper = createTestWrapper(RawTextExplorer, {
       props: {
         data: []
+      },
+      global: {
+        stubs: {
+          ...mockElementPlusComponents()
+        }
       }
     })
 

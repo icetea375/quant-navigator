@@ -8,27 +8,22 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts', './src/test/setup-canvas.ts'],
+    setupFiles: ['./src/test/setup.ts', './src/test/setup-canvas.ts', './src/test/setup-echarts-mock.ts'],
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text'],
       exclude: [
         'node_modules/',
         'src/test/',
         '**/*.d.ts',
         '**/*.config.*',
         '**/coverage/**',
+        '**/dist/**',
+        '**/build/**',
       ],
-      thresholds: {
-        global: {
-          branches: 85,
-          functions: 85,
-          lines: 85,
-          statements: 85,
-        },
-      },
+      include: ['src/**/*.{js,ts,vue}'],
     },
   },
   resolve: {

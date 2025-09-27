@@ -1,5 +1,8 @@
 <template>
-  <div class="personal-precedent-viewer">
+  <div
+    class="personal-precedent-viewer"
+    data-testid="precedent-viewer"
+  >
     <!-- 筛选和排序工具栏 -->
     <div class="toolbar">
       <el-select
@@ -47,7 +50,7 @@
     <!-- 统计信息 -->
     <div class="stats">
       <el-tag type="info">
-        总计: {{ data.length }} 条
+        总计: {{ (props.data || []).length }} 条
       </el-tag>
       <el-tag type="success">
         显示: {{ filteredData.length }} 条
@@ -248,7 +251,7 @@ const sortBy = ref('date');
 
 // ==================== 计算属性 ====================
 const feedbackTypes = computed(() => {
-  const types = Array.from(new Set(props.data.map(item => item.feedbackType)));
+  const types = Array.from(new Set((props.data || []).map(item => item.feedbackType)));
   return types.map(type => ({
     value: type,
     label: getFeedbackTypeLabel(type)
@@ -256,7 +259,7 @@ const feedbackTypes = computed(() => {
 });
 
 const filteredData = computed(() => {
-  let filtered = props.data;
+  let filtered = props.data || [];
 
   if (filterType.value !== 'all') {
     filtered = filtered.filter(item => item.feedbackType === filterType.value);

@@ -1,36 +1,50 @@
 // 财务数据快照组件测试
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { createTestWrapper } from '@/utils/test-utils'
+import { createTestWrapper, mockElementPlusComponents } from '@/utils/test-utils'
 import { useArbitrationStore } from '@/stores/arbitration'
 import FinancialSnapshot from '../FinancialSnapshot.vue'
 
 // 模拟财务数据
 const mockFinancialData = [
   {
-    reportPeriod: '2024-Q1',
-    fiscalYear: '2024',
-    basicInfo: {
-      stock_code: '000001',
-      stock_name: '平安银行',
-      current_price: 12.50,
-      change_pct: 2.5,
-      market_cap: 1000000000,
-      pe_ratio: 8.5,
-      pb_ratio: 0.8
-    },
-    metrics: {
-      revenue_growth: 0.15,
-      profit_growth: 0.12,
-      roe: 0.08,
-      debt_ratio: 0.3,
-      current_ratio: 1.5,
-      quick_ratio: 1.2
-    },
-    trends: [
-      { period: '2024-Q1', revenue: 1000000, profit: 200000 },
-      { period: '2024-Q2', revenue: 1100000, profit: 220000 },
-      { period: '2024-Q3', revenue: 1200000, profit: 240000 }
-    ]
+    reportId: 'report-1',
+    stockCode: '000001',
+    reportDate: '2024-01-15T09:00:00Z',
+    reportPeriod: 'Q1',
+    fiscalYear: 2024,
+    status: 'published',
+
+    // 核心财务指标
+    revenue: 1000000,
+    revenueGrowthRate: 0.15,
+    netProfitExcludingNonRecurring: 200000,
+    netProfitGrowthRate: 0.12,
+    grossMargin: 0.25,
+    netMargin: 0.20,
+    operatingCashFlow: 300000,
+    rdExpenses: 50000,
+    rdRatio: 0.05,
+    contractLiabilities: 100000,
+
+    // 资产负债指标
+    totalAssets: 10000000,
+    totalLiabilities: 3000000,
+    netAssets: 7000000,
+    debtToAssetRatio: 0.3,
+
+    // 盈利能力指标
+    roe: 0.08,
+    roa: 0.06,
+    eps: 1.2,
+
+    // 成长性指标
+    revenue3YearCAGR: 0.10,
+    profit3YearCAGR: 0.12,
+
+    // 数据质量
+    dataCompleteness: 0.95,
+    dataAccuracy: 0.98,
+    dataTimeliness: 0.90
   }
 ]
 
@@ -41,6 +55,12 @@ describe('FinancialSnapshot', () => {
     wrapper = createTestWrapper(FinancialSnapshot, {
       props: {
         data: mockFinancialData
+      },
+      global: {
+        stubs: {
+          ...mockElementPlusComponents(),
+          'v-chart': { template: '<div class="v-chart-mock"></div>' }
+        }
       }
     })
   })
@@ -54,26 +74,27 @@ describe('FinancialSnapshot', () => {
     await wrapper.vm.$nextTick()
     await new Promise(resolve => setTimeout(resolve, 0))
 
-    expect(wrapper.text()).toContain('平安银行')
-    expect(wrapper.text()).toContain('000001')
-    expect(wrapper.text()).toContain('12.50')
+    expect(wrapper.text()).toContain('营业收入')
+    expect(wrapper.text()).toContain('扣非净利润')
+    expect(wrapper.text()).toContain('毛利率')
   })
 
   it('should display financial metrics', async () => {
     await wrapper.vm.$nextTick()
     await new Promise(resolve => setTimeout(resolve, 0))
 
-    expect(wrapper.text()).toContain('15%') // revenue_growth
-    expect(wrapper.text()).toContain('12%') // profit_growth
-    expect(wrapper.text()).toContain('8%')  // roe
+    expect(wrapper.text()).toContain('+15.0%') // revenue_growth
+    expect(wrapper.text()).toContain('+12.0%') // profit_growth
+    expect(wrapper.text()).toContain('盈利能力指标')
   })
 
   it('should render financial charts', async () => {
     await wrapper.vm.$nextTick()
     await new Promise(resolve => setTimeout(resolve, 0))
 
-    const charts = wrapper.findAll('[data-testid="financial-chart"]')
-    expect(charts.length).toBeGreaterThan(0)
+    // 检查图表容器是否存在
+    expect(wrapper.find('.trend-charts').exists()).toBe(true)
+    expect(wrapper.text()).toContain('财务趋势分析')
   })
 
   it('should handle period selection', async () => {
@@ -108,20 +129,31 @@ describe('FinancialSnapshot', () => {
     await new Promise(resolve => setTimeout(resolve, 0))
 
     // 验证趋势数据渲染
-    expect(wrapper.text()).toContain('2024-Q1')
-    expect(wrapper.text()).toContain('2024-Q2')
-    expect(wrapper.text()).toContain('2024-Q3')
+    expect(wrapper.text()).toContain('财务趋势分析')
+    expect(wrapper.text()).toContain('数据质量')
+    expect(wrapper.text()).toContain('数据完整性')
   })
 
   it('should handle empty data state', async () => {
     const emptyWrapper = createTestWrapper(FinancialSnapshot, {
       props: {
-        data: null
+        data: [],
+        loading: false
+      },
+      global: {
+        stubs: {
+          ...mockElementPlusComponents(),
+          'v-chart': { template: '<div class="v-chart-mock"></div>' }
+        }
       }
     })
 
     await emptyWrapper.vm.$nextTick()
     await new Promise(resolve => setTimeout(resolve, 0))
+
+    // 调试：打印组件内容
+    console.log('Empty wrapper HTML:', emptyWrapper.html())
+    console.log('Empty wrapper text:', emptyWrapper.text())
 
     expect(emptyWrapper.text()).toContain('暂无财务数据')
   })

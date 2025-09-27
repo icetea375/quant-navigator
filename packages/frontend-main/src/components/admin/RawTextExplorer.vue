@@ -1,5 +1,8 @@
 <template>
-  <div class="raw-text-explorer">
+  <div
+    class="raw-text-explorer"
+    data-testid="raw-text-explorer"
+  >
     <!-- 搜索和过滤工具栏 -->
     <div class="toolbar">
       <el-input
