@@ -38,7 +38,7 @@ export const createTestApp = () => {
 }
 
 // 测试包装器工厂
-export const createTestWrapper = (component: any, options: any = {}) => {
+export const createTestWrapper = (component: unknown, options: Record<string, unknown> = {}) => {
   const router = createTestRouter()
   const pinia = createTestPinia()
 
@@ -157,7 +157,7 @@ export const mockLocalStorage = () => {
 }
 
 // 模拟fetch
-export const mockFetch = (response: any, ok = true) => {
+export const mockFetch = (response: unknown, ok = true) => {
   global.fetch = vi.fn(() =>
     Promise.resolve({
       ok,
@@ -305,10 +305,10 @@ export const testAssertions = {
 // 测试环境设置
 export const setupTestEnvironment = () => {
   // 设置全局测试变量
-  global.vi = global.vi || {}
+  (global as any).vi = (global as any).vi || {}
 
   // 模拟console方法
-  global.console = {
+  ;(global as any).console = {
     ...console,
     log: vi.fn(),
     warn: vi.fn(),
@@ -328,14 +328,14 @@ export const setupTestEnvironment = () => {
   })
 
   // 模拟IntersectionObserver
-  global.IntersectionObserver = vi.fn().mockImplementation(() => ({
+  ;(global as any).IntersectionObserver = vi.fn().mockImplementation(() => ({
     observe: vi.fn(),
     unobserve: vi.fn(),
     disconnect: vi.fn(),
   }))
 
   // 模拟ResizeObserver
-  global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  ;(global as any).ResizeObserver = vi.fn().mockImplementation(() => ({
     observe: vi.fn(),
     unobserve: vi.fn(),
     disconnect: vi.fn(),

@@ -48,12 +48,16 @@ interface WorkflowResult {
 }
 
 // Mock Database - 先定义接口，再实现
+interface MockTransaction {
+  query(sql: string, params?: unknown[]): Promise<unknown[]>;
+}
+
 class MockDatabase {
-  query(sql: string, params?: any[]): Promise<any[]> {
+  query(sql: string, params?: unknown[]): Promise<unknown[]> {
     return Promise.resolve([]);
   }
 
-  transaction(callback: (tx: any) => Promise<any>): Promise<any> {
+  transaction(callback: (tx: MockTransaction) => Promise<unknown>): Promise<unknown> {
     return Promise.resolve();
   }
 

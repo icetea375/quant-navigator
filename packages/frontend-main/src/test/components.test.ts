@@ -28,7 +28,8 @@ const TestComponent = {
   },
   methods: {
     handleClick() {
-      this.$emit('click', 'clicked')
+      // 模拟组件事件发射
+      console.log('clicked')
     }
   }
 }
@@ -111,7 +112,11 @@ describe('Auth Component', () => {
   it('should show welcome message when authenticated', async () => {
     const authStore = useAuthStore()
     // 直接设置 store 的响应式状态
-    authStore.user = mockUser
+    authStore.user = {
+      ...mockUser,
+      name: 'testuser',
+      avatar: null
+    }
     authStore.token = 'mock-token'
 
     // 强制触发响应式更新
@@ -141,9 +146,9 @@ const MarketComponent = {
   setup() {
     const marketStore = useMarketStore()
     return {
-      loading: marketStore.loading.publicBriefing,
-      briefing: marketStore.publicBriefing,
-      hotspots: marketStore.postMarketHotspots?.items || []
+      loading: marketStore.isLoading.marketBriefing,
+      briefing: marketStore.marketBriefing,
+      hotspots: marketStore.postMarketHotspots || []
     }
   }
 }

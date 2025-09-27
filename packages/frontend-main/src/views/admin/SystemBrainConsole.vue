@@ -227,6 +227,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { logger } from "@/utils/logger"
 import { useAdminStore } from '@/stores/admin'
 import DataPipelineMonitor from '@/components/admin/DataPipelineMonitor.vue'
 import AIEngineMonitor from '@/components/admin/AIEngineMonitor.vue'
@@ -255,27 +256,27 @@ const formatTime = (dateString: string) => {
 
 const refreshDataPipeline = () => {
   // TODO: 刷新数据管道状态
-  console.log('Refreshing data pipeline...')
+  logger.log('Refreshing data pipeline...')
 }
 
 const refreshAIEngines = () => {
   // TODO: 刷新AI引擎状态
-  console.log('Refreshing AI engines...')
+  logger.log('Refreshing AI engines...')
 }
 
 const saveConfig = () => {
   // TODO: 保存系统配置
-  console.log('Saving config...')
+  logger.log('Saving config...')
 }
 
 const resetConfig = () => {
   // TODO: 重置系统配置
-  console.log('Resetting config...')
+  logger.log('Resetting config...')
 }
 
 const refreshLogs = () => {
   // TODO: 刷新系统日志
-  console.log('Refreshing logs...')
+  logger.log('Refreshing logs...')
 }
 
 onMounted(() => {

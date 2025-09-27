@@ -215,7 +215,7 @@ import {
   GridComponent
 } from 'echarts/components';
 import VChart from 'vue-echarts';
-import type { FinancialSnapshotProps, FinancialSnapshot as FinancialSnapshotType } from '@/types/arbitration';
+import type { FinancialSnapshotProps } from '@/types/arbitration';
 
 // 注册 ECharts 组件
 use([
@@ -232,9 +232,13 @@ use([
 const props = withDefaults(defineProps<FinancialSnapshotProps>(), {
   data: () => [],
   loading: false,
-  error: null,
-  onPeriodSelect: () => {},
-  onMetricHover: () => {}
+  error: undefined,
+  onPeriodSelect: () => {
+    // TODO: Implement period selection logic
+  },
+  onMetricHover: () => {
+    // TODO: Implement metric hover logic
+  }
 });
 
 // ==================== 响应式数据 ====================

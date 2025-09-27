@@ -4,13 +4,13 @@
     <div class="list-header">
       <h3>报告列表</h3>
       <div class="list-stats">
-        共 {{ total }} 条记录
+        共 {{ props.total }} 条记录
       </div>
     </div>
 
     <!-- 加载状态 -->
     <div
-      v-if="loading"
+      v-if="props.loading"
       class="loading-state"
     >
       <div class="spinner" />
@@ -38,7 +38,7 @@
         :key="report.reportId"
         class="report-item"
         :class="{
-          'selected': selectedReportId === report.reportId,
+          'selected': props.selectedReportId === report.reportId,
           'pending': report.feedbackStatus === 'pending',
           'good': report.feedbackStatus === 'good',
           'partial': report.feedbackStatus === 'partial',
@@ -86,7 +86,7 @@
 
     <!-- 加载更多 -->
     <div
-      v-if="hasMore && !loading"
+      v-if="props.hasMore && !props.loading"
       class="load-more"
     >
       <button
@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+// computed 未使用，已移除
 
 // 接口定义
 interface Report {

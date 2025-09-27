@@ -12,9 +12,23 @@
 
 import { test, expect } from '@playwright/test';
 
+interface ArbitrationCaseData {
+  case_id: string;
+  report_type: string;
+  target_code?: string;
+  qwen_analysis?: string;
+  doubao_analysis?: string;
+  disagreement_score: number;
+  status: string;
+  created_at: string;
+  updated_at?: string;
+  human_decision?: string;
+  human_reasoning?: string;
+}
+
 test.describe('Sprint 1: 仲裁工作流 E2E测试', () => {
   let caseId: string;
-  let caseData: any;
+  let caseData: ArbitrationCaseData;
 
   test.beforeAll(async () => {
     // 确保数据库中有测试数据

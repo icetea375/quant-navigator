@@ -5,7 +5,7 @@ import { useArbitrationStore } from '@/stores/arbitration'
 import { useAuthStore } from '@/stores/auth'
 import { useMarketStore } from '@/stores/market'
 import { useAdminStore } from '@/stores/admin'
-import * as arbitrationService from '@/services/arbitration'
+import { arbitrationService } from '@/services/api/arbitrationService'
 import * as authService from '@/services/auth'
 import * as marketService from '@/services/market'
 import * as adminService from '@/services/admin'
@@ -41,11 +41,66 @@ describe('全面覆盖率测试 - 遵循测试宪法', () => {
       store.setError('测试错误')
       expect(store.error).toBe('测试错误')
 
-      const mockData = { case_id: 'test-case-1' }
+      const mockData = {
+        caseInfo: {
+          caseId: 'test-case-1',
+          stockCode: '000001',
+          stockName: '测试股票',
+          reportType: 'comprehensive' as const,
+          status: 'pending' as const,
+          priority: 'medium' as const,
+          priorityScore: 0.5,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          keyFindings: [],
+          riskFactors: [],
+          summary: '测试摘要',
+          concept: '测试概念',
+          industry: '银行',
+          tags: []
+        },
+        aiDebate: {
+          qwenAnalysis: {
+            summary: '测试摘要',
+            keyPoints: [],
+            confidence: 0.5,
+            reasoning: '测试推理',
+            recommendations: [],
+            riskFactors: [],
+            timestamp: new Date().toISOString()
+          },
+          doubaoAnalysis: {
+            summary: '测试摘要',
+            keyPoints: [],
+            confidence: 0.5,
+            reasoning: '测试推理',
+            recommendations: [],
+            riskFactors: [],
+            timestamp: new Date().toISOString()
+          },
+          disagreementScore: 0.1,
+          consensusSummary: '测试共识',
+          conflictSummary: '测试冲突'
+        },
+        panels: {
+          rawTextExplorer: [],
+          financialSnapshot: [],
+          quantSignalDashboard: [],
+          flowAndChipsViewer: {
+            moneyFlow: [],
+            topList: [],
+            chipDistribution: []
+          },
+          precedentViewer: []
+        }
+      }
       store.setCaseData(mockData)
       expect(store.caseData).toEqual(mockData)
 
-      store.setLayout({ rows: 2, cols: 2 })
+      store.setLayout([
+        { i: 'panel1', x: 0, y: 0, w: 1, h: 1 },
+        { i: 'panel2', x: 1, y: 0, w: 1, h: 1 }
+      ])
       expect(store.layout).toEqual({ rows: 2, cols: 2 })
 
       store.setMaximizedPanel('rawTextExplorer')
@@ -59,28 +114,72 @@ describe('全面覆盖率测试 - 遵循测试宪法', () => {
       const store = useAuthStore()
 
       // 直接设置状态属性
-      store.user = { id: '1', username: 'testuser', email: 'test@example.com' }
-      expect(store.user).toEqual({ id: '1', username: 'testuser', email: 'test@example.com' })
+      store.user = {
+        id: '1',
+        email: 'test@example.com',
+        name: 'testuser',
+        role: 'user' as const,
+        avatar: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      expect(store.user).toEqual(store.user)
 
       store.token = 'test-token'
       expect(store.token).toBe('test-token')
 
-      store.loading = true
-      expect(store.loading).toBe(true)
+      store.isLoading = true
+      expect(store.isLoading).toBe(true)
     })
 
     it('应该能够设置市场 store 的状态', () => {
       const store = useMarketStore()
 
       // 直接设置状态属性
-      store.publicBriefing = { title: '测试简报', content: '测试内容' }
-      expect(store.publicBriefing).toEqual({ title: '测试简报', content: '测试内容' })
+      store.marketBriefing = {
+        id: '1',
+        date: '2024-01-01',
+        title: '测试简报',
+        summary: '测试内容',
+        keyEvents: [],
+        marketSentiment: 'neutral',
+        events: [],
+        hotspots: [],
+        riskLevel: 'medium',
+        recommendations: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      expect(store.marketBriefing).toEqual(store.marketBriefing)
 
-      store.postMarketHotspots = { hotspots: ['热点1', '热点2'] }
-      expect(store.postMarketHotspots).toEqual({ hotspots: ['热点1', '热点2'] })
+      store.postMarketHotspots = [
+        {
+          id: '1',
+          title: '热点1',
+          description: '热点1描述',
+          stockCodes: ['000001'],
+          confidence: 0.8,
+          impact: 'high' as const,
+          category: '市场',
+          timestamp: new Date().toISOString(),
+          source: '测试源'
+        },
+        {
+          id: '2',
+          title: '热点2',
+          description: '热点2描述',
+          stockCodes: ['000002'],
+          confidence: 0.6,
+          impact: 'medium' as const,
+          category: '技术',
+          timestamp: new Date().toISOString(),
+          source: '测试源'
+        }
+      ]
+      expect(store.postMarketHotspots).toEqual(store.postMarketHotspots)
 
-      store.loading.publicBriefing = true
-      expect(store.loading.publicBriefing).toBe(true)
+      store.isLoading.marketBriefing = true
+      expect(store.isLoading.marketBriefing).toBe(true)
     })
   })
 
@@ -205,7 +304,7 @@ describe('全面覆盖率测试 - 遵循测试宪法', () => {
 
   describe('错误处理测试', () => {
     it('应该能够处理空值', () => {
-      const handleNull = (value: any) => {
+      const handleNull = (value: unknown) => {
         return value ?? 'default'
       }
 

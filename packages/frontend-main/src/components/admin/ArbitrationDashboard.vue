@@ -97,17 +97,71 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useArbitrationStore } from '@/stores/arbitration'
+import { logger } from '@/utils/logger'
 import ArbitrationToolbar from './ArbitrationToolbar.vue'
 import ArbitrationCaseList from './ArbitrationCaseList.vue'
 import DataPanelContainer from './DataPanelContainer.vue'
 import ArbitrationDecisionDialog from './ArbitrationDecisionDialog.vue'
+
+// ==================== 类型定义 ====================
+interface EventData {
+  id: string
+  type: string
+  timestamp: string
+  description: string
+  source: string
+}
+
+interface SignalData {
+  id: string
+  name: string
+  value: number
+  trend: 'up' | 'down' | 'stable'
+  confidence: number
+  timestamp: string
+}
+
+interface FlowData {
+  id: string
+  type: 'inflow' | 'outflow'
+  amount: number
+  percentage: number
+  timestamp: string
+  source: string
+}
+
+interface ChipData {
+  id: string
+  holder: string
+  shares: number
+  percentage: number
+  change: number
+  timestamp: string
+}
+
+interface PrecedentData {
+  id: string
+  title: string
+  description: string
+  relevance: number
+  outcome: string
+  timestamp: string
+  source: string
+}
+
+interface DecisionForm {
+  decision: string
+  reasoning: string
+  confidence: number
+  priority: string
+}
 
 // ==================== Props ====================
 interface Props {
   caseId?: string
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 // ==================== Store ====================
 const arbitrationStore = useArbitrationStore()
@@ -160,50 +214,50 @@ const handleClosePanel = (panelId: string) => {
 }
 
 const handleTextHighlight = (text: string, keywords: string[]) => {
-  console.log('文本高亮:', text, keywords)
+  logger.info('文本高亮:', text, keywords)
 }
 
-const handleEventSelect = (event: any) => {
-  console.log('选择事件:', event)
+const handleEventSelect = (event: EventData) => {
+  logger.info('选择事件:', event)
 }
 
 const handlePeriodSelect = (period: string) => {
-  console.log('选择期间:', period)
+  logger.info('选择期间:', period)
 }
 
 const handleMetricHover = (metric: string, value: number) => {
-  console.log('指标悬浮:', metric, value)
+  logger.info('指标悬浮:', metric, value)
 }
 
 const handleSignalHover = (signal: string, value: number) => {
-  console.log('信号悬浮:', signal, value)
+  logger.info('信号悬浮:', signal, value)
 }
 
-const handleSignalClick = (signal: any) => {
-  console.log('点击信号:', signal)
+const handleSignalClick = (signal: SignalData) => {
+  logger.info('点击信号:', signal)
 }
 
-const handleFlowHover = (flow: any) => {
-  console.log('资金流向悬浮:', flow)
+const handleFlowHover = (flow: FlowData) => {
+  logger.info('资金流向悬浮:', flow)
 }
 
-const handleChipHover = (chip: any) => {
-  console.log('筹码悬浮:', chip)
+const handleChipHover = (chip: ChipData) => {
+  logger.info('筹码悬浮:', chip)
 }
 
-const handlePrecedentSelect = (precedent: any) => {
-  console.log('选择先例:', precedent)
+const handlePrecedentSelect = (precedent: PrecedentData) => {
+  logger.info('选择先例:', precedent)
 }
 
-const handlePrecedentHover = (precedent: any) => {
-  console.log('先例悬浮:', precedent)
+const handlePrecedentHover = (precedent: PrecedentData) => {
+  logger.info('先例悬浮:', precedent)
 }
 
 const handleErrorClose = () => {
   arbitrationStore.clearError()
 }
 
-const handleSubmitDecision = async (form: any) => {
+const handleSubmitDecision = async (form: DecisionForm) => {
   try {
     submittingDecision.value = true
     await arbitrationStore.submitArbitration(form)

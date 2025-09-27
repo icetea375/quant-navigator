@@ -82,7 +82,7 @@
           <div class="overlap-keywords">
             <span
               v-for="keyword in getOverlapKeywords()"
-              :key="keyword"
+              :key="String(keyword)"
               class="keyword-tag overlap-tag"
             >
               {{ keyword }}
@@ -175,7 +175,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+// import { computed } from 'vue'
 
 interface Props {
   stockCode: string
@@ -187,7 +187,7 @@ interface Props {
 const props = defineProps<Props>()
 
 // 计算关键词重叠
-const getOverlapKeywords = () => {
+const getOverlapKeywords = (): string[] => {
   if (!props.qwenReport?.keywords || !props.doubaoReport?.keywords) return []
 
   const qwenKeywords = new Set(props.qwenReport.keywords.map((k: string) => k.toLowerCase()))
@@ -219,13 +219,13 @@ const getCosineSimilarity = () => {
   const qwenWordCount = new Map()
   const doubaoWordCount = new Map()
 
-  qwenWords.forEach(word => {
-    qwenWordCount.set(word, (qwenWordCount.get(word) || 0) + 1)
-  })
+      qwenWords.forEach((word: string) => {
+        qwenWordCount.set(word, (qwenWordCount.get(word) || 0) + 1)
+      })
 
-  doubaoWords.forEach(word => {
-    doubaoWordCount.set(word, (doubaoWordCount.get(word) || 0) + 1)
-  })
+      doubaoWords.forEach((word: string) => {
+        doubaoWordCount.set(word, (doubaoWordCount.get(word) || 0) + 1)
+      })
 
   const allWords = new Set([...qwenWordCount.keys(), ...doubaoWordCount.keys()])
   let dotProduct = 0

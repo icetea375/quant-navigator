@@ -278,6 +278,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { logger } from "@/utils/logger"
 
 interface Props {
   stockCode: string
@@ -372,7 +373,7 @@ const getTrendText = (trend: string) => {
 // 生命周期
 onMounted(() => {
   // 这里可以调用API获取真实的财务数据
-  console.log(`加载股票 ${props.stockCode} 在 ${props.reportDate} 的财务数据`)
+  logger.log(`加载股票 ${props.stockCode} 在 ${props.reportDate} 的财务数据`)
 })
 </script>
 

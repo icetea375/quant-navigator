@@ -17,8 +17,10 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
+    "@types/dompurify": "^3.2.0",
     "axios": "^1.6.2",
     "dayjs": "^1.11.10",
+    "dompurify": "^3.2.7",
     "echarts": "^5.4.3",
     "element-plus": "^2.4.4",
     "pinia": "^2.1.7",

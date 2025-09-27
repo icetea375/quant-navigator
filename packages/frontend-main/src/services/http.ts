@@ -1,6 +1,16 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { ElMessage, ElLoading } from 'element-plus'
+import { logger } from '@/utils/logger'
 import type { ApiResponse, ApiError, RequestConfig } from '@/types/api'
+
+// 扩展AxiosRequestConfig接口
+interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
+  showLoading?: boolean
+  showError?: boolean
+  metadata?: {
+    startTime: number
+  }
+}
 
 // 创建axios实例
 const api: AxiosInstance = axios.create({
@@ -13,7 +23,7 @@ const api: AxiosInstance = axios.create({
 
 // 请求计数器，用于控制loading显示
 let requestCount = 0
-let loadingInstance: any = null
+let loadingInstance: ReturnType<typeof ElLoading.service> | null = null
 
 // 显示loading
 const showLoading = () => {
@@ -41,24 +51,24 @@ const hideLoading = () => {
 
 // 请求拦截器
 api.interceptors.request.use(
-  (config: any) => {
+  (config: InternalAxiosRequestConfig) => {
     // 添加认证token
     const token = localStorage.getItem('token')
     if (token) {
       config.headers = {
         ...config.headers,
         Authorization: `Bearer ${token}`,
-      }
+      } as any
     }
 
     // 显示loading
-    const shouldShowLoading = config.showLoading !== false
+    const shouldShowLoading = (config as ExtendedAxiosRequestConfig).showLoading !== false
     if (shouldShowLoading) {
       showLoading()
     }
 
     // 添加请求时间戳
-    config.metadata = { startTime: Date.now() }
+    (config as ExtendedAxiosRequestConfig).metadata = { startTime: Date.now() }
 
     return config
   },
@@ -74,18 +84,18 @@ api.interceptors.response.use(
     hideLoading()
 
     // 计算请求耗时
-    const startTime = response.config.metadata?.startTime
+    const startTime = (response.config as ExtendedAxiosRequestConfig).metadata?.startTime
     if (startTime) {
       const duration = Date.now() - startTime
-      console.log(`API请求耗时: ${duration}ms - ${response.config.url}`)
+      logger.info(`API请求耗时: ${duration}ms - ${response.config.url}`)
     }
 
     // 统一处理响应数据
     const { data } = response
     if (data.success === false) {
       const error: ApiError = {
-        code: data.code || 'UNKNOWN_ERROR',
-        message: data.message || '请求失败',
+        code: String(data.code || 'UNKNOWN_ERROR'),
+        message: String(data.message || '请求失败'),
         details: data.data,
       }
       return Promise.reject(error)
@@ -154,7 +164,7 @@ api.interceptors.response.use(
     }
 
     const apiError: ApiError = {
-      code: data?.code || `HTTP_${status}`,
+      code: (data as any)?.code || `HTTP_${status}`,
       message: errorMessage,
       details: data,
     }
@@ -169,12 +179,12 @@ api.interceptors.response.use(
 )
 
 // 重试机制
-const retryRequest = async (config: AxiosRequestConfig, retries: number = 3): Promise<any> => {
+const retryRequest = async (config: ExtendedAxiosRequestConfig, retries: number = 3): Promise<any> => {
   try {
     return await api(config)
-  } catch (error: any) {
-    if (retries > 0 && error.code === 'NETWORK_ERROR') {
-      console.log(`请求失败，${retries}次重试机会`)
+  } catch (error: unknown) {
+    if (retries > 0 && (error as Record<string, unknown>).code === 'NETWORK_ERROR') {
+      logger.warn(`请求失败，${retries}次重试机会`)
       await new Promise(resolve => setTimeout(resolve, 1000))
       return retryRequest(config, retries - 1)
     }
@@ -184,27 +194,27 @@ const retryRequest = async (config: AxiosRequestConfig, retries: number = 3): Pr
 
 // 封装的请求方法
 export const request = {
-  get: <T = any>(url: string, config?: RequestConfig & AxiosRequestConfig): Promise<T> => {
+  get: <T = unknown>(url: string, config?: RequestConfig & ExtendedAxiosRequestConfig): Promise<T> => {
     return retryRequest({ ...config, method: 'GET', url })
   },
 
-  post: <T = any>(url: string, data?: any, config?: RequestConfig & AxiosRequestConfig): Promise<T> => {
+  post: <T = unknown>(url: string, data?: unknown, config?: RequestConfig & ExtendedAxiosRequestConfig): Promise<T> => {
     return retryRequest({ ...config, method: 'POST', url, data })
   },
 
-  put: <T = any>(url: string, data?: any, config?: RequestConfig & AxiosRequestConfig): Promise<T> => {
+  put: <T = unknown>(url: string, data?: unknown, config?: RequestConfig & ExtendedAxiosRequestConfig): Promise<T> => {
     return retryRequest({ ...config, method: 'PUT', url, data })
   },
 
-  delete: <T = any>(url: string, config?: RequestConfig & AxiosRequestConfig): Promise<T> => {
+  delete: <T = unknown>(url: string, config?: RequestConfig & ExtendedAxiosRequestConfig): Promise<T> => {
     return retryRequest({ ...config, method: 'DELETE', url })
   },
 
-  patch: <T = any>(url: string, data?: any, config?: RequestConfig & AxiosRequestConfig): Promise<T> => {
+  patch: <T = unknown>(url: string, data?: unknown, config?: RequestConfig & ExtendedAxiosRequestConfig): Promise<T> => {
     return retryRequest({ ...config, method: 'PATCH', url, data })
   },
 
-  upload: <T = any>(url: string, file: File, config?: RequestConfig & AxiosRequestConfig): Promise<T> => {
+  upload: <T = unknown>(url: string, file: File, config?: RequestConfig & ExtendedAxiosRequestConfig): Promise<T> => {
     const formData = new FormData()
     formData.append('file', file)
     return retryRequest({

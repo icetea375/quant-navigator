@@ -88,7 +88,7 @@ export interface SentimentAnalysis {
 }
 
 export interface ValidationError {
-  loc: any[];
+  loc: (string | number)[];
   msg: string;
   type: string;
 }

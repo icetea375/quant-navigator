@@ -28,7 +28,13 @@ const getConfidenceColor = (confidence: number): string => {
   return 'low-confidence';
 };
 
-const validateForm = (formData: any): { isValid: boolean; errors: string[] } => {
+interface FormData {
+  final_recommendation?: string;
+  reasoning?: string;
+  [key: string]: unknown;
+}
+
+const validateForm = (formData: FormData): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
 
   if (!formData.final_recommendation) {

@@ -1,6 +1,7 @@
 // 财务数据快照组件测试
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createTestWrapper, mockElementPlusComponents } from '@/utils/test-utils'
+import type { VueWrapper } from '@vue/test-utils'
 import FinancialSnapshot from '../FinancialSnapshot.vue'
 
 // 模拟财务数据
@@ -48,7 +49,7 @@ const mockFinancialData = [
 ]
 
 describe('FinancialSnapshot', () => {
-  let wrapper: any
+  let wrapper: VueWrapper<InstanceType<typeof FinancialSnapshot>>
 
   beforeEach(() => {
     wrapper = createTestWrapper(FinancialSnapshot, {

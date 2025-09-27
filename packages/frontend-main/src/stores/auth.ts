@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authApi } from '@/services/auth'
-import type { User, LoginRequest, RegisterRequest } from '@/types/user'
+import { logger } from '@/utils/logger'
+import type { User, RegisterRequest } from '@/types/user'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -20,7 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = userData
         localStorage.setItem('userInfo', JSON.stringify(userData))
       } catch (error) {
-        console.error('Failed to get current user:', error)
+        logger.error('Failed to get current user:', error)
         logout()
       }
     }
@@ -29,11 +30,19 @@ export const useAuthStore = defineStore('auth', () => {
   const login = async (email: string, password: string) => {
     isLoading.value = true
     try {
-      const loginData: LoginRequest = { email, password }
+      const loginData = { username: email, password }
       const response = await authApi.login(loginData)
 
       token.value = response.token
-      user.value = response.user
+      user.value = {
+        id: response.user.id,
+        email: response.user.email,
+        name: response.user.username || response.user.email,
+        role: response.user.role,
+        avatar: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
       lastActivity.value = Date.now()
 
       // 保存到本地存储
@@ -42,11 +51,12 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.setItem('userInfo', JSON.stringify(response.user))
 
       return { success: true }
-    } catch (error: any) {
-      console.error('Login error:', error)
+    } catch (error: unknown) {
+      logger.error('Login error:', error)
+      const errorMessage = error instanceof Error ? error.message : '登录失败，请检查邮箱和密码'
       return {
         success: false,
-        error: error.message || '登录失败，请检查邮箱和密码'
+        error: errorMessage
       }
     } finally {
       isLoading.value = false
@@ -56,10 +66,23 @@ export const useAuthStore = defineStore('auth', () => {
   const register = async (userData: RegisterRequest) => {
     isLoading.value = true
     try {
-      const response = await authApi.register(userData)
+      const registerData = {
+        username: userData.email,
+        password: userData.password,
+        email: userData.email
+      }
+      const response = await authApi.register(registerData)
 
       token.value = response.token
-      user.value = response.user
+      user.value = {
+        id: response.user.id,
+        email: response.user.email,
+        name: response.user.username || response.user.email,
+        role: response.user.role,
+        avatar: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
       lastActivity.value = Date.now()
 
       // 保存到本地存储
@@ -68,11 +91,12 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.setItem('userInfo', JSON.stringify(response.user))
 
       return { success: true }
-    } catch (error: any) {
-      console.error('Register error:', error)
+    } catch (error: unknown) {
+      logger.error('Register error:', error)
+      const errorMessage = error instanceof Error ? error.message : '注册失败，请稍后重试'
       return {
         success: false,
-        error: error.message || '注册失败，请稍后重试'
+        error: errorMessage
       }
     } finally {
       isLoading.value = false
@@ -86,7 +110,7 @@ export const useAuthStore = defineStore('auth', () => {
         await authApi.logout()
       }
     } catch (error) {
-      console.error('Logout error:', error)
+      logger.error('Logout error:', error)
     } finally {
       // 清除本地状态
       user.value = null
@@ -110,7 +134,7 @@ export const useAuthStore = defineStore('auth', () => {
       lastActivity.value = Date.now()
       return true
     } catch (error) {
-      console.error('Token refresh error:', error)
+      logger.error('Token refresh error:', error)
       logout()
       return false
     }
@@ -124,11 +148,12 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = updatedUser
       localStorage.setItem('userInfo', JSON.stringify(updatedUser))
       return { success: true }
-    } catch (error: any) {
-      console.error('Update profile error:', error)
+    } catch (error: unknown) {
+      logger.error('Update profile error:', error)
+      const errorMessage = error instanceof Error ? error.message : '更新失败，请稍后重试'
       return {
         success: false,
-        error: error.message || '更新失败，请稍后重试'
+        error: errorMessage
       }
     }
   }
@@ -137,11 +162,12 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await authApi.changePassword({ oldPassword, newPassword })
       return { success: true }
-    } catch (error: any) {
-      console.error('Change password error:', error)
+    } catch (error: unknown) {
+      logger.error('Change password error:', error)
+      const errorMessage = error instanceof Error ? error.message : '密码修改失败，请检查原密码'
       return {
         success: false,
-        error: error.message || '密码修改失败，请检查原密码'
+        error: errorMessage
       }
     }
   }
@@ -160,7 +186,7 @@ export const useAuthStore = defineStore('auth', () => {
         return false
       }
     } catch (error) {
-      console.error('Token validation error:', error)
+      logger.error('Token validation error:', error)
       logout()
       return false
     }
@@ -173,7 +199,7 @@ export const useAuthStore = defineStore('auth', () => {
     const maxInactiveTime = 30 * 60 * 1000 // 30分钟
 
     if (inactiveTime > maxInactiveTime && isAuthenticated.value) {
-      console.log('用户长时间未活动，自动登出')
+      logger.info('用户长时间未活动，自动登出')
       logout()
     }
   }
@@ -197,7 +223,15 @@ export const useAuthStore = defineStore('auth', () => {
 
     const demoToken = 'demo_token_' + Date.now()
 
-    user.value = demoUser
+    user.value = {
+      id: demoUser.id,
+      email: demoUser.email,
+      name: demoUser.name,
+      role: demoUser.role as 'admin' | 'user',
+      avatar: demoUser.avatar,
+      createdAt: demoUser.createdAt,
+      updatedAt: demoUser.updatedAt
+    }
     token.value = demoToken
     lastActivity.value = Date.now()
 
@@ -216,7 +250,7 @@ export const useAuthStore = defineStore('auth', () => {
       try {
         user.value = JSON.parse(storedUserInfo)
       } catch (error) {
-        console.error('Failed to parse stored user info:', error)
+        logger.error('Failed to parse stored user info:', error)
         logout()
       }
     }

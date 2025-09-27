@@ -59,19 +59,19 @@ class MockConfigRepository {
     return Promise.resolve([]);
   }
 
-  findOne(options: any): Promise<ConfigItem | null> {
+  findOne(options: Record<string, unknown>): Promise<ConfigItem | null> {
     return Promise.resolve(null);
   }
 
-  save(entity: any): Promise<ConfigItem> {
+  save(entity: ConfigItem): Promise<ConfigItem> {
     return Promise.resolve(entity);
   }
 
-  update(id: string, entity: any): Promise<any> {
+  update(id: string, entity: Partial<ConfigItem>): Promise<{ affected: number }> {
     return Promise.resolve({ affected: 1 });
   }
 
-  delete(id: string): Promise<any> {
+  delete(id: string): Promise<{ affected: number }> {
     return Promise.resolve({ affected: 1 });
   }
 }

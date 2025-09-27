@@ -240,6 +240,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { logger } from "@/utils/logger"
 
 interface Props {
   stockCode: string
@@ -384,7 +385,7 @@ const formatTime = (time: Date) => {
 
 // 生命周期
 onMounted(() => {
-  console.log(`加载股票 ${props.stockCode} 在 ${props.reportDate} 的市场情绪数据`)
+  logger.log(`加载股票 ${props.stockCode} 在 ${props.reportDate} 的市场情绪数据`)
 })
 </script>
 

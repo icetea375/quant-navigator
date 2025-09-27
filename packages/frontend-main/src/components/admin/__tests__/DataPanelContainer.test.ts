@@ -1,12 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import type { VueWrapper } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import DataPanelContainer from '@/components/admin/DataPanelContainer.vue'
 import { mockElementPlusComponents } from '@/utils/test-utils'
 import type { ArbitrationCaseData } from '@/types/arbitration'
 
 // 创建测试包装器
-const createTestWrapper = (component: any, options = {}) => {
+const createTestWrapper = (component: unknown, options = {}) => {
   return mount(component, {
     global: {
       plugins: [createPinia()],
@@ -25,7 +26,7 @@ const createTestWrapper = (component: any, options = {}) => {
 }
 
 describe('DataPanelContainer - 展示组件单元测试', () => {
-  let wrapper: any
+  let wrapper: VueWrapper<InstanceType<typeof DataPanelContainer>>
 
   const mockCaseData: ArbitrationCaseData = {
     caseInfo: {
@@ -368,7 +369,7 @@ describe('DataPanelContainer - 展示组件单元测试', () => {
       })
 
       const buttons = wrapper.findAll('button')
-      const maximizeButton = buttons.find((btn: any) => btn.text().includes('+'))
+      const maximizeButton = buttons.find((btn: { text: () => string }) => btn.text().includes('+'))
       await maximizeButton?.trigger('click')
 
       expect(wrapper.emitted('toggle-maximize')).toBeTruthy()
@@ -385,7 +386,7 @@ describe('DataPanelContainer - 展示组件单元测试', () => {
       })
 
       const buttons = wrapper.findAll('button')
-      const closeButton = buttons.find((btn: any) => btn.text().includes('Close'))
+      const closeButton = buttons.find((btn: { text: () => string }) => btn.text().includes('Close'))
       await closeButton?.trigger('click')
 
       expect(wrapper.emitted('close-panel')).toBeTruthy()
@@ -402,7 +403,7 @@ describe('DataPanelContainer - 展示组件单元测试', () => {
       })
 
       const buttons = wrapper.findAll('button')
-      const maximizeButton = buttons.find((btn: any) => btn.text().includes('-'))
+      const maximizeButton = buttons.find((btn: { text: () => string }) => btn.text().includes('-'))
       expect(maximizeButton).toBeTruthy()
     })
   })

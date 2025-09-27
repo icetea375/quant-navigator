@@ -219,6 +219,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { logger } from "@/utils/logger"
 
 interface Props {
   stockCode: string
@@ -336,7 +337,7 @@ const getBollingerPosition = () => {
 }
 
 const getSignalIcon = (type: string) => {
-  const icons = {
+  const icons: Record<string, string> = {
     buy: '🟢',
     sell: '🔴',
     warning: '🟡',
@@ -346,19 +347,19 @@ const getSignalIcon = (type: string) => {
 }
 
 const getPatternIcon = (type: string) => {
-  const icons = {
+  const icons: Record<string, string> = {
     triangle: '🔺',
     flag: '🏁',
     head_shoulders: '👤',
     double_top: '⛰️',
     double_bottom: '🏔️'
   }
-  return icons[type] || '📊'
+  return icons[type as keyof typeof icons] || '📊'
 }
 
 // 生命周期
 onMounted(() => {
-  console.log(`加载股票 ${props.stockCode} 在 ${props.reportDate} 的技术分析数据`)
+  logger.log(`加载股票 ${props.stockCode} 在 ${props.reportDate} 的技术分析数据`)
 })
 </script>
 

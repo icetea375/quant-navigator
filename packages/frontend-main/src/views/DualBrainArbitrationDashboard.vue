@@ -319,7 +319,8 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { logger } from "@/utils/logger"
+// useRouter 未使用，已移除
 
 // 类型定义
 interface PendingCase {
@@ -330,6 +331,8 @@ interface PendingCase {
   qwen_confidence: number
   doubao_confidence: number
   days_pending: number
+  qwen_report_id: string
+  doubao_report_id: string
 }
 
 interface QwenReport {
@@ -367,7 +370,7 @@ interface ArbitrationDecision {
 }
 
 // 响应式数据
-const router = useRouter()
+// router 未使用，已移除
 const loading = ref(false)
 const pendingCases = ref<PendingCase[]>([])
 const selectedCase = ref<PendingCase | null>(null)
@@ -394,7 +397,7 @@ const loadPendingCases = async () => {
     const response = await fetch('/api/arbitration/pending-cases')
     pendingCases.value = await response.json()
   } catch (error) {
-    console.error('加载待仲裁案件失败:', error)
+    logger.error('加载待仲裁案件失败:', error)
   } finally {
     loading.value = false
   }
@@ -413,7 +416,7 @@ const selectCase = async (caseItem: PendingCase) => {
     const doubaoResponse = await fetch(`/api/reports/${caseItem.doubao_report_id}`)
     doubaoReport.value = await doubaoResponse.json()
   } catch (error) {
-    console.error('加载报告失败:', error)
+    logger.error('加载报告失败:', error)
   } finally {
     loading.value = false
   }
@@ -463,7 +466,7 @@ const submitArbitrationDecision = async () => {
       resetDecision()
     }
   } catch (error) {
-    console.error('提交仲裁决策失败:', error)
+    logger.error('提交仲裁决策失败:', error)
   } finally {
     loading.value = false
   }

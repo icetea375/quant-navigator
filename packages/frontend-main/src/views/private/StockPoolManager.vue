@@ -19,10 +19,14 @@
         <el-input
           v-model="searchKeyword"
           placeholder="搜索股票池..."
-          prefix-icon="Search"
+        >
+          <template #prefix>
+            <Search />
+          </template>
           clearable
           style="width: 300px;"
-        />
+          />
+        </el-input>
       </div>
     </div>
 
@@ -260,6 +264,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
+import { logger } from "@/utils/logger"
 import { privateApi } from '@/services/market'
 import type { StockPool } from '@/types/market'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
@@ -308,7 +313,7 @@ const loadStockPools = async () => {
     const data = await privateApi.getStockPools()
     stockPools.value = data
   } catch (error) {
-    console.error('Failed to load stock pools:', error)
+    logger.error('Failed to load stock pools:', error)
     ElMessage.error('加载股票池失败')
   } finally {
     loading.value = false

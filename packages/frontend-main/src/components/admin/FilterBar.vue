@@ -120,20 +120,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed } from 'vue'
 
-// Props
-interface Props {
-  loading?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  loading: false
-})
+// Props - 此组件不需要props
 
 // Emits
 const emit = defineEmits<{
-  filterChange: [filters: any]
+  filterChange: [filters: Record<string, unknown>]
 }>()
 
 // 响应式数据
@@ -148,7 +141,7 @@ const filters = ref({
 
 // 计算属性
 const computedFilters = computed(() => {
-  const result: any = {}
+  const result: Record<string, unknown> = {}
 
   if (filters.value.dateRange === 'custom') {
     if (filters.value.startDate) {
@@ -206,7 +199,7 @@ const resetFilters = () => {
 // 防抖函数
 function debounce(func: Function, wait: number) {
   let timeout: NodeJS.Timeout
-  return function executedFunction(...args: any[]) {
+  return function executedFunction(...args: unknown[]) {
     const later = () => {
       clearTimeout(timeout)
       func(...args)

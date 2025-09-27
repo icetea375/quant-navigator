@@ -241,7 +241,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { RadarChart } from 'echarts/charts';
@@ -252,8 +252,7 @@ import {
   GridComponent
 } from 'echarts/components';
 import VChart from 'vue-echarts';
-import { TrendCharts, TrendCharts as TrendDown } from '@element-plus/icons-vue';
-import type { QuantSignalDashboardProps, QuantSignalsData } from '@/types/arbitration';
+import type { QuantSignalDashboardProps } from '@/types/arbitration';
 
 // 注册 ECharts 组件
 use([

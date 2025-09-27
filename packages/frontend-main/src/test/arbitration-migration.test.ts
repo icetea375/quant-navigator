@@ -35,26 +35,34 @@ describe('仲裁功能迁移测试', () => {
         stockCode: '000001',
         stockName: '平安银行',
         reportDate: '2024-01-01',
-        reportType: 'annual',
-        status: 'pending',
-        priority: 1,
+        reportType: 'comprehensive' as const,
+        status: 'pending' as const,
+        priority: 'high' as const,
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T00:00:00Z'
       },
       aiDebate: {
-        reportId: 'report-001',
-        reportType: 'annual',
-        title: 'AI分析报告',
-        summary: 'AI生成的财务分析摘要',
-        content: '详细的AI分析内容...',
-        confidenceScore: 0.85,
-        qualityScore: 0.90,
-        modelUsed: 'qwen-max',
-        version: '1.0.0',
-        keyFindings: ['关键发现1', '关键发现2'],
-        riskFactors: ['风险因素1', '风险因素2'],
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
+        qwenAnalysis: {
+          summary: 'AI生成的财务分析摘要',
+          keyPoints: ['关键发现1', '关键发现2'],
+          confidence: 0.85,
+          reasoning: '详细的AI分析内容...',
+          recommendations: [],
+          riskFactors: ['风险因素1', '风险因素2'],
+          timestamp: '2024-01-01T00:00:00Z'
+        },
+        doubaoAnalysis: {
+          summary: 'AI生成的财务分析摘要',
+          keyPoints: ['关键发现1', '关键发现2'],
+          confidence: 0.90,
+          reasoning: '详细的AI分析内容...',
+          recommendations: [],
+          riskFactors: ['风险因素1', '风险因素2'],
+          timestamp: '2024-01-01T00:00:00Z'
+        },
+        disagreementScore: 0.1,
+        consensusSummary: '测试共识',
+        conflictSummary: '测试冲突'
       },
       panels: {
         rawTextExplorer: [],

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { marketApi, privateApi } from '@/services/market'
+import { logger } from '@/utils/logger'
 import type { MarketBriefing, MarketEvent, HotspotAttribution, StockPool } from '@/types/market'
 
 export const useMarketStore = defineStore('market', () => {
@@ -50,7 +51,7 @@ export const useMarketStore = defineStore('market', () => {
       const data = await marketApi.getMarketBriefing(date)
       marketBriefing.value = data
     } catch (error) {
-      console.error('Failed to load market briefing:', error)
+      logger.error('Failed to load market briefing:', error)
       throw error
     } finally {
       loading.value.marketBriefing = false
@@ -61,14 +62,14 @@ export const useMarketStore = defineStore('market', () => {
     loading.value.preMarketEvents = true
     try {
       const data = await marketApi.getPreMarketEvents(date, page, pageSize)
-      preMarketEvents.value = data.items
+      preMarketEvents.value = data.data || []
       pagination.value.preMarketEvents = {
-        page: data.page,
-        pageSize: data.pageSize,
-        total: data.total,
+        page: data.pagination.page,
+        pageSize: data.pagination.limit,
+        total: data.pagination.total,
       }
     } catch (error) {
-      console.error('Failed to load pre-market events:', error)
+      logger.error('Failed to load pre-market events:', error)
       throw error
     } finally {
       loading.value.preMarketEvents = false
@@ -79,14 +80,14 @@ export const useMarketStore = defineStore('market', () => {
     loading.value.postMarketHotspots = true
     try {
       const data = await marketApi.getPostMarketHotspots(date, page, pageSize)
-      postMarketHotspots.value = data.items
+      postMarketHotspots.value = data.data || []
       pagination.value.postMarketHotspots = {
-        page: data.page,
-        pageSize: data.pageSize,
-        total: data.total,
+        page: data.pagination.page,
+        pageSize: data.pagination.limit,
+        total: data.pagination.total,
       }
     } catch (error) {
-      console.error('Failed to load post-market hotspots:', error)
+      logger.error('Failed to load post-market hotspots:', error)
       throw error
     } finally {
       loading.value.postMarketHotspots = false
@@ -99,7 +100,7 @@ export const useMarketStore = defineStore('market', () => {
       const data = await marketApi.getMarketOverview()
       marketOverview.value = data
     } catch (error) {
-      console.error('Failed to load market overview:', error)
+      logger.error('Failed to load market overview:', error)
       throw error
     } finally {
       loading.value.marketOverview = false
@@ -110,7 +111,7 @@ export const useMarketStore = defineStore('market', () => {
     try {
       return await marketApi.searchStocks(query)
     } catch (error) {
-      console.error('Failed to search stocks:', error)
+      logger.error('Failed to search stocks:', error)
       throw error
     }
   }
@@ -119,7 +120,7 @@ export const useMarketStore = defineStore('market', () => {
     try {
       return await marketApi.getStockDetails(symbol)
     } catch (error) {
-      console.error('Failed to get stock details:', error)
+      logger.error('Failed to get stock details:', error)
       throw error
     }
   }
@@ -131,7 +132,7 @@ export const useMarketStore = defineStore('market', () => {
       const data = await privateApi.getMyBriefing(date)
       myBriefing.value = data
     } catch (error) {
-      console.error('Failed to load my briefing:', error)
+      logger.error('Failed to load my briefing:', error)
       throw error
     } finally {
       loading.value.myBriefing = false
@@ -141,15 +142,15 @@ export const useMarketStore = defineStore('market', () => {
   const loadMyAttributions = async (date?: string, page = 1, pageSize = 20) => {
     loading.value.myAttributions = true
     try {
-      const data = await privateApi.getMyAttributions(date, page, pageSize)
-      myAttributions.value = data.items
+      const data = await privateApi.getMyAttributions(date)
+      myAttributions.value = data.data || []
       pagination.value.myAttributions = {
-        page: data.page,
-        pageSize: data.pageSize,
-        total: data.total,
+        page: data.pagination.page,
+        pageSize: data.pagination.limit,
+        total: data.pagination.total,
       }
     } catch (error) {
-      console.error('Failed to load my attributions:', error)
+      logger.error('Failed to load my attributions:', error)
       throw error
     } finally {
       loading.value.myAttributions = false
@@ -159,15 +160,15 @@ export const useMarketStore = defineStore('market', () => {
   const loadStockPools = async (page = 1, pageSize = 20) => {
     loading.value.stockPools = true
     try {
-      const data = await privateApi.getStockPools(page, pageSize)
-      stockPools.value = data.items
+      const data = await privateApi.getStockPools()
+      stockPools.value = data.data || []
       pagination.value.stockPools = {
-        page: data.page,
-        pageSize: data.pageSize,
-        total: data.total,
+        page: data.pagination.page,
+        pageSize: data.pagination.limit,
+        total: data.pagination.total,
       }
     } catch (error) {
-      console.error('Failed to load stock pools:', error)
+      logger.error('Failed to load stock pools:', error)
       throw error
     } finally {
       loading.value.stockPools = false
@@ -180,21 +181,21 @@ export const useMarketStore = defineStore('market', () => {
       const data = await privateApi.getPortfolioOverview()
       portfolioOverview.value = data
     } catch (error) {
-      console.error('Failed to load portfolio overview:', error)
+      logger.error('Failed to load portfolio overview:', error)
       throw error
     } finally {
       loading.value.portfolioOverview = false
     }
   }
 
-  const getAIAdvice = async (context?: any) => {
+  const getAIAdvice = async (context?: Record<string, unknown>) => {
     loading.value.aiAdvice = true
     try {
       const data = await privateApi.getAIAdvice(context)
       aiAdvice.value = data
       return data
     } catch (error) {
-      console.error('Failed to get AI advice:', error)
+      logger.error('Failed to get AI advice:', error)
       throw error
     } finally {
       loading.value.aiAdvice = false
@@ -208,7 +209,7 @@ export const useMarketStore = defineStore('market', () => {
       stockPools.value.unshift(newPool)
       return newPool
     } catch (error) {
-      console.error('Failed to create stock pool:', error)
+      logger.error('Failed to create stock pool:', error)
       throw error
     }
   }
@@ -222,7 +223,7 @@ export const useMarketStore = defineStore('market', () => {
       }
       return updatedPool
     } catch (error) {
-      console.error('Failed to update stock pool:', error)
+      logger.error('Failed to update stock pool:', error)
       throw error
     }
   }
@@ -235,7 +236,7 @@ export const useMarketStore = defineStore('market', () => {
         stockPools.value.splice(index, 1)
       }
     } catch (error) {
-      console.error('Failed to delete stock pool:', error)
+      logger.error('Failed to delete stock pool:', error)
       throw error
     }
   }
@@ -244,7 +245,7 @@ export const useMarketStore = defineStore('market', () => {
     try {
       return await privateApi.getStockPoolDetails(id)
     } catch (error) {
-      console.error('Failed to get stock pool details:', error)
+      logger.error('Failed to get stock pool details:', error)
       throw error
     }
   }
@@ -271,7 +272,7 @@ export const useMarketStore = defineStore('market', () => {
     try {
       await Promise.allSettled(promises)
     } catch (error) {
-      console.error('Failed to refresh all data:', error)
+      logger.error('Failed to refresh all data:', error)
     }
   }
 

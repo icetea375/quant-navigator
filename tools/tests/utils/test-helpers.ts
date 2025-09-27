@@ -7,11 +7,50 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 
+// 测试数据类型定义
+interface StockPriceData {
+  ts_code: string;
+  trade_date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  vol: number;
+  amount: number;
+}
+
+interface NewsData {
+  id: number;
+  title: string;
+  content: string;
+  publish_time: string;
+  source: string;
+  sentiment: 'positive' | 'negative';
+}
+
+interface ConfigData {
+  id: number;
+  configType: string;
+  configKey: string;
+  configValue: string;
+  description: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ApiResponse {
+  body: Record<string, unknown>;
+  status: number;
+}
+
+type TestData = StockPriceData | NewsData | ConfigData;
+
 export class TestHelpers {
   /**
    * 创建测试模块
    */
-  static async createTestingModule(providers: any[], controllers: any[] = []): Promise<TestingModule> {
+  static async createTestingModule(providers: unknown[], controllers: unknown[] = []): Promise<TestingModule> {
     return await Test.createTestingModule({
       controllers,
       providers,
@@ -35,7 +74,7 @@ export class TestHelpers {
   /**
    * 生成测试数据
    */
-  static generateTestData(type: string, count: number = 10): any[] {
+  static generateTestData(type: string, count: number = 10): TestData[] {
     switch (type) {
       case 'stock_prices':
         return this.generateStockPriceData(count);
@@ -51,7 +90,7 @@ export class TestHelpers {
   /**
    * 验证API响应格式
    */
-  static validateApiResponse(response: any, expectedFields: string[]): boolean {
+  static validateApiResponse(response: ApiResponse, expectedFields: string[]): boolean {
     if (!response.body) return false;
 
     return expectedFields.every(field =>
@@ -62,7 +101,7 @@ export class TestHelpers {
   /**
    * 验证错误响应
    */
-  static validateErrorResponse(response: any): boolean {
+  static validateErrorResponse(response: ApiResponse): boolean {
     return response.status >= 400 &&
            response.body &&
            (response.body.error || response.body.message);
@@ -71,7 +110,7 @@ export class TestHelpers {
   /**
    * 生成股票价格测试数据
    */
-  private static generateStockPriceData(count: number): any[] {
+  private static generateStockPriceData(count: number): StockPriceData[] {
     const data = [];
     const symbols = ['000001.SZ', '000002.SZ', '600000.SH', '600036.SH'];
 
@@ -97,7 +136,7 @@ export class TestHelpers {
   /**
    * 生成新闻测试数据
    */
-  private static generateNewsData(count: number): any[] {
+  private static generateNewsData(count: number): NewsData[] {
     const data = [];
     const titles = [
       '公司发布重大公告',
@@ -124,7 +163,7 @@ export class TestHelpers {
   /**
    * 生成配置测试数据
    */
-  private static generateConfigData(count: number): any[] {
+  private static generateConfigData(count: number): ConfigData[] {
     const data = [];
     const types = ['database', 'api', 'cache', 'logging'];
     const keys = ['host', 'port', 'timeout', 'retry_count'];

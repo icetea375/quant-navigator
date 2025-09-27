@@ -432,7 +432,7 @@ export const exportApiDocsAsMarkdown = () => {
       markdown += '\n'
     }
 
-    if (endpoint.requestBody) {
+    if ('requestBody' in endpoint && endpoint.requestBody) {
       markdown += `**请求体:**\n\n\`\`\`json\n${JSON.stringify(endpoint.requestBody, null, 2)}\n\`\`\`\n\n`
     }
 
@@ -456,7 +456,7 @@ export const exportApiDocsAsMarkdown = () => {
       markdown += '\n'
     }
 
-    if (endpoint.requestBody) {
+    if ('requestBody' in endpoint && endpoint.requestBody) {
       markdown += `**请求体:**\n\n\`\`\`json\n${JSON.stringify(endpoint.requestBody, null, 2)}\n\`\`\`\n\n`
     }
 
@@ -480,7 +480,7 @@ export const exportApiDocsAsMarkdown = () => {
       markdown += '\n'
     }
 
-    if (endpoint.requestBody) {
+    if ('requestBody' in endpoint && endpoint.requestBody) {
       markdown += `**请求体:**\n\n\`\`\`json\n${JSON.stringify(endpoint.requestBody, null, 2)}\n\`\`\`\n\n`
     }
 

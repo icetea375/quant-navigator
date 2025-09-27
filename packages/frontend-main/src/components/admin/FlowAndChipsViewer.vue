@@ -35,7 +35,7 @@
                   >
                     <template #prefix>
                       <el-icon :color="flowData.netAmount > 0 ? '#67c23a' : '#f56c6c'">
-                        <component :is="flowData.netAmount > 0 ? 'TrendCharts' : 'TrendCharts'" />
+                        <TrendCharts />
                       </el-icon>
                     </template>
                   </el-statistic>
@@ -315,7 +315,7 @@ import {
 } from 'echarts/components';
 import VChart from 'vue-echarts';
 import { TrendCharts } from '@element-plus/icons-vue';
-import type { FlowAndChipsViewerProps, FlowAndChipsData, MoneyFlowData, ChipDistributionData } from '@/types/arbitration';
+import type { FlowAndChipsViewerProps, ChipDistributionData } from '@/types/arbitration';
 
 // 注册 ECharts 组件
 use([
@@ -431,10 +431,6 @@ const chipDistributionChartOption = computed(() => {
 });
 
 // ==================== 方法 ====================
-const handleFlowHover = (flow: MoneyFlowData) => {
-  props.onFlowHover?.(flow);
-};
-
 const handleChipHover = (chip: ChipDistributionData) => {
   props.onChipHover?.(chip);
 };

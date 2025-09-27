@@ -109,8 +109,8 @@ config.global.mocks = {
   $t: (key: string) => key,
   $tc: (key: string) => key,
   $te: (key: string) => true,
-  $d: (value: any) => value,
-  $n: (value: any) => value,
+  $d: (value: unknown) => value,
+  $n: (value: unknown) => value,
 }
 
 // 模拟路由

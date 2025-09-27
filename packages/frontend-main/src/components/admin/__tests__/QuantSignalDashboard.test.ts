@@ -1,6 +1,7 @@
 // 量化信号仪表盘组件测试
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createTestWrapper, mockElementPlusComponents } from '@/utils/test-utils'
+import type { VueWrapper } from '@vue/test-utils'
 import QuantSignalDashboard from '../QuantSignalDashboard.vue'
 
 // 模拟量化信号数据
@@ -86,7 +87,7 @@ const mockQuantSignalData = [
 ]
 
 describe('QuantSignalDashboard', () => {
-  let wrapper: any
+  let wrapper: VueWrapper<InstanceType<typeof QuantSignalDashboard>>
 
   beforeEach(() => {
     wrapper = createTestWrapper(QuantSignalDashboard, {

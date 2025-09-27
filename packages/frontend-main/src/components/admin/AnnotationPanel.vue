@@ -38,9 +38,10 @@
       <div class="report-content">
         <div class="content-section">
           <h4>核心结论</h4>
+          <!-- eslint-disable-next-line vue/no-v-html -->
           <div
             class="content-text"
-            v-html="formatMarkdown(report.contentMarkdown)"
+            v-html="sanitizeHtml(formatMarkdown(report.contentMarkdown))"
           />
         </div>
 
@@ -192,19 +193,38 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
+import DOMPurify from 'dompurify'
 
 // 接口定义
+interface AttributionFactor {
+  factor: string
+  weight: number
+  description: string
+}
+
+interface SupportingEvidence {
+  source: string
+  confidence: number
+  description: string
+}
+
+interface EvidencePayload {
+  attributionFactors: AttributionFactor[]
+  supportingEvidence: SupportingEvidence[]
+  confidenceScore: number
+}
+
 interface Report {
   reportId: string
   title: string
   contentMarkdown: string
-  evidencePayload: any
+  evidencePayload: EvidencePayload
   reportType: string
   targetCode: string
   reportDate: string
-  attributionFactors: any
+  attributionFactors: AttributionFactor[]
   confidenceScore: number
-  supportingEvidence: any
+  supportingEvidence: SupportingEvidence[]
 }
 
 interface Feedback {
@@ -225,7 +245,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 // Emits
 const emit = defineEmits<{
-  feedbackSubmit: [feedback: any]
+  feedbackSubmit: [feedback: Feedback]
 }>()
 
 // 响应式数据
@@ -237,6 +257,13 @@ const feedback = reactive<Feedback>({
 })
 
 // 方法
+const sanitizeHtml = (html: string): string => {
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    ALLOWED_ATTR: []
+  })
+}
+
 const handleSubmit = async () => {
   if (!props.report || !feedback.rating || !feedback.correctReasonText.trim()) {
     return
@@ -283,13 +310,19 @@ const formatMarkdown = (markdown: string) => {
     .replace(/\n/g, '<br>')
 }
 
-const getEvidenceItems = () => {
+interface EvidenceItem {
+  type: string
+  confidence: number
+  content: string
+}
+
+const getEvidenceItems = (): EvidenceItem[] => {
   if (!props.report?.evidencePayload) return []
 
   const evidence = props.report.evidencePayload
-  const items = []
+  const items: EvidenceItem[] = []
 
-  if (evidence.attributionFactors) {
+  if (evidence.attributionFactors && evidence.attributionFactors.length > 0) {
     items.push({
       type: '归因因子',
       confidence: Math.round((evidence.confidenceScore || 0) * 100),
@@ -297,7 +330,7 @@ const getEvidenceItems = () => {
     })
   }
 
-  if (evidence.supportingEvidence) {
+  if (evidence.supportingEvidence && evidence.supportingEvidence.length > 0) {
     items.push({
       type: '支持证据',
       confidence: 85,

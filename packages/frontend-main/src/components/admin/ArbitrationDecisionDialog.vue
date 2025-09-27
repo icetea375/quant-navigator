@@ -99,6 +99,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
+import { logger } from "@/utils/logger"
 import type { FormInstance, FormRules } from 'element-plus'
 
 // ==================== Props ====================
@@ -159,7 +160,7 @@ const handleSubmit = async () => {
     await formRef.value.validate()
     emit('submit', { ...form })
   } catch (error) {
-    console.error('表单验证失败:', error)
+    logger.error('表单验证失败:', error)
   }
 }
 

@@ -271,7 +271,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { logger } from "@/utils/logger"
 
 interface ConfigItem {
   configId: number
@@ -406,12 +407,12 @@ const handlePublish = async (config: ConfigItem) => {
 }
 
 const handleViewHistory = (config: ConfigItem) => {
-  console.log('View history', config)
+  logger.log('View history', config)
   menuConfig.value = null
 }
 
 const handleCopy = (config: ConfigItem) => {
-  console.log('Copy', config)
+  logger.log('Copy', config)
   menuConfig.value = null
 }
 

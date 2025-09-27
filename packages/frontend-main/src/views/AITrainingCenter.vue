@@ -94,6 +94,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { logger } from "@/utils/logger"
 import FilterBar from '../components/admin/FilterBar.vue'
 import ReportList from '../components/admin/ReportList.vue'
 import AnnotationPanel from '../components/admin/AnnotationPanel.vue'
@@ -150,7 +151,7 @@ const handleFeedbackSubmit = async (feedback: any) => {
     // 刷新报告列表
     await adminStore.fetchReports()
   } catch (error) {
-    console.error('提交反馈失败:', error)
+    logger.error('提交反馈失败:', error)
   }
 }
 

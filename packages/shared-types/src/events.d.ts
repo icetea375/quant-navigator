@@ -100,7 +100,15 @@ export interface ProcessedEvent {
   /** 处理结果 */
   processing_result?: {
     extracted_entities: string[];
-    sentiment_analysis: any;
+    sentiment_analysis: {
+      sentiment: 'positive' | 'negative' | 'neutral';
+      confidence: number;
+      scores: {
+        positive: number;
+        negative: number;
+        neutral: number;
+      };
+    };
     relevance_score: number;
   };
   /** 错误信息 */

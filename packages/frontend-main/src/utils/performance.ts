@@ -1,8 +1,9 @@
 // 性能优化工具
 import { nextTick } from 'vue'
+import { logger } from '@/utils/logger'
 
 // 防抖函数
-export const debounce = <T extends (...args: any[]) => any>(
+export const debounce = <T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number,
   immediate = false
@@ -25,13 +26,13 @@ export const debounce = <T extends (...args: any[]) => any>(
 }
 
 // 节流函数
-export const throttle = <T extends (...args: any[]) => any>(
+export const throttle = <T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): ((...args: Parameters<T>) => void) => {
   let inThrottle: boolean
 
-  return function executedFunction(...args: Parameters<T>) {
+  return function executedFunction(this: unknown, ...args: Parameters<T>) {
     if (!inThrottle) {
       func.apply(this, args)
       inThrottle = true
@@ -96,7 +97,7 @@ export const compressImage = (
       canvas.height = height
 
       ctx?.drawImage(img, 0, 0, width, height)
-      canvas.toBlob(resolve, 'image/jpeg', quality)
+      canvas.toBlob((blob) => resolve(blob || new Blob()), 'image/jpeg', quality)
     }
 
     img.src = URL.createObjectURL(file)
@@ -120,7 +121,7 @@ export const memoryMonitor = {
   logMemoryUsage: () => {
     const memory = memoryMonitor.getMemoryInfo()
     if (memory) {
-      console.log(`内存使用: ${memory.used}MB / ${memory.total}MB (限制: ${memory.limit}MB)`)
+      logger.info(`内存使用: ${memory.used}MB / ${memory.total}MB (限制: ${memory.limit}MB)`)
     }
   },
 }
@@ -168,7 +169,7 @@ export const codeSplitting = {
       const module = await import(/* @vite-ignore */ componentPath)
       return module.default || module
     } catch (error) {
-      console.error(`Failed to load component: ${componentPath}`, error)
+      logger.error(`Failed to load component: ${componentPath}`, error)
       return null
     }
   },
@@ -185,9 +186,9 @@ export const codeSplitting = {
 // 缓存管理
 export const cacheManager = {
   // 内存缓存
-  memoryCache: new Map<string, { data: any; timestamp: number; ttl: number }>(),
+  memoryCache: new Map<string, { data: unknown; timestamp: number; ttl: number }>(),
 
-  set: (key: string, data: any, ttl = 300000) => { // 默认5分钟
+  set: (key: string, data: unknown, ttl = 300000) => { // 默认5分钟
     cacheManager.memoryCache.set(key, {
       data,
       timestamp: Date.now(),
@@ -267,7 +268,7 @@ export const performanceTips = {
     })
 
     if (largeImages.length > 0) {
-      console.warn(`发现 ${largeImages.length} 张大图片，建议优化`)
+      logger.warn(`发现 ${largeImages.length} 张大图片，建议优化`)
     }
 
     return largeImages
@@ -296,7 +297,7 @@ export const performanceTips = {
     })
 
     if (unusedRules > 0) {
-      console.warn(`发现 ${unusedRules} 条未使用的CSS规则`)
+      logger.warn(`发现 ${unusedRules} 条未使用的CSS规则`)
     }
   },
 
@@ -304,7 +305,7 @@ export const performanceTips = {
   checkMemoryLeaks: () => {
     const memory = memoryMonitor.getMemoryInfo()
     if (memory && memory.used > memory.limit * 0.8) {
-      console.warn('内存使用率过高，可能存在内存泄漏')
+      logger.warn('内存使用率过高，可能存在内存泄漏')
     }
   },
 }
@@ -316,7 +317,7 @@ export const initPerformanceMonitoring = () => {
 
   // 监控长任务
   performanceMetrics.observeLongTasks((task) => {
-    console.warn(`检测到长任务: ${task.duration}ms`)
+    logger.warn(`检测到长任务: ${task.duration}ms`)
   })
 
   // 页面卸载时清理

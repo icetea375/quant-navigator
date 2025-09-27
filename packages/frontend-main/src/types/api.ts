@@ -1,4 +1,7 @@
-// API响应基础类型 - 符合文档规范
+// 重新导出核心类型，确保向后兼容
+export type { BaseResponse as CoreBaseResponse, PaginationParams, PaginatedResponse as CorePaginatedResponse } from './core'
+
+// API响应基础类型 - 符合文档规范（保持向后兼容）
 export interface ApiResponse<T = any> {
   success: boolean
   data: T
@@ -13,24 +16,17 @@ export interface ApiErrorResponse {
   error: {
     code: string
     message: string
-    details?: any
+    details?: Record<string, unknown>
   }
 }
 
-// 分页响应类型
-export interface PaginatedResponse<T> {
-  items: T[]
-  total: number
-  page: number
-  pageSize: number
-  totalPages: number
-}
+// 分页响应类型 - 使用core.ts中的定义
 
 // 错误响应类型
 export interface ApiError {
   code: string
   message: string
-  details?: any
+  details?: Record<string, unknown>
   field?: string
 }
 
@@ -51,16 +47,7 @@ export interface UploadResponse {
   mimeType: string
 }
 
-// 系统状态类型
-export interface SystemStatus {
-  isRunning: boolean
-  lastUpdate: string
-  errorCount: number
-  warningCount: number
-  cpuUsage: number
-  memoryUsage: number
-  diskUsage: number
-}
+// 系统状态类型 - 使用 core.ts 中的定义
 
 // 数据管道状态类型
 export interface DataPipelineStatus {
@@ -235,7 +222,7 @@ export interface DataPipelineLogResponse {
   timestamp: string
   level: 'info' | 'warn' | 'error'
   message: string
-  details?: any
+  details?: Record<string, unknown>
 }
 
 // AI引擎统计类型 - 符合文档规范
@@ -253,5 +240,5 @@ export interface SystemConfigResponse {
   update_frequency: string
   max_concurrency: number
   log_level: string
-  [key: string]: any
+  [key: string]: string | number | boolean
 }

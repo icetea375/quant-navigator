@@ -37,10 +37,56 @@ describe('核心功能测试 - 遵循测试宪法', () => {
     it('应该能够设置案例数据', () => {
       const store = useArbitrationStore()
       const caseData = {
-        case_id: 'test-case-1',
-        qwen_analysis: {
-          analysis: '测试分析',
-          reasoning: '测试推理'
+        caseInfo: {
+          caseId: 'test-case-1',
+          stockCode: '000001',
+          stockName: '测试股票',
+          reportType: 'comprehensive' as const,
+          status: 'pending' as const,
+          priority: 'medium' as const,
+          priorityScore: 0.5,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          keyFindings: [],
+          riskFactors: [],
+          summary: '测试摘要',
+          concept: '测试概念',
+          industry: '银行',
+          tags: []
+        },
+        aiDebate: {
+          qwenAnalysis: {
+            summary: '测试分析',
+            keyPoints: [],
+            confidence: 0.5,
+            reasoning: '测试推理',
+            recommendations: [],
+            riskFactors: [],
+            timestamp: new Date().toISOString()
+          },
+          doubaoAnalysis: {
+            summary: '测试分析',
+            keyPoints: [],
+            confidence: 0.5,
+            reasoning: '测试推理',
+            recommendations: [],
+            riskFactors: [],
+            timestamp: new Date().toISOString()
+          },
+          disagreementScore: 0.1,
+          consensusSummary: '测试共识',
+          conflictSummary: '测试冲突'
+        },
+        panels: {
+          rawTextExplorer: [],
+          financialSnapshot: [],
+          quantSignalDashboard: [],
+          flowAndChipsViewer: {
+            moneyFlow: [],
+            topList: [],
+            chipDistribution: []
+          },
+          precedentViewer: []
         }
       }
 
@@ -69,13 +115,117 @@ describe('核心功能测试 - 遵循测试宪法', () => {
     it('应该能够重置 store 状态', () => {
       const store = useArbitrationStore()
       store.setCurrentCase('test-case-1')
-      store.setCaseData({ case_id: 'test-case-1' })
+      store.setCaseData({
+        caseInfo: {
+          caseId: 'test-case-1',
+          stockCode: '000001',
+          stockName: '测试股票',
+          reportType: 'comprehensive' as const,
+          status: 'pending' as const,
+          priority: 'medium' as const,
+          priorityScore: 0.5,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          keyFindings: [],
+          riskFactors: [],
+          summary: '测试摘要',
+          concept: '测试概念',
+          industry: '银行',
+          tags: []
+        },
+        aiDebate: {
+          qwenAnalysis: {
+            summary: '测试分析',
+            keyPoints: [],
+            confidence: 0.5,
+            reasoning: '测试推理',
+            recommendations: [],
+            riskFactors: [],
+            timestamp: new Date().toISOString()
+          },
+          doubaoAnalysis: {
+            summary: '测试分析',
+            keyPoints: [],
+            confidence: 0.5,
+            reasoning: '测试推理',
+            recommendations: [],
+            riskFactors: [],
+            timestamp: new Date().toISOString()
+          },
+          disagreementScore: 0.1,
+          consensusSummary: '测试共识',
+          conflictSummary: '测试冲突'
+        },
+        panels: {
+          rawTextExplorer: [],
+          financialSnapshot: [],
+          quantSignalDashboard: [],
+          flowAndChipsViewer: {
+            moneyFlow: [],
+            topList: [],
+            chipDistribution: []
+          },
+          precedentViewer: []
+        }
+      })
       store.setError('测试错误')
 
       // 手动重置状态 - 遵循测试宪法第4条：简单性优先
-      store.setCurrentCase(null)
-      store.setCaseData(null)
-      store.setError(null)
+      store.setCurrentCase('')
+      store.setCaseData({
+        caseInfo: {
+          caseId: '',
+          stockCode: '',
+          stockName: '',
+          reportType: 'comprehensive' as const,
+          status: 'pending' as const,
+          priority: 'medium' as const,
+          priorityScore: 0,
+          createdAt: '',
+          updatedAt: '',
+          keyFindings: [],
+          riskFactors: [],
+          summary: '',
+          concept: '',
+          industry: '',
+          tags: []
+        },
+        aiDebate: {
+          qwenAnalysis: {
+            summary: '',
+            keyPoints: [],
+            confidence: 0,
+            reasoning: '',
+            recommendations: [],
+            riskFactors: [],
+            timestamp: ''
+          },
+          doubaoAnalysis: {
+            summary: '',
+            keyPoints: [],
+            confidence: 0,
+            reasoning: '',
+            recommendations: [],
+            riskFactors: [],
+            timestamp: ''
+          },
+          disagreementScore: 0,
+          consensusSummary: '',
+          conflictSummary: ''
+        },
+        panels: {
+          rawTextExplorer: [],
+          financialSnapshot: [],
+          quantSignalDashboard: [],
+          flowAndChipsViewer: {
+            moneyFlow: [],
+            topList: [],
+            chipDistribution: []
+          },
+          precedentViewer: []
+        }
+      })
+      store.setError('')
       store.setLoading(false)
 
       expect(store.currentCaseId).toBeNull()

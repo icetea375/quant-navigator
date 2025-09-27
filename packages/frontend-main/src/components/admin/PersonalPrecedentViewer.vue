@@ -232,6 +232,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { logger } from "@/utils/logger"
 import { ElMessage } from 'element-plus';
 import { Filter, View, Star } from '@element-plus/icons-vue';
 import type { PersonalPrecedentViewerProps, HistoricalArbitrations } from '@/types/arbitration';
@@ -323,7 +324,7 @@ const formatDate = (dateString: string) => {
 
 const handleFilter = () => {
   // 触发过滤逻辑
-  console.log('应用过滤条件');
+  logger.log('应用过滤条件');
 };
 
 const handlePrecedentSelect = (precedent: HistoricalArbitrations) => {
@@ -337,13 +338,13 @@ const handlePrecedentHover = (precedent: HistoricalArbitrations) => {
 
 const viewPrecedentDetails = (precedent: HistoricalArbitrations) => {
   // 查看详情逻辑
-  console.log('查看仲裁记录详情:', precedent);
+  logger.log('查看仲裁记录详情:', precedent);
   ElMessage.info('查看详情功能待实现');
 };
 
 const togglePrecedentFavorite = (precedent: HistoricalArbitrations) => {
   // 收藏/取消收藏逻辑
-  console.log('切换收藏状态:', precedent);
+  logger.log('切换收藏状态:', precedent);
   ElMessage.success(precedent.usedForTraining ? '已取消收藏' : '已收藏');
 };
 

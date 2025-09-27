@@ -183,6 +183,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import { logger } from "@/utils/logger"
 import { ElMessage } from 'element-plus';
 import { Search, Filter, Highlight, Link } from '@element-plus/icons-vue';
 import type { RawTextExplorerProps, RawTextData } from '@/types/arbitration';
@@ -271,7 +272,7 @@ const highlightText = (text: string, searchText: string) => {
 
 const handleFilter = () => {
   // 触发过滤逻辑
-  console.log('应用过滤条件');
+  logger.log('应用过滤条件');
 };
 
 const handleEventSelect = (event: RawTextData) => {

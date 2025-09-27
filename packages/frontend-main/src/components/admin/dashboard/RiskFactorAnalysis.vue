@@ -243,6 +243,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { logger } from "@/utils/logger"
 
 interface Props {
   stockCode: string
@@ -402,7 +403,7 @@ const getTrendClass = (trend: string) => {
 }
 
 const getTrendText = (trend: string) => {
-  const texts = {
+  const texts: Record<string, string> = {
     up: '上升',
     down: '下降',
     stable: '稳定'
@@ -419,12 +420,12 @@ const getLevelClass = (level: string) => {
 }
 
 const getLevelText = (level: string) => {
-  const texts = {
+  const texts: Record<string, string> = {
     high: '高',
     medium: '中',
     low: '低'
   }
-  return texts[level] || '未知'
+  return texts[level as keyof typeof texts] || '未知'
 }
 
 const getFactorClass = (impact: string) => {
@@ -436,16 +437,16 @@ const getSeverityClass = (severity: string) => {
 }
 
 const getSeverityText = (severity: string) => {
-  const texts = {
+  const texts: Record<string, string> = {
     high: '严重',
     medium: '中等',
     low: '轻微'
   }
-  return texts[severity] || '未知'
+  return texts[severity as keyof typeof texts] || '未知'
 }
 
 const getAlertIcon = (type: string) => {
-  const icons = {
+  const icons: Record<string, string> = {
     critical: '🔴',
     warning: '🟡',
     info: '🔵'
@@ -458,7 +459,7 @@ const getPriorityClass = (priority: string) => {
 }
 
 const getPriorityText = (priority: string) => {
-  const texts = {
+  const texts: Record<string, string> = {
     high: '高优先级',
     medium: '中优先级',
     low: '低优先级'
@@ -477,7 +478,7 @@ const formatTime = (time: Date) => {
 
 // 生命周期
 onMounted(() => {
-  console.log(`加载股票 ${props.stockCode} 在 ${props.reportDate} 的风险因子分析数据`)
+  logger.log(`加载股票 ${props.stockCode} 在 ${props.reportDate} 的风险因子分析数据`)
 })
 </script>
 

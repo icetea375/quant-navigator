@@ -79,7 +79,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { MarketBriefing } from '@/types/market'
-import { Clock, TrendCharts, Warning, Trophy, InfoFilled } from '@element-plus/icons-vue'
+import { Clock } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 
 interface Props {

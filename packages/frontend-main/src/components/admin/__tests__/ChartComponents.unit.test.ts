@@ -2,7 +2,7 @@
 import { describe, it, expect, vi } from 'vitest'
 
 // 纯函数测试 - 遵循测试宪法第1条：测试的唯一目的
-const formatChartData = (data: any[]) => {
+const formatChartData = (data: unknown[]) => {
   if (!Array.isArray(data) || data.length === 0) return []
   return data.map(item => ({
     name: item.name || 'Unknown',
@@ -11,7 +11,7 @@ const formatChartData = (data: any[]) => {
   }))
 }
 
-const calculateChartOptions = (data: any[], type: string): any => {
+const calculateChartOptions = (data: unknown[], type: string): Record<string, unknown> => {
   const formattedData = formatChartData(data)
 
   const baseOptions = {
@@ -72,7 +72,7 @@ const calculateChartOptions = (data: any[], type: string): any => {
   }
 }
 
-const validateChartData = (data: any) => {
+const validateChartData = (data: unknown) => {
   if (!data) return false
   if (Array.isArray(data)) {
     return data.every(item =>
@@ -261,7 +261,7 @@ describe('Chart Components - 渲染逻辑测试', () => {
     }
 
     // 模拟图表调整大小
-    const resizeChart = (chart: any, width: number, height: number) => {
+    const resizeChart = (chart: { resize: (options: { width: number; height: number }) => void }, width: number, height: number) => {
       if (chart && chart.resize) {
         chart.resize({ width, height })
       }
@@ -280,7 +280,7 @@ describe('Chart Components - 渲染逻辑测试', () => {
     }
 
     // 模拟图表销毁
-    const disposeChart = (chart: any) => {
+    const disposeChart = (chart: { dispose: () => void }) => {
       if (chart && chart.dispose) {
         chart.dispose()
       }

@@ -1,25 +1,11 @@
-export interface MarketEvent {
-  id: string
-  title: string
-  description: string
-  importance: 'high' | 'medium' | 'low'
-  impact: 'positive' | 'negative' | 'neutral'
-  category: string
-  timestamp: string
-  source: string
-}
+// 重新导出核心类型，确保向后兼容
+export type {
+  MarketEvent,
+  HotspotAttribution,
+  MarketBriefing
+} from './core'
 
-export interface HotspotAttribution {
-  id: string
-  symbol: string
-  name: string
-  change: number
-  changePercent: number
-  volume: number
-  attribution: string
-  confidence: number
-  timestamp: string
-}
+// ==================== 市场特定扩展类型 ====================
 
 export interface StockPool {
   id: string
@@ -28,11 +14,4 @@ export interface StockPool {
   symbols: string[]
   createdAt: string
   updatedAt: string
-}
-
-export interface MarketBriefing {
-  date: string
-  events: MarketEvent[]
-  hotspots: HotspotAttribution[]
-  summary: string
 }

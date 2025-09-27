@@ -98,6 +98,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { logger } from "@/utils/logger"
 import { privateApi } from '@/services/market'
 import type { MarketBriefing, HotspotAttribution } from '@/types/market'
 import MyBriefingCard from '@/components/private/MyBriefingCard.vue'
@@ -136,7 +137,7 @@ const loadMyBriefing = async () => {
     const data = await privateApi.getMyBriefing(selectedDate.value)
     myBriefing.value = data
   } catch (error) {
-    console.error('Failed to load my briefing:', error)
+    logger.error('Failed to load my briefing:', error)
   } finally {
     briefingLoading.value = false
   }
@@ -148,7 +149,7 @@ const loadMyAttributions = async () => {
     const data = await privateApi.getMyAttributions(selectedDate.value)
     myAttributions.value = data
   } catch (error) {
-    console.error('Failed to load my attributions:', error)
+    logger.error('Failed to load my attributions:', error)
   } finally {
     attributionsLoading.value = false
   }
@@ -167,7 +168,7 @@ const generateAdvice = async () => {
     // TODO: 调用AI建议生成API
     aiAdvice.value = '基于当前市场分析，建议关注科技板块的成长股，同时保持对传统制造业的谨慎态度。建议仓位控制在70%左右，留出30%现金等待更好的入场时机。'
   } catch (error) {
-    console.error('Failed to generate advice:', error)
+    logger.error('Failed to generate advice:', error)
   }
 }
 

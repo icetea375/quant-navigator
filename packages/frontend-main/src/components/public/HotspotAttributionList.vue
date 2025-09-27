@@ -1,7 +1,7 @@
 <template>
   <div class="hotspot-list">
     <div
-      v-if="events.length === 0"
+      v-if="props.events.length === 0"
       class="empty-state"
     >
       <el-empty description="暂无数据" />
@@ -12,34 +12,43 @@
       class="events-grid"
     >
       <div
-        v-for="event in events"
+        v-for="event in props.events"
         :key="event.id"
         class="event-card"
         :class="getEventClass(event)"
       >
         <div class="event-header">
           <div class="event-title">
-            {{ event.title }}
+            {{ 'title' in event ? event.title : event.name }}
           </div>
           <div class="event-meta">
             <el-tag
+              v-if="'importance' in event"
               :type="getImportanceType(event.importance)"
               size="small"
             >
               {{ getImportanceText(event.importance) }}
             </el-tag>
             <el-tag
+              v-if="'impact' in event"
               :type="getImpactType(event.impact)"
               size="small"
             >
               {{ getImpactText(event.impact) }}
+            </el-tag>
+            <el-tag
+              v-if="'symbol' in event"
+              type="info"
+              size="small"
+            >
+              {{ event.symbol }}
             </el-tag>
           </div>
         </div>
 
         <div class="event-content">
           <p class="event-description">
-            {{ event.description }}
+            {{ 'description' in event ? event.description : event.attribution }}
           </p>
 
           <div class="event-details">
@@ -49,11 +58,11 @@
             </div>
             <div class="detail-item">
               <el-icon><Link /></el-icon>
-              <span>{{ event.source }}</span>
+              <span>{{ 'source' in event ? event.source : '热点归因' }}</span>
             </div>
             <div class="detail-item">
               <el-icon><PriceTag /></el-icon>
-              <span>{{ event.category }}</span>
+              <span>{{ 'category' in event ? event.category : `涨跌幅: ${event.changePercent}%` }}</span>
             </div>
           </div>
         </div>
@@ -63,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+// computed 未使用，已移除
 import type { MarketEvent, HotspotAttribution } from '@/types/market'
 import { Calendar, Link, PriceTag } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
@@ -75,7 +84,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const getEventClass = (event: MarketEvent | HotspotAttribution) => {
-  if ('importance' in event) {
+  if ('importance' in event && 'impact' in event) {
     return `importance-${event.importance} impact-${event.impact}`
   }
   return 'hotspot-item'

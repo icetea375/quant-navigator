@@ -1,5 +1,6 @@
 // API测试工具
 import { publicApi, privateApi, adminApi, authApi } from '@/services'
+import { logger } from '@/utils/logger'
 
 // API测试配置
 export const API_TEST_CONFIG = {
@@ -31,7 +32,7 @@ export const API_TEST_CONFIG = {
 
 // API连接测试
 export const testApiConnection = async () => {
-  console.log('🔍 开始API连接测试...')
+  logger.info('🔍 开始API连接测试...')
 
   const results = {
     public: [] as Array<{ name: string; success: boolean; error?: string }>,
@@ -40,37 +41,37 @@ export const testApiConnection = async () => {
   }
 
   // 测试公共API
-  console.log('📡 测试公共API...')
+  logger.info('📡 测试公共API...')
   for (const endpoint of API_TEST_CONFIG.endpoints.public) {
     try {
       await endpoint.method()
       results.public.push({ name: endpoint.name, success: true })
-      console.log(`✅ ${endpoint.name}`)
-    } catch (error: any) {
-      results.public.push({ name: endpoint.name, success: false, error: error.message })
-      console.log(`❌ ${endpoint.name}: ${error.message}`)
+      logger.info(`✅ ${endpoint.name}`)
+    } catch (error: unknown) {
+      results.public.push({ name: endpoint.name, success: false, error: error instanceof Error ? error.message : String(error) })
+      logger.info(`❌ ${endpoint.name}: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 
   // 测试私人API（需要先登录）
-  console.log('🔐 测试私人API...')
+  logger.info('🔐 测试私人API...')
   try {
     // 尝试登录
     await authApi.login(API_TEST_CONFIG.testUser)
-    console.log('✅ 用户登录成功')
+    logger.info('✅ 用户登录成功')
 
     for (const endpoint of API_TEST_CONFIG.endpoints.private) {
       try {
         await endpoint.method()
         results.private.push({ name: endpoint.name, success: true })
-        console.log(`✅ ${endpoint.name}`)
-      } catch (error: any) {
-        results.private.push({ name: endpoint.name, success: false, error: error.message })
-        console.log(`❌ ${endpoint.name}: ${error.message}`)
+        logger.info(`✅ ${endpoint.name}`)
+      } catch (error: unknown) {
+        results.private.push({ name: endpoint.name, success: false, error: error instanceof Error ? error.message : String(error) })
+        logger.info(`❌ ${endpoint.name}: ${error instanceof Error ? error.message : String(error)}`)
       }
     }
-  } catch (error: any) {
-    console.log(`❌ 用户登录失败: ${error.message}`)
+  } catch (error: unknown) {
+    logger.info(`❌ 用户登录失败: ${error instanceof Error ? error.message : String(error)}`)
     results.private = API_TEST_CONFIG.endpoints.private.map(endpoint => ({
       name: endpoint.name,
       success: false,
@@ -79,23 +80,23 @@ export const testApiConnection = async () => {
   }
 
   // 测试管理员API
-  console.log('👑 测试管理员API...')
+  logger.info('👑 测试管理员API...')
   for (const endpoint of API_TEST_CONFIG.endpoints.admin) {
     try {
       await endpoint.method()
       results.admin.push({ name: endpoint.name, success: true })
-      console.log(`✅ ${endpoint.name}`)
-    } catch (error: any) {
-      results.admin.push({ name: endpoint.name, success: false, error: error.message })
-      console.log(`❌ ${endpoint.name}: ${error.message}`)
+      logger.info(`✅ ${endpoint.name}`)
+    } catch (error: unknown) {
+      results.admin.push({ name: endpoint.name, success: false, error: error instanceof Error ? error.message : String(error) })
+      logger.info(`❌ ${endpoint.name}: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 
   // 输出测试结果
-  console.log('\n📊 API测试结果汇总:')
-  console.log('公共API:', results.public.filter(r => r.success).length, '/', results.public.length)
-  console.log('私人API:', results.private.filter(r => r.success).length, '/', results.private.length)
-  console.log('管理员API:', results.admin.filter(r => r.success).length, '/', results.admin.length)
+  logger.info('\n📊 API测试结果汇总:')
+  logger.info('公共API:', results.public.filter(r => r.success).length, '/', results.public.length)
+  logger.info('私人API:', results.private.filter(r => r.success).length, '/', results.private.length)
+  logger.info('管理员API:', results.admin.filter(r => r.success).length, '/', results.admin.length)
 
   return results
 }
@@ -172,7 +173,7 @@ export const generateMockData = {
 // 开发环境API模拟
 export const enableApiMocking = () => {
   if (process.env.NODE_ENV === 'development') {
-    console.log('🎭 启用API模拟模式')
+    logger.info('🎭 启用API模拟模式')
 
     // 这里可以集成mock服务，如MSW (Mock Service Worker)
     // 或者简单的拦截器来返回模拟数据

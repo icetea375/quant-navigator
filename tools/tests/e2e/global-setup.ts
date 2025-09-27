@@ -57,7 +57,7 @@ async function globalSetup(config: FullConfig) {
   }
 }
 
-async function createTestUser(page: any) {
+async function createTestUser(page: { goto: (url: string) => Promise<void>; fill: (selector: string, value: string) => Promise<void>; click: (selector: string) => Promise<void>; waitForSelector: (selector: string) => Promise<void> }) {
   try {
     // 创建测试用户
     const userData = {

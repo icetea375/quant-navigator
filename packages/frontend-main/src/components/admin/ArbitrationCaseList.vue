@@ -6,9 +6,9 @@
 
     <div class="case-list">
       <div
-        v-for="caseItem in cases"
+        v-for="caseItem in props.cases"
         :key="caseItem.caseId"
-        :class="['case-item', { active: currentCaseId === caseItem.caseId }]"
+        :class="['case-item', { active: props.currentCaseId === caseItem.caseId }]"
         @click="handleCaseSelect(caseItem.caseId)"
       >
         <div class="case-info">
@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 // import { computed } from 'vue'
-import type { ArbitrationCaseInfo } from '@/types/arbitration'
+import type { ArbitrationCaseInfo } from '@/types'
 
 // ==================== Props ====================
 interface Props {

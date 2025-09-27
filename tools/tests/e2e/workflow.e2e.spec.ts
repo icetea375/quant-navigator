@@ -156,7 +156,7 @@ describe('Workflow E2E Tests', () => {
 
       // 2. 验证信号格式
       const signals = signalResponse.body.signals;
-      signals.forEach((signal: any) => {
+      signals.forEach((signal: { symbol: string; zScore: number; status: string }) => {
         expect(signal).toHaveProperty('symbol');
         expect(signal).toHaveProperty('zScore');
         expect(signal).toHaveProperty('status');
@@ -195,7 +195,7 @@ describe('Workflow E2E Tests', () => {
 
       // 3. 验证预测格式
       const predictions = predictResponse.body.predictions;
-      predictions.forEach((prediction: any) => {
+      predictions.forEach((prediction: { symbol: string; predictedReturn: number; confidence: number }) => {
         expect(prediction).toHaveProperty('symbol');
         expect(prediction).toHaveProperty('predictedReturn');
         expect(prediction).toHaveProperty('confidence');

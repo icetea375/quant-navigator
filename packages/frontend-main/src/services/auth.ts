@@ -1,5 +1,5 @@
 import { request } from './http'
-import type { User, LoginRequest, RegisterRequest } from '@/types/user'
+import type { User } from '@/types/user'
 import type { AuthResponse } from '@/types/api'
 
 // 认证API服务 - 符合文档规范

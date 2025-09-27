@@ -5,10 +5,10 @@
         AI治理中心 - 仲裁仪表盘
       </h2>
       <el-tag
-        v-if="currentCase"
+        v-if="props.currentCase"
         type="info"
       >
-        当前案例: {{ currentCase.stockName }} ({{ currentCase.stockCode }})
+        当前案例: {{ props.currentCase.stockName }} ({{ props.currentCase.stockCode }})
       </el-tag>
     </div>
 
@@ -16,7 +16,7 @@
       <el-button
         type="primary"
         :icon="Refresh"
-        :loading="loading"
+        :loading="props.loading"
         @click="handleRefresh"
       >
         刷新数据
@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 import { Refresh, Setting } from '@element-plus/icons-vue'
-import type { ArbitrationCaseInfo } from '@/types/arbitration'
+import type { ArbitrationCaseInfo } from '@/types'
 
 // ==================== Props ====================
 interface Props {

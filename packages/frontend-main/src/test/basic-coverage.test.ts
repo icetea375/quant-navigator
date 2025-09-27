@@ -38,8 +38,57 @@ describe('基础覆盖率测试 - 遵循测试宪法', () => {
     it('应该能够设置案例数据', () => {
       const store = useArbitrationStore()
       const mockData = {
-        case_id: 'test-case-1',
-        qwen_analysis: { analysis: '测试分析' }
+        caseInfo: {
+          caseId: 'test-case-1',
+          stockCode: '000001',
+          stockName: '测试股票',
+          reportType: 'comprehensive' as const,
+          status: 'pending' as const,
+          priority: 'medium' as const,
+          priorityScore: 0.5,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          keyFindings: [],
+          riskFactors: [],
+          summary: '测试摘要',
+          concept: '测试概念',
+          industry: '银行',
+          tags: []
+        },
+        aiDebate: {
+          qwenAnalysis: {
+            summary: '测试分析',
+            keyPoints: [],
+            confidence: 0.5,
+            reasoning: '测试推理',
+            recommendations: [],
+            riskFactors: [],
+            timestamp: new Date().toISOString()
+          },
+          doubaoAnalysis: {
+            summary: '测试分析',
+            keyPoints: [],
+            confidence: 0.5,
+            reasoning: '测试推理',
+            recommendations: [],
+            riskFactors: [],
+            timestamp: new Date().toISOString()
+          },
+          disagreementScore: 0.1,
+          consensusSummary: '测试共识',
+          conflictSummary: '测试冲突'
+        },
+        panels: {
+          rawTextExplorer: [],
+          financialSnapshot: [],
+          quantSignalDashboard: [],
+          flowAndChipsViewer: {
+            moneyFlow: [],
+            topList: [],
+            chipDistribution: []
+          },
+          precedentViewer: []
+        }
       }
       store.setCaseData(mockData)
       expect(store.caseData).toEqual(mockData)

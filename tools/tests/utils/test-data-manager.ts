@@ -7,11 +7,16 @@ import { Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// 测试数据类型定义
+interface TestDataItem {
+  [key: string]: unknown;
+}
+
 export interface TestDataset {
   id: string;
   name: string;
   type: 'historical' | 'mock' | 'fixture';
-  data: any[];
+  data: TestDataItem[];
   metadata: {
     createdAt: Date;
     size: number;
@@ -39,7 +44,7 @@ export class TestDataManager {
   /**
    * 创建测试数据集
    */
-  async createDataset(name: string, type: 'historical' | 'mock' | 'fixture', data: any[]): Promise<string> {
+  async createDataset(name: string, type: 'historical' | 'mock' | 'fixture', data: TestDataItem[]): Promise<string> {
     const datasetId = `dataset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     const dataset: TestDataset = {
@@ -100,14 +105,14 @@ export class TestDataManager {
   /**
    * 创建模拟数据
    */
-  async createMockDataset(name: string, data: any[]): Promise<string> {
+  async createMockDataset(name: string, data: TestDataItem[]): Promise<string> {
     return await this.createDataset(name, 'mock', data);
   }
 
   /**
    * 创建测试夹具
    */
-  async createFixtureDataset(name: string, data: any[]): Promise<string> {
+  async createFixtureDataset(name: string, data: TestDataItem[]): Promise<string> {
     return await this.createDataset(name, 'fixture', data);
   }
 
@@ -168,7 +173,7 @@ export class TestDataManager {
     fs.writeFileSync(datasetPath, JSON.stringify(dataset, null, 2));
   }
 
-  private generateMockHistoricalData(config: HistoricalDataConfig): any[] {
+  private generateMockHistoricalData(config: HistoricalDataConfig): TestDataItem[] {
     const data = [];
     const startDate = new Date(config.startDate);
     const endDate = new Date(config.endDate);
@@ -193,12 +198,12 @@ export class TestDataManager {
     return data;
   }
 
-  private calculateAccuracy(data: any[]): number {
+  private calculateAccuracy(data: TestDataItem[]): number {
     // 简单的准确性计算，实际应该更复杂
     return data.length > 0 ? 0.99 : 0;
   }
 
-  private calculateConsistency(data: any[]): number {
+  private calculateConsistency(data: TestDataItem[]): number {
     // 简单的一致性计算，实际应该检查数据格式、范围等
     return data.length > 0 ? 0.98 : 0;
   }

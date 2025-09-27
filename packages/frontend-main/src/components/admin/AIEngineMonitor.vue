@@ -77,11 +77,11 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 
-const aiEngines = ref([
+const aiEngines = ref<AIEngine[]>([
   {
     name: 'LightGBM引擎',
     description: '第一层机器学习预测',
-    status: 'running',
+    status: 'running' as const,
     cpuUsage: 45,
     memoryUsage: 62,
     requestCount: 120
@@ -89,7 +89,7 @@ const aiEngines = ref([
   {
     name: 'FinBERT引擎',
     description: '第二层情感分析',
-    status: 'running',
+    status: 'running' as const,
     cpuUsage: 38,
     memoryUsage: 55,
     requestCount: 95
@@ -97,7 +97,7 @@ const aiEngines = ref([
   {
     name: 'LLaMA3引擎',
     description: '第三层大语言模型',
-    status: 'stopped',
+    status: 'stopped' as const,
     cpuUsage: 0,
     memoryUsage: 12,
     requestCount: 0
@@ -105,7 +105,7 @@ const aiEngines = ref([
   {
     name: '归因引擎',
     description: '市场异动归因分析',
-    status: 'running',
+    status: 'running' as const,
     cpuUsage: 28,
     memoryUsage: 41,
     requestCount: 78
@@ -136,7 +136,16 @@ const getUsageClass = (usage: number) => {
   return 'low'
 }
 
-const toggleEngine = (engine: any) => {
+interface AIEngine {
+  name: string
+  description: string
+  status: 'running' | 'stopped'
+  cpuUsage: number
+  memoryUsage: number
+  requestCount: number
+}
+
+const toggleEngine = (engine: AIEngine) => {
   engine.status = engine.status === 'running' ? 'stopped' : 'running'
   if (engine.status === 'stopped') {
     engine.cpuUsage = 0
@@ -148,7 +157,7 @@ const toggleEngine = (engine: any) => {
   ElMessage.success(`${engine.name} ${engine.status === 'running' ? '已启动' : '已停止'}`)
 }
 
-const viewEngineLogs = (engine: any) => {
+const viewEngineLogs = (engine: AIEngine) => {
   ElMessage.info(`查看 ${engine.name} 日志`)
 }
 

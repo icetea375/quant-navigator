@@ -23,7 +23,7 @@ global.console = {
 // 全局测试工具函数
 global.testUtils = {
   // 创建测试数据
-  createTestData: (type: string, overrides: any = {}) => {
+  createTestData: (type: string, overrides: Record<string, unknown> = {}) => {
     const baseData = {
       user: {
         id: 'test-user-id',
@@ -53,11 +53,11 @@ global.testUtils = {
   waitFor: (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
 
   // 创建Mock函数
-  createMock: (implementation?: any) => jest.fn(implementation),
+  createMock: (implementation?: (...args: unknown[]) => unknown) => jest.fn(implementation),
 
   // 创建Mock对象
   createMockObject: (methods: string[]) => {
-    const mockObj: any = {};
+    const mockObj: Record<string, jest.Mock> = {};
     methods.forEach(method => {
       mockObj[method] = jest.fn();
     });

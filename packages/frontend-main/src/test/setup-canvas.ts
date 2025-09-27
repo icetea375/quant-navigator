@@ -92,8 +92,8 @@ Object.defineProperty(HTMLCanvasElement.prototype, 'height', {
 
 // 模拟 ImageData
 global.ImageData = class ImageData {
-  constructor(public data: Uint8ClampedArray, public width: number, public height: number) {}
-}
+  constructor(public data: Uint8ClampedArray, public width: number, public height: number, public colorSpace = 'srgb') {}
+} as any
 
 // 模拟 OffscreenCanvas
 global.OffscreenCanvas = class OffscreenCanvas {
@@ -101,7 +101,11 @@ global.OffscreenCanvas = class OffscreenCanvas {
   getContext = mockCanvas.getContext
   toDataURL = mockCanvas.toDataURL
   toBlob = mockCanvas.toBlob
-}
+  oncontextlost = null
+  oncontextrestored = null
+  convertToBlob = vi.fn()
+  transferToImageBitmap = vi.fn()
+} as any
 
 // 模拟 requestAnimationFrame
 global.requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
@@ -138,7 +142,7 @@ global.getComputedStyle = vi.fn(() => ({
   getPropertyValue: vi.fn(() => ''),
   setProperty: vi.fn(),
   removeProperty: vi.fn()
-}))
+})) as any
 
 // 模拟 matchMedia
 global.matchMedia = vi.fn(() => ({

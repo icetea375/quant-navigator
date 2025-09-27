@@ -1,18 +1,27 @@
 import { request } from './http'
 import { publicApi } from './public'
-import { privateApi } from './private'
+import { privateApi as privateApiService } from './private'
 import type { MarketBriefing, MarketEvent, HotspotAttribution, StockPool } from '@/types/market'
-import type { PaginatedResponse } from '@/types/api'
+import type { PaginatedResponse } from '@/types/core'
+import type { MyAttributionResponse, StockPoolResponse } from '@/types/api'
 
 // 市场API服务 - 整合公共和私人API
 export const marketApi = {
   // 获取市场简报 - 使用公共API
   getMarketBriefing: (date?: string): Promise<MarketBriefing> => {
     return publicApi.getMarketBriefing(date).then(response => ({
+      id: 'default',
+      title: '市场简报',
       date: response.publish_time,
+      keyEvents: [],
+      marketSentiment: 'neutral',
+      summary: response.content,
       events: [],
       hotspots: [],
-      summary: response.content
+      riskLevel: 'medium',
+      recommendations: [],
+      createdAt: response.publish_time,
+      updatedAt: response.publish_time
     }))
   },
 
@@ -29,7 +38,19 @@ export const marketApi = {
     return request.get<PaginatedResponse<HotspotAttribution>>('/public/post-market-hotspots', {
       params: { date, page, pageSize },
       showLoading: true,
-    })
+    }).then(response => ({
+      success: true,
+      data: response.data || [],
+      pagination: {
+        page: response.pagination?.page || page,
+        limit: response.pagination?.limit || pageSize,
+        total: response.pagination?.total || 0,
+        totalPages: response.pagination?.totalPages || 0,
+        hasNext: response.pagination?.hasNext || false,
+        hasPrev: response.pagination?.hasPrev || false
+      },
+      timestamp: new Date().toISOString()
+    }))
   },
 
   // 获取市场概览
@@ -92,32 +113,50 @@ export const marketApi = {
 export const privateApi = {
   // 获取专属盘前雷达 - 使用新的API结构
   getMyBriefing: (date?: string): Promise<MarketBriefing> => {
-    return privateApi.getMyBriefing(date).then(response => ({
+    return privateApiService.getMyBriefing(date).then(response => ({
+      id: 'default',
+      title: '专属盘前雷达',
       date: response.publish_time,
+      keyEvents: [],
+      marketSentiment: 'neutral',
+      summary: response.content,
       events: [],
       hotspots: [],
-      summary: response.content
+      riskLevel: 'medium',
+      recommendations: [],
+      createdAt: response.publish_time,
+      updatedAt: response.publish_time
     }))
   },
 
   // 获取持仓异动归因 - 使用新的API结构
-  getMyAttributions: (date?: string, page = 1, pageSize = 20): Promise<PaginatedResponse<HotspotAttribution>> => {
-    return privateApi.getMyAttribution(date).then(response => ({
-      items: response.map(item => ({
-        id: item.target_name,
-        symbol: item.target_name,
-        name: item.target_name,
+  getMyAttributions: (date?: string): Promise<PaginatedResponse<HotspotAttribution>> => {
+    return privateApiService.getMyAttribution(date).then((response: MyAttributionResponse[]) => ({
+      success: true,
+      data: response.map((item: MyAttributionResponse) => ({
+        id: String(item.target_name),
+        title: String(item.target_name),
+        description: item.snapshot?.attribution || '',
+        stockCodes: [String(item.target_name)],
+        impact: 'medium' as const,
+        confidence: item.snapshot?.confidence || 0,
+        timestamp: item.snapshot?.timestamp || new Date().toISOString(),
         change: 0,
-        changePercent: item.change_pct,
-        volume: item.snapshot.volume,
-        attribution: item.snapshot.attribution,
-        confidence: item.snapshot.confidence,
-        timestamp: item.snapshot.timestamp
+        changePercent: Number(item.change_pct) || 0,
+        volume: item.snapshot?.volume || 0,
+        attribution: item.snapshot?.attribution || '',
+        category: 'market',
+        source: 'ai_analysis'
       })),
-      total: response.length,
-      page: 1,
-      pageSize: response.length,
-      totalPages: 1
+      pagination: {
+        page: 1,
+        limit: response.length,
+        total: response.length,
+        totalPages: 1,
+        hasNext: false,
+        hasPrev: false
+      },
+      timestamp: new Date().toISOString()
     }))
   },
 
@@ -166,28 +205,34 @@ export const privateApi = {
   },
 
   // 获取股票池列表 - 使用新的API结构
-  getStockPools: (page = 1, pageSize = 20): Promise<PaginatedResponse<StockPool>> => {
-    return privateApi.getStockPools().then(response => ({
-      items: response.map(pool => ({
-        id: pool.id,
-        name: pool.name,
+  getStockPools: (): Promise<PaginatedResponse<StockPool>> => {
+    return privateApiService.getStockPools().then((response: StockPoolResponse[]) => ({
+      success: true,
+      data: response.map((pool: StockPoolResponse) => ({
+        id: String(pool.id),
+        name: String(pool.name),
         description: '',
-        symbols: pool.items?.map(item => item.code) || [],
+        symbols: pool.items?.map((item) => item.code) || [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       })),
-      total: response.length,
-      page: 1,
-      pageSize: response.length,
-      totalPages: 1
+      pagination: {
+        page: 1,
+        limit: response.length,
+        total: response.length,
+        totalPages: 1,
+        hasNext: false,
+        hasPrev: false
+      },
+      timestamp: new Date().toISOString()
     }))
   },
 
   // 创建股票池 - 使用新的API结构
   createStockPool: (data: { name: string; description: string; symbols: string[] }): Promise<StockPool> => {
-    return privateApi.createStockPool({ name: data.name }).then(response => ({
-      id: response.id,
-      name: response.name,
+    return privateApiService.createStockPool({ name: data.name }).then((response: StockPoolResponse) => ({
+      id: String(response.id),
+      name: String(response.name),
       description: data.description,
       symbols: data.symbols,
       createdAt: new Date().toISOString(),
@@ -250,7 +295,7 @@ export const privateApi = {
   },
 
   // 更新个人设置
-  updatePersonalSettings: (data: any): Promise<void> => {
+  updatePersonalSettings: (data: Record<string, unknown>): Promise<void> => {
     return request.put<void>('/private/settings', data, { showLoading: true })
   },
 }

@@ -61,7 +61,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { CircleCheck, Clock, Warning } from '@element-plus/icons-vue'
 
 const pipelineStatus = ref({
   status: 'running', // running, stopped, error

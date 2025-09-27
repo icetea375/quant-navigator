@@ -10,7 +10,7 @@ vi.mock('@/services/arbitration', () => ({
   }
 }))
 
-import { arbitrationApi } from '@/services/arbitration'
+import { arbitrationService } from '@/services/api/arbitrationService'
 
 describe('ArbitrationCaseList - Basic Functionality', () => {
   beforeEach(() => {

@@ -6,39 +6,46 @@ declare module '*.vue' {
   export default component
 }
 
-// 为测试环境提供Vue组件类型支持
-declare module '../ArbitrationCaseList.vue' {
-  import type { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
+// Element Plus 类型声明
+declare module 'element-plus' {
+  export * from 'element-plus/es'
+  export * from 'element-plus/lib'
 }
 
-declare module '../ArbitrationDashboard.vue' {
-  import type { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
+// 全局类型声明
+declare global {
+  interface Window {
+    // 添加全局属性类型声明
+  }
 }
 
-declare module '../ArbitrationDecisionDialog.vue' {
-  import type { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
+// 模块声明
+declare module '*.svg' {
+  const content: string
+  export default content
 }
 
-declare module '@/components/admin/ArbitrationCaseList.vue' {
-  import type { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
+declare module '*.png' {
+  const content: string
+  export default content
 }
 
-declare module '@/components/admin/ArbitrationDashboard.vue' {
-  import type { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
+declare module '*.jpg' {
+  const content: string
+  export default content
 }
 
-declare module '@/components/admin/ArbitrationDecisionDialog.vue' {
-  import type { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
+declare module '*.jpeg' {
+  const content: string
+  export default content
+}
+
+declare module '*.gif' {
+  const content: string
+  export default content
+}
+
+declare module '*.webp' {
+  const content: string
+  export default content
 }

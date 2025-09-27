@@ -63,7 +63,11 @@ export interface AttributionEngineConfig {
   /** 信号转换配置 */
   signalTranslation: {
     enabled: boolean;
-    translationRules: any[];
+    translationRules: Array<{
+      pattern: string;
+      replacement: string;
+      condition?: string;
+    }>;
     outputFormat: 'json' | 'text';
   };
   /** LLM协作配置 */

@@ -1,6 +1,7 @@
 // 原始文本浏览器组件测试
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createTestWrapper, mockElementPlusComponents } from '@/utils/test-utils'
+import type { VueWrapper } from '@vue/test-utils'
 import RawTextExplorer from '../RawTextExplorer.vue'
 
 // 模拟原始文本数据
@@ -26,7 +27,7 @@ const mockRawTextData = [
 ]
 
 describe('RawTextExplorer', () => {
-  let wrapper: any
+  let wrapper: VueWrapper<InstanceType<typeof RawTextExplorer>>
 
   beforeEach(() => {
     wrapper = createTestWrapper(RawTextExplorer, {

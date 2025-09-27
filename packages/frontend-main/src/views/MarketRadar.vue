@@ -100,6 +100,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { logger } from "@/utils/logger"
 import { useAuthStore } from '@/stores/auth'
 import { marketApi } from '@/services/market'
 import type { MarketEvent, HotspotAttribution } from '@/types/market'
@@ -120,7 +121,7 @@ const loadPreMarketEvents = async () => {
     const data = await marketApi.getPreMarketEvents()
     preMarketEvents.value = data
   } catch (error) {
-    console.error('Failed to load pre-market events:', error)
+    logger.error('Failed to load pre-market events:', error)
   } finally {
     eventsLoading.value = false
   }
@@ -132,7 +133,7 @@ const loadPostMarketHotspots = async () => {
     const data = await marketApi.getPostMarketHotspots()
     postMarketHotspots.value = data
   } catch (error) {
-    console.error('Failed to load post-market hotspots:', error)
+    logger.error('Failed to load post-market hotspots:', error)
   } finally {
     hotspotsLoading.value = false
   }

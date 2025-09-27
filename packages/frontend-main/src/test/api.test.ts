@@ -8,7 +8,7 @@ const mockFetch = vi.fn()
 global.fetch = mockFetch
 
 // 创建模拟响应工厂
-const createMockResponse = (data: any, ok = true, status = 200) => ({
+const createMockResponse = (data: unknown, ok = true, status = 200) => ({
   ok,
   status,
   json: () => Promise.resolve(data),

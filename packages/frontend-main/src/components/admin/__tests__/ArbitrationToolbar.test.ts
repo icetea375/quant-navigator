@@ -1,12 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import type { VueWrapper } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import ArbitrationToolbar from '@/components/admin/ArbitrationToolbar.vue'
 import { mockElementPlusComponents } from '@/utils/test-utils'
 import type { ArbitrationCaseInfo } from '@/types/arbitration'
 
 // 创建测试包装器
-const createTestWrapper = (component: any, options = {}) => {
+const createTestWrapper = (component: unknown, options = {}) => {
   return mount(component, {
     global: {
       plugins: [createPinia()],
@@ -19,7 +20,7 @@ const createTestWrapper = (component: any, options = {}) => {
 }
 
 describe('ArbitrationToolbar - 展示组件单元测试', () => {
-  let wrapper: any
+  let wrapper: VueWrapper<InstanceType<typeof ArbitrationToolbar>>
 
   const mockCurrentCase: ArbitrationCaseInfo = {
     caseId: 'case-001',
@@ -173,7 +174,7 @@ describe('ArbitrationToolbar - 展示组件单元测试', () => {
       })
 
       const buttons = wrapper.findAll('button')
-      const settingsButton = buttons.find((btn: any) => btn.text().includes('设置'))
+      const settingsButton = buttons.find((btn: { text: () => string }) => btn.text().includes('设置'))
       await settingsButton?.trigger('click')
 
       expect(wrapper.emitted('settings')).toBeTruthy()
@@ -189,7 +190,7 @@ describe('ArbitrationToolbar - 展示组件单元测试', () => {
       })
 
       const buttons = wrapper.findAll('button')
-      const fullscreenButton = buttons.find((btn: any) => btn.text().includes('全屏'))
+      const fullscreenButton = buttons.find((btn: { text: () => string }) => btn.text().includes('全屏'))
       await fullscreenButton?.trigger('click')
 
       expect(wrapper.emitted('toggle-fullscreen')).toBeTruthy()

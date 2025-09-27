@@ -31,7 +31,7 @@
           <RawTextExplorer
             :data="caseData?.panels?.rawTextExplorer || []"
             :loading="loading"
-            :error="error"
+            :error="error ?? undefined"
             @text-highlight="handleTextHighlight"
             @event-select="handleEventSelect"
           />
@@ -61,7 +61,7 @@
           <FinancialSnapshot
             :data="caseData?.panels?.financialSnapshot || []"
             :loading="loading"
-            :error="error"
+            :error="error ?? undefined"
             @period-select="handlePeriodSelect"
             @metric-hover="handleMetricHover"
           />
@@ -91,7 +91,7 @@
           <QuantSignalDashboard
             :data="caseData?.panels?.quantSignalDashboard || []"
             :loading="loading"
-            :error="error"
+            :error="error ?? undefined"
             @signal-hover="handleSignalHover"
             @signal-click="handleSignalClick"
           />
@@ -121,7 +121,7 @@
           <FlowAndChipsViewer
             :data="caseData?.panels?.flowAndChipsViewer || {}"
             :loading="loading"
-            :error="error"
+            :error="error ?? undefined"
             @flow-hover="handleFlowHover"
             @chip-hover="handleChipHover"
           />
@@ -151,7 +151,7 @@
           <PersonalPrecedentViewer
             :data="caseData?.panels?.precedentViewer || []"
             :loading="loading"
-            :error="error"
+            :error="error ?? undefined"
             @precedent-select="handlePrecedentSelect"
             @precedent-hover="handlePrecedentHover"
           />
@@ -167,7 +167,17 @@ import FinancialSnapshot from './FinancialSnapshot.vue'
 import QuantSignalDashboard from './QuantSignalDashboard.vue'
 import FlowAndChipsViewer from './FlowAndChipsViewer.vue'
 import PersonalPrecedentViewer from './PersonalPrecedentViewer.vue'
-import type { ArbitrationCaseData } from '@/types/arbitration'
+import type { ArbitrationCaseData } from '@/types'
+
+// ==================== 类型定义 ====================
+// Import the correct types from arbitration types
+import type {
+  RawTextData,
+  QuantSignalsData,
+  MoneyFlowData,
+  ChipDistributionData,
+  HistoricalArbitrations
+} from '@/types'
 
 // ==================== Props ====================
 interface Props {
@@ -188,15 +198,15 @@ interface Emits {
   (e: 'toggle-maximize', panelId: string): void
   (e: 'close-panel', panelId: string): void
   (e: 'text-highlight', text: string, keywords: string[]): void
-  (e: 'event-select', event: any): void
+  (e: 'event-select', event: RawTextData): void
   (e: 'period-select', period: string): void
   (e: 'metric-hover', metric: string, value: number): void
   (e: 'signal-hover', signal: string, value: number): void
-  (e: 'signal-click', signal: any): void
-  (e: 'flow-hover', flow: any): void
-  (e: 'chip-hover', chip: any): void
-  (e: 'precedent-select', precedent: any): void
-  (e: 'precedent-hover', precedent: any): void
+  (e: 'signal-click', signal: QuantSignalsData): void
+  (e: 'flow-hover', flow: MoneyFlowData): void
+  (e: 'chip-hover', chip: ChipDistributionData): void
+  (e: 'precedent-select', precedent: HistoricalArbitrations): void
+  (e: 'precedent-hover', precedent: HistoricalArbitrations): void
 }
 
 const emit = defineEmits<Emits>()
@@ -218,7 +228,7 @@ const handleTextHighlight = (text: string, keywords: string[]) => {
   emit('text-highlight', text, keywords)
 }
 
-const handleEventSelect = (event: any) => {
+const handleEventSelect = (event: RawTextData) => {
   emit('event-select', event)
 }
 
@@ -234,23 +244,23 @@ const handleSignalHover = (signal: string, value: number) => {
   emit('signal-hover', signal, value)
 }
 
-const handleSignalClick = (signal: any) => {
+const handleSignalClick = (signal: QuantSignalsData) => {
   emit('signal-click', signal)
 }
 
-const handleFlowHover = (flow: any) => {
+const handleFlowHover = (flow: MoneyFlowData) => {
   emit('flow-hover', flow)
 }
 
-const handleChipHover = (chip: any) => {
+const handleChipHover = (chip: ChipDistributionData) => {
   emit('chip-hover', chip)
 }
 
-const handlePrecedentSelect = (precedent: any) => {
+const handlePrecedentSelect = (precedent: HistoricalArbitrations) => {
   emit('precedent-select', precedent)
 }
 
-const handlePrecedentHover = (precedent: any) => {
+const handlePrecedentHover = (precedent: HistoricalArbitrations) => {
   emit('precedent-hover', precedent)
 }
 </script>

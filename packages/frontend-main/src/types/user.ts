@@ -1,16 +1,5 @@
-export interface User {
-  id: string
-  email: string
-  name: string
-  role: 'user' | 'admin'
-  createdAt: string
-  updatedAt: string
-}
-
-export interface LoginRequest {
-  email: string
-  password: string
-}
+// 重新导出核心类型，确保向后兼容
+export type { User, LoginRequest } from './core'
 
 export interface RegisterRequest {
   email: string
@@ -18,7 +7,4 @@ export interface RegisterRequest {
   name: string
 }
 
-export interface AuthResponse {
-  token: string
-  user: User
-}
+// AuthResponse 使用 api.ts 中的定义

@@ -1,6 +1,7 @@
 // 资金流向与筹码查看器组件测试
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createTestWrapper, mockElementPlusComponents } from '@/utils/test-utils'
+import type { VueWrapper } from '@vue/test-utils'
 import FlowAndChipsViewer from '../FlowAndChipsViewer.vue'
 
 // 模拟资金流向和筹码数据
@@ -41,7 +42,7 @@ const mockFlowAndChipsData = {
 }
 
 describe('FlowAndChipsViewer', () => {
-  let wrapper: any
+  let wrapper: VueWrapper<InstanceType<typeof FlowAndChipsViewer>>
 
   beforeEach(() => {
     wrapper = createTestWrapper(FlowAndChipsViewer, {

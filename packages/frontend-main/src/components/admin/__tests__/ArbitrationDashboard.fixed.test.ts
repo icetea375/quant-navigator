@@ -1,12 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import type { VueWrapper } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import ArbitrationDashboard from '../ArbitrationDashboard.vue'
 import { useArbitrationStore } from '@/stores/arbitration'
 import { mockElementPlusComponents } from '@/utils/test-utils'
 
 // 创建测试包装器
-const createTestWrapper = (component: any, options = {}) => {
+const createTestWrapper = (component: unknown, options = {}) => {
   return mount(component, {
     global: {
       plugins: [createPinia()],
@@ -20,8 +21,8 @@ const createTestWrapper = (component: any, options = {}) => {
 }
 
 describe('ArbitrationDashboard - 修复后的集成测试', () => {
-  let wrapper: any
-  let arbitrationStore: any
+  let wrapper: VueWrapper<InstanceType<typeof ArbitrationDashboard>>
+  let arbitrationStore: ReturnType<typeof useArbitrationStore>
 
   beforeEach(() => {
     setActivePinia(createPinia())

@@ -20,7 +20,7 @@ const mockEChartsInstance = {
 }
 
 // 模拟 ECharts 主函数
-const mockECharts = vi.fn(() => mockEChartsInstance)
+const mockECharts = vi.fn(() => mockEChartsInstance) as any
 
 // 模拟 ECharts 工具函数
 mockECharts.init = vi.fn(() => mockEChartsInstance)

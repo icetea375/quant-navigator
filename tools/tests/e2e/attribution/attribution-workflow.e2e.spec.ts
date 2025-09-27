@@ -24,7 +24,7 @@ const testEvent = {
 test.describe('异常事件归因流程E2E测试', () => {
   let page: Page;
 
-  test.beforeEach(async ({ browser }: { browser: any }) => {
+  test.beforeEach(async ({ browser }: { browser: { newPage(): Promise<Page> } }) => {
     // 创建新的浏览器页面
     page = await browser.newPage();
 
@@ -99,7 +99,7 @@ test.describe('异常事件归因流程E2E测试', () => {
     await page.locator('[data-testid="event-item"]').first().click();
 
     // 模拟分析失败
-    await page.route('**/api/attribution/analyze', (route: any) => {
+    await page.route('**/api/attribution/analyze', (route: { fulfill: (options: { status: number; contentType: string; body: string }) => void }) => {
       route.fulfill({
         status: 500,
         contentType: 'application/json',

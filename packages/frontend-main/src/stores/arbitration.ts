@@ -4,10 +4,10 @@
  */
 
 import { defineStore } from 'pinia';
-import { ref, computed, readonly } from 'vue';
+import { ref, computed } from 'vue';
+import { arbitrationService } from '@/services/api/arbitrationService';
+import { logger } from '@/utils/logger';
 import type {
-  ArbitrationState,
-  ArbitrationActions,
   ArbitrationCaseData,
   ArbitrationDecision,
   GridLayout,
@@ -86,52 +86,8 @@ export const useArbitrationStore = defineStore('arbitration', () => {
       setLoading(true);
       setError(null);
 
-      // TODO: 替换为实际的 API 调用
-      // const response = await arbitrationService.getCaseData(caseId);
-      // setCaseData(response.data);
-
-      // 模拟数据 - 实际开发时需要替换
-      const mockData: ArbitrationCaseData = {
-        caseInfo: {
-          caseId,
-          stockCode: '000001',
-          stockName: '平安银行',
-          reportDate: '2024-01-01',
-          reportType: 'annual',
-          status: 'pending',
-          priority: 1,
-          createdAt: '2024-01-01T00:00:00Z',
-          updatedAt: '2024-01-01T00:00:00Z'
-        },
-        aiDebate: {
-          reportId: 'report-001',
-          reportType: 'annual',
-          title: 'AI分析报告',
-          summary: 'AI生成的财务分析摘要',
-          content: '详细的AI分析内容...',
-          confidenceScore: 0.85,
-          qualityScore: 0.90,
-          modelUsed: 'qwen-max',
-          version: '1.0.0',
-          keyFindings: ['关键发现1', '关键发现2'],
-          riskFactors: ['风险因素1', '风险因素2'],
-          createdAt: '2024-01-01T00:00:00Z',
-          updatedAt: '2024-01-01T00:00:00Z'
-        },
-        panels: {
-          rawTextExplorer: [],
-          financialSnapshot: [],
-          quantSignalDashboard: [],
-          flowAndChipsViewer: {
-            moneyFlow: {} as any,
-            topList: [],
-            chipDistribution: []
-          },
-          precedentViewer: []
-        }
-      };
-
-      setCaseData(mockData);
+      const caseData = await arbitrationService.getCaseData(caseId);
+      setCaseData(caseData);
       setCurrentCase(caseId);
     } catch (err) {
       setError(err instanceof Error ? err.message : '获取案例数据失败');
@@ -140,42 +96,13 @@ export const useArbitrationStore = defineStore('arbitration', () => {
     }
   };
 
-  const fetchCases = async (): Promise<void> => {
+  const fetchCases = async (filters?: Record<string, unknown>): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
 
-      // TODO: 替换为实际的 API 调用
-      // const response = await arbitrationService.getCases();
-      // setCases(response.data);
-
-      // 模拟数据
-      const mockCases: ArbitrationCaseInfo[] = [
-        {
-          caseId: 'case-001',
-          stockCode: '000001',
-          stockName: '平安银行',
-          reportDate: '2024-01-01',
-          reportType: 'annual',
-          status: 'pending',
-          priority: 1,
-          createdAt: '2024-01-01T00:00:00Z',
-          updatedAt: '2024-01-01T00:00:00Z'
-        },
-        {
-          caseId: 'case-002',
-          stockCode: '000002',
-          stockName: '万科A',
-          reportDate: '2024-01-02',
-          reportType: 'quarterly',
-          status: 'in_progress',
-          priority: 2,
-          createdAt: '2024-01-02T00:00:00Z',
-          updatedAt: '2024-01-02T00:00:00Z'
-        }
-      ];
-
-      setCases(mockCases);
+      const cases = await arbitrationService.getCasesList(filters);
+      setCases(cases);
     } catch (err) {
       setError(err instanceof Error ? err.message : '获取案例列表失败');
     } finally {
@@ -188,13 +115,7 @@ export const useArbitrationStore = defineStore('arbitration', () => {
       setLoading(true);
       setError(null);
 
-      // TODO: 替换为实际的 API 调用
-      // await arbitrationService.submitArbitration(decision);
-
-      console.log('提交仲裁决策:', decision);
-
-      // 模拟成功响应
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await arbitrationService.submitArbitration(decision);
     } catch (err) {
       setError(err instanceof Error ? err.message : '提交仲裁决策失败');
       throw err;
@@ -227,7 +148,7 @@ export const useArbitrationStore = defineStore('arbitration', () => {
         layout.value = JSON.parse(savedLayout);
       }
     } catch (err) {
-      console.warn('加载布局配置失败:', err);
+      logger.warn('加载布局配置失败:', err);
     }
   };
 
@@ -235,7 +156,7 @@ export const useArbitrationStore = defineStore('arbitration', () => {
     try {
       localStorage.setItem('arbitration-dashboard-layout', JSON.stringify(layout.value));
     } catch (err) {
-      console.warn('保存布局配置失败:', err);
+      logger.warn('保存布局配置失败:', err);
     }
   };
 

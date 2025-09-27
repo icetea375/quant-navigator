@@ -6,7 +6,7 @@ import { mockElementPlusComponents } from '@/utils/test-utils'
 import type { ArbitrationCaseInfo } from '@/types/arbitration'
 
 // 创建测试包装器
-const createTestWrapper = (component: any, options = {}) => {
+const createTestWrapper = (component: unknown, options = {}) => {
   return mount(component, {
     global: {
       plugins: [createPinia()],
@@ -27,9 +27,9 @@ describe('ArbitrationCaseList - 展示组件单元测试', () => {
       stockCode: '000001',
       stockName: '平安银行',
       reportDate: '2024-01-01',
-      reportType: 'annual',
-      status: 'pending',
-      priority: 1,
+      reportType: 'comprehensive' as const,
+      status: 'pending' as const,
+      priority: 'high' as const,
       createdAt: '2024-01-01T00:00:00Z',
       updatedAt: '2024-01-01T00:00:00Z'
     },

@@ -1,7 +1,7 @@
 <template>
   <div class="my-attribution-list">
     <div
-      v-if="attributions.length === 0"
+      v-if="props.attributions.length === 0"
       class="empty-state"
     >
       <el-empty description="暂无持仓异动数据" />
@@ -12,7 +12,7 @@
       class="attributions-grid"
     >
       <div
-        v-for="attribution in attributions"
+        v-for="attribution in props.attributions"
         :key="attribution.id"
         class="attribution-card"
         :class="getAttributionClass(attribution)"
@@ -85,9 +85,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+// computed 未使用，已移除
 import type { HotspotAttribution } from '@/types/market'
 import { TrendCharts, DataAnalysis, Clock } from '@element-plus/icons-vue'
+import { logger } from "@/utils/logger"
 import dayjs from 'dayjs'
 
 interface Props {
@@ -124,12 +125,12 @@ const formatTime = (timestamp: string) => {
 
 const viewDetails = (attribution: HotspotAttribution) => {
   // TODO: 实现查看详情功能
-  console.log('View details for:', attribution.symbol)
+  logger.log('View details for:', attribution.symbol)
 }
 
 const addToWatchlist = (attribution: HotspotAttribution) => {
   // TODO: 实现加入关注功能
-  console.log('Add to watchlist:', attribution.symbol)
+  logger.log('Add to watchlist:', attribution.symbol)
 }
 </script>
 

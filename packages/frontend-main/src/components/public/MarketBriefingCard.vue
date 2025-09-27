@@ -67,7 +67,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import { logger } from "@/utils/logger"
 import { marketApi } from '@/services/market'
 import type { MarketBriefing } from '@/types/market'
 import { Clock } from '@element-plus/icons-vue'
@@ -100,7 +101,7 @@ const loadBriefing = async () => {
     const data = await marketApi.getMarketBriefing()
     briefing.value = data
   } catch (error) {
-    console.error('Failed to load market briefing:', error)
+    logger.error('Failed to load market briefing:', error)
     briefing.value.summary = '数据加载失败，请稍后重试'
   } finally {
     loading.value = false

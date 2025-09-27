@@ -412,14 +412,85 @@
         </div>
       </div>
 
-      <!-- 超级仪表盘集成 -->
-      <SuperDashboard
-        :stock-code="caseDetail?.stockCode || ''"
-        :report-date="caseDetail?.reportDate || ''"
-        :qwen-report="caseDetail?.qwenReport"
-        :doubao-report="caseDetail?.doubaoReport"
-        :arbitration-case="caseDetail"
-      />
+      <!-- 数据分析Tab区域 -->
+      <div class="analysis-tabs-section">
+        <h2>📊 数据分析</h2>
+
+        <!-- Tab选项卡式关联信息聚合区 -->
+        <div class="dashboard-tabs">
+          <div class="tab-header">
+            <button
+              v-for="(tab, index) in analysisTabs"
+              :key="index"
+              :class="['tab-button', { active: activeAnalysisTab === index }]"
+              @click="activeAnalysisTab = index"
+            >
+              <span class="tab-icon">{{ tab.icon }}</span>
+              <span class="tab-label">{{ tab.label }}</span>
+            </button>
+          </div>
+
+          <div class="tab-content">
+            <!-- 原始文本探索器 -->
+            <div
+              v-if="activeAnalysisTab === 0"
+              class="tab-panel"
+            >
+              <TextComparisonViewer
+                :stock-code="caseDetail?.stockCode || ''"
+                :report-date="caseDetail?.reportDate || ''"
+                :qwen-report="caseDetail?.qwenReport"
+                :doubao-report="caseDetail?.doubaoReport"
+              />
+            </div>
+
+            <!-- 财务快照 -->
+            <div
+              v-if="activeAnalysisTab === 1"
+              class="tab-panel"
+            >
+              <FinancialOverview
+                :stock-code="caseDetail?.stockCode || ''"
+                :report-date="caseDetail?.reportDate || ''"
+              />
+            </div>
+
+            <!-- 技术指标分析 -->
+            <div
+              v-if="activeAnalysisTab === 2"
+              class="tab-panel"
+            >
+              <TechnicalAnalysis
+                :stock-code="caseDetail?.stockCode || ''"
+                :report-date="caseDetail?.reportDate || ''"
+              />
+            </div>
+
+            <!-- 市场情绪监控 -->
+            <div
+              v-if="activeAnalysisTab === 3"
+              class="tab-panel"
+            >
+              <MarketSentimentMonitor
+                :stock-code="caseDetail?.stockCode || ''"
+                :report-date="caseDetail?.reportDate || ''"
+              />
+            </div>
+
+            <!-- 风险因子分析 -->
+            <div
+              v-if="activeAnalysisTab === 4"
+              class="tab-panel"
+            >
+              <RiskFactorAnalysis
+                :stock-code="caseDetail?.stockCode || ''"
+                :report-date="caseDetail?.reportDate || ''"
+                :arbitration-case="caseDetail"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 错误状态 -->
@@ -445,7 +516,12 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import SuperDashboard from './SuperDashboard.vue'
+import { logger } from '@/utils/logger'
+import TextComparisonViewer from './dashboard/TextComparisonViewer.vue'
+import FinancialOverview from './dashboard/FinancialOverview.vue'
+import TechnicalAnalysis from './dashboard/TechnicalAnalysis.vue'
+import MarketSentimentMonitor from './dashboard/MarketSentimentMonitor.vue'
+import RiskFactorAnalysis from './dashboard/RiskFactorAnalysis.vue'
 
 // 类型定义
 interface ArbitrationCaseDetail {
@@ -460,7 +536,7 @@ interface ArbitrationCaseDetail {
   conflictSummary: string
   priorityScore: number
   status: 'PENDING_HUMAN' | 'ARBITRATED' | 'IGNORED'
-  analysisMetadata: Record<string, any>
+  analysisMetadata: Record<string, string | number | boolean>
   humanDecision: {
     finalRecommendation: string
     confidenceLevel: number
@@ -516,6 +592,16 @@ const router = useRouter()
 const route = useRoute()
 const loading = ref(false)
 const caseDetail = ref<ArbitrationCaseDetail | null>(null)
+const activeAnalysisTab = ref(0)
+
+// 分析Tab配置
+const analysisTabs = [
+  { icon: '📄', label: '原始文本探索器' },
+  { icon: '💰', label: '财务快照' },
+  { icon: '📈', label: '技术指标分析' },
+  { icon: '😊', label: '市场情绪监控' },
+  { icon: '⚠️', label: '风险因子分析' }
+]
 
 const arbitrationDecision = reactive<ArbitrationDecision>({
   finalRecommendation: 'HOLD',
@@ -603,7 +689,7 @@ const loadCaseDetail = async () => {
       caseDetail.value = null
     }
   } catch (error) {
-    console.error('加载案件详情失败:', error)
+    logger.error('加载案件详情失败:', error)
     caseDetail.value = null
   } finally {
     loading.value = false
@@ -659,7 +745,7 @@ const submitArbitrationDecision = async () => {
       alert(`提交失败: ${errorData.detail || '未知错误'}`)
     }
   } catch (error) {
-    console.error('提交仲裁决策失败:', error)
+    logger.error('提交仲裁决策失败:', error)
     alert('提交仲裁决策失败，请重试')
   } finally {
     loading.value = false
@@ -691,7 +777,7 @@ const ignoreCase = async () => {
       router.push('/admin/arbitration')
     }
   } catch (error) {
-    console.error('忽略案件失败:', error)
+    logger.error('忽略案件失败:', error)
   } finally {
     loading.value = false
   }
@@ -1365,5 +1451,70 @@ onMounted(() => {
   .case-metrics {
     grid-template-columns: 1fr;
   }
+}
+
+/* 数据分析Tab样式 */
+.analysis-tabs-section {
+  margin-top: 30px;
+}
+
+.analysis-tabs-section h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.dashboard-tabs {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tab-header {
+  display: flex;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tab-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 15px 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-button:hover {
+  background: #e9ecef;
+}
+
+.tab-button.active {
+  background: white;
+  border-bottom-color: #3498db;
+  color: #3498db;
+  font-weight: bold;
+}
+
+.tab-icon {
+  font-size: 16px;
+}
+
+.tab-label {
+  font-size: 14px;
+}
+
+.tab-content {
+  min-height: 400px;
+}
+
+.tab-panel {
+  padding: 20px;
 }
 </style>
