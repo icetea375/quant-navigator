@@ -43,9 +43,6 @@ export interface ArbitrationCaseUpdate {
   human_reasoning?: string;
 }
 
-export interface ArbitrationStatus {
-}
-
 export interface GeneratedReport {
   report_id: number;
   report_type: string;
@@ -79,12 +76,6 @@ export interface ReportResponse {
   data?: string;
 }
 
-export interface ReportStatus {
-}
-
-export interface ReportType {
-}
-
 export interface ReportUpdate {
   content?: string;
   status?: string;
@@ -103,19 +94,19 @@ export interface ValidationError {
 }
 
 export type ArbitrationStatus =
-  | 'pending',
-  | 'in_review',
-  | 'resolved',
-  | 'rejected'
+  | 'pending'
+  | 'in_review'
+  | 'resolved'
+  | 'rejected';
 
 export type ReportStatus =
-  | 'pending',
-  | 'processing',
-  | 'completed',
-  | 'failed'
+  | 'pending'
+  | 'processing'
+  | 'completed'
+  | 'failed';
 
 export type ReportType =
-  | 'daily_analysis',
-  | 'fact_analysis',
-  | 'sentiment_analysis',
-  | 'arbitration_case'
+  | 'daily_analysis'
+  | 'fact_analysis'
+  | 'sentiment_analysis'
+  | 'arbitration_case';
