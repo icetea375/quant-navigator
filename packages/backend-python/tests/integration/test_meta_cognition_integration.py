@@ -33,7 +33,7 @@ class TestMetaCognitionIntegration:
         return AnalysisResult(
             analysis="该公司2024年营业收入预计达到100亿元,同比增长15%,净利润率保持在12%以上。基于强劲的财务表现和良好的市场前景,我们看好该股票。",
             confidence=0.85,
-            reasoning="基于财务数据分析,公司业绩表现优秀,增长趋势明确,建议买入。"
+            reasoning="基于财务数据分析,公司业绩表现优秀,增长趋势明确,建议买入。",
         )
 
     @pytest.fixture
@@ -42,7 +42,7 @@ class TestMetaCognitionIntegration:
         return AnalysisResult(
             analysis="该公司2024年营业收入预计达到95亿元,同比增长12%,净利润率保持在11%以上。基于稳健的财务表现和谨慎的市场评估,我们对该股票持中性态度。",
             confidence=0.75,
-            reasoning="基于财务数据分析,公司业绩表现良好,但增长预期相对保守,建议持有。"
+            reasoning="基于财务数据分析,公司业绩表现良好,但增长预期相对保守,建议持有。",
         )
 
     @pytest.fixture
@@ -51,7 +51,7 @@ class TestMetaCognitionIntegration:
         return AnalysisResult(
             analysis="该公司2024年营业收入预计达到150亿元,同比增长30%,净利润率保持在15%以上。基于超预期的财务表现和巨大的市场机会,我们强烈看好该股票。",
             confidence=0.95,
-            reasoning="基于乐观的财务预测和市场分析,公司具有巨大的增长潜力,强烈建议买入。"
+            reasoning="基于乐观的财务预测和市场分析,公司具有巨大的增长潜力,强烈建议买入。",
         )
 
     @pytest.fixture
@@ -60,11 +60,13 @@ class TestMetaCognitionIntegration:
         return AnalysisResult(
             analysis="该公司2024年营业收入预计达到80亿元,同比增长5%,净利润率保持在8%左右。基于保守的财务预期和谨慎的市场评估,我们对该股票持谨慎态度。",
             confidence=0.60,
-            reasoning="基于保守的财务预测和风险分析,公司增长前景有限,建议观望。"
+            reasoning="基于保守的财务预测和风险分析,公司增长前景有限,建议观望。",
         )
 
     @pytest.mark.asyncio
-    async def test_meta_cognition_with_consistent_reports(self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report):
+    async def test_meta_cognition_with_consistent_reports(
+        self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report
+    ):
         """测试:元认知仲裁一致报告"""
         # 模拟LLM响应 - 观点一致
         mock_response = AnalysisResult(
@@ -82,12 +84,14 @@ class TestMetaCognitionIntegration:
             }
             """,
             confidence=0.9,
-            reasoning="元认知仲裁"
+            reasoning="元认知仲裁",
         )
         mock_llm_service.analyze_fact.return_value = mock_response
 
         # 执行元认知仲裁
-        result = await meta_engine.arbitrate_and_summarize(sample_qwen_report, sample_doubao_report)
+        result = await meta_engine.arbitrate_and_summarize(
+            sample_qwen_report, sample_doubao_report
+        )
 
         # 验证结果
         assert isinstance(result, MetaCognitionResult)
@@ -106,7 +110,13 @@ class TestMetaCognitionIntegration:
         assert "元认知仲裁" in call_args["news_content"]
 
     @pytest.mark.asyncio
-    async def test_meta_cognition_with_conflicting_reports(self, meta_engine, mock_llm_service, conflicting_qwen_report, conflicting_doubao_report):
+    async def test_meta_cognition_with_conflicting_reports(
+        self,
+        meta_engine,
+        mock_llm_service,
+        conflicting_qwen_report,
+        conflicting_doubao_report,
+    ):
         """测试:元认知仲裁冲突报告"""
         # 模拟LLM响应 - 观点冲突
         mock_response = AnalysisResult(
@@ -124,12 +134,14 @@ class TestMetaCognitionIntegration:
             }
             """,
             confidence=0.8,
-            reasoning="元认知仲裁"
+            reasoning="元认知仲裁",
         )
         mock_llm_service.analyze_fact.return_value = mock_response
 
         # 执行元认知仲裁
-        result = await meta_engine.arbitrate_and_summarize(conflicting_qwen_report, conflicting_doubao_report)
+        result = await meta_engine.arbitrate_and_summarize(
+            conflicting_qwen_report, conflicting_doubao_report
+        )
 
         # 验证结果
         assert result.requires_human_review
@@ -140,13 +152,17 @@ class TestMetaCognitionIntegration:
         assert "分歧过大" in result.reasoning
 
     @pytest.mark.asyncio
-    async def test_meta_cognition_with_llm_error(self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report):
+    async def test_meta_cognition_with_llm_error(
+        self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report
+    ):
         """测试:LLM服务出错时的处理"""
         # 模拟LLM服务抛出异常
         mock_llm_service.analyze_fact.side_effect = Exception("LLM服务连接失败")
 
         # 执行元认知仲裁
-        result = await meta_engine.arbitrate_and_summarize(sample_qwen_report, sample_doubao_report)
+        result = await meta_engine.arbitrate_and_summarize(
+            sample_qwen_report, sample_doubao_report
+        )
 
         # 验证错误处理
         assert result.requires_human_review
@@ -155,18 +171,20 @@ class TestMetaCognitionIntegration:
         assert "元认知仲裁过程发生错误" in result.final_conclusion["summary"]
 
     @pytest.mark.asyncio
-    async def test_meta_cognition_with_malformed_response(self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report):
+    async def test_meta_cognition_with_malformed_response(
+        self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report
+    ):
         """测试:LLM返回格式错误的响应"""
         # 模拟LLM返回格式错误的响应
         mock_response = AnalysisResult(
-            analysis="这不是一个有效的JSON响应",
-            confidence=0.8,
-            reasoning="元认知仲裁"
+            analysis="这不是一个有效的JSON响应", confidence=0.8, reasoning="元认知仲裁"
         )
         mock_llm_service.analyze_fact.return_value = mock_response
 
         # 执行元认知仲裁
-        result = await meta_engine.arbitrate_and_summarize(sample_qwen_report, sample_doubao_report)
+        result = await meta_engine.arbitrate_and_summarize(
+            sample_qwen_report, sample_doubao_report
+        )
 
         # 验证错误处理
         assert result.requires_human_review
@@ -175,7 +193,9 @@ class TestMetaCognitionIntegration:
         assert "元认知仲裁过程发生错误" in result.final_conclusion["summary"]
 
     @pytest.mark.asyncio
-    async def test_meta_cognition_workflow_integration(self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report):
+    async def test_meta_cognition_workflow_integration(
+        self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report
+    ):
         """测试:完整的元认知仲裁工作流集成"""
         # 模拟LLM响应
         mock_response = AnalysisResult(
@@ -193,12 +213,14 @@ class TestMetaCognitionIntegration:
             }
             """,
             confidence=0.9,
-            reasoning="元认知仲裁"
+            reasoning="元认知仲裁",
         )
         mock_llm_service.analyze_fact.return_value = mock_response
 
         # 执行元认知仲裁
-        result = await meta_engine.arbitrate_and_summarize(sample_qwen_report, sample_doubao_report)
+        result = await meta_engine.arbitrate_and_summarize(
+            sample_qwen_report, sample_doubao_report
+        )
 
         # 验证完整工作流
         assert isinstance(result, MetaCognitionResult)
@@ -217,18 +239,22 @@ class TestMetaCognitionIntegration:
         assert "豆包舆情分析师报告" in call_args["news_content"]
 
     @pytest.mark.asyncio
-    async def test_meta_cognition_prompt_quality(self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report):
+    async def test_meta_cognition_prompt_quality(
+        self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report
+    ):
         """测试:元认知提示词质量"""
         # 模拟LLM响应
         mock_response = AnalysisResult(
             analysis='{"requires_human_review": false, "final_conclusion": {"summary": "测试", "consensus_points": [], "key_conflicts": [], "reasoning": "测试"}, "confidence": 0.8, "reasoning": "测试"}',
             confidence=0.9,
-            reasoning="元认知仲裁"
+            reasoning="元认知仲裁",
         )
         mock_llm_service.analyze_fact.return_value = mock_response
 
         # 执行元认知仲裁
-        await meta_engine.arbitrate_and_summarize(sample_qwen_report, sample_doubao_report)
+        await meta_engine.arbitrate_and_summarize(
+            sample_qwen_report, sample_doubao_report
+        )
 
         # 验证提示词质量
         call_args = mock_llm_service.analyze_fact.call_args[0][0]

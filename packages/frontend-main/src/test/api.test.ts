@@ -22,6 +22,9 @@ describe('API Services', () => {
     vi.clearAllMocks()
     // 设置默认的成功响应
     mockFetch.mockResolvedValue(createMockResponse(mockApiResponse({})))
+
+    // 模拟全局fetch
+    global.fetch = mockFetch
   })
 
   describe('Public API', () => {

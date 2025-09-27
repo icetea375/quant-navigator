@@ -166,4 +166,3 @@ python -m pytest packages/backend-python/tests/e2e/test_real_world_e2e.py -v -s
 - **可持续**：不会成为开发负担，反而提供价值
 
 这就是我们的E2E测试哲学：**"足够好"的真实性 + 人类专家的智慧**。
-

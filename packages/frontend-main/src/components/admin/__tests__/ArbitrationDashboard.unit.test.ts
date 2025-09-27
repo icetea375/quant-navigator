@@ -1,5 +1,5 @@
 // 仲裁仪表盘单元测试 - 遵循测试宪法
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { createTestWrapper } from '@/utils/test-utils'
 
 // 纯函数测试 - 遵循测试宪法第1条：测试的唯一目的
@@ -134,7 +134,7 @@ describe('ArbitrationDashboard - 状态管理测试', () => {
   it('should handle state transitions correctly', () => {
     // 测试状态转换逻辑
     const states = ['loading', 'error', 'success', 'empty']
-    const transitions = {
+    const transitions: Record<string, string[]> = {
       loading: ['error', 'success'],
       error: ['loading', 'success'],
       success: ['loading', 'empty'],

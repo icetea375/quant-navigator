@@ -3,7 +3,6 @@
 遵循YAGNI平衡法则:这是"必要的架构守护",不是"不必要的复杂功能"
 """
 
-
 import pandas as pd
 
 from src.core.interfaces import (
@@ -58,11 +57,13 @@ class DataSourceContractTester:
             "get_industry_classification",
             "get_concept_data",
             "get_market_data",
-            "health_check"
+            "health_check",
         ]
 
         for method_name in required_methods:
-            assert hasattr(self.data_source, method_name), f"缺少必需方法: {method_name}"
+            assert hasattr(
+                self.data_source, method_name
+            ), f"缺少必需方法: {method_name}"
             method = getattr(self.data_source, method_name)
             assert callable(method), f"方法不可调用: {method_name}"
 
@@ -144,8 +145,19 @@ class DataSourceContractTester:
         try:
             result = await self.data_source.get_daily_quotes("000001.SZ", "20250126")
             if not result.empty:
-                required_columns = ["stock_code", "trade_date", "open", "high", "low", "close", "volume", "amount"]
-                assert set(required_columns).issubset(result.columns), f"DataFrame缺少必需列: {required_columns}"
+                required_columns = [
+                    "stock_code",
+                    "trade_date",
+                    "open",
+                    "high",
+                    "low",
+                    "close",
+                    "volume",
+                    "amount",
+                ]
+                assert set(required_columns).issubset(
+                    result.columns
+                ), f"DataFrame缺少必需列: {required_columns}"
         except Exception:
             pass
 
@@ -154,8 +166,17 @@ class DataSourceContractTester:
             result = await self.data_source.get_announcements("000001.SZ", "20250126")
             if result:
                 announcement = result[0]
-                required_keys = ["announcement_id", "stock_code", "title", "content", "publish_date", "announcement_type"]
-                assert set(required_keys).issubset(announcement.keys()), f"公告Dict缺少必需键: {required_keys}"
+                required_keys = [
+                    "announcement_id",
+                    "stock_code",
+                    "title",
+                    "content",
+                    "publish_date",
+                    "announcement_type",
+                ]
+                assert set(required_keys).issubset(
+                    announcement.keys()
+                ), f"公告Dict缺少必需键: {required_keys}"
         except Exception:
             pass
 
@@ -163,8 +184,19 @@ class DataSourceContractTester:
         try:
             result = await self.data_source.get_financial_data("000001.SZ", "20241231")
             if result:
-                required_keys = ["stock_code", "report_date", "revenue", "net_profit", "total_assets", "total_liabilities", "roe", "roa"]
-                assert set(required_keys).issubset(result.keys()), f"财务数据Dict缺少必需键: {required_keys}"
+                required_keys = [
+                    "stock_code",
+                    "report_date",
+                    "revenue",
+                    "net_profit",
+                    "total_assets",
+                    "total_liabilities",
+                    "roe",
+                    "roa",
+                ]
+                assert set(required_keys).issubset(
+                    result.keys()
+                ), f"财务数据Dict缺少必需键: {required_keys}"
         except Exception:
             pass
 
@@ -174,11 +206,23 @@ class DataSourceContractTester:
         """测试健康检查格式"""
         try:
             result = await self.data_source.health_check()
-            required_keys = ["status", "response_time", "last_success", "error_count", "rate_limit_remaining"]
-            assert set(required_keys).issubset(result.keys()), f"健康检查Dict缺少必需键: {required_keys}"
+            required_keys = [
+                "status",
+                "response_time",
+                "last_success",
+                "error_count",
+                "rate_limit_remaining",
+            ]
+            assert set(required_keys).issubset(
+                result.keys()
+            ), f"健康检查Dict缺少必需键: {required_keys}"
 
             # 测试status值
-            assert result["status"] in ["healthy", "unhealthy", "degraded"], f"无效的status值: {result['status']}"
+            assert result["status"] in [
+                "healthy",
+                "unhealthy",
+                "degraded",
+            ], f"无效的status值: {result['status']}"
 
         except Exception:
             pass
@@ -229,11 +273,13 @@ class LlmProviderContractTester:
             "batch_process",
             "get_available_models",
             "get_model_info",
-            "health_check"
+            "health_check",
         ]
 
         for method_name in required_methods:
-            assert hasattr(self.llm_provider, method_name), f"缺少必需方法: {method_name}"
+            assert hasattr(
+                self.llm_provider, method_name
+            ), f"缺少必需方法: {method_name}"
             method = getattr(self.llm_provider, method_name)
             assert callable(method), f"方法不可调用: {method_name}"
 
@@ -258,10 +304,14 @@ class LlmProviderContractTester:
 
         # 测试generate_embeddings返回List[List[float]]
         try:
-            result = await self.llm_provider.generate_embeddings(["测试"], "text-embedding-v1")
+            result = await self.llm_provider.generate_embeddings(
+                ["测试"], "text-embedding-v1"
+            )
             assert isinstance(result, list), "generate_embeddings必须返回List"
             if result:
-                assert isinstance(result[0], list), "generate_embeddings的元素必须是List"
+                assert isinstance(
+                    result[0], list
+                ), "generate_embeddings的元素必须是List"
                 assert isinstance(result[0][0], (int, float)), "embedding元素必须是数字"
         except Exception:
             pass
@@ -275,7 +325,9 @@ class LlmProviderContractTester:
 
         # 测试analyze_fact返回Dict
         try:
-            result = await self.llm_provider.analyze_fact("测试文本", "测试上下文", "qwen-plus")
+            result = await self.llm_provider.analyze_fact(
+                "测试文本", "测试上下文", "qwen-plus"
+            )
             assert isinstance(result, dict), "analyze_fact必须返回Dict"
         except Exception:
             pass
@@ -332,11 +384,24 @@ class LlmProviderContractTester:
         """测试健康检查格式"""
         try:
             result = await self.llm_provider.health_check()
-            required_keys = ["status", "response_time", "last_success", "error_count", "rate_limit_remaining", "available_models"]
-            assert set(required_keys).issubset(result.keys()), f"健康检查Dict缺少必需键: {required_keys}"
+            required_keys = [
+                "status",
+                "response_time",
+                "last_success",
+                "error_count",
+                "rate_limit_remaining",
+                "available_models",
+            ]
+            assert set(required_keys).issubset(
+                result.keys()
+            ), f"健康检查Dict缺少必需键: {required_keys}"
 
             # 测试status值
-            assert result["status"] in ["healthy", "unhealthy", "degraded"], f"无效的status值: {result['status']}"
+            assert result["status"] in [
+                "healthy",
+                "unhealthy",
+                "degraded",
+            ], f"无效的status值: {result['status']}"
 
         except Exception:
             pass

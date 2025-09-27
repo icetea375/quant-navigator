@@ -13,6 +13,7 @@ from .base import BaseEntity
 
 class AnomalyEventEntity(BaseEntity):
     """异常事件实体类"""
+
     __tablename__ = "anomaly_events"
 
     # 基本信息
@@ -35,9 +36,16 @@ class AnomalyEventEntity(BaseEntity):
 
     # 添加约束
     __table_args__ = (
-        CheckConstraint("confidence >= 0 AND confidence <= 1", name="check_confidence_range"),
-        CheckConstraint('anomaly_type IN ("price", "volume", "volatility", "correlation")', name="check_anomaly_type"),
-        CheckConstraint('severity IN ("low", "medium", "high", "critical")', name="check_severity"),
+        CheckConstraint(
+            "confidence >= 0 AND confidence <= 1", name="check_confidence_range"
+        ),
+        CheckConstraint(
+            'anomaly_type IN ("price", "volume", "volatility", "correlation")',
+            name="check_anomaly_type",
+        ),
+        CheckConstraint(
+            'severity IN ("low", "medium", "high", "critical")', name="check_severity"
+        ),
     )
 
     def __init__(self, **kwargs):
@@ -76,7 +84,7 @@ class AnomalyEventEntity(BaseEntity):
             "deviation": self.deviation,
             "confidence": self.confidence,
             "context": self.context_json or {},
-            "metadata": self.metadata_json or {}
+            "metadata": self.metadata_json or {},
         }
         return AnomalyEvent(**data)
 
@@ -97,7 +105,7 @@ class AnomalyEventEntity(BaseEntity):
             deviation=data["deviation"],
             confidence=data["confidence"],
             context_json=data["context"],
-            metadata_json=data["metadata"]
+            metadata_json=data["metadata"],
         )
 
     def __repr__(self):

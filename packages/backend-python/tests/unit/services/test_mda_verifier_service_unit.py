@@ -66,7 +66,7 @@ class TestMDAVerifierServiceUnit:
                 category="财务承诺",
                 confidence=0.9,
                 source_text="公司预计2024年营业收入将达到100亿元,同比增长15%。",
-                position=(100, 150)
+                position=(100, 150),
             ),
             Commitment(
                 id="commitment_2",
@@ -74,7 +74,7 @@ class TestMDAVerifierServiceUnit:
                 category="财务承诺",
                 confidence=0.85,
                 source_text="我们承诺将净利润率保持在10%以上。",
-                position=(200, 250)
+                position=(200, 250),
             ),
             Commitment(
                 id="commitment_3",
@@ -82,8 +82,8 @@ class TestMDAVerifierServiceUnit:
                 category="战略承诺",
                 confidence=0.8,
                 source_text="计划在未来三年内投资50亿元。",
-                position=(300, 350)
-            )
+                position=(300, 350),
+            ),
         ]
 
     @pytest.fixture
@@ -94,7 +94,7 @@ class TestMDAVerifierServiceUnit:
             "revenue_growth": 0.12,  # 12%
             "net_profit_margin": 0.11,  # 11%
             "investment_plan": 45.0,  # 亿元
-            "risk_loss_ratio": 0.008  # 0.8%
+            "risk_loss_ratio": 0.008,  # 0.8%
         }
 
     def test_should_initialize_with_llm_provider(self, mock_llm_provider):
@@ -138,7 +138,9 @@ class TestMDAVerifierServiceUnit:
         assert "优化" in operational_keywords
 
     @pytest.mark.asyncio
-    async def test_extract_commitments_with_valid_response(self, verifier_service, sample_mda_text):
+    async def test_extract_commitments_with_valid_response(
+        self, verifier_service, sample_mda_text
+    ):
         """测试:使用有效响应提取承诺"""
         # 模拟LLM响应
         mock_response = """
@@ -186,10 +188,14 @@ class TestMDAVerifierServiceUnit:
         assert call_args.kwargs["temperature"] == 0.1
 
     @pytest.mark.asyncio
-    async def test_extract_commitments_with_invalid_response(self, verifier_service, sample_mda_text):
+    async def test_extract_commitments_with_invalid_response(
+        self, verifier_service, sample_mda_text
+    ):
         """测试:使用无效响应提取承诺"""
         # 模拟无效LLM响应
-        verifier_service.llm_provider.generate_text.return_value = "invalid json response"
+        verifier_service.llm_provider.generate_text.return_value = (
+            "invalid json response"
+        )
 
         commitments = await verifier_service.extract_commitments(sample_mda_text)
 
@@ -197,10 +203,14 @@ class TestMDAVerifierServiceUnit:
         assert len(commitments) == 0
 
     @pytest.mark.asyncio
-    async def test_extract_commitments_with_llm_error(self, verifier_service, sample_mda_text):
+    async def test_extract_commitments_with_llm_error(
+        self, verifier_service, sample_mda_text
+    ):
         """测试:LLM调用失败时的承诺提取"""
         # 模拟LLM调用失败
-        verifier_service.llm_provider.generate_text.side_effect = Exception("LLM API error")
+        verifier_service.llm_provider.generate_text.side_effect = Exception(
+            "LLM API error"
+        )
 
         commitments = await verifier_service.extract_commitments(sample_mda_text)
 
@@ -208,7 +218,9 @@ class TestMDAVerifierServiceUnit:
         assert len(commitments) == 0
 
     @pytest.mark.asyncio
-    async def test_verify_commitments_with_fulfilled_commitments(self, verifier_service, sample_commitments, sample_current_data):
+    async def test_verify_commitments_with_fulfilled_commitments(
+        self, verifier_service, sample_commitments, sample_current_data
+    ):
         """测试:验证已履行的承诺"""
         # 模拟LLM验证响应
         mock_responses = [
@@ -241,12 +253,14 @@ class TestMDAVerifierServiceUnit:
                 "confidence": 0.8,
                 "reasoning": "投资进度良好,但尚未完全达到目标"
             }
-            """
+            """,
         ]
 
         verifier_service.llm_provider.generate_text.side_effect = mock_responses
 
-        results = await verifier_service.verify_commitments(sample_commitments, sample_current_data)
+        results = await verifier_service.verify_commitments(
+            sample_commitments, sample_current_data
+        )
 
         # 验证结果
         assert len(results) == 3
@@ -267,7 +281,9 @@ class TestMDAVerifierServiceUnit:
         assert verifier_service.llm_provider.generate_text.call_count == 3
 
     @pytest.mark.asyncio
-    async def test_verify_commitments_with_verification_error(self, verifier_service, sample_commitments, sample_current_data):
+    async def test_verify_commitments_with_verification_error(
+        self, verifier_service, sample_commitments, sample_current_data
+    ):
         """测试:验证过程中发生错误"""
         # 模拟第一个验证成功,第二个失败
         mock_responses = [
@@ -280,12 +296,14 @@ class TestMDAVerifierServiceUnit:
                 "reasoning": "验证通过"
             }
             """,
-            Exception("验证失败")
+            Exception("验证失败"),
         ]
 
         verifier_service.llm_provider.generate_text.side_effect = mock_responses
 
-        results = await verifier_service.verify_commitments(sample_commitments, sample_current_data)
+        results = await verifier_service.verify_commitments(
+            sample_commitments, sample_current_data
+        )
 
         # 验证结果
         assert len(results) == 3
@@ -297,16 +315,20 @@ class TestMDAVerifierServiceUnit:
         assert not results[2].is_fulfilled  # 没有响应
 
     @pytest.mark.asyncio
-    async def test_calculate_information_density_with_high_fulfillment(self, verifier_service, sample_commitments):
+    async def test_calculate_information_density_with_high_fulfillment(
+        self, verifier_service, sample_commitments
+    ):
         """测试:计算高履行率的信息密度"""
         # 创建高履行率的验证结果
         verification_results = [
             VerificationResult("commitment_1", True, 0.95, ["证据1"], 0.9, "推理1"),
             VerificationResult("commitment_2", True, 1.0, ["证据2"], 0.95, "推理2"),
-            VerificationResult("commitment_3", True, 0.9, ["证据3"], 0.85, "推理3")
+            VerificationResult("commitment_3", True, 0.9, ["证据3"], 0.85, "推理3"),
         ]
 
-        density = await verifier_service.calculate_information_density(sample_commitments, verification_results)
+        density = await verifier_service.calculate_information_density(
+            sample_commitments, verification_results
+        )
 
         # 验证结果
         assert density.total_commitments == 3
@@ -316,13 +338,17 @@ class TestMDAVerifierServiceUnit:
         assert density.clarity_score > 0.8  # 高置信度
 
     @pytest.mark.asyncio
-    async def test_calculate_information_density_with_low_fulfillment(self, verifier_service, sample_commitments):
+    async def test_calculate_information_density_with_low_fulfillment(
+        self, verifier_service, sample_commitments
+    ):
         """测试:计算低履行率的信息密度"""
         # 创建低履行率的验证结果
         verification_results = [
             VerificationResult("commitment_1", False, 0.3, [], 0.4, "未履行"),
             VerificationResult("commitment_2", False, 0.2, [], 0.3, "未履行"),
-            VerificationResult("commitment_3", True, 0.6, ["部分证据"], 0.5, "部分履行")
+            VerificationResult(
+                "commitment_3", True, 0.6, ["部分证据"], 0.5, "部分履行"
+            ),
         ]
 
         # 修改测试数据中的承诺置信度,使其反映低清晰度
@@ -330,17 +356,21 @@ class TestMDAVerifierServiceUnit:
         sample_commitments[1].confidence = 0.3
         sample_commitments[2].confidence = 0.5
 
-        density = await verifier_service.calculate_information_density(sample_commitments, verification_results)
+        density = await verifier_service.calculate_information_density(
+            sample_commitments, verification_results
+        )
 
         # 验证结果
         assert density.total_commitments == 3
         assert density.fulfilled_commitments == 1
-        assert density.fulfillment_rate == 1/3
+        assert density.fulfillment_rate == 1 / 3
         assert density.information_richness >= 0.5  # 有多个类别
         assert density.clarity_score < 0.6  # 低置信度
 
     @pytest.mark.asyncio
-    async def test_calculate_information_density_with_empty_commitments(self, verifier_service):
+    async def test_calculate_information_density_with_empty_commitments(
+        self, verifier_service
+    ):
         """测试:计算空承诺列表的信息密度"""
         density = await verifier_service.calculate_information_density([], [])
 
@@ -351,7 +381,9 @@ class TestMDAVerifierServiceUnit:
         assert density.information_richness == 0.0
         assert density.clarity_score == 0.0
 
-    def test_build_commitment_extraction_prompt(self, verifier_service, sample_mda_text):
+    def test_build_commitment_extraction_prompt(
+        self, verifier_service, sample_mda_text
+    ):
         """测试:构建承诺提取提示词"""
         prompt = verifier_service._build_commitment_extraction_prompt(sample_mda_text)
 
@@ -364,10 +396,14 @@ class TestMDAVerifierServiceUnit:
         assert "JSON格式" in prompt
         assert sample_mda_text[:100] in prompt  # 包含部分原文
 
-    def test_build_verification_prompt(self, verifier_service, sample_commitments, sample_current_data):
+    def test_build_verification_prompt(
+        self, verifier_service, sample_commitments, sample_current_data
+    ):
         """测试:构建承诺验证提示词"""
         commitment = sample_commitments[0]
-        prompt = verifier_service._build_verification_prompt(commitment, sample_current_data)
+        prompt = verifier_service._build_verification_prompt(
+            commitment, sample_current_data
+        )
 
         # 验证提示词内容
         assert commitment.content in prompt
@@ -377,7 +413,9 @@ class TestMDAVerifierServiceUnit:
         assert "JSON格式" in prompt
         assert str(sample_current_data["revenue_2024"]) in prompt
 
-    def test_parse_commitment_response_with_valid_json(self, verifier_service, sample_mda_text):
+    def test_parse_commitment_response_with_valid_json(
+        self, verifier_service, sample_mda_text
+    ):
         """测试:解析有效的承诺响应"""
         response = """
         {
@@ -394,7 +432,9 @@ class TestMDAVerifierServiceUnit:
         }
         """
 
-        commitments = verifier_service._parse_commitment_response(response, sample_mda_text)
+        commitments = verifier_service._parse_commitment_response(
+            response, sample_mda_text
+        )
 
         # 验证结果
         assert len(commitments) == 1
@@ -404,16 +444,22 @@ class TestMDAVerifierServiceUnit:
         assert commitments[0].confidence == 0.9
         assert commitments[0].position == (100, 200)
 
-    def test_parse_commitment_response_with_invalid_json(self, verifier_service, sample_mda_text):
+    def test_parse_commitment_response_with_invalid_json(
+        self, verifier_service, sample_mda_text
+    ):
         """测试:解析无效的承诺响应"""
         response = "invalid json"
 
-        commitments = verifier_service._parse_commitment_response(response, sample_mda_text)
+        commitments = verifier_service._parse_commitment_response(
+            response, sample_mda_text
+        )
 
         # 应该返回空列表
         assert len(commitments) == 0
 
-    def test_parse_verification_response_with_valid_json(self, verifier_service, sample_commitments):
+    def test_parse_verification_response_with_valid_json(
+        self, verifier_service, sample_commitments
+    ):
         """测试:解析有效的验证响应"""
         response = """
         {
@@ -436,7 +482,9 @@ class TestMDAVerifierServiceUnit:
         assert result.confidence == 0.9
         assert result.reasoning == "验证推理"
 
-    def test_parse_verification_response_with_invalid_json(self, verifier_service, sample_commitments):
+    def test_parse_verification_response_with_invalid_json(
+        self, verifier_service, sample_commitments
+    ):
         """测试:解析无效的验证响应"""
         response = "invalid json"
 
@@ -452,7 +500,9 @@ class TestMDAVerifierServiceUnit:
         assert "解析响应时发生错误" in result.reasoning
 
     @pytest.mark.asyncio
-    async def test_integration_workflow(self, verifier_service, sample_mda_text, sample_current_data):
+    async def test_integration_workflow(
+        self, verifier_service, sample_mda_text, sample_current_data
+    ):
         """测试:完整的MD&A验证工作流"""
         # 模拟完整的LLM响应
         extraction_response = """
@@ -482,13 +532,17 @@ class TestMDAVerifierServiceUnit:
 
         verifier_service.llm_provider.generate_text.side_effect = [
             extraction_response,
-            verification_response
+            verification_response,
         ]
 
         # 执行完整工作流
         commitments = await verifier_service.extract_commitments(sample_mda_text)
-        verification_results = await verifier_service.verify_commitments(commitments, sample_current_data)
-        density = await verifier_service.calculate_information_density(commitments, verification_results)
+        verification_results = await verifier_service.verify_commitments(
+            commitments, sample_current_data
+        )
+        density = await verifier_service.calculate_information_density(
+            commitments, verification_results
+        )
 
         # 验证结果
         assert len(commitments) == 1
@@ -513,7 +567,7 @@ class TestMDAVerifierServiceUnit:
                 category="财务承诺",
                 confidence=0.8,
                 source_text="我们承诺在2024年实现收入增长20%",
-                position=(100, 150)
+                position=(100, 150),
             )
         ]
 
@@ -524,13 +578,15 @@ class TestMDAVerifierServiceUnit:
                 fulfillment_rate=0.95,
                 evidence=["Q1收入增长18%", "Q2收入增长22%"],
                 confidence=0.9,
-                reasoning="收入接近目标,基本履行承诺"
+                reasoning="收入接近目标,基本履行承诺",
             )
         ]
 
         # 使用patch来模拟内部计算抛出异常
         with patch("builtins.len", side_effect=Exception("模拟计算异常")):
-            density = await verifier_service.calculate_information_density(commitments, verification_results)
+            density = await verifier_service.calculate_information_density(
+                commitments, verification_results
+            )
 
             # 验证异常处理结果
             assert density.total_commitments == 0

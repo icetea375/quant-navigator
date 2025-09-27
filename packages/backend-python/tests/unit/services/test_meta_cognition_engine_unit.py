@@ -33,7 +33,7 @@ class TestMetaCognitionEngineUnit:
         return AnalysisResult(
             analysis="该公司2024年营业收入预计达到100亿元,同比增长15%,净利润率保持在12%以上。基于强劲的财务表现和良好的市场前景,我们看好该股票。",
             confidence=0.85,
-            reasoning="基于财务数据分析,公司业绩表现优秀,增长趋势明确,建议买入。"
+            reasoning="基于财务数据分析,公司业绩表现优秀,增长趋势明确,建议买入。",
         )
 
     @pytest.fixture
@@ -42,7 +42,7 @@ class TestMetaCognitionEngineUnit:
         return AnalysisResult(
             analysis="该公司2024年营业收入预计达到95亿元,同比增长12%,净利润率保持在11%以上。基于稳健的财务表现和谨慎的市场评估,我们对该股票持中性态度。",
             confidence=0.75,
-            reasoning="基于财务数据分析,公司业绩表现良好,但增长预期相对保守,建议持有。"
+            reasoning="基于财务数据分析,公司业绩表现良好,但增长预期相对保守,建议持有。",
         )
 
     @pytest.fixture
@@ -51,7 +51,7 @@ class TestMetaCognitionEngineUnit:
         return AnalysisResult(
             analysis="该公司2024年营业收入预计达到150亿元,同比增长30%,净利润率保持在15%以上。基于超预期的财务表现和巨大的市场机会,我们强烈看好该股票。",
             confidence=0.95,
-            reasoning="基于乐观的财务预测和市场分析,公司具有巨大的增长潜力,强烈建议买入。"
+            reasoning="基于乐观的财务预测和市场分析,公司具有巨大的增长潜力,强烈建议买入。",
         )
 
     @pytest.fixture
@@ -60,7 +60,7 @@ class TestMetaCognitionEngineUnit:
         return AnalysisResult(
             analysis="该公司2024年营业收入预计达到80亿元,同比增长5%,净利润率保持在8%左右。基于保守的财务预期和谨慎的市场评估,我们对该股票持谨慎态度。",
             confidence=0.60,
-            reasoning="基于保守的财务预测和风险分析,公司增长前景有限,建议观望。"
+            reasoning="基于保守的财务预测和风险分析,公司增长前景有限,建议观望。",
         )
 
     def test_should_initialize_with_llm_service(self, meta_engine, mock_llm_service):
@@ -79,9 +79,13 @@ class TestMetaCognitionEngineUnit:
         assert "requires_human_review" in prompt
         assert "final_conclusion" in prompt
 
-    def test_should_build_arbitration_prompt(self, meta_engine, sample_qwen_report, sample_doubao_report):
+    def test_should_build_arbitration_prompt(
+        self, meta_engine, sample_qwen_report, sample_doubao_report
+    ):
         """测试:应该构建仲裁提示词"""
-        prompt = meta_engine._build_arbitration_prompt(sample_qwen_report, sample_doubao_report)
+        prompt = meta_engine._build_arbitration_prompt(
+            sample_qwen_report, sample_doubao_report
+        )
 
         # 验证提示词包含关键信息
         assert "Qwen基本面分析师报告" in prompt
@@ -163,7 +167,9 @@ class TestMetaCognitionEngineUnit:
         assert isinstance(result.created_at, datetime)
 
     @pytest.mark.asyncio
-    async def test_arbitrate_and_summarize_with_consistent_reports(self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report):
+    async def test_arbitrate_and_summarize_with_consistent_reports(
+        self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report
+    ):
         """测试:仲裁一致报告"""
         # 模拟LLM响应
         mock_response = AnalysisResult(
@@ -181,11 +187,13 @@ class TestMetaCognitionEngineUnit:
             }
             """,
             confidence=0.9,
-            reasoning="元认知仲裁"
+            reasoning="元认知仲裁",
         )
         mock_llm_service.analyze_fact.return_value = mock_response
 
-        result = await meta_engine.arbitrate_and_summarize(sample_qwen_report, sample_doubao_report)
+        result = await meta_engine.arbitrate_and_summarize(
+            sample_qwen_report, sample_doubao_report
+        )
 
         # 验证结果
         assert isinstance(result, MetaCognitionResult)
@@ -200,7 +208,13 @@ class TestMetaCognitionEngineUnit:
         assert "豆包舆情分析师报告" in call_args["news_content"]
 
     @pytest.mark.asyncio
-    async def test_arbitrate_and_summarize_with_conflicting_reports(self, meta_engine, mock_llm_service, conflicting_qwen_report, conflicting_doubao_report):
+    async def test_arbitrate_and_summarize_with_conflicting_reports(
+        self,
+        meta_engine,
+        mock_llm_service,
+        conflicting_qwen_report,
+        conflicting_doubao_report,
+    ):
         """测试:仲裁冲突报告"""
         # 模拟LLM响应
         mock_response = AnalysisResult(
@@ -218,11 +232,13 @@ class TestMetaCognitionEngineUnit:
             }
             """,
             confidence=0.8,
-            reasoning="元认知仲裁"
+            reasoning="元认知仲裁",
         )
         mock_llm_service.analyze_fact.return_value = mock_response
 
-        result = await meta_engine.arbitrate_and_summarize(conflicting_qwen_report, conflicting_doubao_report)
+        result = await meta_engine.arbitrate_and_summarize(
+            conflicting_qwen_report, conflicting_doubao_report
+        )
 
         # 验证结果
         assert result.requires_human_review
@@ -231,12 +247,16 @@ class TestMetaCognitionEngineUnit:
         assert len(result.final_conclusion["key_conflicts"]) == 2
 
     @pytest.mark.asyncio
-    async def test_arbitrate_and_summarize_with_llm_error(self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report):
+    async def test_arbitrate_and_summarize_with_llm_error(
+        self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report
+    ):
         """测试:LLM服务出错时的处理"""
         # 模拟LLM服务抛出异常
         mock_llm_service.analyze_fact.side_effect = Exception("LLM服务错误")
 
-        result = await meta_engine.arbitrate_and_summarize(sample_qwen_report, sample_doubao_report)
+        result = await meta_engine.arbitrate_and_summarize(
+            sample_qwen_report, sample_doubao_report
+        )
 
         # 验证错误处理
         assert result.requires_human_review
@@ -245,7 +265,9 @@ class TestMetaCognitionEngineUnit:
         assert "元认知仲裁过程发生错误" in result.final_conclusion["summary"]
 
     @pytest.mark.asyncio
-    async def test_integration_workflow(self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report):
+    async def test_integration_workflow(
+        self, meta_engine, mock_llm_service, sample_qwen_report, sample_doubao_report
+    ):
         """测试:完整的元认知仲裁工作流"""
         # 模拟LLM响应
         mock_response = AnalysisResult(
@@ -263,12 +285,14 @@ class TestMetaCognitionEngineUnit:
             }
             """,
             confidence=0.9,
-            reasoning="元认知仲裁"
+            reasoning="元认知仲裁",
         )
         mock_llm_service.analyze_fact.return_value = mock_response
 
         # 执行仲裁
-        result = await meta_engine.arbitrate_and_summarize(sample_qwen_report, sample_doubao_report)
+        result = await meta_engine.arbitrate_and_summarize(
+            sample_qwen_report, sample_doubao_report
+        )
 
         # 验证完整工作流
         assert isinstance(result, MetaCognitionResult)

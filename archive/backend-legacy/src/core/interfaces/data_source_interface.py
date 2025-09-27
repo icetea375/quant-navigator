@@ -42,7 +42,9 @@ class DataSourceInterface(ABC):
         pass
 
     @abstractmethod
-    def get_announcements(self, stock_code: str, trade_date: str) -> list[dict[str, Any]]:
+    def get_announcements(
+        self, stock_code: str, trade_date: str
+    ) -> list[dict[str, Any]]:
         """
         获取公司公告数据
 
@@ -102,7 +104,9 @@ class DataSourceInterface(ABC):
         pass
 
     @abstractmethod
-    def get_concept_data(self, stock_code: str, trade_date: str) -> list[dict[str, Any]]:
+    def get_concept_data(
+        self, stock_code: str, trade_date: str
+    ) -> list[dict[str, Any]]:
         """
         获取概念板块数据
 
@@ -157,19 +161,23 @@ class DataSourceInterface(ABC):
 
 class DataSourceError(Exception):
     """数据源相关异常"""
+
     pass
 
 
 class DataSourceTimeoutError(DataSourceError):
     """数据源超时异常"""
+
     pass
 
 
 class DataSourceRateLimitError(DataSourceError):
     """数据源限流异常"""
+
     pass
 
 
 class DataSourceAuthenticationError(DataSourceError):
     """数据源认证异常"""
+
     pass

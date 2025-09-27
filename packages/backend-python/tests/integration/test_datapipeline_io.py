@@ -40,7 +40,7 @@ class TestDataPipelineIOIntegration:
         """创建DataPipelineService实例"""
         config = {
             "tushare": {"token": "test_token"},
-            "database": {"url": "sqlite:///:memory:", "echo": False}
+            "database": {"url": "sqlite:///:memory:", "echo": False},
         }
         return DataPipelineService(config)
 
@@ -48,45 +48,58 @@ class TestDataPipelineIOIntegration:
     async def test_should_handle_tushare_api_success_response(self, service):
         """测试:Tushare API成功响应的情况"""
         # 模拟Tushare API成功返回数据
-        mock_daily_basic = pd.DataFrame([{
-            "ts_code": "000001.SZ",
-            "trade_date": "20240117",
-            "close": 12.50,
-            "pe": 15.0,
-            "pb": 2.0,
-            "ps": 3.0,
-            "dv_ratio": 2.5,
-            "turnover_rate": 1.5,
-            "volume_ratio": 1.2,
-            "total_mv": 1000000.0,
-            "circ_mv": 900000.0
-        }])
+        mock_daily_basic = pd.DataFrame(
+            [
+                {
+                    "ts_code": "000001.SZ",
+                    "trade_date": "20240117",
+                    "close": 12.50,
+                    "pe": 15.0,
+                    "pb": 2.0,
+                    "ps": 3.0,
+                    "dv_ratio": 2.5,
+                    "turnover_rate": 1.5,
+                    "volume_ratio": 1.2,
+                    "total_mv": 1000000.0,
+                    "circ_mv": 900000.0,
+                }
+            ]
+        )
 
-        mock_daily = pd.DataFrame([{
-            "ts_code": "000001.SZ",
-            "trade_date": "20240117",
-            "open": 12.30,
-            "high": 12.80,
-            "low": 12.20,
-            "close": 12.50,
-            "pct_chg": 2.5,
-            "vol": 150000000
-        }])
+        mock_daily = pd.DataFrame(
+            [
+                {
+                    "ts_code": "000001.SZ",
+                    "trade_date": "20240117",
+                    "open": 12.30,
+                    "high": 12.80,
+                    "low": 12.20,
+                    "close": 12.50,
+                    "pct_chg": 2.5,
+                    "vol": 150000000,
+                }
+            ]
+        )
 
-        mock_stock_basic = pd.DataFrame([{
-            "ts_code": "000001.SZ",
-            "symbol": "000001",
-            "name": "平安银行",
-            "area": "深圳",
-            "industry": "银行",
-            "market": "主板",
-            "list_date": "19910403"
-        }])
+        mock_stock_basic = pd.DataFrame(
+            [
+                {
+                    "ts_code": "000001.SZ",
+                    "symbol": "000001",
+                    "name": "平安银行",
+                    "area": "深圳",
+                    "industry": "银行",
+                    "market": "主板",
+                    "list_date": "19910403",
+                }
+            ]
+        )
 
-        with patch.object(service.pro, "daily_basic", return_value=mock_daily_basic), \
-             patch.object(service.pro, "daily", return_value=mock_daily), \
-             patch.object(service.pro, "stock_basic", return_value=mock_stock_basic):
-
+        with (
+            patch.object(service.pro, "daily_basic", return_value=mock_daily_basic),
+            patch.object(service.pro, "daily", return_value=mock_daily),
+            patch.object(service.pro, "stock_basic", return_value=mock_stock_basic),
+        ):
             result = await service.fetch_tushare_data("000001.SZ", "20240117")
 
             # 验证返回数据结构
@@ -104,45 +117,58 @@ class TestDataPipelineIOIntegration:
     async def test_should_handle_tushare_api_null_values(self, service):
         """测试:Tushare API返回预期外null值的情况"""
         # 模拟Tushare API返回包含null值的数据
-        mock_daily_basic = pd.DataFrame([{
-            "ts_code": "000001.SZ",
-            "trade_date": "20240117",
-            "close": 12.50,
-            "pe": None,  # 关键财务指标为null
-            "pb": None,
-            "ps": None,
-            "dv_ratio": None,
-            "turnover_rate": 1.5,
-            "volume_ratio": 1.2,
-            "total_mv": 1000000.0,
-            "circ_mv": 900000.0
-        }])
+        mock_daily_basic = pd.DataFrame(
+            [
+                {
+                    "ts_code": "000001.SZ",
+                    "trade_date": "20240117",
+                    "close": 12.50,
+                    "pe": None,  # 关键财务指标为null
+                    "pb": None,
+                    "ps": None,
+                    "dv_ratio": None,
+                    "turnover_rate": 1.5,
+                    "volume_ratio": 1.2,
+                    "total_mv": 1000000.0,
+                    "circ_mv": 900000.0,
+                }
+            ]
+        )
 
-        mock_daily = pd.DataFrame([{
-            "ts_code": "000001.SZ",
-            "trade_date": "20240117",
-            "open": 12.30,
-            "high": 12.80,
-            "low": 12.20,
-            "close": 12.50,
-            "pct_chg": 2.5,
-            "vol": 150000000
-        }])
+        mock_daily = pd.DataFrame(
+            [
+                {
+                    "ts_code": "000001.SZ",
+                    "trade_date": "20240117",
+                    "open": 12.30,
+                    "high": 12.80,
+                    "low": 12.20,
+                    "close": 12.50,
+                    "pct_chg": 2.5,
+                    "vol": 150000000,
+                }
+            ]
+        )
 
-        mock_stock_basic = pd.DataFrame([{
-            "ts_code": "000001.SZ",
-            "symbol": "000001",
-            "name": "平安银行",
-            "area": "深圳",
-            "industry": "银行",
-            "market": "主板",
-            "list_date": "19910403"
-        }])
+        mock_stock_basic = pd.DataFrame(
+            [
+                {
+                    "ts_code": "000001.SZ",
+                    "symbol": "000001",
+                    "name": "平安银行",
+                    "area": "深圳",
+                    "industry": "银行",
+                    "market": "主板",
+                    "list_date": "19910403",
+                }
+            ]
+        )
 
-        with patch.object(service.pro, "daily_basic", return_value=mock_daily_basic), \
-             patch.object(service.pro, "daily", return_value=mock_daily), \
-             patch.object(service.pro, "stock_basic", return_value=mock_stock_basic):
-
+        with (
+            patch.object(service.pro, "daily_basic", return_value=mock_daily_basic),
+            patch.object(service.pro, "daily", return_value=mock_daily),
+            patch.object(service.pro, "stock_basic", return_value=mock_stock_basic),
+        ):
             result = await service.fetch_tushare_data("000001.SZ", "20240117")
 
             # 验证系统能处理null值
@@ -164,7 +190,9 @@ class TestDataPipelineIOIntegration:
     async def test_should_handle_tushare_api_exception(self, service):
         """测试:Tushare API抛出异常的情况"""
         # 模拟Tushare API抛出异常
-        with patch.object(service.pro, "daily_basic", side_effect=Exception("API调用失败")):
+        with patch.object(
+            service.pro, "daily_basic", side_effect=Exception("API调用失败")
+        ):
             with pytest.raises(Exception) as exc_info:
                 await service.fetch_tushare_data("000001.SZ", "20240117")
 
@@ -178,10 +206,11 @@ class TestDataPipelineIOIntegration:
         mock_daily = pd.DataFrame()
         mock_stock_basic = pd.DataFrame()
 
-        with patch.object(service.pro, "daily_basic", return_value=mock_daily_basic), \
-             patch.object(service.pro, "daily", return_value=mock_daily), \
-             patch.object(service.pro, "stock_basic", return_value=mock_stock_basic):
-
+        with (
+            patch.object(service.pro, "daily_basic", return_value=mock_daily_basic),
+            patch.object(service.pro, "daily", return_value=mock_daily),
+            patch.object(service.pro, "stock_basic", return_value=mock_stock_basic),
+        ):
             result = await service.fetch_tushare_data("000001.SZ", "20240117")
 
             # 验证返回空数据结构
@@ -208,45 +237,55 @@ class TestDataPipelineIOIntegration:
         assert "无效的日期格式" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_should_extract_financial_factors_with_real_data_structure(self, service):
+    async def test_should_extract_financial_factors_with_real_data_structure(
+        self, service
+    ):
         """测试:使用真实数据结构提取财务因子"""
         # 模拟真实的Tushare数据结构
         raw_data = {
-            "daily_basic": [{
-                "ts_code": "000001.SZ",
-                "trade_date": "20240117",
-                "close": 12.50,
-                "pe": 15.0,
-                "pb": 2.0,
-                "ps": 3.0,
-                "dv_ratio": 2.5,
-                "turnover_rate": 1.5,
-                "volume_ratio": 1.2,
-                "total_mv": 1000000.0,
-                "circ_mv": 900000.0
-            }],
-            "daily": [{
-                "ts_code": "000001.SZ",
-                "trade_date": "20240117",
-                "open": 12.30,
-                "high": 12.80,
-                "low": 12.20,
-                "close": 12.50,
-                "pct_chg": 2.5,
-                "vol": 150000000
-            }],
-            "stock_basic": [{
-                "ts_code": "000001.SZ",
-                "symbol": "000001",
-                "name": "平安银行",
-                "area": "深圳",
-                "industry": "银行",
-                "market": "主板",
-                "list_date": "19910403"
-            }]
+            "daily_basic": [
+                {
+                    "ts_code": "000001.SZ",
+                    "trade_date": "20240117",
+                    "close": 12.50,
+                    "pe": 15.0,
+                    "pb": 2.0,
+                    "ps": 3.0,
+                    "dv_ratio": 2.5,
+                    "turnover_rate": 1.5,
+                    "volume_ratio": 1.2,
+                    "total_mv": 1000000.0,
+                    "circ_mv": 900000.0,
+                }
+            ],
+            "daily": [
+                {
+                    "ts_code": "000001.SZ",
+                    "trade_date": "20240117",
+                    "open": 12.30,
+                    "high": 12.80,
+                    "low": 12.20,
+                    "close": 12.50,
+                    "pct_chg": 2.5,
+                    "vol": 150000000,
+                }
+            ],
+            "stock_basic": [
+                {
+                    "ts_code": "000001.SZ",
+                    "symbol": "000001",
+                    "name": "平安银行",
+                    "area": "深圳",
+                    "industry": "银行",
+                    "market": "主板",
+                    "list_date": "19910403",
+                }
+            ],
         }
 
-        result = await service.extract_financial_factors("000001.SZ", "20240117", raw_data)
+        result = await service.extract_financial_factors(
+            "000001.SZ", "20240117", raw_data
+        )
 
         # 验证财务因子提取结果
         assert result["stock_code"] == "000001.SZ"
@@ -263,14 +302,16 @@ class TestDataPipelineIOIntegration:
         assert result["volume"] == 150000000
 
     @pytest.mark.asyncio
-    async def test_should_calculate_super_financial_factors_with_edge_cases(self, service):
+    async def test_should_calculate_super_financial_factors_with_edge_cases(
+        self, service
+    ):
         """测试:超级财务因子计算边界情况"""
         # 测试极端值情况
         financial_factors = {
             "pe_ratio": 0.0,  # 极端低值
             "pb_ratio": 100.0,  # 极端高值
             "ps_ratio": 0.0,
-            "dividend_yield": 0.0
+            "dividend_yield": 0.0,
         }
 
         result = await service.calculate_super_financial_factors(financial_factors)
@@ -298,50 +339,63 @@ class TestDataPipelineIOIntegration:
     async def test_should_handle_concurrent_api_calls(self, service):
         """测试:并发API调用的情况"""
         # 模拟多个并发API调用
-        mock_daily_basic = pd.DataFrame([{
-            "ts_code": "000001.SZ",
-            "trade_date": "20240117",
-            "close": 12.50,
-            "pe": 15.0,
-            "pb": 2.0,
-            "ps": 3.0,
-            "dv_ratio": 2.5,
-            "turnover_rate": 1.5,
-            "volume_ratio": 1.2,
-            "total_mv": 1000000.0,
-            "circ_mv": 900000.0
-        }])
+        mock_daily_basic = pd.DataFrame(
+            [
+                {
+                    "ts_code": "000001.SZ",
+                    "trade_date": "20240117",
+                    "close": 12.50,
+                    "pe": 15.0,
+                    "pb": 2.0,
+                    "ps": 3.0,
+                    "dv_ratio": 2.5,
+                    "turnover_rate": 1.5,
+                    "volume_ratio": 1.2,
+                    "total_mv": 1000000.0,
+                    "circ_mv": 900000.0,
+                }
+            ]
+        )
 
-        mock_daily = pd.DataFrame([{
-            "ts_code": "000001.SZ",
-            "trade_date": "20240117",
-            "open": 12.30,
-            "high": 12.80,
-            "low": 12.20,
-            "close": 12.50,
-            "pct_chg": 2.5,
-            "vol": 150000000
-        }])
+        mock_daily = pd.DataFrame(
+            [
+                {
+                    "ts_code": "000001.SZ",
+                    "trade_date": "20240117",
+                    "open": 12.30,
+                    "high": 12.80,
+                    "low": 12.20,
+                    "close": 12.50,
+                    "pct_chg": 2.5,
+                    "vol": 150000000,
+                }
+            ]
+        )
 
-        mock_stock_basic = pd.DataFrame([{
-            "ts_code": "000001.SZ",
-            "symbol": "000001",
-            "name": "平安银行",
-            "area": "深圳",
-            "industry": "银行",
-            "market": "主板",
-            "list_date": "19910403"
-        }])
+        mock_stock_basic = pd.DataFrame(
+            [
+                {
+                    "ts_code": "000001.SZ",
+                    "symbol": "000001",
+                    "name": "平安银行",
+                    "area": "深圳",
+                    "industry": "银行",
+                    "market": "主板",
+                    "list_date": "19910403",
+                }
+            ]
+        )
 
-        with patch.object(service.pro, "daily_basic", return_value=mock_daily_basic), \
-             patch.object(service.pro, "daily", return_value=mock_daily), \
-             patch.object(service.pro, "stock_basic", return_value=mock_stock_basic):
-
+        with (
+            patch.object(service.pro, "daily_basic", return_value=mock_daily_basic),
+            patch.object(service.pro, "daily", return_value=mock_daily),
+            patch.object(service.pro, "stock_basic", return_value=mock_stock_basic),
+        ):
             # 并发调用多个股票数据
             tasks = [
                 service.fetch_tushare_data("000001.SZ", "20240117"),
                 service.fetch_tushare_data("000002.SZ", "20240117"),
-                service.fetch_tushare_data("000003.SZ", "20240117")
+                service.fetch_tushare_data("000003.SZ", "20240117"),
             ]
 
             results = await asyncio.gather(*tasks)

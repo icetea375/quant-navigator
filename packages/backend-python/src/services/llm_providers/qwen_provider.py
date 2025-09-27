@@ -16,7 +16,6 @@ project_root = Path(__file__).parent.parent.parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from config.settings import settings
-
 from src.core.interfaces import (
     LlmProviderAuthenticationError,
     LlmProviderError,
@@ -34,7 +33,12 @@ class QwenProvider(LlmProviderInterface):
     未来可以轻松切换到其他LLM提供商(如OpenAI,豆包等)
     """
 
-    def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None, client: Optional[httpx.AsyncClient] = None):
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        base_url: Optional[str] = None,
+        client: Optional[httpx.AsyncClient] = None,
+    ):
         """
         初始化Qwen提供商
 
@@ -56,7 +60,7 @@ class QwenProvider(LlmProviderInterface):
         model: str = "qwen-plus",
         max_tokens: Optional[int] = None,
         temperature: Optional[float] = None,
-        **kwargs
+        **kwargs,
     ) -> str:
         """
         生成文本内容
@@ -77,10 +81,8 @@ class QwenProvider(LlmProviderInterface):
             # 构建请求参数
             request_data = {
                 "model": model,
-                "input": {
-                    "messages": [{"role": "user", "content": prompt}]
-                },
-                "parameters": {}
+                "input": {"messages": [{"role": "user", "content": prompt}]},
+                "parameters": {},
             }
 
             if max_tokens:
@@ -96,9 +98,9 @@ class QwenProvider(LlmProviderInterface):
                 f"{self.base_url}/services/aigc/text-generation/generation",
                 headers={
                     "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                json=request_data
+                json=request_data,
             )
 
             if response.status_code == 401:
@@ -112,6 +114,7 @@ class QwenProvider(LlmProviderInterface):
 
             # ✅ 关键：用契约验证响应结构
             from src.core.contract_validator import contract_validator
+
             if not contract_validator.validate_response(result, "chat_completion"):
                 raise LlmProviderError("Qwen API响应不符合契约定义")
 
@@ -123,7 +126,15 @@ class QwenProvider(LlmProviderInterface):
             raise LlmProviderTimeoutError("Qwen API请求超时") from e
         except Exception as e:
             self._error_count += 1
-            if isinstance(e, (LlmProviderError, LlmProviderTimeoutError, LlmProviderRateLimitError, LlmProviderAuthenticationError)):
+            if isinstance(
+                e,
+                (
+                    LlmProviderError,
+                    LlmProviderTimeoutError,
+                    LlmProviderRateLimitError,
+                    LlmProviderAuthenticationError,
+                ),
+            ):
                 raise
             else:
                 raise LlmProviderError(f"Qwen API调用失败: {e!s}") from e
@@ -134,7 +145,7 @@ class QwenProvider(LlmProviderInterface):
         model: str = "qwen-plus",
         max_tokens: Optional[int] = None,
         temperature: Optional[float] = None,
-        **kwargs
+        **kwargs,
     ) -> str:
         """
         聊天完成接口
@@ -155,10 +166,8 @@ class QwenProvider(LlmProviderInterface):
             # 构建请求参数
             request_data = {
                 "model": model,
-                "input": {
-                    "messages": messages
-                },
-                "parameters": {}
+                "input": {"messages": messages},
+                "parameters": {},
             }
 
             if max_tokens:
@@ -174,9 +183,9 @@ class QwenProvider(LlmProviderInterface):
                 f"{self.base_url}/services/aigc/text-generation/generation",
                 headers={
                     "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                json=request_data
+                json=request_data,
             )
 
             if response.status_code == 401:
@@ -190,6 +199,7 @@ class QwenProvider(LlmProviderInterface):
 
             # ✅ 关键：用契约验证响应结构
             from src.core.contract_validator import contract_validator
+
             if not contract_validator.validate_response(result, "chat_completion"):
                 raise LlmProviderError("Qwen API响应不符合契约定义")
 
@@ -201,16 +211,21 @@ class QwenProvider(LlmProviderInterface):
             raise LlmProviderTimeoutError("Qwen API请求超时") from e
         except Exception as e:
             self._error_count += 1
-            if isinstance(e, (LlmProviderError, LlmProviderTimeoutError, LlmProviderRateLimitError, LlmProviderAuthenticationError)):
+            if isinstance(
+                e,
+                (
+                    LlmProviderError,
+                    LlmProviderTimeoutError,
+                    LlmProviderRateLimitError,
+                    LlmProviderAuthenticationError,
+                ),
+            ):
                 raise
             else:
                 raise LlmProviderError(f"Qwen API调用失败: {e!s}") from e
 
     async def generate_embeddings(
-        self,
-        texts: list[str],
-        model: str = "text-embedding-v1",
-        **kwargs
+        self, texts: list[str], model: str = "text-embedding-v1", **kwargs
     ) -> list[list[float]]:
         """
         生成文本嵌入向量
@@ -229,10 +244,8 @@ class QwenProvider(LlmProviderInterface):
             # 构建请求参数
             request_data = {
                 "model": model,
-                "input": {
-                    "texts": texts
-                },
-                "parameters": kwargs
+                "input": {"texts": texts},
+                "parameters": kwargs,
             }
 
             # 发送请求
@@ -240,9 +253,9 @@ class QwenProvider(LlmProviderInterface):
                 f"{self.base_url}/services/embeddings/text-embedding/text-embedding",
                 headers={
                     "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                json=request_data
+                json=request_data,
             )
 
             if response.status_code == 401:
@@ -265,16 +278,21 @@ class QwenProvider(LlmProviderInterface):
             raise LlmProviderTimeoutError("Qwen API请求超时") from e
         except Exception as e:
             self._error_count += 1
-            if isinstance(e, (LlmProviderError, LlmProviderTimeoutError, LlmProviderRateLimitError, LlmProviderAuthenticationError)):
+            if isinstance(
+                e,
+                (
+                    LlmProviderError,
+                    LlmProviderTimeoutError,
+                    LlmProviderRateLimitError,
+                    LlmProviderAuthenticationError,
+                ),
+            ):
                 raise
             else:
                 raise LlmProviderError(f"Qwen API调用失败: {e!s}") from e
 
     async def analyze_sentiment(
-        self,
-        text: str,
-        model: str = "qwen-plus",
-        **kwargs
+        self, text: str, model: str = "qwen-plus", **kwargs
     ) -> dict[str, Any]:
         """
         情感分析
@@ -306,6 +324,7 @@ class QwenProvider(LlmProviderInterface):
 
             # 解析响应(这里简化处理,实际应该更robust)
             import json
+
             try:
                 result = json.loads(response_text)
                 return result
@@ -315,7 +334,7 @@ class QwenProvider(LlmProviderInterface):
                     "sentiment": "neutral",
                     "score": 0.5,
                     "confidence": 0.5,
-                    "reasoning": "无法解析模型响应"
+                    "reasoning": "无法解析模型响应",
                 }
 
         except Exception as e:
@@ -327,7 +346,7 @@ class QwenProvider(LlmProviderInterface):
         text: str,
         context: Optional[str] = None,
         model: str = "qwen-plus",
-        **kwargs
+        **kwargs,
     ) -> dict[str, Any]:
         """
         事实分析
@@ -366,6 +385,7 @@ class QwenProvider(LlmProviderInterface):
 
             # 解析响应(这里简化处理,实际应该更robust)
             import json
+
             try:
                 result = json.loads(response_text)
                 return result
@@ -375,7 +395,7 @@ class QwenProvider(LlmProviderInterface):
                     "analysis": "无法进行事实分析",
                     "confidence": 0.0,
                     "reasoning": "无法解析模型响应",
-                    "fact_check": "无法验证"
+                    "fact_check": "无法验证",
                 }
 
         except Exception as e:
@@ -383,10 +403,7 @@ class QwenProvider(LlmProviderInterface):
             raise LlmProviderError(f"事实分析失败: {e!s}") from e
 
     async def batch_process(
-        self,
-        requests: list[dict[str, Any]],
-        model: str = "qwen-plus",
-        **kwargs
+        self, requests: list[dict[str, Any]], model: str = "qwen-plus", **kwargs
     ) -> list[dict[str, Any]]:
         """
         批量处理请求
@@ -405,37 +422,33 @@ class QwenProvider(LlmProviderInterface):
                 # 根据请求类型调用相应方法
                 if request.get("type") == "text_generation":
                     result = await self.generate_text(
-                        request["prompt"],
-                        model,
-                        **request.get("params", {})
+                        request["prompt"], model, **request.get("params", {})
                     )
                 elif request.get("type") == "chat_completion":
                     result = await self.chat_completion(
-                        request["messages"],
-                        model,
-                        **request.get("params", {})
+                        request["messages"], model, **request.get("params", {})
                     )
                 elif request.get("type") == "sentiment_analysis":
                     result = await self.analyze_sentiment(
-                        request["text"],
-                        model,
-                        **request.get("params", {})
+                        request["text"], model, **request.get("params", {})
                     )
                 elif request.get("type") == "fact_analysis":
                     result = await self.analyze_fact(
                         request["text"],
                         request.get("context"),
                         model,
-                        **request.get("params", {})
+                        **request.get("params", {}),
                     )
                 else:
                     result = {"error": f"未知的请求类型: {request.get('type')}"}
 
-                results.append({
-                    "request_id": request.get("id"),
-                    "result": result,
-                    "status": "success"
-                })
+                results.append(
+                    {
+                        "request_id": request.get("id"),
+                        "result": result,
+                        "status": "success",
+                    }
+                )
 
             return results
 
@@ -455,7 +468,7 @@ class QwenProvider(LlmProviderInterface):
             "qwen-turbo",
             "qwen-max",
             "text-embedding-v1",
-            "text-embedding-v2"
+            "text-embedding-v2",
         ]
 
     def get_model_info(self, model: str) -> dict[str, Any]:
@@ -473,46 +486,59 @@ class QwenProvider(LlmProviderInterface):
                 "model_name": "qwen-plus",
                 "model_type": "chat_completion",
                 "max_tokens": 8192,
-                "supported_features": ["text_generation", "chat_completion", "sentiment_analysis", "fact_analysis"],
-                "cost_per_token": 0.0001
+                "supported_features": [
+                    "text_generation",
+                    "chat_completion",
+                    "sentiment_analysis",
+                    "fact_analysis",
+                ],
+                "cost_per_token": 0.0001,
             },
             "qwen-turbo": {
                 "model_name": "qwen-turbo",
                 "model_type": "chat_completion",
                 "max_tokens": 4096,
                 "supported_features": ["text_generation", "chat_completion"],
-                "cost_per_token": 0.00005
+                "cost_per_token": 0.00005,
             },
             "qwen-max": {
                 "model_name": "qwen-max",
                 "model_type": "chat_completion",
                 "max_tokens": 16384,
-                "supported_features": ["text_generation", "chat_completion", "sentiment_analysis", "fact_analysis"],
-                "cost_per_token": 0.0002
+                "supported_features": [
+                    "text_generation",
+                    "chat_completion",
+                    "sentiment_analysis",
+                    "fact_analysis",
+                ],
+                "cost_per_token": 0.0002,
             },
             "text-embedding-v1": {
                 "model_name": "text-embedding-v1",
                 "model_type": "embedding",
                 "max_tokens": 2048,
                 "supported_features": ["text_embedding"],
-                "cost_per_token": 0.00001
+                "cost_per_token": 0.00001,
             },
             "text-embedding-v2": {
                 "model_name": "text-embedding-v2",
                 "model_type": "embedding",
                 "max_tokens": 2048,
                 "supported_features": ["text_embedding"],
-                "cost_per_token": 0.00001
-            }
+                "cost_per_token": 0.00001,
+            },
         }
 
-        return model_info.get(model, {
-            "model_name": model,
-            "model_type": "unknown",
-            "max_tokens": 0,
-            "supported_features": [],
-            "cost_per_token": 0
-        })
+        return model_info.get(
+            model,
+            {
+                "model_name": model,
+                "model_type": "unknown",
+                "max_tokens": 0,
+                "supported_features": [],
+                "cost_per_token": 0,
+            },
+        )
 
     async def health_check(self) -> dict[str, Any]:
         """
@@ -536,7 +562,7 @@ class QwenProvider(LlmProviderInterface):
                 "last_success": end_time.isoformat(),
                 "error_count": self._error_count,
                 "rate_limit_remaining": 999,  # Qwen的限流信息需要额外获取
-                "available_models": len(self.get_available_models())
+                "available_models": len(self.get_available_models()),
             }
 
         except Exception as e:
@@ -547,7 +573,7 @@ class QwenProvider(LlmProviderInterface):
                 "last_success": None,
                 "error_count": self._error_count,
                 "rate_limit_remaining": 0,
-                "available_models": 0
+                "available_models": 0,
             }
 
     async def close(self):

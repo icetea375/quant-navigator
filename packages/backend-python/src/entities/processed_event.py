@@ -13,6 +13,7 @@ from .base import BaseEntity
 
 class ProcessedEventEntity(BaseEntity):
     """处理事件实体类"""
+
     __tablename__ = "processed_events"
 
     # 基本信息
@@ -38,10 +39,22 @@ class ProcessedEventEntity(BaseEntity):
 
     # 添加约束
     __table_args__ = (
-        CheckConstraint("sentiment_score >= -1 AND sentiment_score <= 1", name="check_sentiment_range"),
-        CheckConstraint("importance_score >= 0 AND importance_score <= 1", name="check_importance_range"),
-        CheckConstraint('event_type IN ("news", "announcement", "e_interaction", "market_data")', name="check_event_type"),
-        CheckConstraint('status IN ("pending", "processing", "completed", "failed")', name="check_status"),
+        CheckConstraint(
+            "sentiment_score >= -1 AND sentiment_score <= 1",
+            name="check_sentiment_range",
+        ),
+        CheckConstraint(
+            "importance_score >= 0 AND importance_score <= 1",
+            name="check_importance_range",
+        ),
+        CheckConstraint(
+            'event_type IN ("news", "announcement", "e_interaction", "market_data")',
+            name="check_event_type",
+        ),
+        CheckConstraint(
+            'status IN ("pending", "processing", "completed", "failed")',
+            name="check_status",
+        ),
     )
 
     def __init__(self, **kwargs):
@@ -73,12 +86,14 @@ class ProcessedEventEntity(BaseEntity):
             "status": self.status,
             "processing_result": self.processing_result_json,
             "error_message": self.error_message,
-            "metadata": self.metadata_json or {}
+            "metadata": self.metadata_json or {},
         }
         return ProcessedEvent(**data)
 
     @classmethod
-    def from_processed_event(cls, processed_event: ProcessedEvent) -> "ProcessedEventEntity":
+    def from_processed_event(
+        cls, processed_event: ProcessedEvent
+    ) -> "ProcessedEventEntity":
         """从Pydantic ProcessedEvent模型创建实体"""
         data = processed_event.model_dump()
         return cls(
@@ -95,7 +110,7 @@ class ProcessedEventEntity(BaseEntity):
             status=data["status"],
             processing_result_json=data.get("processing_result"),
             error_message=data.get("error_message"),
-            metadata_json=data["metadata"]
+            metadata_json=data["metadata"],
         )
 
     def __repr__(self):

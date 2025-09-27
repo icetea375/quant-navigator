@@ -15,6 +15,7 @@ from src.exceptions.workflow_exceptions import ArbitrationWorkflowError
 
 class MockMainWorkflow:
     """模拟主工作流类(带并行处理)"""
+
     def __init__(self, config):
         self.config = config
         self.logger = MagicMock()
@@ -72,10 +73,9 @@ class MockMainWorkflow:
             for i, result in enumerate(results):
                 if isinstance(result, Exception):
                     failed += 1
-                    failed_stocks.append({
-                        "stock_code": anomaly_stocks[i],
-                        "error": str(result)
-                    })
+                    failed_stocks.append(
+                        {"stock_code": anomaly_stocks[i], "error": str(result)}
+                    )
                 else:
                     successful += 1
 
@@ -84,7 +84,7 @@ class MockMainWorkflow:
             return {
                 "successful": successful,
                 "failed": failed,
-                "failed_stocks": failed_stocks
+                "failed_stocks": failed_stocks,
             }
 
         except Exception as e:
@@ -144,8 +144,9 @@ class TestProcessAnomalyStocksParallel:
     @pytest.mark.asyncio
     async def test_process_anomaly_stocks_parallel_all_failures(self, mock_workflow):
         """测试所有股票处理失败"""
+
         # 修改模拟方法,让所有股票都失败
-        async def failing_processor(stock_code, _trade_date,_max_retriess):
+        async def failing_processor(stock_code, _trade_date, _max_retriess):
             raise ArbitrationWorkflowError(f"股票 {stock_code} 处理失败")
 
         mock_workflow._process_single_stock_with_retry = failing_processor
@@ -210,10 +211,13 @@ class TestProcessAnomalyStocksParallel:
         assert execution_time < 0.5  # 并行执行应该很快
 
     @pytest.mark.asyncio
-    async def test_process_anomaly_stocks_parallel_exception_handling(self, mock_workflow):
+    async def test_process_anomaly_stocks_parallel_exception_handling(
+        self, mock_workflow
+    ):
         """测试异常处理"""
+
         # 修改模拟方法,让它在创建任务时抛出异常
-        async def failing_processor(stock_code, _trade_date,_max_retriess):
+        async def failing_processor(stock_code, _trade_date, _max_retriess):
             if stock_code == "000001":
                 raise Exception("创建任务时出错")
             return {"stock_code": stock_code, "status": "success"}
@@ -236,6 +240,7 @@ class TestProcessAnomalyStocksParallel:
     @pytest.mark.asyncio
     async def test_process_anomaly_stocks_parallel_critical_error(self, mock_workflow):
         """测试关键错误处理"""
+
         # 修改模拟方法,让它在gather时抛出异常
         async def critical_failing_processor(_stock_code, _trade_date, _max_retries):
             raise Exception("关键错误")
@@ -311,7 +316,9 @@ class TestProcessAnomalyStocksParallel:
             asyncio.create_task = original_create_task
 
     @pytest.mark.asyncio
-    async def test_process_anomaly_stocks_parallel_result_structure(self, mock_workflow):
+    async def test_process_anomaly_stocks_parallel_result_structure(
+        self, mock_workflow
+    ):
         """测试结果结构"""
         anomaly_stocks = ["000001", "000002", "000003"]
         trade_date = "2025-01-17"

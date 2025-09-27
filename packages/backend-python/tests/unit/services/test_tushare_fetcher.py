@@ -40,8 +40,12 @@ class TestTushareFetcher:
 
     def test_initialization_without_token(self, mock_tushare_pro):
         """测试使用默认token初始化"""
-        with patch("tushare.set_token") as mock_set_token, \
-             patch("src.services.data_sources.tushare_fetcher.settings") as mock_settings:
+        with (
+            patch("tushare.set_token") as mock_set_token,
+            patch(
+                "src.services.data_sources.tushare_fetcher.settings"
+            ) as mock_settings,
+        ):
             mock_settings.TUSHARE_TOKEN = "default_token"
 
             fetcher = TushareFetcher()
@@ -61,16 +65,18 @@ class TestTushareFetcher:
     async def test_get_daily_quotes_success(self, fetcher, mock_tushare_pro):
         """测试成功获取日线行情数据"""
         # 模拟返回数据
-        mock_data = pd.DataFrame({
-            "ts_code": ["000001.SZ"],
-            "trade_date": ["20240101"],
-            "open": [10.0],
-            "high": [11.0],
-            "low": [9.0],
-            "close": [10.5],
-            "vol": [1000000],
-            "amount": [10500000.0]
-        })
+        mock_data = pd.DataFrame(
+            {
+                "ts_code": ["000001.SZ"],
+                "trade_date": ["20240101"],
+                "open": [10.0],
+                "high": [11.0],
+                "low": [9.0],
+                "close": [10.5],
+                "vol": [1000000],
+                "amount": [10500000.0],
+            }
+        )
         mock_tushare_pro.daily.return_value = mock_data
 
         result = await fetcher.get_daily_quotes("000001.SZ", "20240101")
@@ -80,8 +86,7 @@ class TestTushareFetcher:
         assert result.iloc[0]["stock_code"] == "000001.SZ"
         assert result.iloc[0]["trade_date"] == "20240101"
         mock_tushare_pro.daily.assert_called_once_with(
-            ts_code="000001.SZ",
-            trade_date="20240101"
+            ts_code="000001.SZ", trade_date="20240101"
         )
 
     @pytest.mark.asyncio
@@ -97,12 +102,14 @@ class TestTushareFetcher:
     @pytest.mark.asyncio
     async def test_get_announcements_success(self, fetcher, mock_tushare_pro):
         """测试成功获取公告数据"""
-        mock_data = pd.DataFrame({
-            "ts_code": ["000001.SZ"],
-            "ann_date": ["20240101"],
-            "title": ["测试公告"],
-            "content": ["公告内容"]
-        })
+        mock_data = pd.DataFrame(
+            {
+                "ts_code": ["000001.SZ"],
+                "ann_date": ["20240101"],
+                "title": ["测试公告"],
+                "content": ["公告内容"],
+            }
+        )
         mock_tushare_pro.anns.return_value = mock_data
 
         result = await fetcher.get_announcements("000001.SZ", "20240101")
@@ -111,8 +118,7 @@ class TestTushareFetcher:
         assert len(result) == 1
         assert result[0]["stock_code"] == "000001.SZ"
         mock_tushare_pro.anns.assert_called_once_with(
-            ts_code="000001.SZ",
-            ann_date="20240101"
+            ts_code="000001.SZ", ann_date="20240101"
         )
 
     @pytest.mark.asyncio
@@ -128,24 +134,30 @@ class TestTushareFetcher:
     @pytest.mark.asyncio
     async def test_get_financial_data_success(self, fetcher, mock_tushare_pro):
         """测试成功获取财务数据"""
-        mock_income = pd.DataFrame({
-            "ts_code": ["000001.SZ"],
-            "ann_date": ["20240101"],
-            "revenue": [1000000.0],
-            "n_income": [100000.0]
-        })
-        mock_balancesheet = pd.DataFrame({
-            "ts_code": ["000001.SZ"],
-            "ann_date": ["20240101"],
-            "total_assets": [5000000.0],
-            "total_liab": [2000000.0]
-        })
-        mock_cashflow = pd.DataFrame({
-            "ts_code": ["000001.SZ"],
-            "ann_date": ["20240101"],
-            "c_fr_sale_sg": [100000.0],
-            "c_paid_goods_s": [50000.0]
-        })
+        mock_income = pd.DataFrame(
+            {
+                "ts_code": ["000001.SZ"],
+                "ann_date": ["20240101"],
+                "revenue": [1000000.0],
+                "n_income": [100000.0],
+            }
+        )
+        mock_balancesheet = pd.DataFrame(
+            {
+                "ts_code": ["000001.SZ"],
+                "ann_date": ["20240101"],
+                "total_assets": [5000000.0],
+                "total_liab": [2000000.0],
+            }
+        )
+        mock_cashflow = pd.DataFrame(
+            {
+                "ts_code": ["000001.SZ"],
+                "ann_date": ["20240101"],
+                "c_fr_sale_sg": [100000.0],
+                "c_paid_goods_s": [50000.0],
+            }
+        )
 
         mock_tushare_pro.income.return_value = mock_income
         mock_tushare_pro.balancesheet.return_value = mock_balancesheet
@@ -172,12 +184,14 @@ class TestTushareFetcher:
     @pytest.mark.asyncio
     async def test_get_industry_classification_success(self, fetcher, mock_tushare_pro):
         """测试成功获取行业分类数据"""
-        mock_data = pd.DataFrame({
-            "ts_code": ["000001.SZ"],
-            "industry": ["银行"],
-            "area": ["深圳"],
-            "market": ["主板"]
-        })
+        mock_data = pd.DataFrame(
+            {
+                "ts_code": ["000001.SZ"],
+                "industry": ["银行"],
+                "area": ["深圳"],
+                "market": ["主板"],
+            }
+        )
         mock_tushare_pro.stock_basic.return_value = mock_data
 
         result = await fetcher.get_industry_classification("000001.SZ")
@@ -187,8 +201,7 @@ class TestTushareFetcher:
         assert "industry_name" in result
         assert "classification_source" in result
         mock_tushare_pro.stock_basic.assert_called_once_with(
-            ts_code="000001.SZ",
-            fields="ts_code,name,industry,area,market,list_date"
+            ts_code="000001.SZ", fields="ts_code,name,industry,area,market,list_date"
         )
 
     @pytest.mark.asyncio
@@ -204,11 +217,13 @@ class TestTushareFetcher:
     @pytest.mark.asyncio
     async def test_get_concept_data_success(self, fetcher, mock_tushare_pro):
         """测试成功获取概念数据"""
-        mock_data = pd.DataFrame({
-            "ts_code": ["000001.SZ"],
-            "concept_name": ["人工智能"],
-            "concept_desc": ["AI相关概念"]
-        })
+        mock_data = pd.DataFrame(
+            {
+                "ts_code": ["000001.SZ"],
+                "concept_name": ["人工智能"],
+                "concept_desc": ["AI相关概念"],
+            }
+        )
         mock_tushare_pro.concept_detail.return_value = mock_data
 
         result = await fetcher.get_concept_data("000001.SZ", "20240101")
@@ -216,9 +231,7 @@ class TestTushareFetcher:
         assert isinstance(result, list)
         assert len(result) == 1
         assert result[0]["stock_code"] == "000001.SZ"
-        mock_tushare_pro.concept_detail.assert_called_once_with(
-            ts_code="000001.SZ"
-        )
+        mock_tushare_pro.concept_detail.assert_called_once_with(ts_code="000001.SZ")
 
     @pytest.mark.asyncio
     async def test_get_concept_data_failure(self, fetcher, mock_tushare_pro):
@@ -233,22 +246,26 @@ class TestTushareFetcher:
     @pytest.mark.asyncio
     async def test_get_market_data_success(self, fetcher, mock_tushare_pro):
         """测试成功获取市场数据"""
-        mock_daily_basic = pd.DataFrame({
-            "trade_date": ["20240101"],
-            "ts_code": ["000001.SZ"],
-            "pe": [10.5],
-            "pb": [1.2],
-            "ps": [2.1],
-            "dv_ratio": [3.5],
-            "total_mv": [1000000000],
-            "turnover_rate": [0.05]
-        })
-        mock_index_daily = pd.DataFrame({
-            "ts_code": ["000001.SH"],
-            "trade_date": ["20240101"],
-            "close": [3000.0],
-            "pct_chg": [1.5]
-        })
+        mock_daily_basic = pd.DataFrame(
+            {
+                "trade_date": ["20240101"],
+                "ts_code": ["000001.SZ"],
+                "pe": [10.5],
+                "pb": [1.2],
+                "ps": [2.1],
+                "dv_ratio": [3.5],
+                "total_mv": [1000000000],
+                "turnover_rate": [0.05],
+            }
+        )
+        mock_index_daily = pd.DataFrame(
+            {
+                "ts_code": ["000001.SH"],
+                "trade_date": ["20240101"],
+                "close": [3000.0],
+                "pct_chg": [1.5],
+            }
+        )
 
         mock_tushare_pro.daily_basic.return_value = mock_daily_basic
         mock_tushare_pro.index_daily.return_value = mock_index_daily
@@ -273,9 +290,9 @@ class TestTushareFetcher:
     @pytest.mark.asyncio
     async def test_health_check_success(self, fetcher, mock_tushare_pro):
         """测试健康检查成功"""
-        mock_tushare_pro.stock_basic.return_value = pd.DataFrame({
-            "ts_code": ["000001.SZ"]
-        })
+        mock_tushare_pro.stock_basic.return_value = pd.DataFrame(
+            {"ts_code": ["000001.SZ"]}
+        )
 
         result = await fetcher.health_check()
 
@@ -319,11 +336,9 @@ class TestTushareFetcher:
     @pytest.mark.asyncio
     async def test_data_conversion_to_dict(self, fetcher, mock_tushare_pro):
         """测试数据转换为字典格式"""
-        mock_data = pd.DataFrame({
-            "ts_code": ["000001.SZ"],
-            "trade_date": ["20240101"],
-            "close": [10.5]
-        })
+        mock_data = pd.DataFrame(
+            {"ts_code": ["000001.SZ"], "trade_date": ["20240101"], "close": [10.5]}
+        )
         mock_tushare_pro.anns.return_value = mock_data
 
         result = await fetcher.get_announcements("000001.SZ", "20240101")
@@ -345,8 +360,7 @@ class TestTushareFetcher:
         assert isinstance(result, list)
         assert len(result) == 0
         mock_tushare_pro.anns.assert_called_once_with(
-            ts_code="000001.SZ",
-            ann_date="20240101"
+            ts_code="000001.SZ", ann_date="20240101"
         )
 
     @pytest.mark.asyncio
@@ -360,12 +374,13 @@ class TestTushareFetcher:
         assert isinstance(result, dict)
         assert len(result) == 0
         mock_tushare_pro.income.assert_called_once_with(
-            ts_code="000001.SZ",
-            period="20240101"
+            ts_code="000001.SZ", period="20240101"
         )
 
     @pytest.mark.asyncio
-    async def test_get_industry_classification_empty_data(self, fetcher, mock_tushare_pro):
+    async def test_get_industry_classification_empty_data(
+        self, fetcher, mock_tushare_pro
+    ):
         """测试获取行业分类数据时返回空数据的情况"""
         # 模拟返回空DataFrame
         mock_tushare_pro.stock_basic.return_value = pd.DataFrame()
@@ -375,8 +390,7 @@ class TestTushareFetcher:
         assert isinstance(result, dict)
         assert len(result) == 0
         mock_tushare_pro.stock_basic.assert_called_once_with(
-            ts_code="000001.SZ",
-            fields="ts_code,name,industry,area,market,list_date"
+            ts_code="000001.SZ", fields="ts_code,name,industry,area,market,list_date"
         )
 
     @pytest.mark.asyncio
@@ -389,9 +403,7 @@ class TestTushareFetcher:
 
         assert isinstance(result, list)
         assert len(result) == 0
-        mock_tushare_pro.concept_detail.assert_called_once_with(
-            ts_code="000001.SZ"
-        )
+        mock_tushare_pro.concept_detail.assert_called_once_with(ts_code="000001.SZ")
 
     @pytest.mark.asyncio
     async def test_get_market_data_empty_data(self, fetcher, mock_tushare_pro):
@@ -403,9 +415,7 @@ class TestTushareFetcher:
 
         assert isinstance(result, dict)
         assert len(result) == 0
-        mock_tushare_pro.daily_basic.assert_called_once_with(
-            trade_date="20240101"
-        )
+        mock_tushare_pro.daily_basic.assert_called_once_with(trade_date="20240101")
 
     def test_standardize_financial_data_empty_dataframe(self, fetcher):
         """测试标准化财务数据时处理空DataFrame的情况"""

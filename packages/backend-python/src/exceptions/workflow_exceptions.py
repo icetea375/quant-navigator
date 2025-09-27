@@ -11,6 +11,7 @@ class QuantDataProviderError(Exception):
 
     当数据加载,异常检测等数据相关操作失败时抛出
     """
+
     pass
 
 
@@ -20,6 +21,7 @@ class LLMServiceError(Exception):
 
     当LLM服务配置错误,连接失败等AI服务相关操作失败时抛出
     """
+
     pass
 
 
@@ -29,4 +31,5 @@ class ArbitrationWorkflowError(Exception):
 
     当仲裁工作流执行失败,案件创建失败等工作流相关操作失败时抛出
     """
+
     pass

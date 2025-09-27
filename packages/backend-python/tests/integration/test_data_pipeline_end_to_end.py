@@ -23,20 +23,14 @@ class TestDataPipelineEndToEnd:
     def mock_config(self):
         """创建模拟配置"""
         return {
-            "tushare": {
-                "token": "test_token",
-                "timeout": 30
-            },
-            "database": {
-                "url": "postgresql://test:test@localhost/test"
-            }
+            "tushare": {"token": "test_token", "timeout": 30},
+            "database": {"url": "postgresql://test:test@localhost/test"},
         }
 
     @pytest.fixture
     def tushare_fetcher(self, mock_config):
         """创建TushareFetcher实例"""
-        with patch("tushare.set_token"), \
-             patch("tushare.pro_api") as mock_pro_api:
+        with patch("tushare.set_token"), patch("tushare.pro_api") as mock_pro_api:
             mock_pro = mock_pro_api.return_value
             return TushareFetcher(token="test_token")
 
@@ -49,53 +43,61 @@ class TestDataPipelineEndToEnd:
     def sample_tushare_data(self):
         """创建模拟的Tushare原始数据"""
         return {
-            "stock_basic": [{
-                "ts_code": "000001.SZ",
-                "symbol": "000001",
-                "name": "平安银行",
-                "area": "深圳",
-                "industry": "银行",
-                "market": "主板",
-                "list_date": "19910403"
-            }],
-            "daily_basic": [{
-                "ts_code": "000001.SZ",
-                "trade_date": "20240101",
-                "close": 10.2,
-                "turnover_rate": 0.05,
-                "volume_ratio": 1.2,
-                "pe": 15.0,
-                "pe_ttm": 14.5,
-                "pb": 2.0,
-                "ps": 3.0,
-                "ps_ttm": 2.8,
-                "dv_ratio": 2.5,
-                "dv_ttm": 2.3,
-                "total_share": 1000000000,
-                "float_share": 800000000,
-                "free_share": 600000000,
-                "total_mv": 10000000000,
-                "circ_mv": 8000000000
-            }],
-            "daily": [{
-                "ts_code": "000001.SZ",
-                "trade_date": "20240101",
-                "open": 10.0,
-                "high": 10.5,
-                "low": 9.5,
-                "close": 10.2,
-                "pre_close": 10.0,
-                "change": 0.2,
-                "pct_chg": 2.0,
-                "vol": 1000000,
-                "amount": 10000000
-            }]
+            "stock_basic": [
+                {
+                    "ts_code": "000001.SZ",
+                    "symbol": "000001",
+                    "name": "平安银行",
+                    "area": "深圳",
+                    "industry": "银行",
+                    "market": "主板",
+                    "list_date": "19910403",
+                }
+            ],
+            "daily_basic": [
+                {
+                    "ts_code": "000001.SZ",
+                    "trade_date": "20240101",
+                    "close": 10.2,
+                    "turnover_rate": 0.05,
+                    "volume_ratio": 1.2,
+                    "pe": 15.0,
+                    "pe_ttm": 14.5,
+                    "pb": 2.0,
+                    "ps": 3.0,
+                    "ps_ttm": 2.8,
+                    "dv_ratio": 2.5,
+                    "dv_ttm": 2.3,
+                    "total_share": 1000000000,
+                    "float_share": 800000000,
+                    "free_share": 600000000,
+                    "total_mv": 10000000000,
+                    "circ_mv": 8000000000,
+                }
+            ],
+            "daily": [
+                {
+                    "ts_code": "000001.SZ",
+                    "trade_date": "20240101",
+                    "open": 10.0,
+                    "high": 10.5,
+                    "low": 9.5,
+                    "close": 10.2,
+                    "pre_close": 10.0,
+                    "change": 0.2,
+                    "pct_chg": 2.0,
+                    "vol": 1000000,
+                    "amount": 10000000,
+                }
+            ],
         }
 
     # ==================== 完整流程测试 ====================
 
     @pytest.mark.asyncio
-    async def test_complete_data_pipeline_flow(self, tushare_fetcher, data_pipeline_service, sample_tushare_data):
+    async def test_complete_data_pipeline_flow(
+        self, tushare_fetcher, data_pipeline_service, sample_tushare_data
+    ):
         """
         测试完整的数据管道流程：
         1. 从TushareFetcher获取数据
@@ -104,18 +106,26 @@ class TestDataPipelineEndToEnd:
         4. 保存到数据库
         """
         # 模拟DataPipelineService的Tushare API调用
-        with patch.object(data_pipeline_service.pro, "stock_basic") as mock_stock_basic, \
-             patch.object(data_pipeline_service.pro, "daily_basic") as mock_daily_basic, \
-             patch.object(data_pipeline_service.pro, "daily") as mock_daily:
-
+        with (
+            patch.object(data_pipeline_service.pro, "stock_basic") as mock_stock_basic,
+            patch.object(data_pipeline_service.pro, "daily_basic") as mock_daily_basic,
+            patch.object(data_pipeline_service.pro, "daily") as mock_daily,
+        ):
             # 设置模拟返回值
             import pandas as pd
-            mock_stock_basic.return_value = pd.DataFrame(sample_tushare_data["stock_basic"])
-            mock_daily_basic.return_value = pd.DataFrame(sample_tushare_data["daily_basic"])
+
+            mock_stock_basic.return_value = pd.DataFrame(
+                sample_tushare_data["stock_basic"]
+            )
+            mock_daily_basic.return_value = pd.DataFrame(
+                sample_tushare_data["daily_basic"]
+            )
             mock_daily.return_value = pd.DataFrame(sample_tushare_data["daily"])
 
             # 步骤1: 从TushareFetcher获取数据
-            raw_data = await data_pipeline_service.fetch_tushare_data("000001.SZ", "20240101")
+            raw_data = await data_pipeline_service.fetch_tushare_data(
+                "000001.SZ", "20240101"
+            )
 
             # 验证获取的数据结构
             assert "stock_basic" in raw_data
@@ -140,7 +150,11 @@ class TestDataPipelineEndToEnd:
             assert financial_factors["close_price"] == 10.2
 
             # 步骤3: 计算超级财务因子
-            super_factors = await data_pipeline_service.calculate_super_financial_factors(financial_factors)
+            super_factors = (
+                await data_pipeline_service.calculate_super_financial_factors(
+                    financial_factors
+                )
+            )
 
             # 验证超级财务因子计算
             assert "value_score" in super_factors
@@ -152,28 +166,38 @@ class TestDataPipelineEndToEnd:
             assert 0 <= super_factors["overall_score"] <= 100
 
             # 步骤4: 保存财务因子到数据库
-            save_result = await data_pipeline_service.save_financial_factors(financial_factors)
+            save_result = await data_pipeline_service.save_financial_factors(
+                financial_factors
+            )
             assert save_result is True
 
             # 步骤5: 保存超级财务因子到数据库
-            save_super_result = await data_pipeline_service.save_super_financial_factors(super_factors)
+            save_super_result = (
+                await data_pipeline_service.save_super_financial_factors(super_factors)
+            )
             assert save_super_result is True
 
     @pytest.mark.asyncio
-    async def test_data_pipeline_flow_with_empty_data(self, tushare_fetcher, data_pipeline_service):
+    async def test_data_pipeline_flow_with_empty_data(
+        self, tushare_fetcher, data_pipeline_service
+    ):
         """测试数据管道流程处理空数据的情况"""
         # 模拟返回空数据
-        with patch.object(data_pipeline_service.pro, "stock_basic") as mock_stock_basic, \
-             patch.object(data_pipeline_service.pro, "daily_basic") as mock_daily_basic, \
-             patch.object(data_pipeline_service.pro, "daily") as mock_daily:
-
+        with (
+            patch.object(data_pipeline_service.pro, "stock_basic") as mock_stock_basic,
+            patch.object(data_pipeline_service.pro, "daily_basic") as mock_daily_basic,
+            patch.object(data_pipeline_service.pro, "daily") as mock_daily,
+        ):
             import pandas as pd
+
             mock_stock_basic.return_value = pd.DataFrame()
             mock_daily_basic.return_value = pd.DataFrame()
             mock_daily.return_value = pd.DataFrame()
 
             # 获取空数据
-            raw_data = await data_pipeline_service.fetch_tushare_data("000001.SZ", "20240101")
+            raw_data = await data_pipeline_service.fetch_tushare_data(
+                "000001.SZ", "20240101"
+            )
 
             # 验证空数据处理
             assert "stock_basic" in raw_data
@@ -184,10 +208,14 @@ class TestDataPipelineEndToEnd:
             assert len(raw_data["daily"]) == 0
 
     @pytest.mark.asyncio
-    async def test_data_pipeline_flow_with_api_error(self, tushare_fetcher, data_pipeline_service):
+    async def test_data_pipeline_flow_with_api_error(
+        self, tushare_fetcher, data_pipeline_service
+    ):
         """测试数据管道流程处理API错误的情况"""
         # 模拟API错误
-        with patch.object(tushare_fetcher.pro, "stock_basic", side_effect=Exception("API调用失败")):
+        with patch.object(
+            tushare_fetcher.pro, "stock_basic", side_effect=Exception("API调用失败")
+        ):
             with pytest.raises(Exception) as exc_info:
                 await data_pipeline_service.fetch_tushare_data("000001.SZ", "20240101")
 
@@ -211,7 +239,9 @@ class TestDataPipelineEndToEnd:
     # ==================== 数据一致性测试 ====================
 
     @pytest.mark.asyncio
-    async def test_data_consistency_through_pipeline(self, data_pipeline_service, sample_tushare_data):
+    async def test_data_consistency_through_pipeline(
+        self, data_pipeline_service, sample_tushare_data
+    ):
         """测试数据在管道中的一致性"""
         # 模拟获取数据
         raw_data = sample_tushare_data
@@ -226,7 +256,9 @@ class TestDataPipelineEndToEnd:
         assert financial_factors["trade_date"] == "20240101"
 
         # 计算超级财务因子
-        super_factors = await data_pipeline_service.calculate_super_financial_factors(financial_factors)
+        super_factors = await data_pipeline_service.calculate_super_financial_factors(
+            financial_factors
+        )
 
         # 验证超级财务因子包含原始数据
         assert super_factors["stock_code"] == "000001.SZ"
@@ -237,7 +269,9 @@ class TestDataPipelineEndToEnd:
     # ==================== 性能测试 ====================
 
     @pytest.mark.asyncio
-    async def test_data_pipeline_performance(self, data_pipeline_service, sample_tushare_data):
+    async def test_data_pipeline_performance(
+        self, data_pipeline_service, sample_tushare_data
+    ):
         """测试数据管道的性能"""
         import time
 
@@ -248,9 +282,15 @@ class TestDataPipelineEndToEnd:
         financial_factors = await data_pipeline_service.extract_financial_factors(
             "000001.SZ", "20240101", raw_data
         )
-        super_factors = await data_pipeline_service.calculate_super_financial_factors(financial_factors)
-        save_result = await data_pipeline_service.save_financial_factors(financial_factors)
-        save_super_result = await data_pipeline_service.save_super_financial_factors(super_factors)
+        super_factors = await data_pipeline_service.calculate_super_financial_factors(
+            financial_factors
+        )
+        save_result = await data_pipeline_service.save_financial_factors(
+            financial_factors
+        )
+        save_super_result = await data_pipeline_service.save_super_financial_factors(
+            super_factors
+        )
 
         end_time = time.time()
 
@@ -266,7 +306,9 @@ class TestDataPipelineEndToEnd:
     # ==================== 错误恢复测试 ====================
 
     @pytest.mark.asyncio
-    async def test_data_pipeline_error_recovery(self, data_pipeline_service, sample_tushare_data):
+    async def test_data_pipeline_error_recovery(
+        self, data_pipeline_service, sample_tushare_data
+    ):
         """测试数据管道的错误恢复能力"""
         # 测试部分失败的情况
         raw_data = sample_tushare_data
@@ -277,7 +319,11 @@ class TestDataPipelineEndToEnd:
         )
 
         # 模拟保存失败
-        with patch.object(data_pipeline_service, "_persist_financial_factors", side_effect=Exception("数据库连接失败")):
+        with patch.object(
+            data_pipeline_service,
+            "_persist_financial_factors",
+            side_effect=Exception("数据库连接失败"),
+        ):
             with pytest.raises(Exception) as exc_info:
                 await data_pipeline_service.save_financial_factors(financial_factors)
 
@@ -295,26 +341,32 @@ class TestDataPipelineEndToEnd:
         tasks = []
         for i in range(5):
             task = data_pipeline_service.extract_financial_factors(
-                f"00000{i}.SZ", "20240101", {
-                    "daily_basic": [{
-                        "ts_code": f"00000{i}.SZ",
-                        "trade_date": "20240101",
-                        "pe": 15.0 + i,
-                        "pb": 2.0 + i * 0.1,
-                        "ps": 3.0 + i * 0.2,
-                        "dv_ratio": 2.5 + i * 0.1
-                    }],
-                    "daily": [{
-                        "ts_code": f"00000{i}.SZ",
-                        "trade_date": "20240101",
-                        "open": 10.0 + i,
-                        "high": 10.5 + i,
-                        "low": 9.5 + i,
-                        "close": 10.2 + i,
-                        "vol": 1000000 + i * 100000,
-                        "amount": 10000000 + i * 1000000
-                    }]
-                }
+                f"00000{i}.SZ",
+                "20240101",
+                {
+                    "daily_basic": [
+                        {
+                            "ts_code": f"00000{i}.SZ",
+                            "trade_date": "20240101",
+                            "pe": 15.0 + i,
+                            "pb": 2.0 + i * 0.1,
+                            "ps": 3.0 + i * 0.2,
+                            "dv_ratio": 2.5 + i * 0.1,
+                        }
+                    ],
+                    "daily": [
+                        {
+                            "ts_code": f"00000{i}.SZ",
+                            "trade_date": "20240101",
+                            "open": 10.0 + i,
+                            "high": 10.5 + i,
+                            "low": 9.5 + i,
+                            "close": 10.2 + i,
+                            "vol": 1000000 + i * 100000,
+                            "amount": 10000000 + i * 1000000,
+                        }
+                    ],
+                },
             )
             tasks.append(task)
 

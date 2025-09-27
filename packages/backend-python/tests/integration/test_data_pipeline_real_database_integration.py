@@ -113,13 +113,8 @@ class TestDataPipelineRealDatabaseIntegration:
     def mock_config(self, temp_db_path):
         """创建模拟配置"""
         return {
-            "tushare": {
-                "token": "test_token",
-                "timeout": 30
-            },
-            "database": {
-                "url": f"sqlite:///{temp_db_path}"
-            }
+            "tushare": {"token": "test_token", "timeout": 30},
+            "database": {"url": f"sqlite:///{temp_db_path}"},
         }
 
     @pytest.fixture
@@ -155,7 +150,7 @@ class TestDataPipelineRealDatabaseIntegration:
             "price_change": 0.2,
             "price_change_pct": 2.0,
             "volume": 1000000,
-            "amount": 10000000
+            "amount": 10000000,
         }
 
     @pytest.fixture
@@ -189,7 +184,7 @@ class TestDataPipelineRealDatabaseIntegration:
             "profitability_score": 50.0,
             "financial_health_score": 50.0,
             "overall_score": 42.5,
-            "calculated_at": "2024-01-01T10:00:00"
+            "calculated_at": "2024-01-01T10:00:00",
         }
 
     def _save_financial_factors_to_db(self, db_path: str, financial_factors: dict):
@@ -197,37 +192,40 @@ class TestDataPipelineRealDatabaseIntegration:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT OR REPLACE INTO financial_factors
             (stock_code, trade_date, pe_ratio, pb_ratio, ps_ratio, dividend_yield,
              market_cap, turnover_rate, volume_ratio, float_market_cap, total_shares,
              float_shares, free_shares, open_price, high_price, low_price, close_price,
              pre_close, price_change, price_change_pct, volume, amount)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            financial_factors["stock_code"],
-            financial_factors["trade_date"],
-            financial_factors["pe_ratio"],
-            financial_factors["pb_ratio"],
-            financial_factors["ps_ratio"],
-            financial_factors["dividend_yield"],
-            financial_factors["market_cap"],
-            financial_factors["turnover_rate"],
-            financial_factors["volume_ratio"],
-            financial_factors["float_market_cap"],
-            financial_factors["total_shares"],
-            financial_factors["float_shares"],
-            financial_factors["free_shares"],
-            financial_factors["open_price"],
-            financial_factors["high_price"],
-            financial_factors["low_price"],
-            financial_factors["close_price"],
-            financial_factors["pre_close"],
-            financial_factors["price_change"],
-            financial_factors["price_change_pct"],
-            financial_factors["volume"],
-            financial_factors["amount"]
-        ))
+        """,
+            (
+                financial_factors["stock_code"],
+                financial_factors["trade_date"],
+                financial_factors["pe_ratio"],
+                financial_factors["pb_ratio"],
+                financial_factors["ps_ratio"],
+                financial_factors["dividend_yield"],
+                financial_factors["market_cap"],
+                financial_factors["turnover_rate"],
+                financial_factors["volume_ratio"],
+                financial_factors["float_market_cap"],
+                financial_factors["total_shares"],
+                financial_factors["float_shares"],
+                financial_factors["free_shares"],
+                financial_factors["open_price"],
+                financial_factors["high_price"],
+                financial_factors["low_price"],
+                financial_factors["close_price"],
+                financial_factors["pre_close"],
+                financial_factors["price_change"],
+                financial_factors["price_change_pct"],
+                financial_factors["volume"],
+                financial_factors["amount"],
+            ),
+        )
 
         conn.commit()
         conn.close()
@@ -237,7 +235,8 @@ class TestDataPipelineRealDatabaseIntegration:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT OR REPLACE INTO super_financial_factors
             (stock_code, trade_date, pe_ratio, pb_ratio, ps_ratio, dividend_yield,
              market_cap, turnover_rate, volume_ratio, float_market_cap, total_shares,
@@ -246,36 +245,38 @@ class TestDataPipelineRealDatabaseIntegration:
              value_score, growth_score, profitability_score, financial_health_score,
              overall_score, calculated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            super_factors["stock_code"],
-            super_factors["trade_date"],
-            super_factors["pe_ratio"],
-            super_factors["pb_ratio"],
-            super_factors["ps_ratio"],
-            super_factors["dividend_yield"],
-            super_factors["market_cap"],
-            super_factors["turnover_rate"],
-            super_factors["volume_ratio"],
-            super_factors["float_market_cap"],
-            super_factors["total_shares"],
-            super_factors["float_shares"],
-            super_factors["free_shares"],
-            super_factors["open_price"],
-            super_factors["high_price"],
-            super_factors["low_price"],
-            super_factors["close_price"],
-            super_factors["pre_close"],
-            super_factors["price_change"],
-            super_factors["price_change_pct"],
-            super_factors["volume"],
-            super_factors["amount"],
-            super_factors["value_score"],
-            super_factors["growth_score"],
-            super_factors["profitability_score"],
-            super_factors["financial_health_score"],
-            super_factors["overall_score"],
-            super_factors["calculated_at"]
-        ))
+        """,
+            (
+                super_factors["stock_code"],
+                super_factors["trade_date"],
+                super_factors["pe_ratio"],
+                super_factors["pb_ratio"],
+                super_factors["ps_ratio"],
+                super_factors["dividend_yield"],
+                super_factors["market_cap"],
+                super_factors["turnover_rate"],
+                super_factors["volume_ratio"],
+                super_factors["float_market_cap"],
+                super_factors["total_shares"],
+                super_factors["float_shares"],
+                super_factors["free_shares"],
+                super_factors["open_price"],
+                super_factors["high_price"],
+                super_factors["low_price"],
+                super_factors["close_price"],
+                super_factors["pre_close"],
+                super_factors["price_change"],
+                super_factors["price_change_pct"],
+                super_factors["volume"],
+                super_factors["amount"],
+                super_factors["value_score"],
+                super_factors["growth_score"],
+                super_factors["profitability_score"],
+                super_factors["financial_health_score"],
+                super_factors["overall_score"],
+                super_factors["calculated_at"],
+            ),
+        )
 
         conn.commit()
         conn.close()
@@ -285,14 +286,17 @@ class TestDataPipelineRealDatabaseIntegration:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT stock_code, trade_date, pe_ratio, pb_ratio, ps_ratio, dividend_yield,
                    market_cap, turnover_rate, volume_ratio, float_market_cap, total_shares,
                    float_shares, free_shares, open_price, high_price, low_price, close_price,
                    pre_close, price_change, price_change_pct, volume, amount
             FROM financial_factors
             WHERE stock_code = ? AND trade_date = ?
-        """, (expected_data["stock_code"], expected_data["trade_date"]))
+        """,
+            (expected_data["stock_code"], expected_data["trade_date"]),
+        )
 
         result = cursor.fetchone()
         conn.close()
@@ -328,7 +332,8 @@ class TestDataPipelineRealDatabaseIntegration:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT stock_code, trade_date, pe_ratio, pb_ratio, ps_ratio, dividend_yield,
                    market_cap, turnover_rate, volume_ratio, float_market_cap, total_shares,
                    float_shares, free_shares, open_price, high_price, low_price, close_price,
@@ -337,7 +342,9 @@ class TestDataPipelineRealDatabaseIntegration:
                    overall_score, calculated_at
             FROM super_financial_factors
             WHERE stock_code = ? AND trade_date = ?
-        """, (expected_data["stock_code"], expected_data["trade_date"]))
+        """,
+            (expected_data["stock_code"], expected_data["trade_date"]),
+        )
 
         result = cursor.fetchone()
         conn.close()
@@ -360,26 +367,42 @@ class TestDataPipelineRealDatabaseIntegration:
 
     # ==================== 真实数据库集成测试 ====================
 
-    def test_save_financial_factors_to_real_database(self, data_pipeline_service, sample_financial_factors, setup_test_tables):
+    def test_save_financial_factors_to_real_database(
+        self, data_pipeline_service, sample_financial_factors, setup_test_tables
+    ):
         """测试将财务因子保存到真实数据库"""
         # 使用真实数据库保存
-        self._save_financial_factors_to_db(data_pipeline_service.db_path, sample_financial_factors)
+        self._save_financial_factors_to_db(
+            data_pipeline_service.db_path, sample_financial_factors
+        )
 
         # 验证数据是否正确保存
-        self._verify_financial_factors_in_db(data_pipeline_service.db_path, sample_financial_factors)
+        self._verify_financial_factors_in_db(
+            data_pipeline_service.db_path, sample_financial_factors
+        )
 
-    def test_save_super_financial_factors_to_real_database(self, data_pipeline_service, sample_super_financial_factors, setup_test_tables):
+    def test_save_super_financial_factors_to_real_database(
+        self, data_pipeline_service, sample_super_financial_factors, setup_test_tables
+    ):
         """测试将超级财务因子保存到真实数据库"""
         # 使用真实数据库保存
-        self._save_super_financial_factors_to_db(data_pipeline_service.db_path, sample_super_financial_factors)
+        self._save_super_financial_factors_to_db(
+            data_pipeline_service.db_path, sample_super_financial_factors
+        )
 
         # 验证数据是否正确保存
-        self._verify_super_financial_factors_in_db(data_pipeline_service.db_path, sample_super_financial_factors)
+        self._verify_super_financial_factors_in_db(
+            data_pipeline_service.db_path, sample_super_financial_factors
+        )
 
-    def test_database_constraints_and_uniqueness(self, data_pipeline_service, sample_financial_factors, setup_test_tables):
+    def test_database_constraints_and_uniqueness(
+        self, data_pipeline_service, sample_financial_factors, setup_test_tables
+    ):
         """测试数据库约束和唯一性"""
         # 第一次保存
-        self._save_financial_factors_to_db(data_pipeline_service.db_path, sample_financial_factors)
+        self._save_financial_factors_to_db(
+            data_pipeline_service.db_path, sample_financial_factors
+        )
 
         # 修改数据后再次保存（应该更新而不是插入）
         modified_data = sample_financial_factors.copy()
@@ -389,19 +412,28 @@ class TestDataPipelineRealDatabaseIntegration:
         self._save_financial_factors_to_db(data_pipeline_service.db_path, modified_data)
 
         # 验证数据已更新
-        self._verify_financial_factors_in_db(data_pipeline_service.db_path, modified_data)
+        self._verify_financial_factors_in_db(
+            data_pipeline_service.db_path, modified_data
+        )
 
         # 验证只有一条记录
         conn = sqlite3.connect(data_pipeline_service.db_path)
         cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM financial_factors WHERE stock_code = ? AND trade_date = ?",
-                      (sample_financial_factors["stock_code"], sample_financial_factors["trade_date"]))
+        cursor.execute(
+            "SELECT COUNT(*) FROM financial_factors WHERE stock_code = ? AND trade_date = ?",
+            (
+                sample_financial_factors["stock_code"],
+                sample_financial_factors["trade_date"],
+            ),
+        )
         count = cursor.fetchone()[0]
         conn.close()
 
         assert count == 1, "应该只有一条记录，因为使用了UNIQUE约束"
 
-    def test_database_transaction_rollback(self, data_pipeline_service, sample_financial_factors, setup_test_tables):
+    def test_database_transaction_rollback(
+        self, data_pipeline_service, sample_financial_factors, setup_test_tables
+    ):
         """测试数据库事务回滚"""
         conn = sqlite3.connect(data_pipeline_service.db_path)
         cursor = conn.cursor()
@@ -411,12 +443,19 @@ class TestDataPipelineRealDatabaseIntegration:
             cursor.execute("BEGIN TRANSACTION")
 
             # 插入数据
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO financial_factors
                 (stock_code, trade_date, pe_ratio, pb_ratio)
                 VALUES (?, ?, ?, ?)
-            """, (sample_financial_factors["stock_code"], sample_financial_factors["trade_date"],
-                  sample_financial_factors["pe_ratio"], sample_financial_factors["pb_ratio"]))
+            """,
+                (
+                    sample_financial_factors["stock_code"],
+                    sample_financial_factors["trade_date"],
+                    sample_financial_factors["pe_ratio"],
+                    sample_financial_factors["pb_ratio"],
+                ),
+            )
 
             # 故意引发错误
             cursor.execute("INSERT INTO non_existent_table VALUES (1)")
@@ -429,14 +468,21 @@ class TestDataPipelineRealDatabaseIntegration:
             # 验证数据未保存
             conn = sqlite3.connect(data_pipeline_service.db_path)
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM financial_factors WHERE stock_code = ? AND trade_date = ?",
-                          (sample_financial_factors["stock_code"], sample_financial_factors["trade_date"]))
+            cursor.execute(
+                "SELECT COUNT(*) FROM financial_factors WHERE stock_code = ? AND trade_date = ?",
+                (
+                    sample_financial_factors["stock_code"],
+                    sample_financial_factors["trade_date"],
+                ),
+            )
             count = cursor.fetchone()[0]
             conn.close()
 
             assert count == 0, "事务回滚后数据应该未保存"
 
-    def test_database_performance_with_multiple_records(self, data_pipeline_service, setup_test_tables):
+    def test_database_performance_with_multiple_records(
+        self, data_pipeline_service, setup_test_tables
+    ):
         """测试数据库性能（多条记录）"""
         import time
 
@@ -466,14 +512,16 @@ class TestDataPipelineRealDatabaseIntegration:
                 "price_change": 0.2,
                 "price_change_pct": 2.0,
                 "volume": 1000000 + i * 10000,
-                "amount": 10000000 + i * 100000
+                "amount": 10000000 + i * 100000,
             }
             self._save_financial_factors_to_db(data_pipeline_service.db_path, data)
 
         end_time = time.time()
 
         # 验证性能（100条记录应该在合理时间内完成）
-        assert (end_time - start_time) < 5.0, f"插入100条记录耗时过长: {end_time - start_time:.3f}秒"
+        assert (
+            end_time - start_time
+        ) < 5.0, f"插入100条记录耗时过长: {end_time - start_time:.3f}秒"
 
         # 验证数据完整性
         conn = sqlite3.connect(data_pipeline_service.db_path)
@@ -483,4 +531,3 @@ class TestDataPipelineRealDatabaseIntegration:
         conn.close()
 
         assert count == 100, f"应该插入100条记录，实际插入{count}条"
-

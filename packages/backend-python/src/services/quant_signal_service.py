@@ -42,7 +42,7 @@ class QuantSignalService:
         database_config = config.get("database", {})
         self.engine = create_engine(
             database_config.get("url", "sqlite:///:memory:"),
-            echo=database_config.get("echo", False)
+            echo=database_config.get("echo", False),
         )
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
@@ -58,7 +58,7 @@ class QuantSignalService:
         stock_code: str,
         trade_date: datetime,
         financial_factors: dict[str, Any],
-        price_data: list[dict[str, Any]]
+        price_data: list[dict[str, Any]],
     ) -> QuantSignal:
         """
         计算量化信号
@@ -83,15 +83,27 @@ class QuantSignalService:
 
             # 计算宏观和市场指标
             macro_risk_z_score = self._calculate_macro_risk_z_score(financial_factors)
-            market_style_z_score = self._calculate_market_style_z_score(financial_factors)
-            industry_rotation_z_score = self._calculate_industry_rotation_z_score(financial_factors)
+            market_style_z_score = self._calculate_market_style_z_score(
+                financial_factors
+            )
+            industry_rotation_z_score = self._calculate_industry_rotation_z_score(
+                financial_factors
+            )
             concept_z_score = self._calculate_concept_z_score(financial_factors)
 
             # 计算MDA相关指标
-            mda_fulfillment_rate = self._calculate_mda_fulfillment_rate(financial_factors)
-            management_credibility_score = self._calculate_management_credibility_score(financial_factors)
-            disclosure_quality_score = self._calculate_disclosure_quality_score(financial_factors)
-            financial_transparency_score = self._calculate_financial_transparency_score(financial_factors)
+            mda_fulfillment_rate = self._calculate_mda_fulfillment_rate(
+                financial_factors
+            )
+            management_credibility_score = self._calculate_management_credibility_score(
+                financial_factors
+            )
+            disclosure_quality_score = self._calculate_disclosure_quality_score(
+                financial_factors
+            )
+            financial_transparency_score = self._calculate_financial_transparency_score(
+                financial_factors
+            )
 
             # 计算技术指标
             rsi = self._calculate_rsi(price_data)
@@ -136,16 +148,18 @@ class QuantSignalService:
                 model_version="v1.0.0",
                 calculation_params={
                     "z_score_threshold": self.z_score_threshold,
-                    "lookback_days": self.lookback_days
+                    "lookback_days": self.lookback_days,
                 },
                 source="quant_signal_service",
                 metadata={
                     "calculated_at": datetime.now().isoformat(),
-                    "financial_factors": financial_factors
-                }
+                    "financial_factors": financial_factors,
+                },
             )
 
-            self.logger.info(f"量化信号计算完成: {stock_code}, 信号强度: {overall_signal_strength:.3f}")
+            self.logger.info(
+                f"量化信号计算完成: {stock_code}, 信号强度: {overall_signal_strength:.3f}"
+            )
             return quant_signal
 
         except Exception as e:
@@ -157,9 +171,11 @@ class QuantSignalService:
                 context={
                     "stock_code": stock_code,
                     "trade_date": trade_date.isoformat(),
-                    "financial_factors_keys": list(financial_factors.keys()) if financial_factors else [],
-                    "price_data_length": len(price_data) if price_data else 0
-                }
+                    "financial_factors_keys": list(financial_factors.keys())
+                    if financial_factors
+                    else [],
+                    "price_data_length": len(price_data) if price_data else 0,
+                },
             ) from e
 
     async def detect_anomalies(
@@ -167,7 +183,7 @@ class QuantSignalService:
         stock_code: str,
         trade_date: datetime,
         price_data: list[dict[str, Any]],
-        basic_data: list[dict[str, Any]]
+        basic_data: list[dict[str, Any]],
     ) -> list[AnomalyEvent]:
         """
         检测异常事件
@@ -193,21 +209,29 @@ class QuantSignalService:
             basic_info = basic_data[0]
 
             # 检测价格异常
-            price_anomaly = self._detect_price_anomaly(stock_code, trade_date, price_info)
+            price_anomaly = self._detect_price_anomaly(
+                stock_code, trade_date, price_info
+            )
             if price_anomaly:
                 anomalies.append(price_anomaly)
 
             # 检测成交量异常
-            volume_anomaly = self._detect_volume_anomaly(stock_code, trade_date, price_info, basic_info)
+            volume_anomaly = self._detect_volume_anomaly(
+                stock_code, trade_date, price_info, basic_info
+            )
             if volume_anomaly:
                 anomalies.append(volume_anomaly)
 
             # 检测波动率异常
-            volatility_anomaly = self._detect_volatility_anomaly(stock_code, trade_date, price_info)
+            volatility_anomaly = self._detect_volatility_anomaly(
+                stock_code, trade_date, price_info
+            )
             if volatility_anomaly:
                 anomalies.append(volatility_anomaly)
 
-            self.logger.info(f"异常检测完成: {stock_code}, 发现 {len(anomalies)} 个异常")
+            self.logger.info(
+                f"异常检测完成: {stock_code}, 发现 {len(anomalies)} 个异常"
+            )
             return anomalies
 
         except Exception as e:
@@ -220,8 +244,8 @@ class QuantSignalService:
                     "stock_code": stock_code,
                     "trade_date": trade_date.isoformat(),
                     "price_data_length": len(price_data) if price_data else 0,
-                    "basic_data_length": len(basic_data) if basic_data else 0
-                }
+                    "basic_data_length": len(basic_data) if basic_data else 0,
+                },
             ) from e
 
     async def save_quant_signal(self, quant_signal: QuantSignal) -> QuantSignalEntity:
@@ -257,12 +281,18 @@ class QuantSignalService:
                 entity="QuantSignal",
                 context={
                     "signal_id": quant_signal.signal_id if quant_signal else "unknown",
-                    "target_code": quant_signal.target_code if quant_signal else "unknown",
-                    "signal_type": quant_signal.signal_type.value if quant_signal and hasattr(quant_signal.signal_type, "value") else "unknown"
-                }
+                    "target_code": quant_signal.target_code
+                    if quant_signal
+                    else "unknown",
+                    "signal_type": quant_signal.signal_type.value
+                    if quant_signal and hasattr(quant_signal.signal_type, "value")
+                    else "unknown",
+                },
             ) from e
 
-    async def get_quant_signal_by_id(self, signal_id: str) -> Optional[QuantSignalEntity]:
+    async def get_quant_signal_by_id(
+        self, signal_id: str
+    ) -> Optional[QuantSignalEntity]:
         """
         根据ID获取量化信号
 
@@ -274,9 +304,11 @@ class QuantSignalService:
         """
         try:
             with self.Session() as session:
-                return session.query(QuantSignalEntity).filter(
-                    QuantSignalEntity.signal_id == signal_id
-                ).first()
+                return (
+                    session.query(QuantSignalEntity)
+                    .filter(QuantSignalEntity.signal_id == signal_id)
+                    .first()
+                )
 
         except Exception as e:
             self.logger.error(f"获取量化信号失败: {e}")
@@ -284,10 +316,7 @@ class QuantSignalService:
                 f"获取量化信号失败: {e}",
                 operation="query",
                 entity="QuantSignal",
-                context={
-                    "signal_id": signal_id,
-                    "query_type": "by_id"
-                }
+                context={"signal_id": signal_id, "query_type": "by_id"},
             ) from e
 
     def _calculate_return_z_score(self, price_data: list[dict[str, Any]]) -> float:
@@ -331,12 +360,16 @@ class QuantSignalService:
         # 简化实现
         return 0.0
 
-    def _calculate_market_style_z_score(self, financial_factors: dict[str, Any]) -> float:
+    def _calculate_market_style_z_score(
+        self, financial_factors: dict[str, Any]
+    ) -> float:
         """计算市场风格Z分数"""
         # 简化实现
         return 0.0
 
-    def _calculate_industry_rotation_z_score(self, financial_factors: dict[str, Any]) -> float:
+    def _calculate_industry_rotation_z_score(
+        self, financial_factors: dict[str, Any]
+    ) -> float:
         """计算行业轮动Z分数"""
         # 简化实现
         return 0.0
@@ -346,22 +379,30 @@ class QuantSignalService:
         # 简化实现
         return 0.0
 
-    def _calculate_mda_fulfillment_rate(self, financial_factors: dict[str, Any]) -> float:
+    def _calculate_mda_fulfillment_rate(
+        self, financial_factors: dict[str, Any]
+    ) -> float:
         """计算MDA履行率"""
         # 简化实现
         return 0.8
 
-    def _calculate_management_credibility_score(self, financial_factors: dict[str, Any]) -> float:
+    def _calculate_management_credibility_score(
+        self, financial_factors: dict[str, Any]
+    ) -> float:
         """计算管理层可信度分数"""
         # 简化实现
         return 0.7
 
-    def _calculate_disclosure_quality_score(self, financial_factors: dict[str, Any]) -> float:
+    def _calculate_disclosure_quality_score(
+        self, financial_factors: dict[str, Any]
+    ) -> float:
         """计算披露质量分数"""
         # 简化实现
         return 0.75
 
-    def _calculate_financial_transparency_score(self, financial_factors: dict[str, Any]) -> float:
+    def _calculate_financial_transparency_score(
+        self, financial_factors: dict[str, Any]
+    ) -> float:
         """计算财务透明度分数"""
         # 简化实现
         return 0.8
@@ -403,11 +444,7 @@ class QuantSignalService:
         return pct_chg / 5.0  # 简化的移动平均信号
 
     def _calculate_overall_signal_strength(
-        self,
-        return_z: float,
-        volume_z: float,
-        momentum_z: float,
-        volatility_z: float
+        self, return_z: float, volume_z: float, momentum_z: float, volatility_z: float
     ) -> float:
         """计算整体信号强度"""
         # 加权平均
@@ -418,9 +455,7 @@ class QuantSignalService:
         return min(max(weighted_sum / 2.0, -1.0), 1.0)  # 归一化到[-1, 1]
 
     def _calculate_signal_confidence(
-        self,
-        financial_factors: dict[str, Any],
-        price_data: list[dict[str, Any]]
+        self, financial_factors: dict[str, Any], price_data: list[dict[str, Any]]
     ) -> float:
         """计算信号置信度"""
         # 简化实现,基于数据完整性
@@ -434,13 +469,17 @@ class QuantSignalService:
 
         return min(confidence, 1.0)
 
-    def _detect_price_anomaly(self, stock_code: str, trade_date: datetime, price_info: dict[str, Any]) -> Optional[AnomalyEvent]:
+    def _detect_price_anomaly(
+        self, stock_code: str, trade_date: datetime, price_info: dict[str, Any]
+    ) -> Optional[AnomalyEvent]:
         """检测价格异常"""
         pct_chg = price_info.get("pct_chg", 0.0)
 
         if abs(pct_chg) > 10.0:  # 涨跌幅超过10%
             z_score = abs(pct_chg) / 3.0
-            severity = SeverityLevel.HIGH if abs(pct_chg) > 15.0 else SeverityLevel.MEDIUM
+            severity = (
+                SeverityLevel.HIGH if abs(pct_chg) > 15.0 else SeverityLevel.MEDIUM
+            )
 
             return AnomalyEvent(
                 id=f"anomaly_{stock_code}_{trade_date.strftime('%Y%m%d')}_price_{int(datetime.now().timestamp())}",
@@ -458,20 +497,28 @@ class QuantSignalService:
                     "market_state": "trading",
                     "sector_performance": 0.0,
                     "news_count": 0,
-                    "volume_ratio": 1.0
+                    "volume_ratio": 1.0,
                 },
-                metadata={"detection_method": "price_threshold"}
+                metadata={"detection_method": "price_threshold"},
             )
 
         return None
 
-    def _detect_volume_anomaly(self, stock_code: str, trade_date: datetime, price_info: dict[str, Any], basic_info: dict[str, Any]) -> Optional[AnomalyEvent]:
+    def _detect_volume_anomaly(
+        self,
+        stock_code: str,
+        trade_date: datetime,
+        price_info: dict[str, Any],
+        basic_info: dict[str, Any],
+    ) -> Optional[AnomalyEvent]:
         """检测成交量异常"""
         volume_ratio = basic_info.get("volume_ratio", 1.0)
 
         if volume_ratio > 3.0:  # 成交量比率超过3倍
             z_score = volume_ratio / 2.0
-            severity = SeverityLevel.HIGH if volume_ratio > 5.0 else SeverityLevel.MEDIUM
+            severity = (
+                SeverityLevel.HIGH if volume_ratio > 5.0 else SeverityLevel.MEDIUM
+            )
 
             return AnomalyEvent(
                 id=f"anomaly_{stock_code}_{trade_date.strftime('%Y%m%d')}_volume_{int(datetime.now().timestamp())}",
@@ -489,14 +536,16 @@ class QuantSignalService:
                     "market_state": "trading",
                     "sector_performance": 0.0,
                     "news_count": 0,
-                    "volume_ratio": volume_ratio
+                    "volume_ratio": volume_ratio,
                 },
-                metadata={"detection_method": "volume_threshold"}
+                metadata={"detection_method": "volume_threshold"},
             )
 
         return None
 
-    def _detect_volatility_anomaly(self, stock_code: str, trade_date: datetime, price_info: dict[str, Any]) -> Optional[AnomalyEvent]:
+    def _detect_volatility_anomaly(
+        self, stock_code: str, trade_date: datetime, price_info: dict[str, Any]
+    ) -> Optional[AnomalyEvent]:
         """检测波动率异常"""
         pct_chg = price_info.get("pct_chg", 0.0)
         volatility = abs(pct_chg)
@@ -521,9 +570,9 @@ class QuantSignalService:
                     "market_state": "trading",
                     "sector_performance": 0.0,
                     "news_count": 0,
-                    "volume_ratio": 1.0
+                    "volume_ratio": 1.0,
                 },
-                metadata={"detection_method": "volatility_threshold"}
+                metadata={"detection_method": "volatility_threshold"},
             )
 
         return None

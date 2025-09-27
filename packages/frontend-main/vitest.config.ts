@@ -11,6 +11,9 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts', './src/test/setup-canvas.ts', './src/test/setup-echarts-mock.ts'],
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
+    typecheck: {
+      tsconfig: './tsconfig.vitest.json'
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text'],

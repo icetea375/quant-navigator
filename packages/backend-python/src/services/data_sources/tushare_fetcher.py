@@ -57,10 +57,7 @@ class TushareFetcher(DataSourceInterface):
         """
         try:
             # 调用Tushare API获取数据
-            df = self.pro.daily(
-                ts_code=stock_code,
-                trade_date=trade_date
-            )
+            df = self.pro.daily(ts_code=stock_code, trade_date=trade_date)
 
             if df.empty:
                 self.logger.warning(f"未找到股票 {stock_code} 在 {trade_date} 的数据")
@@ -74,7 +71,9 @@ class TushareFetcher(DataSourceInterface):
             self.logger.error(f"获取日线行情失败: {e!s}")
             raise DataSourceError(f"获取日线行情失败: {e!s}") from e
 
-    async def get_announcements(self, stock_code: str, trade_date: str) -> list[dict[str, Any]]:
+    async def get_announcements(
+        self, stock_code: str, trade_date: str
+    ) -> list[dict[str, Any]]:
         """
         获取公司公告数据
 
@@ -87,10 +86,7 @@ class TushareFetcher(DataSourceInterface):
         """
         try:
             # 调用Tushare API获取公告数据
-            df = self.pro.anns(
-                ts_code=stock_code,
-                ann_date=trade_date
-            )
+            df = self.pro.anns(ts_code=stock_code, ann_date=trade_date)
 
             if df.empty:
                 self.logger.warning(f"未找到股票 {stock_code} 在 {trade_date} 的公告")
@@ -104,7 +100,9 @@ class TushareFetcher(DataSourceInterface):
             self.logger.error(f"获取公告数据失败: {e!s}")
             raise DataSourceError(f"获取公告数据失败: {e!s}") from e
 
-    async def get_financial_data(self, stock_code: str, report_date: str) -> dict[str, Any]:
+    async def get_financial_data(
+        self, stock_code: str, report_date: str
+    ) -> dict[str, Any]:
         """
         获取财务数据
 
@@ -117,17 +115,18 @@ class TushareFetcher(DataSourceInterface):
         """
         try:
             # 调用Tushare API获取财务数据
-            df = self.pro.income(
-                ts_code=stock_code,
-                period=report_date
-            )
+            df = self.pro.income(ts_code=stock_code, period=report_date)
 
             if df.empty:
-                self.logger.warning(f"未找到股票 {stock_code} 在 {report_date} 的财务数据")
+                self.logger.warning(
+                    f"未找到股票 {stock_code} 在 {report_date} 的财务数据"
+                )
                 return {}
 
             # 标准化数据格式
-            financial_data = self._standardize_financial_data(df, stock_code, report_date)
+            financial_data = self._standardize_financial_data(
+                df, stock_code, report_date
+            )
             return financial_data
 
         except Exception as e:
@@ -147,8 +146,7 @@ class TushareFetcher(DataSourceInterface):
         try:
             # 调用Tushare API获取行业分类数据
             df = self.pro.stock_basic(
-                ts_code=stock_code,
-                fields="ts_code,name,industry,area,market,list_date"
+                ts_code=stock_code, fields="ts_code,name,industry,area,market,list_date"
             )
 
             if df.empty:
@@ -163,7 +161,9 @@ class TushareFetcher(DataSourceInterface):
             self.logger.error(f"获取行业分类数据失败: {e!s}")
             raise DataSourceError(f"获取行业分类数据失败: {e!s}") from e
 
-    async def get_concept_data(self, stock_code: str, trade_date: str) -> list[dict[str, Any]]:
+    async def get_concept_data(
+        self, stock_code: str, trade_date: str
+    ) -> list[dict[str, Any]]:
         """
         获取概念板块数据
 
@@ -176,9 +176,7 @@ class TushareFetcher(DataSourceInterface):
         """
         try:
             # 调用Tushare API获取概念数据
-            df = self.pro.concept_detail(
-                ts_code=stock_code
-            )
+            df = self.pro.concept_detail(ts_code=stock_code)
 
             if df.empty:
                 self.logger.warning(f"未找到股票 {stock_code} 的概念数据")
@@ -204,9 +202,7 @@ class TushareFetcher(DataSourceInterface):
         """
         try:
             # 调用Tushare API获取市场数据
-            df = self.pro.daily_basic(
-                trade_date=trade_date
-            )
+            df = self.pro.daily_basic(trade_date=trade_date)
 
             if df.empty:
                 self.logger.warning(f"未找到 {trade_date} 的市场数据")
@@ -231,10 +227,7 @@ class TushareFetcher(DataSourceInterface):
             start_time = datetime.now()
 
             # 测试API连接
-            self.pro.stock_basic(
-                ts_code="000001.SZ",
-                fields="ts_code,name"
-            )
+            self.pro.stock_basic(ts_code="000001.SZ", fields="ts_code,name")
 
             end_time = datetime.now()
             response_time = (end_time - start_time).total_seconds() * 1000
@@ -244,7 +237,7 @@ class TushareFetcher(DataSourceInterface):
                 "response_time": response_time,
                 "last_success": end_time.isoformat(),
                 "error_count": 0,
-                "rate_limit_remaining": 999  # Tushare的限流信息需要额外获取
+                "rate_limit_remaining": 999,  # Tushare的限流信息需要额外获取
             }
 
         except Exception as e:
@@ -254,24 +247,30 @@ class TushareFetcher(DataSourceInterface):
                 "response_time": -1,
                 "last_success": None,
                 "error_count": 1,
-                "rate_limit_remaining": 0
+                "rate_limit_remaining": 0,
             }
 
-    def _standardize_daily_quotes(self, df: pd.DataFrame, stock_code: str, trade_date: str) -> pd.DataFrame:
+    def _standardize_daily_quotes(
+        self, df: pd.DataFrame, stock_code: str, trade_date: str
+    ) -> pd.DataFrame:
         """标准化日线行情数据格式"""
-        standardized_df = pd.DataFrame({
-            "stock_code": [stock_code] * len(df),
-            "trade_date": [trade_date] * len(df),
-            "open": df["open"],
-            "high": df["high"],
-            "low": df["low"],
-            "close": df["close"],
-            "volume": df["vol"],
-            "amount": df["amount"]
-        })
+        standardized_df = pd.DataFrame(
+            {
+                "stock_code": [stock_code] * len(df),
+                "trade_date": [trade_date] * len(df),
+                "open": df["open"],
+                "high": df["high"],
+                "low": df["low"],
+                "close": df["close"],
+                "volume": df["vol"],
+                "amount": df["amount"],
+            }
+        )
         return standardized_df
 
-    def _standardize_announcements(self, df: pd.DataFrame, stock_code: str, trade_date: str) -> list[dict[str, Any]]:
+    def _standardize_announcements(
+        self, df: pd.DataFrame, stock_code: str, trade_date: str
+    ) -> list[dict[str, Any]]:
         """标准化公告数据格式"""
         announcements = []
         for _, row in df.iterrows():
@@ -281,12 +280,14 @@ class TushareFetcher(DataSourceInterface):
                 "title": row.get("title", ""),
                 "content": row.get("content", ""),
                 "publish_date": row.get("ann_date", trade_date),
-                "announcement_type": row.get("ann_type", "unknown")
+                "announcement_type": row.get("ann_type", "unknown"),
             }
             announcements.append(announcement)
         return announcements
 
-    def _standardize_financial_data(self, df: pd.DataFrame, stock_code: str, report_date: str) -> dict[str, Any]:
+    def _standardize_financial_data(
+        self, df: pd.DataFrame, stock_code: str, report_date: str
+    ) -> dict[str, Any]:
         """标准化财务数据格式"""
         if df.empty:
             return {}
@@ -300,10 +301,12 @@ class TushareFetcher(DataSourceInterface):
             "total_assets": row.get("total_assets", 0),
             "total_liabilities": row.get("total_liab", 0),
             "roe": row.get("roe", 0),
-            "roa": row.get("roa", 0)
+            "roa": row.get("roa", 0),
         }
 
-    def _standardize_industry_classification(self, df: pd.DataFrame, stock_code: str) -> dict[str, Any]:
+    def _standardize_industry_classification(
+        self, df: pd.DataFrame, stock_code: str
+    ) -> dict[str, Any]:
         """标准化行业分类数据格式"""
         if df.empty:
             return {}
@@ -314,10 +317,12 @@ class TushareFetcher(DataSourceInterface):
             "industry_code": row.get("industry", ""),
             "industry_name": row.get("industry", ""),
             "industry_level": "level1",
-            "classification_source": "tushare"
+            "classification_source": "tushare",
         }
 
-    def _standardize_concept_data(self, df: pd.DataFrame, stock_code: str, trade_date: str) -> list[dict[str, Any]]:
+    def _standardize_concept_data(
+        self, df: pd.DataFrame, stock_code: str, trade_date: str
+    ) -> list[dict[str, Any]]:
         """标准化概念数据格式"""
         concepts = []
         for _, row in df.iterrows():
@@ -326,12 +331,14 @@ class TushareFetcher(DataSourceInterface):
                 "concept_code": row.get("concept_code", ""),
                 "concept_name": row.get("concept_name", ""),
                 "hot_rank": 0,  # Tushare概念数据中没有热度排名
-                "concept_source": "tushare"
+                "concept_source": "tushare",
             }
             concepts.append(concept)
         return concepts
 
-    def _standardize_market_data(self, df: pd.DataFrame, trade_date: str) -> dict[str, Any]:
+    def _standardize_market_data(
+        self, df: pd.DataFrame, trade_date: str
+    ) -> dict[str, Any]:
         """标准化市场数据格式"""
         if df.empty:
             return {}
@@ -348,5 +355,5 @@ class TushareFetcher(DataSourceInterface):
             "turnover_rate": avg_turnover_rate,
             "pe_ratio": avg_pe_ratio,
             "pb_ratio": avg_pb_ratio,
-            "market_sentiment": 0.5  # 需要额外的情绪分析
+            "market_sentiment": 0.5,  # 需要额外的情绪分析
         }

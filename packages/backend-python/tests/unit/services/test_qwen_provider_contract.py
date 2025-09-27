@@ -2,6 +2,7 @@
 QwenProvider 契约测试 - 符合《测试宪法》第3.0条
 用契约生成测试，而非修补硬编码Mock
 """
+
 import os
 import sys
 from unittest.mock import AsyncMock
@@ -22,6 +23,7 @@ class TestQwenProviderContract:
         """创建QwenProvider实例"""
         # 使用Mock避免复杂的依赖
         from unittest.mock import MagicMock
+
         provider = MagicMock()
         provider.chat_completion = AsyncMock()
         provider.generate_embeddings = AsyncMock()
@@ -42,36 +44,41 @@ class TestQwenProviderContract:
         # 使用契约生成的有效响应
         valid_response = {
             "output": {"text": "这是聊天回复"},
-            "usage": {"total_tokens": 150}
+            "usage": {"total_tokens": 150},
         }
 
         # 验证响应符合契约
-        assert contract_validator.validate_response(valid_response, "chat_completion") == True
+        assert (
+            contract_validator.validate_response(valid_response, "chat_completion")
+            == True
+        )
 
-    def test_generate_embeddings_contract_validation(self, provider, valid_embeddings_response):
+    def test_generate_embeddings_contract_validation(
+        self, provider, valid_embeddings_response
+    ):
         """测试嵌入向量生成契约验证"""
         # 使用契约生成的有效响应
         valid_response = {
-            "output": {
-                "embeddings": [
-                    {"embedding": [0.1, 0.2, 0.3], "text_index": 0}
-                ]
-            },
-            "usage": {"total_tokens": 20}
+            "output": {"embeddings": [{"embedding": [0.1, 0.2, 0.3], "text_index": 0}]},
+            "usage": {"total_tokens": 20},
         }
 
         # 验证响应符合契约
-        assert contract_validator.validate_response(valid_response, "generate_embeddings") == True
+        assert (
+            contract_validator.validate_response(valid_response, "generate_embeddings")
+            == True
+        )
 
     def test_invalid_response_raises_error(self, provider):
         """测试无效响应抛出错误"""
         # 不符合契约的响应
-        invalid_response = {
-            "invalid": "response"
-        }
+        invalid_response = {"invalid": "response"}
 
         # 验证响应不符合契约
-        assert contract_validator.validate_response(invalid_response, "chat_completion") == False
+        assert (
+            contract_validator.validate_response(invalid_response, "chat_completion")
+            == False
+        )
 
     def test_contract_schemas_loaded(self):
         """测试契约文件已正确加载"""
@@ -84,14 +91,15 @@ class TestQwenProviderContract:
 
     def test_contract_validation_works(self):
         """测试契约验证功能"""
-        valid_response = {
-            "output": {"text": "测试"},
-            "usage": {"total_tokens": 10}
-        }
+        valid_response = {"output": {"text": "测试"}, "usage": {"total_tokens": 10}}
 
-        invalid_response = {
-            "invalid": "response"
-        }
+        invalid_response = {"invalid": "response"}
 
-        assert contract_validator.validate_response(valid_response, "chat_completion") == True
-        assert contract_validator.validate_response(invalid_response, "chat_completion") == False
+        assert (
+            contract_validator.validate_response(valid_response, "chat_completion")
+            == True
+        )
+        assert (
+            contract_validator.validate_response(invalid_response, "chat_completion")
+            == False
+        )

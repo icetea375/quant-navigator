@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import ArbitrationDashboard from '@/components/admin/ArbitrationDashboard.vue'
+import ArbitrationDashboard from '../ArbitrationDashboard.vue'
 import { useArbitrationStore } from '@/stores/arbitration'
 import { mockElementPlusComponents } from '@/utils/test-utils'
 import type { ArbitrationCaseInfo, ArbitrationCaseData } from '@/types/arbitration'
@@ -23,6 +23,35 @@ const createTestWrapper = (component: any, options = {}) => {
 describe('ArbitrationDashboard - 容器组件集成测试', () => {
   let wrapper: any
   let arbitrationStore: any
+  let pinia: any
+
+  beforeEach(() => {
+    // 创建新的Pinia实例
+    pinia = createPinia()
+    setActivePinia(pinia)
+
+    // 创建包装器
+    wrapper = createTestWrapper(ArbitrationDashboard, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          ...mockElementPlusComponents(),
+          'v-chart': { template: '<div class="v-chart-mock"></div>' }
+        }
+      }
+    })
+
+    // 获取Store实例
+    arbitrationStore = useArbitrationStore()
+
+    // 重置 store 状态
+    arbitrationStore.cases = []
+    arbitrationStore.currentCaseId = null
+    arbitrationStore.caseData = null
+    arbitrationStore.loading = false
+    arbitrationStore.error = null
+    arbitrationStore.maximizedPanel = null
+  })
 
   const mockCases: ArbitrationCaseInfo[] = [
     {
@@ -50,69 +79,124 @@ describe('ArbitrationDashboard - 容器组件集成测试', () => {
   ]
 
   const mockCaseData: ArbitrationCaseData = {
-    case_id: 'case-001',
-    report_type: 'anomaly',
-    target_code: '000001',
-    qwen_analysis: {
-      analysis: '测试分析内容',
-      confidence: 0.85,
-      reasoning: '测试推理过程'
+    caseInfo: {
+      caseId: 'case-001',
+      stockCode: '000001',
+      stockName: '平安银行',
+      reportDate: '2024-01-15',
+      reportType: 'anomaly',
+      status: 'pending' as const,
+      priority: 0.7,
+      createdAt: '2024-01-15T09:00:00Z',
+      updatedAt: '2024-01-15T09:00:00Z'
     },
-    doubao_analysis: {
-      sentiment: 'positive',
-      score: 0.8,
-      reasoning: '测试情感分析'
+    aiDebate: {
+      reportId: 'report-1',
+      reportType: 'anomaly',
+      title: '测试报告标题',
+      summary: '测试报告摘要',
+      content: '测试报告内容',
+      confidenceScore: 0.85,
+      qualityScore: 0.8,
+      modelUsed: 'qwen-doubao',
+      version: '1.0',
+      keyFindings: ['测试发现1', '测试发现2'],
+      riskFactors: ['风险因素1', '风险因素2'],
+      createdAt: '2024-01-15T09:00:00Z',
+      updatedAt: '2024-01-15T09:00:00Z'
     },
-    disagreement_score: 0.3,
-    status: 'pending',
-    consensus_summary: '测试共识摘要',
-    conflict_summary: '测试冲突摘要',
-    priority_score: 0.7,
-    created_at: '2024-01-15T09:00:00Z',
-    updated_at: '2024-01-15T09:00:00Z',
     panels: {
       rawTextExplorer: [],
       financialSnapshot: [],
       quantSignalDashboard: [],
       flowAndChipsViewer: {
         moneyFlow: {
+          flowId: 'test-flow-1',
+          stockCode: '000001',
+          flowDate: '2024-01-01',
+          flowType: 'main_force',
+          flowDirection: 'inflow',
           netAmount: 0,
+          buyAmount: 0,
+          sellAmount: 0,
+          totalAmount: 0,
           netInflowRatio: 0,
+          mainForceRatio: 0,
+          retailRatio: 0,
+          flowIntensity: 0,
+          flowAnomalyScore: 0,
+          flowTrend: 0,
+          avgNetInflow5d: 0,
+          avgNetInflow10d: 0,
+          avgNetInflow20d: 0,
+          changeVs5dAvg: 0,
+          changeVs10dAvg: 0,
+          changeVs20dAvg: 0,
+          currentPrice: 0,
+          costRangeLower: 0,
+          costRangeUpper: 0,
+          mainChipPeak: 0,
+          chipConcentration: 0,
+          dataSource: 'test',
+          dataUpdatedAt: '2024-01-01',
           superLargeNetInflow: 0,
           largeNetInflow: 0,
           mediumNetInflow: 0,
-          smallNetInflow: 0
+          smallNetInflow: 0,
+          mainInflow: 0,
+          retailInflow: 0,
+          institutionalInflow: 0
         },
         topList: [],
-        chipDistribution: {
+        chipDistribution: [{
+          distributionId: 'test-dist-1',
+          stockCode: '000001',
+          distributionDate: '2024-01-01',
+          distributionType: 'cost_distribution',
+          chipStatus: 'active',
+          priceLower: 0,
+          priceUpper: 0,
+          priceMedian: 0,
+          chipQuantity: 0,
+          chipRatio: 0,
+          chipAmount: 0,
+          chipAmountRatio: 0,
+          averageCost: 0,
+          costConcentration: 0,
+          costDispersion: 0,
+          currentPrice: 0,
+          profitLossRatio: 0,
+          profitLossAmount: 0,
+          profitLossStatus: 'neutral',
+          chipInflow: 0,
+          chipOutflow: 0,
+          netChipFlow: 0,
+          chipFlowIntensity: 0,
+          changeVs5d: 0,
+          changeVs10d: 0,
+          changeVs20d: 0,
+          changeVsHistorical: 0,
+          distributionStd: 0,
+          distributionSkewness: 0,
+          distributionKurtosis: 0,
+          modelVersion: '1.0',
+          calculationParams: {},
+          dataSource: 'test',
+          dataUpdatedAt: '2024-01-01',
           high_cost_ratio: 0,
           medium_cost_ratio: 0,
           low_cost_ratio: 0,
           avg_cost: 0,
           cost_concentration: 0
-        }
+        }]
       },
       precedentViewer: []
     }
   }
 
-  beforeEach(() => {
-    setActivePinia(createPinia())
-    arbitrationStore = useArbitrationStore()
-
-    // 重置 store 状态 - 使用 store 的方法而不是直接赋值
-    arbitrationStore.cases = []
-    arbitrationStore.currentCaseId = null
-    arbitrationStore.caseData = null
-    arbitrationStore.loading = false
-    arbitrationStore.error = null
-    arbitrationStore.maximizedPanel = null
-  })
 
   describe('状态流测试 - Store状态到UI的传递', () => {
     it('应该正确传递加载状态到子组件', async () => {
-      wrapper = createTestWrapper(ArbitrationDashboard)
-
       // 等待组件更新
       await wrapper.vm.$nextTick()
 

@@ -12,22 +12,22 @@ jobs:
   update-docs-index:
     name: Update Documentation Index
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      
+
       - name: Update documentation index
         run: |
           python3 scripts/update_docs_index.py
-      
+
       - name: Check for changes
         id: verify-changed-files
         run: |
@@ -36,7 +36,7 @@ jobs:
           else
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Commit changes
         if: steps.verify-changed-files.outputs.changed == 'true'
         run: |
@@ -45,7 +45,7 @@ jobs:
           git add docs/README.md
           git commit -m "docs: auto-update documentation index [skip ci]"
           git push
-      
+
       - name: Summary
         run: |
           echo "## 📚 Documentation Index Update" >> $GITHUB_STEP_SUMMARY

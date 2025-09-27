@@ -64,9 +64,7 @@ class SimpleWorkflowService:
             self.logger.error(f"日常分析工作流失败: {workflow_id}, 错误: {e}")
             raise
 
-    async def run_historical_backfill(
-        self, start_date: str, end_date: str
-    ) -> str:
+    async def run_historical_backfill(self, start_date: str, end_date: str) -> str:
         """运行历史数据回填工作流"""
         workflow_id = f"backfill_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 

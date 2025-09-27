@@ -3,7 +3,6 @@ DataPipelineService 同步单元测试
 实施测试金字塔原则 - 大量快速单元测试
 """
 
-
 import pytest
 
 from src.services.data_pipeline_service import DataPipelineService
@@ -17,7 +16,7 @@ class TestDataPipelineServiceSync:
         """创建服务实例"""
         config = {
             "tushare": {"token": "test_token"},
-            "data_pipeline": {"batch_size": 100}
+            "data_pipeline": {"batch_size": 100},
         }
         return DataPipelineService(config)
 
@@ -51,7 +50,9 @@ class TestDataPipelineServiceSync:
         score = service._calculate_value_score(15.0, 1.5, 1.5, 2.0)
         assert score == 80.0  # 20 + 20 + 25 + 15
 
-    def test_should_calculate_value_score_correctly_for_excellent_dividend_yield(self, service):
+    def test_should_calculate_value_score_correctly_for_excellent_dividend_yield(
+        self, service
+    ):
         """测试:应该为优秀的股息率计算正确的价值评分"""
         # PE in [10,20) 得到20分, PB in [1,2) 得到20分, PS in [2,5) 得到20分, 股息率 >= 5% 得到25分
         score = service._calculate_value_score(15.0, 1.5, 3.0, 6.0)
@@ -86,7 +87,9 @@ class TestDataPipelineServiceSync:
         score = service._calculate_profitability_score(factors)
         assert score == 50.0
 
-    def test_should_calculate_financial_health_score_returns_default_value(self, service):
+    def test_should_calculate_financial_health_score_returns_default_value(
+        self, service
+    ):
         """测试:财务健康度评分计算应该返回默认值"""
         factors = {"test": "data"}
         score = service._calculate_financial_health_score(factors)
@@ -99,7 +102,7 @@ class TestDataPipelineServiceSync:
             "pe_ratio": 8.0,
             "pb_ratio": 0.8,
             "ps_ratio": 1.5,
-            "dividend_yield": 4.0
+            "dividend_yield": 4.0,
         }
 
         result = await service.calculate_super_financial_factors(financial_factors)
@@ -126,7 +129,7 @@ class TestDataPipelineServiceSync:
             "pb_ratio": 0.8,
             "ps_ratio": 1.5,
             "dividend_yield": 4.0,
-            "custom_field": "test_value"
+            "custom_field": "test_value",
         }
 
         result = await service.calculate_super_financial_factors(financial_factors)
@@ -150,7 +153,9 @@ class TestDataPipelineServiceSync:
         assert result["overall_score"] == 58.75
 
     @pytest.mark.asyncio
-    async def test_should_handle_missing_required_fields_in_financial_factors(self, service):
+    async def test_should_handle_missing_required_fields_in_financial_factors(
+        self, service
+    ):
         """测试:应该优雅地处理缺少必需字段的财务因子"""
         financial_factors = {"pe_ratio": 8.0}  # 缺少其他字段
 

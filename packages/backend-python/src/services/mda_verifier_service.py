@@ -13,6 +13,7 @@ from src.core.interfaces import LlmProviderInterface
 @dataclass
 class Commitment:
     """承诺数据类"""
+
     id: str
     content: str
     category: str  # 财务承诺,战略承诺,风险承诺等
@@ -24,6 +25,7 @@ class Commitment:
 @dataclass
 class VerificationResult:
     """验证结果数据类"""
+
     commitment_id: str
     is_fulfilled: bool
     fulfillment_rate: float  # 0-1之间的履行率
@@ -35,6 +37,7 @@ class VerificationResult:
 @dataclass
 class InformationDensity:
     """信息密度数据类"""
+
     total_commitments: int
     fulfilled_commitments: int
     fulfillment_rate: float
@@ -60,7 +63,7 @@ class MDAVerifierService:
             "财务承诺": ["预计", "计划", "目标", "承诺", "预期", "将实现", "力争"],
             "战略承诺": ["战略", "规划", "发展方向", "重点", "核心", "布局"],
             "风险承诺": ["风险", "挑战", "应对", "措施", "防范", "控制"],
-            "运营承诺": ["运营", "管理", "提升", "优化", "改进", "加强"]
+            "运营承诺": ["运营", "管理", "提升", "优化", "改进", "加强"],
         }
 
     async def extract_commitments(self, mda_text: str) -> list[Commitment]:
@@ -80,10 +83,7 @@ class MDAVerifierService:
             prompt = self._build_commitment_extraction_prompt(mda_text)
 
             response = await self.llm_provider.generate_text(
-                prompt=prompt,
-                model="qwen-plus",
-                max_tokens=2000,
-                temperature=0.1
+                prompt=prompt, model="qwen-plus", max_tokens=2000, temperature=0.1
             )
 
             # 解析LLM响应
@@ -97,9 +97,7 @@ class MDAVerifierService:
             return []
 
     async def verify_commitments(
-        self,
-        commitments: list[Commitment],
-        current_data: dict[str, Any]
+        self, commitments: list[Commitment], current_data: dict[str, Any]
     ) -> list[VerificationResult]:
         """
         验证承诺履行情况
@@ -121,10 +119,7 @@ class MDAVerifierService:
                 prompt = self._build_verification_prompt(commitment, current_data)
 
                 response = await self.llm_provider.generate_text(
-                    prompt=prompt,
-                    model="qwen-plus",
-                    max_tokens=1000,
-                    temperature=0.1
+                    prompt=prompt, model="qwen-plus", max_tokens=1000, temperature=0.1
                 )
 
                 # 解析验证结果
@@ -134,14 +129,16 @@ class MDAVerifierService:
             except Exception as e:
                 self.logger.error(f"验证承诺 {commitment.id} 失败: {e}")
                 # 创建默认的失败结果
-                verification_results.append(VerificationResult(
-                    commitment_id=commitment.id,
-                    is_fulfilled=False,
-                    fulfillment_rate=0.0,
-                    evidence=[],
-                    confidence=0.0,
-                    reasoning="验证过程中发生错误"
-                ))
+                verification_results.append(
+                    VerificationResult(
+                        commitment_id=commitment.id,
+                        is_fulfilled=False,
+                        fulfillment_rate=0.0,
+                        evidence=[],
+                        confidence=0.0,
+                        reasoning="验证过程中发生错误",
+                    )
+                )
 
         self.logger.info(f"完成验证,成功验证 {len(verification_results)} 个承诺")
         return verification_results
@@ -149,7 +146,7 @@ class MDAVerifierService:
     async def calculate_information_density(
         self,
         commitments: list[Commitment],
-        verification_results: list[VerificationResult]
+        verification_results: list[VerificationResult],
     ) -> InformationDensity:
         """
         计算信息密度
@@ -165,15 +162,21 @@ class MDAVerifierService:
 
         try:
             total_commitments = len(commitments)
-            fulfilled_commitments = sum(1 for result in verification_results if result.is_fulfilled)
+            fulfilled_commitments = sum(
+                1 for result in verification_results if result.is_fulfilled
+            )
             fulfillment_rate = fulfilled_commitments / max(total_commitments, 1)
 
             # 计算信息丰富度(基于承诺数量和类别多样性)
-            category_diversity = len({commitment.category for commitment in commitments})
+            category_diversity = len(
+                {commitment.category for commitment in commitments}
+            )
             information_richness = min(category_diversity / 4.0, 1.0)  # 最多4个类别
 
             # 计算清晰度分数(基于承诺内容的平均置信度)
-            avg_confidence = sum(commitment.confidence for commitment in commitments) / max(total_commitments, 1)
+            avg_confidence = sum(
+                commitment.confidence for commitment in commitments
+            ) / max(total_commitments, 1)
             clarity_score = avg_confidence
 
             density = InformationDensity(
@@ -181,10 +184,12 @@ class MDAVerifierService:
                 fulfilled_commitments=fulfilled_commitments,
                 fulfillment_rate=fulfillment_rate,
                 information_richness=information_richness,
-                clarity_score=clarity_score
+                clarity_score=clarity_score,
             )
 
-            self.logger.info(f"信息密度计算完成: 履行率={fulfillment_rate:.2f}, 丰富度={information_richness:.2f}")
+            self.logger.info(
+                f"信息密度计算完成: 履行率={fulfillment_rate:.2f}, 丰富度={information_richness:.2f}"
+            )
             return density
 
         except Exception as e:
@@ -194,7 +199,7 @@ class MDAVerifierService:
                 fulfilled_commitments=0,
                 fulfillment_rate=0.0,
                 information_richness=0.0,
-                clarity_score=0.0
+                clarity_score=0.0,
             )
 
     def _build_commitment_extraction_prompt(self, mda_text: str) -> str:
@@ -226,7 +231,9 @@ MD&A文本:
 }}
 """
 
-    def _build_verification_prompt(self, commitment: Commitment, current_data: dict[str, Any]) -> str:
+    def _build_verification_prompt(
+        self, commitment: Commitment, current_data: dict[str, Any]
+    ) -> str:
         """构建承诺验证提示词"""
         return f"""
 请验证以下管理层承诺的履行情况,基于提供的当前数据。
@@ -248,10 +255,13 @@ MD&A文本:
 }}
 """
 
-    def _parse_commitment_response(self, response: str, mda_text: str) -> list[Commitment]:
+    def _parse_commitment_response(
+        self, response: str, mda_text: str
+    ) -> list[Commitment]:
         """解析承诺提取响应"""
         try:
             import json
+
             data = json.loads(response)
             commitments = []
 
@@ -262,7 +272,7 @@ MD&A文本:
                     category=item.get("category", "未知"),
                     confidence=float(item.get("confidence", 0.5)),
                     source_text=item.get("source_text", ""),
-                    position=tuple(item.get("position", [0, 0]))
+                    position=tuple(item.get("position", [0, 0])),
                 )
                 commitments.append(commitment)
 
@@ -272,10 +282,13 @@ MD&A文本:
             self.logger.error(f"解析承诺响应失败: {e}")
             return []
 
-    def _parse_verification_response(self, response: str, commitment: Commitment) -> VerificationResult:
+    def _parse_verification_response(
+        self, response: str, commitment: Commitment
+    ) -> VerificationResult:
         """解析验证响应"""
         try:
             import json
+
             data = json.loads(response)
 
             return VerificationResult(
@@ -284,7 +297,7 @@ MD&A文本:
                 fulfillment_rate=float(data.get("fulfillment_rate", 0.0)),
                 evidence=data.get("evidence", []),
                 confidence=float(data.get("confidence", 0.0)),
-                reasoning=data.get("reasoning", "")
+                reasoning=data.get("reasoning", ""),
             )
 
         except Exception as e:
@@ -295,5 +308,5 @@ MD&A文本:
                 fulfillment_rate=0.0,
                 evidence=[],
                 confidence=0.0,
-                reasoning="解析响应时发生错误"
+                reasoning="解析响应时发生错误",
             )

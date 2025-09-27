@@ -13,6 +13,7 @@ from .base import BaseEntity
 
 class QuantSignalEntity(BaseEntity):
     """量化信号实体类"""
+
     __tablename__ = "quant_signals"
 
     # 基本信息
@@ -34,9 +35,13 @@ class QuantSignalEntity(BaseEntity):
 
     # MDA相关指标
     mda_fulfillment_rate = Column(Float, nullable=False, comment="MDA履行率")
-    management_credibility_score = Column(Float, nullable=False, comment="管理层可信度分数")
+    management_credibility_score = Column(
+        Float, nullable=False, comment="管理层可信度分数"
+    )
     disclosure_quality_score = Column(Float, nullable=False, comment="披露质量分数")
-    financial_transparency_score = Column(Float, nullable=False, comment="财务透明度分数")
+    financial_transparency_score = Column(
+        Float, nullable=False, comment="财务透明度分数"
+    )
 
     # 技术指标
     rsi = Column(Float, nullable=False, comment="RSI指标")
@@ -57,17 +62,44 @@ class QuantSignalEntity(BaseEntity):
 
     # 添加约束
     __table_args__ = (
-        CheckConstraint("mda_fulfillment_rate >= 0 AND mda_fulfillment_rate <= 1", name="check_mda_fulfillment_range"),
-        CheckConstraint("management_credibility_score >= 0 AND management_credibility_score <= 1", name="check_management_credibility_range"),
-        CheckConstraint("disclosure_quality_score >= 0 AND disclosure_quality_score <= 1", name="check_disclosure_quality_range"),
-        CheckConstraint("financial_transparency_score >= 0 AND financial_transparency_score <= 1", name="check_financial_transparency_range"),
+        CheckConstraint(
+            "mda_fulfillment_rate >= 0 AND mda_fulfillment_rate <= 1",
+            name="check_mda_fulfillment_range",
+        ),
+        CheckConstraint(
+            "management_credibility_score >= 0 AND management_credibility_score <= 1",
+            name="check_management_credibility_range",
+        ),
+        CheckConstraint(
+            "disclosure_quality_score >= 0 AND disclosure_quality_score <= 1",
+            name="check_disclosure_quality_range",
+        ),
+        CheckConstraint(
+            "financial_transparency_score >= 0 AND financial_transparency_score <= 1",
+            name="check_financial_transparency_range",
+        ),
         CheckConstraint("rsi >= 0 AND rsi <= 100", name="check_rsi_range"),
-        CheckConstraint("bollinger_position >= 0 AND bollinger_position <= 1", name="check_bollinger_position_range"),
-        CheckConstraint("overall_signal_strength >= -1 AND overall_signal_strength <= 1", name="check_signal_strength_range"),
-        CheckConstraint("signal_confidence >= 0 AND signal_confidence <= 1", name="check_signal_confidence_range"),
+        CheckConstraint(
+            "bollinger_position >= 0 AND bollinger_position <= 1",
+            name="check_bollinger_position_range",
+        ),
+        CheckConstraint(
+            "overall_signal_strength >= -1 AND overall_signal_strength <= 1",
+            name="check_signal_strength_range",
+        ),
+        CheckConstraint(
+            "signal_confidence >= 0 AND signal_confidence <= 1",
+            name="check_signal_confidence_range",
+        ),
         CheckConstraint("validity_days > 0", name="check_validity_days_positive"),
-        CheckConstraint('signal_type IN ("individual", "market", "macro", "style", "industry")', name="check_signal_type"),
-        CheckConstraint('status IN ("active", "expired", "cancelled", "archived")', name="check_signal_status"),
+        CheckConstraint(
+            'signal_type IN ("individual", "market", "macro", "style", "industry")',
+            name="check_signal_type",
+        ),
+        CheckConstraint(
+            'status IN ("active", "expired", "cancelled", "archived")',
+            name="check_signal_status",
+        ),
     )
 
     def __init__(self, **kwargs):
@@ -114,7 +146,7 @@ class QuantSignalEntity(BaseEntity):
             "model_version": self.model_version,
             "calculation_params": self.calculation_params_json or {},
             "source": self.source,
-            "metadata": self.metadata_json or {}
+            "metadata": self.metadata_json or {},
         }
         return QuantSignal(**data)
 
@@ -151,7 +183,7 @@ class QuantSignalEntity(BaseEntity):
             model_version=data["model_version"],
             calculation_params_json=data["calculation_params"],
             source=data["source"],
-            metadata_json=data["metadata"]
+            metadata_json=data["metadata"],
         )
 
     def __repr__(self):

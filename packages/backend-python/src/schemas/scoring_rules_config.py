@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field, field_validator
 
 class ScoringRule(BaseModel):
     """单个评分规则模型"""
+
     min_value: float = Field(..., description="最小值(包含)")
     max_value: float = Field(..., description="最大值(不包含)")
     score: float = Field(..., ge=0.0, le=100.0, description="得分(0-100)")
@@ -19,16 +20,16 @@ class ScoringRule(BaseModel):
     def validate_value_range(cls, v):
         """
         验证数值范围字段的有效性。
-        
+
         确保min_value和max_value字段的值是有效的数字类型，
         并将其转换为float类型。
-        
+
         Args:
             v: 待验证的值，可以是int或float类型
-            
+
         Returns:
             float: 转换后的浮点数值
-            
+
         Raises:
             ValueError: 当值不是数字类型时
         """
@@ -41,15 +42,15 @@ class ScoringRule(BaseModel):
     def validate_score_range(cls, v):
         """
         验证得分字段的有效性。
-        
+
         确保score字段的值是有效的数字类型，并且在0-100的范围内。
-        
+
         Args:
             v: 待验证的得分值，可以是int或float类型
-            
+
         Returns:
             float: 转换后的浮点数值
-            
+
         Raises:
             ValueError: 当值不是数字类型或超出0-100范围时
         """
@@ -62,6 +63,7 @@ class ScoringRule(BaseModel):
 
 class ValueScoreRules(BaseModel):
     """价值评分规则模型"""
+
     pe: list[ScoringRule] = Field(..., description="PE比率评分规则")
     pb: list[ScoringRule] = Field(..., description="PB比率评分规则")
     ps: list[ScoringRule] = Field(..., description="PS比率评分规则")
@@ -76,7 +78,10 @@ class ValueScoreRules(BaseModel):
             if v and isinstance(v[0], ScoringRule):
                 return v
             # 否则转换为ScoringRule对象
-            return [ScoringRule(min_value=item[0], max_value=item[1], score=item[2]) for item in v]
+            return [
+                ScoringRule(min_value=item[0], max_value=item[1], score=item[2])
+                for item in v
+            ]
         return v
 
     @field_validator("pe", "pb", "ps", "dividend_yield")
@@ -84,16 +89,16 @@ class ValueScoreRules(BaseModel):
     def validate_rules_not_empty(cls, v):
         """
         验证评分规则列表不为空。
-        
+
         确保每个评分规则列表都包含至少一个规则，
         避免空规则列表导致的评分错误。
-        
+
         Args:
             v: 待验证的评分规则列表
-            
+
         Returns:
             list: 验证通过的评分规则列表
-            
+
         Raises:
             ValueError: 当评分规则列表为空时
         """
@@ -104,22 +109,33 @@ class ValueScoreRules(BaseModel):
 
 class DefaultScoreRules(BaseModel):
     """默认评分规则模型"""
+
     default: float = Field(..., ge=0.0, le=100.0, description="默认得分(0-100)")
 
 
 class ScoringRulesConfig(BaseModel):
     """评分规则配置主模型"""
+
     value_score_rules: ValueScoreRules = Field(..., description="价值评分规则")
     growth_score_rules: DefaultScoreRules = Field(..., description="成长性评分规则")
-    profitability_score_rules: DefaultScoreRules = Field(..., description="盈利能力评分规则")
-    financial_health_score_rules: DefaultScoreRules = Field(..., description="财务健康度评分规则")
+    profitability_score_rules: DefaultScoreRules = Field(
+        ..., description="盈利能力评分规则"
+    )
+    financial_health_score_rules: DefaultScoreRules = Field(
+        ..., description="财务健康度评分规则"
+    )
 
     @field_validator("value_score_rules")
     @classmethod
     def validate_value_rules_continuity(cls, v):
         """验证评分规则的连续性"""
         for rule_type, rules in v.model_dump().items():
-            if rule_type == "pe" or rule_type == "pb" or rule_type == "ps" or rule_type == "dividend_yield":
+            if (
+                rule_type == "pe"
+                or rule_type == "pb"
+                or rule_type == "ps"
+                or rule_type == "dividend_yield"
+            ):
                 cls._validate_rule_continuity(rules, rule_type)
         return v
 
@@ -137,7 +153,9 @@ class ScoringRulesConfig(BaseModel):
             current_max = sorted_rules[i]["max_value"]
             next_min = sorted_rules[i + 1]["min_value"]
             if current_max > next_min:
-                raise ValueError(f"{rule_type}规则存在重叠: [{sorted_rules[i]['min_value']}, {current_max}) 与 [{next_min}, {sorted_rules[i + 1]['max_value']})")
+                raise ValueError(
+                    f"{rule_type}规则存在重叠: [{sorted_rules[i]['min_value']}, {current_max}) 与 [{next_min}, {sorted_rules[i + 1]['max_value']})"
+                )
 
         # 检查是否有间隙(可选,根据业务需求)
         for i in range(len(sorted_rules) - 1):

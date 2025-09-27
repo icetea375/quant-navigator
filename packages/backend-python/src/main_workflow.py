@@ -29,6 +29,7 @@ from services.llm_service import LLMService  # noqa: E402
 from services.meta_cognition_engine import MetaCognitionEngine  # noqa: E402
 from services.quant_signal_service import QuantSignalService  # noqa: E402
 from services.report_service import ReportService  # noqa: E402
+
 from src.exceptions.workflow_exceptions import (  # noqa: E402
     ArbitrationWorkflowError,
     LLMServiceError,
@@ -54,15 +55,21 @@ class MainWorkflow:
         self.logger = logging.getLogger(__name__)
 
         # 初始化并发控制器 - 防止惊群效应
-        self.db_semaphore = asyncio.Semaphore(config.get("concurrency", {}).get("max_db_connections", 10))
-        self.llm_semaphore = asyncio.Semaphore(config.get("concurrency", {}).get("max_llm_requests", 5))
-        self.stock_processing_semaphore = asyncio.Semaphore(config.get("concurrency", {}).get("max_stock_processing", 20))
+        self.db_semaphore = asyncio.Semaphore(
+            config.get("concurrency", {}).get("max_db_connections", 10)
+        )
+        self.llm_semaphore = asyncio.Semaphore(
+            config.get("concurrency", {}).get("max_llm_requests", 5)
+        )
+        self.stock_processing_semaphore = asyncio.Semaphore(
+            config.get("concurrency", {}).get("max_stock_processing", 20)
+        )
 
         # 初始化核心服务
         self.data_pipeline = DataPipelineService(config)
         self.quant_engine = QuantSignalService(config)
         self.llm_service = LLMService(config)
-        
+
         # 初始化仲裁和报告服务
         self.arbitration_service = ArbitrationService()
         self.report_service = ReportService()
@@ -105,32 +112,32 @@ class MainWorkflow:
     async def run_daily_flow(self, trade_date: Optional[str] = None) -> dict[str, Any]:
         """
         执行每日量化分析工作流 - 双脑并行分析的核心协调器
-        
+
         为什么需要这个函数：
         - 金融数据具有时效性，必须在交易日内完成分析，错过时机=直接损失
         - 双脑架构（Qwen事实归因 + 豆包舆情感知）需要协调两个AI的并行分析
         - 元认知仲裁需要等待两个AI完成分析后才能进行决策，避免单点故障
         - 重试机制是因为LLM服务不稳定，金融分析不能因单次失败而中断
-        
+
         为什么采用这种架构：
         - 事件驱动：响应市场数据变化，而非定时轮询，减少无效计算成本
         - 重试机制：金融分析容错性要求高，不能因网络问题失败
         - 隔离机制：防止单个股票分析失败影响整体流程，保护其他交易
         - 并发控制：防止惊群效应，保护下游服务，避免API限流
-        
+
         性能数据收集：
         - 使用 tools/scripts/collect_performance_data.py 收集真实的性能数据
         - 数据存储在 data/performance/performance.db 中
         - 包括仲裁时间、API调用成本、错误成本等指标
-        
+
         Args:
             trade_date: 交易日期，格式为YYYY-MM-DD，默认为今天
                        为什么需要日期参数：金融数据按交易日组织，必须指定分析哪一天的数据
-            
+
         Returns:
             dict: 包含成功/失败股票统计、异常事件数量、仲裁结果等
                  为什么返回这些信息：需要向用户报告分析结果，便于监控和调试
-                 
+
         Raises:
             ArbitrationWorkflowError: 当元认知仲裁失败时
             QuantDataProviderError: 当数据获取失败时
@@ -153,7 +160,7 @@ class MainWorkflow:
                 trade_date,
                 retries=3,
                 delay=60,
-                operation_name="异常检测"
+                operation_name="异常检测",
             )
 
             if not anomaly_stocks:
@@ -175,7 +182,7 @@ class MainWorkflow:
                 "processed_count": results["successful"],
                 "failed_count": results["failed"],
                 "failed_stocks": results["failed_stocks"],
-                "human_review_cases": results["human_review_cases"]
+                "human_review_cases": results["human_review_cases"],
             }
 
         except Exception as e:
@@ -223,7 +230,7 @@ class MainWorkflow:
             # 并行检测多种异常
             tasks = [
                 self.quant_engine.detect_anomalies_async(trade_date),
-                self.data_pipeline.get_price_anomalies_async(trade_date)
+                self.data_pipeline.get_price_anomalies_async(trade_date),
             ]
 
             results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -250,7 +257,9 @@ class MainWorkflow:
             self.logger.critical(f"异常检测失败: {e}", exc_info=True)
             raise QuantDataProviderError(f"异常检测失败: {e}") from e
 
-    async def _load_stock_data(self, stock_code: str, trade_date: str) -> dict[str, Any]:
+    async def _load_stock_data(
+        self, stock_code: str, trade_date: str
+    ) -> dict[str, Any]:
         """
         加载股票数据 - 快速失败版本,并行加载数据(带并发控制)
 
@@ -267,14 +276,18 @@ class MainWorkflow:
         # 使用数据库信号量控制并发
         async with self.db_semaphore:
             try:
-                self.logger.info(f"加载股票数据: {stock_code} (并发控制: {self.db_semaphore._value})")
+                self.logger.info(
+                    f"加载股票数据: {stock_code} (并发控制: {self.db_semaphore._value})"
+                )
 
                 # 并行加载所有数据
                 tasks = [
                     self.data_pipeline.get_financial_data_async(stock_code, trade_date),
                     self.data_pipeline.get_price_data_async(stock_code, trade_date),
                     self.data_pipeline.get_news_data_async(stock_code, trade_date),
-                    self.data_pipeline.get_announcement_data_async(stock_code, trade_date)
+                    self.data_pipeline.get_announcement_data_async(
+                        stock_code, trade_date
+                    ),
                 ]
 
                 results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -291,7 +304,7 @@ class MainWorkflow:
                     "news_data": results[2],
                     "announcement_data": results[3],
                     "stock_code": stock_code,
-                    "trade_date": trade_date
+                    "trade_date": trade_date,
                 }
 
                 # 验证数据完整性
@@ -306,10 +319,22 @@ class MainWorkflow:
                 raise
             except Exception as e:
                 # 快速失败 - 重新抛出异常
-                self.logger.error(f"加载股票数据失败: {stock_code} - {e}", exc_info=True)
-                raise QuantDataProviderError(f"加载股票数据失败: {stock_code} - {e}") from e
+                self.logger.error(
+                    f"加载股票数据失败: {stock_code} - {e}", exc_info=True
+                )
+                raise QuantDataProviderError(
+                    f"加载股票数据失败: {stock_code} - {e}"
+                ) from e
 
-    async def _retry_wrapper(self, func, *args, retries: int = 3, delay: int = 60, operation_name: str = "操作", **kwargs):
+    async def _retry_wrapper(
+        self,
+        func,
+        *args,
+        retries: int = 3,
+        delay: int = 60,
+        operation_name: str = "操作",
+        **kwargs,
+    ):
         """
         重试包装器 - 为关键操作提供重试机制
 
@@ -348,10 +373,14 @@ class MainWorkflow:
                     self.logger.critical(f"{operation_name} - 所有重试失败,操作终止")
 
         # 所有重试都失败了,发送告警
-        await self._send_critical_alert(f"{operation_name}重试失败", str(last_exception))
+        await self._send_critical_alert(
+            f"{operation_name}重试失败", str(last_exception)
+        )
         raise last_exception
 
-    async def _send_critical_alert(self, title: str, message: str, trade_date: Optional[str] = None):
+    async def _send_critical_alert(
+        self, title: str, message: str, trade_date: Optional[str] = None
+    ):
         """
         发送最高级别告警
 
@@ -366,7 +395,7 @@ class MainWorkflow:
                 "message": message,
                 "trade_date": trade_date or datetime.now().strftime("%Y-%m-%d"),
                 "timestamp": datetime.now().isoformat(),
-                "severity": "CRITICAL"
+                "severity": "CRITICAL",
             }
 
             # 记录到日志
@@ -391,7 +420,7 @@ class MainWorkflow:
             health_status = {
                 "status": "healthy",
                 "timestamp": datetime.now().isoformat(),
-                "checks": {}
+                "checks": {},
             }
 
             # 检查数据库连接
@@ -416,7 +445,7 @@ class MainWorkflow:
             return {
                 "status": "unhealthy",
                 "timestamp": datetime.now().isoformat(),
-                "error": str(e)
+                "error": str(e),
             }
 
     async def _test_llm_connections(self):
@@ -455,7 +484,9 @@ class MainWorkflow:
         """
         for attempt in range(max_retries):
             try:
-                self.logger.info(f"处理股票 {stock_code} (尝试 {attempt + 1}/{max_retries})")
+                self.logger.info(
+                    f"处理股票 {stock_code} (尝试 {attempt + 1}/{max_retries})"
+                )
 
                 # 1. 加载数据
                 await self._load_stock_data(stock_code, trade_date)
@@ -474,7 +505,9 @@ class MainWorkflow:
 
                 # 3. 保存报告
                 await self._save_report_to_db_async(qwen_report, "qwen_fact_based")
-                await self._save_report_to_db_async(doubao_report, "doubao_sentiment_based")
+                await self._save_report_to_db_async(
+                    doubao_report, "doubao_sentiment_based"
+                )
 
                 # 4. 创建仲裁案件
                 await self._create_arbitration_case_async(
@@ -485,16 +518,22 @@ class MainWorkflow:
                 return {"stock_code": stock_code, "status": "success"}
 
             except Exception as e:
-                self.logger.warning(f"处理股票 {stock_code} 失败 (尝试 {attempt + 1}): {e}")
+                self.logger.warning(
+                    f"处理股票 {stock_code} 失败 (尝试 {attempt + 1}): {e}"
+                )
 
                 if attempt == max_retries - 1:
                     # 最后一次尝试失败
-                    raise ArbitrationWorkflowError(f"股票 {stock_code} 处理失败: {e}") from e
+                    raise ArbitrationWorkflowError(
+                        f"股票 {stock_code} 处理失败: {e}"
+                    ) from e
 
                 # 等待后重试
-                await asyncio.sleep(2 ** attempt)  # 指数退避
+                await asyncio.sleep(2**attempt)  # 指数退避
 
-    async def _save_report_to_db_async(self, report: dict[str, Any], report_type: str) -> dict[str, Any]:
+    async def _save_report_to_db_async(
+        self, report: dict[str, Any], report_type: str
+    ) -> dict[str, Any]:
         """
         保存报告到数据库
 
@@ -507,38 +546,43 @@ class MainWorkflow:
         """
         try:
             from datetime import date
+
             from schemas.reports import ReportCreate, ReportType
-            
+
             # 将字符串类型转换为枚举
             type_mapping = {
                 "qwen_fact_based": ReportType.FACT_ANALYSIS,
                 "doubao_sentiment_based": ReportType.SENTIMENT_ANALYSIS,
                 "daily_analysis": ReportType.DAILY_ANALYSIS,
-                "arbitration_case": ReportType.ARBITRATION_CASE
+                "arbitration_case": ReportType.ARBITRATION_CASE,
             }
-            
+
             report_type_enum = type_mapping.get(report_type, ReportType.DAILY_ANALYSIS)
-            
+
             # 创建报告数据
             report_data = ReportCreate(
                 report_type=report_type_enum,
-                target_code=report.get('stock_code'),
+                target_code=report.get("stock_code"),
                 report_date=date.today(),
-                content=json.dumps(report, ensure_ascii=False, indent=2)
+                content=json.dumps(report, ensure_ascii=False, indent=2),
             )
-            
+
             # 调用ReportService保存报告
             saved_report = await self.report_service.create_report(report_data)
-            
+
             self.logger.info(f"报告保存成功: {saved_report.report_id}")
             return {"id": saved_report.report_id, "report_id": saved_report.report_id}
-            
+
         except Exception as e:
             self.logger.error(f"保存报告失败: {e}")
             raise
 
     async def _create_arbitration_case_async(
-        self, stock_code: str, trade_date: str, qwen_report: dict[str, Any], doubao_report: dict[str, Any]
+        self,
+        stock_code: str,
+        trade_date: str,
+        qwen_report: dict[str, Any],
+        doubao_report: dict[str, Any],
     ) -> dict[str, Any]:
         """
         创建仲裁案件
@@ -553,36 +597,40 @@ class MainWorkflow:
             案件信息
         """
         try:
-            from schemas.arbitration import ArbitrationCaseCreate, AnalysisResult, SentimentAnalysis
-            
+            from schemas.arbitration import (
+                AnalysisResult,
+                ArbitrationCaseCreate,
+                SentimentAnalysis,
+            )
+
             # 创建Qwen分析结果
             qwen_analysis = AnalysisResult(
-                analysis=qwen_report.get('analysis', ''),
-                confidence=qwen_report.get('confidence', 0.0),
-                reasoning=qwen_report.get('reasoning', '')
+                analysis=qwen_report.get("analysis", ""),
+                confidence=qwen_report.get("confidence", 0.0),
+                reasoning=qwen_report.get("reasoning", ""),
             )
-            
+
             # 创建豆包情感分析结果
             doubao_analysis = SentimentAnalysis(
-                sentiment=doubao_report.get('sentiment', 'neutral'),
-                score=doubao_report.get('score', 0.0),
-                reasoning=doubao_report.get('reasoning', '')
+                sentiment=doubao_report.get("sentiment", "neutral"),
+                score=doubao_report.get("score", 0.0),
+                reasoning=doubao_report.get("reasoning", ""),
             )
-            
+
             # 创建仲裁案件数据
             case_data = ArbitrationCaseCreate(
                 report_type="fact_analysis",
                 target_code=stock_code,
                 qwen_analysis=qwen_analysis,
-                doubao_analysis=doubao_analysis
+                doubao_analysis=doubao_analysis,
             )
-            
+
             # 调用ArbitrationService创建案件
             created_case = await self.arbitration_service.create_case(case_data)
-            
+
             self.logger.info(f"仲裁案件创建成功: {created_case.case_id}")
             return {"case_id": created_case.case_id, "case": created_case}
-            
+
         except Exception as e:
             self.logger.error(f"创建仲裁案件失败: {e}")
             raise
@@ -628,10 +676,9 @@ class MainWorkflow:
             for i, result in enumerate(results):
                 if isinstance(result, Exception):
                     failed += 1
-                    failed_stocks.append({
-                        "stock_code": anomaly_stocks[i],
-                        "error": str(result)
-                    })
+                    failed_stocks.append(
+                        {"stock_code": anomaly_stocks[i], "error": str(result)}
+                    )
                 else:
                     successful += 1
 
@@ -640,14 +687,16 @@ class MainWorkflow:
             return {
                 "successful": successful,
                 "failed": failed,
-                "failed_stocks": failed_stocks
+                "failed_stocks": failed_stocks,
             }
 
         except Exception as e:
             self.logger.critical(f"并行处理异常股票失败: {e}", exc_info=True)
             raise ArbitrationWorkflowError(f"并行处理异常股票失败: {e}") from e
 
-    async def _process_anomaly_stocks(self, anomaly_stocks: list[str], trade_date: str) -> dict[str, Any]:
+    async def _process_anomaly_stocks(
+        self, anomaly_stocks: list[str], trade_date: str
+    ) -> dict[str, Any]:
         """
         处理异常股票 - 双脑并行分析 + 元认知仲裁
 
@@ -677,8 +726,7 @@ class MainWorkflow:
                 # 2. [v14.4核心]元认知仲裁
                 self.logger.info(f"元认知仲裁: {stock_code}")
                 meta_result = self.meta_cognition_engine.arbitrate_and_summarize(
-                    qwen_report,
-                    doubao_report
+                    qwen_report, doubao_report
                 )
 
                 # 3. 根据仲裁结果处理
@@ -704,10 +752,12 @@ class MainWorkflow:
             "successful": successful,
             "failed": failed,
             "failed_stocks": failed_stocks,
-            "human_review_cases": human_review_cases
+            "human_review_cases": human_review_cases,
         }
 
-    async def _analyze_with_qwen(self, stock_code: str, trade_date: str) -> AnalysisResult:
+    async def _analyze_with_qwen(
+        self, stock_code: str, trade_date: str
+    ) -> AnalysisResult:
         """
         使用Qwen进行事实归因分析
 
@@ -740,10 +790,9 @@ class MainWorkflow:
             """
 
             # 调用LLM分析
-            result = await self.llm_service.analyze_fact({
-                "news_content": prompt,
-                "context": f"Qwen基本面分析-{stock_code}"
-            })
+            result = await self.llm_service.analyze_fact(
+                {"news_content": prompt, "context": f"Qwen基本面分析-{stock_code}"}
+            )
 
             return result
 
@@ -751,7 +800,9 @@ class MainWorkflow:
             self.logger.error(f"Qwen分析失败 {stock_code}: {e}")
             raise
 
-    async def _analyze_with_doubao(self, stock_code: str, trade_date: str) -> AnalysisResult:
+    async def _analyze_with_doubao(
+        self, stock_code: str, trade_date: str
+    ) -> AnalysisResult:
         """
         使用豆包进行舆情感知分析
 
@@ -764,7 +815,9 @@ class MainWorkflow:
         """
         try:
             # 获取市场情绪数据
-            sentiment_data = await self.data_pipeline.get_sentiment_data(stock_code, trade_date)
+            sentiment_data = await self.data_pipeline.get_sentiment_data(
+                stock_code, trade_date
+            )
 
             # 构建分析提示词
             prompt = f"""
@@ -784,10 +837,9 @@ class MainWorkflow:
             """
 
             # 调用LLM分析
-            result = await self.llm_service.analyze_sentiment({
-                "news_content": prompt,
-                "context": f"豆包情绪分析-{stock_code}"
-            })
+            result = await self.llm_service.analyze_sentiment(
+                {"news_content": prompt, "context": f"豆包情绪分析-{stock_code}"}
+            )
 
             return result
 
@@ -813,7 +865,7 @@ class MainWorkflow:
                 "meta_analysis": meta_result.final_conclusion,
                 "confidence": meta_result.confidence,
                 "reasoning": meta_result.reasoning,
-                "created_at": datetime.now().isoformat()
+                "created_at": datetime.now().isoformat(),
             }
 
             # 这里应该保存到数据库
@@ -839,7 +891,7 @@ class MainWorkflow:
                 "final_conclusion": meta_result.final_conclusion,
                 "confidence": meta_result.confidence,
                 "reasoning": meta_result.reasoning,
-                "created_at": datetime.now().isoformat()
+                "created_at": datetime.now().isoformat(),
             }
 
             # 这里应该保存到数据库
@@ -849,7 +901,9 @@ class MainWorkflow:
             self.logger.error(f"保存最终报告失败 {stock_code}: {e}")
             raise
 
-    def _generate_execution_report(self, trade_date: str, anomaly_stocks: list[str], results: dict[str, Any]) -> None:
+    def _generate_execution_report(
+        self, trade_date: str, anomaly_stocks: list[str], results: dict[str, Any]
+    ) -> None:
         """
         生成执行报告
 
@@ -882,13 +936,8 @@ async def main():
 
         # 加载配置
         config = {
-            "llm": {
-                "provider": "qwen",
-                "api_key": "your_api_key_here"
-            },
-            "database": {
-                "url": "postgresql://user:pass@localhost/db"
-            }
+            "llm": {"provider": "qwen", "api_key": "your_api_key_here"},
+            "database": {"url": "postgresql://user:pass@localhost/db"},
         }
 
         # 创建并运行工作流
@@ -904,4 +953,5 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())

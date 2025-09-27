@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import ArbitrationDecisionDialog from '@/components/admin/ArbitrationDecisionDialog.vue'
+import ArbitrationDecisionDialog from '../ArbitrationDecisionDialog.vue'
 import { mockElementPlusComponents } from '@/utils/test-utils'
 
 // 创建测试包装器
@@ -115,7 +115,7 @@ describe('ArbitrationDecisionDialog - 展示组件单元测试', () => {
       expect(radioButtons.length).toBeGreaterThanOrEqual(3)
 
       // 选择"拒绝"选项
-      const rejectRadio = radioButtons.find(radio => radio.attributes('value') === 'reject')
+      const rejectRadio = radioButtons.find((radio: any) => radio.attributes('value') === 'reject')
       if (rejectRadio) {
         await rejectRadio.setChecked()
         expect(rejectRadio.element.checked).toBe(true)
@@ -197,7 +197,7 @@ describe('ArbitrationDecisionDialog - 展示组件单元测试', () => {
       await textarea.setValue('这是一个测试决策理由，长度超过10个字符')
 
       const buttons = wrapper.findAll('button')
-      const submitButton = buttons.find(btn => btn.text().includes('提交决策'))
+      const submitButton = buttons.find((btn: any) => btn.text().includes('提交决策'))
       await submitButton?.trigger('click')
 
       expect(wrapper.emitted('submit')).toBeTruthy()
@@ -229,7 +229,7 @@ describe('ArbitrationDecisionDialog - 展示组件单元测试', () => {
       })
 
       const buttons = wrapper.findAll('button')
-      const submitButton = buttons.find(btn => btn.text().includes('提交决策'))
+      const submitButton = buttons.find((btn: any) => btn.text().includes('提交决策'))
       expect(submitButton?.attributes('loading')).toBeDefined()
     })
 
@@ -242,7 +242,7 @@ describe('ArbitrationDecisionDialog - 展示组件单元测试', () => {
       })
 
       const buttons = wrapper.findAll('button')
-      const submitButton = buttons.find(btn => btn.text().includes('提交决策'))
+      const submitButton = buttons.find((btn: any) => btn.text().includes('提交决策'))
       expect(submitButton?.attributes('loading')).toBeUndefined()
     })
   })
@@ -258,7 +258,7 @@ describe('ArbitrationDecisionDialog - 展示组件单元测试', () => {
 
       // 尝试提交空表单
       const buttons = wrapper.findAll('button')
-      const submitButton = buttons.find(btn => btn.text().includes('提交决策'))
+      const submitButton = buttons.find((btn: any) => btn.text().includes('提交决策'))
       await submitButton?.trigger('click')
 
       // 由于表单验证失败，不应该触发 submit 事件
@@ -278,7 +278,7 @@ describe('ArbitrationDecisionDialog - 展示组件单元测试', () => {
       await textarea.setValue('短')
 
       const buttons = wrapper.findAll('button')
-      const submitButton = buttons.find(btn => btn.text().includes('提交决策'))
+      const submitButton = buttons.find((btn: any) => btn.text().includes('提交决策'))
       await submitButton?.trigger('click')
 
       // 由于验证失败，不应该触发 submit 事件

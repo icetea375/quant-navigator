@@ -13,6 +13,7 @@ import pytest
 
 class MockMainWorkflow:
     """模拟主工作流类(带健康检查)"""
+
     def __init__(self, config):
         self.config = config
         self.logger = MagicMock()
@@ -34,7 +35,7 @@ class MockMainWorkflow:
             health_status = {
                 "status": "healthy",
                 "timestamp": datetime.now().isoformat(),
-                "checks": {}
+                "checks": {},
             }
 
             # 检查数据库连接
@@ -59,7 +60,7 @@ class MockMainWorkflow:
             return {
                 "status": "unhealthy",
                 "timestamp": datetime.now().isoformat(),
-                "error": str(e)
+                "error": str(e),
             }
 
     async def _test_llm_connections(self):
@@ -77,7 +78,7 @@ class TestHealthCheck:
         config = {
             "llm_service": {
                 "qwen": {"api_key": "test_key"},
-                "doubao": {"api_key": "test_key"}
+                "doubao": {"api_key": "test_key"},
             }
         }
         return MockMainWorkflow(config)
@@ -101,7 +102,9 @@ class TestHealthCheck:
     async def test_health_check_database_unhealthy(self, mock_workflow):
         """测试数据库不健康"""
         # 模拟数据库连接失败
-        mock_workflow.db_manager.test_connection.side_effect = Exception("数据库连接失败")
+        mock_workflow.db_manager.test_connection.side_effect = Exception(
+            "数据库连接失败"
+        )
         mock_workflow.llm_service.test_connection.return_value = None
 
         result = await mock_workflow.health_check()
@@ -116,7 +119,9 @@ class TestHealthCheck:
         """测试LLM服务不健康"""
         # 模拟LLM服务连接失败
         mock_workflow.db_manager.test_connection.return_value = None
-        mock_workflow.llm_service.test_connection.side_effect = Exception("LLM服务连接失败")
+        mock_workflow.llm_service.test_connection.side_effect = Exception(
+            "LLM服务连接失败"
+        )
 
         result = await mock_workflow.health_check()
 
@@ -129,8 +134,12 @@ class TestHealthCheck:
     async def test_health_check_both_unhealthy(self, mock_workflow):
         """测试所有服务都不健康"""
         # 模拟所有服务都失败
-        mock_workflow.db_manager.test_connection.side_effect = Exception("数据库连接失败")
-        mock_workflow.llm_service.test_connection.side_effect = Exception("LLM服务连接失败")
+        mock_workflow.db_manager.test_connection.side_effect = Exception(
+            "数据库连接失败"
+        )
+        mock_workflow.llm_service.test_connection.side_effect = Exception(
+            "LLM服务连接失败"
+        )
 
         result = await mock_workflow.health_check()
 
@@ -143,8 +152,12 @@ class TestHealthCheck:
     async def test_health_check_critical_error(self, mock_workflow):
         """测试健康检查本身出错"""
         # 模拟数据库和LLM都失败,但健康检查本身正常处理
-        mock_workflow.db_manager.test_connection.side_effect = Exception("数据库连接失败")
-        mock_workflow.llm_service.test_connection.side_effect = Exception("LLM服务连接失败")
+        mock_workflow.db_manager.test_connection.side_effect = Exception(
+            "数据库连接失败"
+        )
+        mock_workflow.llm_service.test_connection.side_effect = Exception(
+            "LLM服务连接失败"
+        )
 
         result = await mock_workflow.health_check()
 
@@ -192,7 +205,7 @@ class TestHealthCheck:
             Exception("通用异常"),
             ConnectionError("连接错误"),
             TimeoutError("超时错误"),
-            ValueError("值错误")
+            ValueError("值错误"),
         ]
 
         for exc in exceptions:
@@ -213,7 +226,7 @@ class TestHealthCheck:
             Exception("通用异常"),
             ConnectionError("连接错误"),
             TimeoutError("超时错误"),
-            ValueError("值错误")
+            ValueError("值错误"),
         ]
 
         for exc in exceptions:
@@ -229,6 +242,7 @@ class TestHealthCheck:
     @pytest.mark.asyncio
     async def test_health_check_async_behavior(self, mock_workflow):
         """测试异步行为"""
+
         # 模拟异步延迟
         async def delayed_db_test():
             await asyncio.sleep(0.1)

@@ -32,39 +32,39 @@ CREATE TABLE IF NOT EXISTS arbitration_cases (
     trade_date DATE NOT NULL,
     qwen_report_id BIGINT NOT NULL,
     doubao_report_id BIGINT NOT NULL,
-    
+
     -- 分歧度分析结果
     divergence_score DECIMAL(5,4) NOT NULL,
     sentiment_diff DECIMAL(5,4) NOT NULL,
     keyword_overlap DECIMAL(5,4) NOT NULL,
     entity_diff DECIMAL(5,4) NOT NULL,
-    
+
     -- AI总结结果
     consensus_summary TEXT NOT NULL,
     conflict_summary TEXT NOT NULL,
-    
+
     -- 优先级计算
     priority_score DECIMAL(5,4) NOT NULL,
     company_importance DECIMAL(5,4) NOT NULL,
     event_importance DECIMAL(5,4) NOT NULL,
-    
+
     -- 状态管理
     status VARCHAR(20) DEFAULT 'PENDING_HUMAN',
-    
+
     -- 人类仲裁结果（可选）
     human_arbitrator_id VARCHAR(50) DEFAULT NULL,
     human_decision TEXT DEFAULT NULL,
     final_recommendation VARCHAR(20) DEFAULT NULL,
     final_confidence DECIMAL(3,2) DEFAULT NULL,
-    
+
     -- 分析元数据
     analysis_metadata JSON DEFAULT NULL,
-    
+
     -- 时间戳
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     completed_at TIMESTAMP NULL DEFAULT NULL,
-    
+
     -- 外键约束
     FOREIGN KEY (qwen_report_id) REFERENCES generated_reports(id) ON DELETE CASCADE,
     FOREIGN KEY (doubao_report_id) REFERENCES generated_reports(id) ON DELETE CASCADE
@@ -75,23 +75,23 @@ CREATE TABLE IF NOT EXISTS human_arbitrator_feedback (
     id BIGSERIAL PRIMARY KEY,
     arbitration_case_id BIGINT NOT NULL,
     arbitrator_id VARCHAR(50) NOT NULL,
-    
+
     -- 反馈评分
     ai_summary_quality INTEGER NOT NULL,
     priority_accuracy INTEGER NOT NULL,
     divergence_analysis_quality INTEGER NOT NULL,
     overall_satisfaction INTEGER NOT NULL,
-    
+
     -- 文本反馈
     feedback_text TEXT DEFAULT NULL,
     suggestions TEXT DEFAULT NULL,
-    
+
     -- 决策信息
     decision_time_minutes INTEGER DEFAULT NULL,
     decision_factors JSON DEFAULT NULL,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (arbitration_case_id) REFERENCES arbitration_cases(id) ON DELETE CASCADE
 );
 
@@ -109,9 +109,9 @@ CREATE INDEX IF NOT EXISTS idx_human_feedback_arbitrator ON human_arbitrator_fee
 
 -- 5. 插入示例数据
 INSERT INTO generated_reports (
-    stock_code, trade_date, analyzer_type, source, analysis_text, 
+    stock_code, trade_date, analyzer_type, source, analysis_text,
     confidence_score, sentiment_score, keywords, entities, summary
-) VALUES 
+) VALUES
 (
     '000001', CURRENT_DATE, 'qwen_fact_analyzer', 'qwen_fact_based',
     '基于财务数据分析，该股票基本面表现稳定：营收增长15%，利润率维持在35%以上，现金流为正。建议持有观望。',
@@ -133,7 +133,7 @@ INSERT INTO arbitration_cases (
     priority_score, company_importance, event_importance,
     status, analysis_metadata
 ) VALUES (
-    'ARB_000001_' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD'), 
+    'ARB_000001_' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD'),
     '000001', CURRENT_DATE, 1, 2,
     0.65, 0.5, 0.4, 0.3,
     '两家AI都认为该股票基本面稳定，建议持有观望，但关注点不同。',
@@ -145,7 +145,7 @@ INSERT INTO arbitration_cases (
 
 -- 7. 创建视图
 CREATE OR REPLACE VIEW v_high_priority_cases AS
-SELECT 
+SELECT
     ac.id,
     ac.case_id,
     ac.stock_code,
@@ -158,7 +158,7 @@ SELECT
     ac.created_at,
     EXTRACT(DAY FROM (CURRENT_TIMESTAMP - ac.created_at)) as days_pending
 FROM arbitration_cases ac
-WHERE ac.priority_score >= 0.7 
+WHERE ac.priority_score >= 0.7
     AND ac.status = 'PENDING_HUMAN'
 ORDER BY ac.priority_score DESC, ac.created_at ASC;
 

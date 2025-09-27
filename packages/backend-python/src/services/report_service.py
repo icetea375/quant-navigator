@@ -140,10 +140,18 @@ class ReportService:
         """获取统计信息"""
         total_reports = len(self.reports)
         completed_reports = len(
-            [report for report in self.reports.values() if report.status == ReportStatus.COMPLETED]
+            [
+                report
+                for report in self.reports.values()
+                if report.status == ReportStatus.COMPLETED
+            ]
         )
         pending_reports = len(
-            [report for report in self.reports.values() if report.status == ReportStatus.PENDING]
+            [
+                report
+                for report in self.reports.values()
+                if report.status == ReportStatus.PENDING
+            ]
         )
 
         # 按类型统计
@@ -156,6 +164,8 @@ class ReportService:
             "total_reports": total_reports,
             "completed_reports": completed_reports,
             "pending_reports": pending_reports,
-            "completion_rate": completed_reports / total_reports if total_reports > 0 else 0,
+            "completion_rate": completed_reports / total_reports
+            if total_reports > 0
+            else 0,
             "type_distribution": type_stats,
         }

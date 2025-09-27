@@ -5,6 +5,4 @@
 
 from .tushare_fetcher import TushareFetcher
 
-__all__ = [
-    "TushareFetcher"
-]
+__all__ = ["TushareFetcher"]

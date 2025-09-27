@@ -658,28 +658,27 @@ class DatabaseManager:
             self.logger.error(f"获取历史仲裁记录失败: {e}")
             return []
 
-
     def get_mda_data(self, stock_code: str, trade_date: str) -> Dict[str, Any]:
         """
         获取股票MD&A数据
-        
+
         业务契约：
         1. 当数据库中存在某股票的MD&A数据时，必须能正确地将其查询出来
         2. 当数据库中不存在数据时，返回包含默认值的字典，避免调用方出错
         3. 当数据库查询失败时，优雅地处理错误，返回错误信息而不是崩溃
         4. 当存在多条记录时，返回最新的那一条
-        
+
         Args:
             stock_code: 股票代码
             trade_date: 交易日期
-            
+
         Returns:
             MD&A数据字典
         """
         try:
             # 查询MD&A数据 - 使用 generated_reports 表
             query = """
-            SELECT 
+            SELECT
                 id,
                 stock_code,
                 trade_date,
@@ -692,17 +691,16 @@ class DatabaseManager:
                 entities,
                 summary,
                 created_at
-            FROM generated_reports 
-            WHERE stock_code = :stock_code 
+            FROM generated_reports
+            WHERE stock_code = :stock_code
             AND trade_date <= :trade_date
             ORDER BY trade_date DESC, created_at DESC
             LIMIT 1
             """
 
-            results = self.execute_query(query, {
-                "stock_code": stock_code,
-                "trade_date": trade_date
-            })
+            results = self.execute_query(
+                query, {"stock_code": stock_code, "trade_date": trade_date}
+            )
 
             if results:
                 # 业务契约1：当存在数据时，返回查询结果
@@ -721,7 +719,7 @@ class DatabaseManager:
                     "keywords": None,
                     "entities": None,
                     "summary": "暂无数据",
-                    "created_at": None
+                    "created_at": None,
                 }
 
         except Exception as e:
@@ -740,7 +738,7 @@ class DatabaseManager:
                 "entities": None,
                 "summary": "无法获取数据",
                 "created_at": None,
-                "error": str(e)
+                "error": str(e),
             }
 
     def close_connections(self):

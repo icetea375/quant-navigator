@@ -25,12 +25,9 @@ class TestQuantSignalServiceUnitSimple:
             "quant_engine": {
                 "z_score_threshold": 2.0,
                 "lookback_days": 30,
-                "min_data_points": 20
+                "min_data_points": 20,
             },
-            "database": {
-                "url": "sqlite:///:memory:",
-                "echo": False
-            }
+            "database": {"url": "sqlite:///:memory:", "echo": False},
         }
         return QuantSignalService(config)
 
@@ -47,12 +44,14 @@ class TestQuantSignalServiceUnitSimple:
             "pe_ratio": 15.0,
             "pb_ratio": 2.0,
             "ps_ratio": 3.0,
-            "dividend_yield": 2.0
+            "dividend_yield": 2.0,
         }
         price_data = [{"pct_chg": 2.5, "vol": 150000000}]
         trade_date = datetime(2024, 1, 17)
 
-        signal = await service.calculate_quant_signal("000001.SZ", trade_date, financial_factors, price_data)
+        signal = await service.calculate_quant_signal(
+            "000001.SZ", trade_date, financial_factors, price_data
+        )
 
         assert isinstance(signal, QuantSignal)
         assert signal.target_code == "000001.SZ"
@@ -203,7 +202,13 @@ class TestQuantSignalServiceUnitSimple:
 
     def test_should_calculate_signal_confidence_with_good_data(self, service):
         """测试:应该正确计算信号置信度"""
-        financial_factors = {"pe_ratio": 15.0, "pb_ratio": 2.0, "ps_ratio": 3.0, "dividend_yield": 2.0, "roe": 0.15}
+        financial_factors = {
+            "pe_ratio": 15.0,
+            "pb_ratio": 2.0,
+            "ps_ratio": 3.0,
+            "dividend_yield": 2.0,
+            "roe": 0.15,
+        }
         price_data = [{"pct_chg": 2.5}]
 
         confidence = service._calculate_signal_confidence(financial_factors, price_data)
@@ -249,7 +254,9 @@ class TestQuantSignalServiceUnitSimple:
         price_info = {"vol": 100000000}
         basic_info = {"volume_ratio": 4.0}
 
-        anomaly = service._detect_volume_anomaly(stock_code, trade_date, price_info, basic_info)
+        anomaly = service._detect_volume_anomaly(
+            stock_code, trade_date, price_info, basic_info
+        )
 
         assert anomaly.stock_code == stock_code
         assert anomaly.anomaly_type.value == "volume"
@@ -263,7 +270,9 @@ class TestQuantSignalServiceUnitSimple:
         price_info = {"vol": 100000000}
         basic_info = {"volume_ratio": 2.0}
 
-        anomaly = service._detect_volume_anomaly(stock_code, trade_date, price_info, basic_info)
+        anomaly = service._detect_volume_anomaly(
+            stock_code, trade_date, price_info, basic_info
+        )
 
         assert anomaly is None
 
@@ -297,7 +306,9 @@ class TestQuantSignalServiceUnitSimple:
         price_data = [{"pct_chg": 2.5, "vol": 150000000}]
         trade_date = datetime(2024, 1, 17)
 
-        signal = await service.calculate_quant_signal("000001.SZ", trade_date, financial_factors, price_data)
+        signal = await service.calculate_quant_signal(
+            "000001.SZ", trade_date, financial_factors, price_data
+        )
 
         assert isinstance(signal, QuantSignal)
         assert signal.target_code == "000001.SZ"
@@ -311,7 +322,9 @@ class TestQuantSignalServiceUnitSimple:
         price_data = []
         trade_date = datetime(2024, 1, 17)
 
-        signal = await service.calculate_quant_signal("000001.SZ", trade_date, financial_factors, price_data)
+        signal = await service.calculate_quant_signal(
+            "000001.SZ", trade_date, financial_factors, price_data
+        )
 
         assert isinstance(signal, QuantSignal)
         assert signal.target_code == "000001.SZ"

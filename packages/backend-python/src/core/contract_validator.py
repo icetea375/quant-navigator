@@ -2,6 +2,7 @@
 契约验证器 - 符合《测试宪法》第3.0条
 定义契约，而非修补测试
 """
+
 import logging
 from pathlib import Path
 from typing import Any, Dict
@@ -10,6 +11,7 @@ import jsonschema
 import yaml
 
 logger = logging.getLogger(__name__)
+
 
 class ContractValidator:
     """API响应契约验证器"""
@@ -38,11 +40,11 @@ class ContractValidator:
     def validate_response(self, response: Dict[str, Any], schema_name: str) -> bool:
         """
         验证API响应是否符合契约
-        
+
         Args:
             response: API响应数据
             schema_name: 契约名称
-            
+
         Returns:
             bool: 是否符合契约
         """
@@ -68,6 +70,7 @@ class ContractValidator:
     def list_schemas(self) -> list:
         """列出所有可用契约"""
         return list(self._schemas.keys())
+
 
 # 全局契约验证器实例
 contract_validator = ContractValidator()

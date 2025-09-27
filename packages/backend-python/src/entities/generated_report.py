@@ -13,6 +13,7 @@ from .base import BaseEntity
 
 class GeneratedReportEntity(BaseEntity):
     """生成报告实体类"""
+
     __tablename__ = "generated_reports"
 
     # 基本信息
@@ -56,9 +57,18 @@ class GeneratedReportEntity(BaseEntity):
     # 添加约束
     __table_args__ = (
         CheckConstraint("file_size >= 0", name="check_file_size_positive"),
-        CheckConstraint('file_format IN ("pdf", "html", "json", "markdown")', name="check_file_format"),
-        CheckConstraint('report_type IN ("daily_analysis", "weekly_summary", "monthly_report", "anomaly_report", "signal_report", "arbitration_report", "custom")', name="check_report_type"),
-        CheckConstraint('status IN ("draft", "generating", "completed", "failed", "archived")', name="check_report_status"),
+        CheckConstraint(
+            'file_format IN ("pdf", "html", "json", "markdown")',
+            name="check_file_format",
+        ),
+        CheckConstraint(
+            'report_type IN ("daily_analysis", "weekly_summary", "monthly_report", "anomaly_report", "signal_report", "arbitration_report", "custom")',
+            name="check_report_type",
+        ),
+        CheckConstraint(
+            'status IN ("draft", "generating", "completed", "failed", "archived")',
+            name="check_report_status",
+        ),
     )
 
     def __init__(self, **kwargs):
@@ -101,12 +111,14 @@ class GeneratedReportEntity(BaseEntity):
             "file_path": self.file_path,
             "file_size": self.file_size,
             "file_format": self.file_format,
-            "metadata": self.metadata_json or {}
+            "metadata": self.metadata_json or {},
         }
         return GeneratedReport(**data)
 
     @classmethod
-    def from_generated_report(cls, generated_report: GeneratedReport) -> "GeneratedReportEntity":
+    def from_generated_report(
+        cls, generated_report: GeneratedReport
+    ) -> "GeneratedReportEntity":
         """从Pydantic GeneratedReport模型创建实体"""
         data = generated_report.model_dump()
         return cls(
@@ -134,7 +146,7 @@ class GeneratedReportEntity(BaseEntity):
             file_path=data.get("file_path"),
             file_size=data.get("file_size"),
             file_format=data["file_format"],
-            metadata_json=data["metadata"]
+            metadata_json=data["metadata"],
         )
 
     def __repr__(self):

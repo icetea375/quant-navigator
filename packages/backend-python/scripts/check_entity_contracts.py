@@ -86,19 +86,23 @@ class EntityContractChecker:
                         # 检查nullable字段是否一致
                         if is_nullable != entity_nullable:
                             if is_nullable and not entity_nullable:
-                                self.issues.append({
-                                    "type": "nullable_mismatch",
-                                    "table": table_name,
-                                    "column": column_name,
-                                    "issue": f"数据库列 {column_name} 为nullable,但实体字段为not null"
-                                })
+                                self.issues.append(
+                                    {
+                                        "type": "nullable_mismatch",
+                                        "table": table_name,
+                                        "column": column_name,
+                                        "issue": f"数据库列 {column_name} 为nullable,但实体字段为not null",
+                                    }
+                                )
                             elif not is_nullable and entity_nullable:
-                                self.issues.append({
-                                    "type": "nullable_mismatch",
-                                    "table": table_name,
-                                    "column": column_name,
-                                    "issue": f"数据库列 {column_name} 为not null,但实体字段为nullable"
-                                })
+                                self.issues.append(
+                                    {
+                                        "type": "nullable_mismatch",
+                                        "table": table_name,
+                                        "column": column_name,
+                                        "issue": f"数据库列 {column_name} 为not null,但实体字段为nullable",
+                                    }
+                                )
 
     def _get_entity_class_by_table_name(self, table_name: str):
         """根据表名获取实体类"""
@@ -129,7 +133,7 @@ class EntityContractChecker:
             "src/entities/anomaly_event.py",
             "src/entities/processed_event.py",
             "src/entities/quant_signal.py",
-            "src/entities/generated_report.py"
+            "src/entities/generated_report.py",
         ]
 
         for entity_file in entity_files:
@@ -142,8 +146,8 @@ class EntityContractChecker:
         # 这里简化实现,实际应该分析测试文件
         return {
             "total_methods": 10,  # 示例数据
-            "tested_methods": 8,   # 示例数据
-            "coverage_percentage": 80.0
+            "tested_methods": 8,  # 示例数据
+            "coverage_percentage": 80.0,
         }
 
     def _generate_report(self) -> dict[str, Any]:
@@ -153,7 +157,7 @@ class EntityContractChecker:
             "issues": self.issues,
             "issues_by_type": {},
             "coverage_report": self.coverage_report,
-            "recommendations": []
+            "recommendations": [],
         }
 
         # 统计问题类型
@@ -167,16 +171,20 @@ class EntityContractChecker:
         if report["total_issues"] > 0:
             report["recommendations"].append("发现实体契约不一致问题,需要修复")
 
-        if any(cov["coverage_percentage"] < 85 for cov in self.coverage_report.values()):
-            report["recommendations"].append("实体单元测试覆盖率低于85%门禁,需要补充测试")
+        if any(
+            cov["coverage_percentage"] < 85 for cov in self.coverage_report.values()
+        ):
+            report["recommendations"].append(
+                "实体单元测试覆盖率低于85%门禁,需要补充测试"
+            )
 
         return report
 
     def print_report(self, report: dict[str, Any]):
         """打印检查报告"""
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("📋 数据库实体契约检查报告")
-        print("="*60)
+        print("=" * 60)
 
         print(f"🔍 总问题数: {report['total_issues']}")
 
@@ -199,7 +207,7 @@ class EntityContractChecker:
             for rec in report["recommendations"]:
                 print(f"  - {rec}")
 
-        print("="*60)
+        print("=" * 60)
 
 
 def main():

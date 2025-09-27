@@ -1,7 +1,7 @@
 # Docstring规范指南
 
-**版本**: v1.0  
-**维护者**: AI Assistant  
+**版本**: v1.0
+**维护者**: AI Assistant
 **最后更新**: 2025年1月17日
 
 ---
@@ -20,20 +20,20 @@
 def function_name(param1: type, param2: type = default) -> return_type:
     """
     函数的简短描述（一行）。
-    
+
     函数的详细描述，可以跨越多行。
     解释函数的目的、工作原理和重要细节。
-    
+
     Args:
         param1: 参数1的描述
         param2: 参数2的描述，包含默认值说明
-        
+
     Returns:
         返回值的描述，包括类型和含义
-        
+
     Raises:
         ExceptionType: 什么情况下会抛出此异常
-        
+
     Examples:
         >>> result = function_name("example", 42)
         >>> print(result)
@@ -64,10 +64,10 @@ def calculate_quant_signal(self, data: pd.DataFrame) -> QuantSignal:
 def calculate_quant_signal(self, data: pd.DataFrame) -> QuantSignal:
     """
     计算量化信号，基于市场数据异常检测。
-    
+
     该方法通过分析市场数据的统计特征，识别潜在的异常模式，
     并生成相应的量化交易信号。信号强度基于异常程度和置信度。
-    
+
     算法流程：
     1. 数据预处理和清洗
     2. 特征提取和标准化
@@ -83,8 +83,8 @@ def calculate_quant_signal(self, data: pd.DataFrame) -> QuantSignal:
 
 ```python
 def calculate_quant_signal(
-    self, 
-    market_data: pd.DataFrame, 
+    self,
+    market_data: pd.DataFrame,
     threshold: float = 0.05,
     lookback_days: int = 30
 ) -> QuantSignal:
@@ -140,11 +140,11 @@ def calculate_quant_signal(self, data: pd.DataFrame) -> QuantSignal:
         >>> # 基本用法
         >>> signal = engine.calculate_quant_signal(df)
         >>> print(f"Signal strength: {signal.strength}")
-        
+
         >>> # 自定义阈值
         >>> signal = engine.calculate_quant_signal(df, threshold=0.03)
         >>> print(f"Confidence: {signal.confidence}")
-        
+
         >>> # 处理异常情况
         >>> try:
         ...     signal = engine.calculate_quant_signal(empty_df)
@@ -161,24 +161,24 @@ def calculate_quant_signal(self, data: pd.DataFrame) -> QuantSignal:
 class QuantSignalEngine:
     """
     量化信号引擎，负责生成基于市场数据的交易信号。
-    
+
     该类封装了异常检测算法和信号生成逻辑，提供统一的接口
     用于计算各种类型的量化交易信号。
-    
+
     Attributes:
         config: 引擎配置对象
         logger: 日志记录器
         cache: 缓存管理器
-        
+
     Examples:
         >>> engine = QuantSignalEngine(config)
         >>> signal = engine.calculate_signal(market_data)
     """
-    
+
     def __init__(self, config: EngineConfig):
         """
         初始化量化信号引擎。
-        
+
         Args:
             config: 引擎配置对象，包含算法参数和系统设置
         """
@@ -235,19 +235,19 @@ class QuantSignalEngine:
 async def fetch_market_data(self, symbol: str) -> pd.DataFrame:
     """
     异步获取市场数据。
-    
+
     从外部API异步获取指定股票的市场数据，支持并发请求。
-    
+
     Args:
         symbol: 股票代码，如'AAPL'
-        
+
     Returns:
         pd.DataFrame: 包含OHLCV数据的DataFrame
-        
+
     Raises:
         APIError: 当API请求失败时
         TimeoutError: 当请求超时时
-        
+
     Examples:
         >>> data = await engine.fetch_market_data('AAPL')
         >>> print(data.head())
@@ -260,15 +260,15 @@ async def fetch_market_data(self, symbol: str) -> pd.DataFrame:
 def retry_on_failure(max_retries: int = 3):
     """
     失败重试装饰器。
-    
+
     当函数执行失败时，自动重试指定次数。
-    
+
     Args:
         max_retries: 最大重试次数，默认3次
-        
+
     Returns:
         装饰器函数
-        
+
     Examples:
         >>> @retry_on_failure(max_retries=5)
         ... def risky_operation():
@@ -286,15 +286,15 @@ def retry_on_failure(max_retries: int = 3):
 ```python
 class QuantSignal:
     """量化信号数据模型。"""
-    
+
     @property
     def strength(self) -> float:
         """
         信号强度。
-        
+
         范围[0, 1]，值越大表示信号越强。
         0表示无信号，1表示最强信号。
-        
+
         Returns:
             float: 信号强度值
         """
@@ -341,13 +341,13 @@ def calculate_signal(data):
 def calculate_signal(data: pd.DataFrame) -> QuantSignal:
     """
     计算量化信号，基于市场数据异常检测。
-    
+
     Args:
         data: 市场数据DataFrame，必须包含'price'和'volume'列
-        
+
     Returns:
         QuantSignal: 包含信号强度和置信度的信号对象
-        
+
     Raises:
         DataValidationError: 当数据格式不正确时
     """

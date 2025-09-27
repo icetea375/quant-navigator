@@ -30,22 +30,26 @@ class TestTushareFetcherContract:
         这是核心的契约测试,确保TushareFetcher完全符合接口定义
         """
         # 使用契约测试生成器验证TushareFetcher
-        assert await run_data_source_contract_tests(tushare_fetcher), "TushareFetcher不符合DataSourceInterface契约"
+        assert await run_data_source_contract_tests(
+            tushare_fetcher
+        ), "TushareFetcher不符合DataSourceInterface契约"
 
     @pytest.mark.asyncio
     async def test_get_daily_quotes_contract(self, tushare_fetcher):
         """测试get_daily_quotes方法契约"""
         # Mock Tushare API响应
-        mock_df = pd.DataFrame({
-            "ts_code": ["000001.SZ"],
-            "trade_date": ["20250126"],
-            "open": [100.0],
-            "high": [105.0],
-            "low": [98.0],
-            "close": [103.0],
-            "vol": [1000000],
-            "amount": [103000000]
-        })
+        mock_df = pd.DataFrame(
+            {
+                "ts_code": ["000001.SZ"],
+                "trade_date": ["20250126"],
+                "open": [100.0],
+                "high": [105.0],
+                "low": [98.0],
+                "close": [103.0],
+                "vol": [1000000],
+                "amount": [103000000],
+            }
+        )
 
         with patch.object(tushare_fetcher.pro, "daily", return_value=mock_df):
             result = await tushare_fetcher.get_daily_quotes("000001.SZ", "20250126")
@@ -54,21 +58,34 @@ class TestTushareFetcherContract:
             assert isinstance(result, pd.DataFrame), "必须返回DataFrame"
 
             # 验证必需列
-            required_columns = ["stock_code", "trade_date", "open", "high", "low", "close", "volume", "amount"]
-            assert set(required_columns).issubset(result.columns), f"缺少必需列: {required_columns}"
+            required_columns = [
+                "stock_code",
+                "trade_date",
+                "open",
+                "high",
+                "low",
+                "close",
+                "volume",
+                "amount",
+            ]
+            assert set(required_columns).issubset(
+                result.columns
+            ), f"缺少必需列: {required_columns}"
 
     @pytest.mark.asyncio
     async def test_get_announcements_contract(self, tushare_fetcher):
         """测试get_announcements方法契约"""
         # Mock Tushare API响应
-        mock_df = pd.DataFrame({
-            "ann_id": ["ann_001"],
-            "ts_code": ["000001.SZ"],
-            "title": ["测试公告"],
-            "content": ["测试内容"],
-            "ann_date": ["20250126"],
-            "ann_type": ["业绩预告"]
-        })
+        mock_df = pd.DataFrame(
+            {
+                "ann_id": ["ann_001"],
+                "ts_code": ["000001.SZ"],
+                "title": ["测试公告"],
+                "content": ["测试内容"],
+                "ann_date": ["20250126"],
+                "ann_type": ["业绩预告"],
+            }
+        )
 
         with patch.object(tushare_fetcher.pro, "anns", return_value=mock_df):
             result = await tushare_fetcher.get_announcements("000001.SZ", "20250126")
@@ -78,23 +95,34 @@ class TestTushareFetcherContract:
 
             if result:
                 # 验证必需键
-                required_keys = ["announcement_id", "stock_code", "title", "content", "publish_date", "announcement_type"]
-                assert set(required_keys).issubset(result[0].keys()), f"缺少必需键: {required_keys}"
+                required_keys = [
+                    "announcement_id",
+                    "stock_code",
+                    "title",
+                    "content",
+                    "publish_date",
+                    "announcement_type",
+                ]
+                assert set(required_keys).issubset(
+                    result[0].keys()
+                ), f"缺少必需键: {required_keys}"
 
     @pytest.mark.asyncio
     async def test_get_financial_data_contract(self, tushare_fetcher):
         """测试get_financial_data方法契约"""
         # Mock Tushare API响应
-        mock_df = pd.DataFrame({
-            "ts_code": ["000001.SZ"],
-            "f_ann_date": ["20250126"],
-            "revenue": [1000000000],
-            "n_income": [100000000],
-            "total_assets": [10000000000],
-            "total_liab": [5000000000],
-            "roe": [0.1],
-            "roa": [0.05]
-        })
+        mock_df = pd.DataFrame(
+            {
+                "ts_code": ["000001.SZ"],
+                "f_ann_date": ["20250126"],
+                "revenue": [1000000000],
+                "n_income": [100000000],
+                "total_assets": [10000000000],
+                "total_liab": [5000000000],
+                "roe": [0.1],
+                "roa": [0.05],
+            }
+        )
 
         with patch.object(tushare_fetcher.pro, "income", return_value=mock_df):
             result = await tushare_fetcher.get_financial_data("000001.SZ", "20241231")
@@ -104,17 +132,25 @@ class TestTushareFetcherContract:
 
             if result:
                 # 验证必需键
-                required_keys = ["stock_code", "report_date", "revenue", "net_profit", "total_assets", "total_liabilities", "roe", "roa"]
-                assert set(required_keys).issubset(result.keys()), f"缺少必需键: {required_keys}"
+                required_keys = [
+                    "stock_code",
+                    "report_date",
+                    "revenue",
+                    "net_profit",
+                    "total_assets",
+                    "total_liabilities",
+                    "roe",
+                    "roa",
+                ]
+                assert set(required_keys).issubset(
+                    result.keys()
+                ), f"缺少必需键: {required_keys}"
 
     @pytest.mark.asyncio
     async def test_health_check_contract(self, tushare_fetcher):
         """测试health_check方法契约"""
         # Mock Tushare API响应
-        mock_df = pd.DataFrame({
-            "ts_code": ["000001.SZ"],
-            "name": ["平安银行"]
-        })
+        mock_df = pd.DataFrame({"ts_code": ["000001.SZ"], "name": ["平安银行"]})
 
         with patch.object(tushare_fetcher.pro, "stock_basic", return_value=mock_df):
             result = await tushare_fetcher.health_check()
@@ -123,17 +159,31 @@ class TestTushareFetcherContract:
             assert isinstance(result, dict), "必须返回Dict"
 
             # 验证必需键
-            required_keys = ["status", "response_time", "last_success", "error_count", "rate_limit_remaining"]
-            assert set(required_keys).issubset(result.keys()), f"缺少必需键: {required_keys}"
+            required_keys = [
+                "status",
+                "response_time",
+                "last_success",
+                "error_count",
+                "rate_limit_remaining",
+            ]
+            assert set(required_keys).issubset(
+                result.keys()
+            ), f"缺少必需键: {required_keys}"
 
             # 验证status值
-            assert result["status"] in ["healthy", "unhealthy", "degraded"], f"无效的status值: {result['status']}"
+            assert result["status"] in [
+                "healthy",
+                "unhealthy",
+                "degraded",
+            ], f"无效的status值: {result['status']}"
 
     @pytest.mark.asyncio
     async def test_exception_handling_contract(self, tushare_fetcher):
         """测试异常处理契约"""
         # Mock API调用失败
-        with patch.object(tushare_fetcher.pro, "daily", side_effect=Exception("API调用失败")):
+        with patch.object(
+            tushare_fetcher.pro, "daily", side_effect=Exception("API调用失败")
+        ):
             from src.core.interfaces import DataSourceError
 
             with pytest.raises(DataSourceError):
@@ -156,16 +206,18 @@ class TestTushareFetcherContract:
     async def test_data_standardization(self, tushare_fetcher):
         """测试数据标准化"""
         # Mock Tushare原始数据
-        mock_df = pd.DataFrame({
-            "ts_code": ["000001.SZ"],
-            "trade_date": ["20250126"],
-            "open": [100.0],
-            "high": [105.0],
-            "low": [98.0],
-            "close": [103.0],
-            "vol": [1000000],  # Tushare使用'vol'
-            "amount": [103000000]
-        })
+        mock_df = pd.DataFrame(
+            {
+                "ts_code": ["000001.SZ"],
+                "trade_date": ["20250126"],
+                "open": [100.0],
+                "high": [105.0],
+                "low": [98.0],
+                "close": [103.0],
+                "vol": [1000000],  # Tushare使用'vol'
+                "amount": [103000000],
+            }
+        )
 
         with patch.object(tushare_fetcher.pro, "daily", return_value=mock_df):
             result = await tushare_fetcher.get_daily_quotes("000001.SZ", "20250126")

@@ -12,12 +12,12 @@ const testDemoLogin = () => {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
-  
+
   const demoToken = 'demo_token_' + Date.now()
-  
+
   console.log('演示用户:', demoUser);
   console.log('演示Token:', demoToken);
-  
+
   return { success: true }
 }
 

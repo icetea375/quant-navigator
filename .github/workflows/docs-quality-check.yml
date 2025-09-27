@@ -17,25 +17,25 @@ on:
 jobs:
   docs-quality-check:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: 检出代码
       uses: actions/checkout@v4
-      
+
     - name: 设置Python环境
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-        
+
     - name: 安装依赖
       run: |
         python -m pip install --upgrade pip
         pip install requests pandas ast pathlib
-        
+
     - name: 运行文档质量检查
       run: |
         python tools/scripts/check_docs_quality.py --project-root .
-        
+
     - name: 检查docstring覆盖率
       run: |
         # 设置最低覆盖率要求
@@ -47,7 +47,7 @@ jobs:
         else
           echo "✅ Docstring覆盖率 $COVERAGE% 符合要求"
         fi
-        
+
     - name: 检查文档链接有效性
       run: |
         # 检查是否有损坏的链接
@@ -58,7 +58,7 @@ jobs:
         else
           echo "✅ 所有链接都有效"
         fi
-        
+
     - name: 检查ADR文档完整性
       run: |
         # 检查ADR文档是否存在且格式正确
@@ -66,7 +66,7 @@ jobs:
           echo "❌ ADR.md 文件不存在"
           exit 1
         fi
-        
+
         # 检查ADR数量
         ADR_COUNT=$(grep -c "## ADR-" docs/ADR.md || echo "0")
         if [ "$ADR_COUNT" -lt 3 ]; then
@@ -75,14 +75,14 @@ jobs:
         else
           echo "✅ ADR数量 $ADR_COUNT 符合要求"
         fi
-        
+
     - name: 上传检查报告
       uses: actions/upload-artifact@v3
       if: always()
       with:
         name: docs-quality-report
         path: docs/文档质量检查报告.md
-        
+
     - name: 评论PR
       if: github.event_name == 'pull_request'
       uses: actions/github-script@v6
@@ -90,7 +90,7 @@ jobs:
         script: |
           const fs = require('fs');
           const report = fs.readFileSync('docs/文档质量检查报告.md', 'utf8');
-          
+
           github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,

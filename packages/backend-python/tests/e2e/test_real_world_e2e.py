@@ -26,11 +26,11 @@ class TestRealWorldE2E:
         return {
             "tushare": {
                 "token": os.getenv("TUSHARE_TOKEN", "test_token"),
-                "timeout": 30
+                "timeout": 30,
             },
             "database": {
                 "url": "sqlite:///test_e2e.db"  # 使用独立的测试数据库
-            }
+            },
         }
 
     @pytest.fixture
@@ -56,7 +56,9 @@ class TestRealWorldE2E:
     @pytest.mark.e2e
     @pytest.mark.slow
     @pytest.mark.asyncio
-    async def test_core_data_pipeline_workflow_real_world(self, real_tushare_fetcher, real_data_pipeline_service, stable_test_data):
+    async def test_core_data_pipeline_workflow_real_world(
+        self, real_tushare_fetcher, real_data_pipeline_service, stable_test_data
+    ):
         """
         核心数据管道工作流的真实世界测试
 
@@ -68,7 +70,9 @@ class TestRealWorldE2E:
         注意：这个测试可能会因为网络或API问题偶尔失败
         如果失败，请人工判断是外部问题还是代码问题
         """
-        print(f"\n🚀 开始真实世界E2E测试: {stable_test_data['stock_code']} - {stable_test_data['trade_date']}")
+        print(
+            f"\n🚀 开始真实世界E2E测试: {stable_test_data['stock_code']} - {stable_test_data['trade_date']}"
+        )
 
         try:
             # 步骤1: 从真实Tushare API获取数据
@@ -76,8 +80,7 @@ class TestRealWorldE2E:
             start_time = time.time()
 
             raw_data = await real_data_pipeline_service.fetch_tushare_data(
-                stable_test_data["stock_code"],
-                stable_test_data["trade_date"]
+                stable_test_data["stock_code"], stable_test_data["trade_date"]
             )
 
             api_time = time.time() - start_time
@@ -95,10 +98,12 @@ class TestRealWorldE2E:
 
             # 步骤2: 提取财务因子
             print("🔧 提取财务因子...")
-            financial_factors = await real_data_pipeline_service.extract_financial_factors(
-                stable_test_data["stock_code"],
-                stable_test_data["trade_date"],
-                raw_data
+            financial_factors = (
+                await real_data_pipeline_service.extract_financial_factors(
+                    stable_test_data["stock_code"],
+                    stable_test_data["trade_date"],
+                    raw_data,
+                )
             )
 
             # 验证财务因子的合理性（银行股的特征）
@@ -112,15 +117,25 @@ class TestRealWorldE2E:
             print(f"📊 财务指标: PE={pe_ratio:.2f}, PB={pb_ratio:.2f}")
 
             # 银行股的PE和PB通常较低
-            assert stable_test_data["expected_pe_range"][0] <= pe_ratio <= stable_test_data["expected_pe_range"][1], \
-                f"PE比率 {pe_ratio} 超出银行股合理范围 {stable_test_data['expected_pe_range']}"
+            assert (
+                stable_test_data["expected_pe_range"][0]
+                <= pe_ratio
+                <= stable_test_data["expected_pe_range"][1]
+            ), f"PE比率 {pe_ratio} 超出银行股合理范围 {stable_test_data['expected_pe_range']}"
 
-            assert stable_test_data["expected_pb_range"][0] <= pb_ratio <= stable_test_data["expected_pb_range"][1], \
-                f"PB比率 {pb_ratio} 超出银行股合理范围 {stable_test_data['expected_pb_range']}"
+            assert (
+                stable_test_data["expected_pb_range"][0]
+                <= pb_ratio
+                <= stable_test_data["expected_pb_range"][1]
+            ), f"PB比率 {pb_ratio} 超出银行股合理范围 {stable_test_data['expected_pb_range']}"
 
             # 步骤3: 计算超级财务因子
             print("🧮 计算超级财务因子...")
-            super_factors = await real_data_pipeline_service.calculate_super_financial_factors(financial_factors)
+            super_factors = (
+                await real_data_pipeline_service.calculate_super_financial_factors(
+                    financial_factors
+                )
+            )
 
             # 验证超级财务因子的合理性
             assert "overall_score" in super_factors
@@ -166,7 +181,9 @@ class TestRealWorldE2E:
     @pytest.mark.e2e
     @pytest.mark.slow
     @pytest.mark.asyncio
-    async def test_data_pipeline_error_handling_real_world(self, real_data_pipeline_service):
+    async def test_data_pipeline_error_handling_real_world(
+        self, real_data_pipeline_service
+    ):
         """
         真实世界错误处理测试
 
@@ -176,7 +193,9 @@ class TestRealWorldE2E:
 
         # 测试无效股票代码
         try:
-            await real_data_pipeline_service.fetch_tushare_data("INVALID.SH", "20230101")
+            await real_data_pipeline_service.fetch_tushare_data(
+                "INVALID.SH", "20230101"
+            )
             assert False, "应该抛出异常"
         except Exception as e:
             print(f"✅ 无效股票代码正确抛出异常: {e}")
@@ -184,7 +203,9 @@ class TestRealWorldE2E:
 
         # 测试无效日期格式
         try:
-            await real_data_pipeline_service.fetch_tushare_data("601398.SH", "invalid-date")
+            await real_data_pipeline_service.fetch_tushare_data(
+                "601398.SH", "invalid-date"
+            )
             assert False, "应该抛出异常"
         except Exception as e:
             print(f"✅ 无效日期格式正确抛出异常: {e}")
@@ -193,7 +214,9 @@ class TestRealWorldE2E:
     @pytest.mark.e2e
     @pytest.mark.slow
     @pytest.mark.asyncio
-    async def test_system_performance_real_world(self, real_tushare_fetcher, real_data_pipeline_service, stable_test_data):
+    async def test_system_performance_real_world(
+        self, real_tushare_fetcher, real_data_pipeline_service, stable_test_data
+    ):
         """
         真实世界性能测试
 
@@ -205,24 +228,27 @@ class TestRealWorldE2E:
 
         # 执行完整流程
         raw_data = await real_data_pipeline_service.fetch_tushare_data(
-            stable_test_data["stock_code"],
-            stable_test_data["trade_date"]
+            stable_test_data["stock_code"], stable_test_data["trade_date"]
         )
 
         financial_factors = await real_data_pipeline_service.extract_financial_factors(
-            stable_test_data["stock_code"],
-            stable_test_data["trade_date"],
-            raw_data
+            stable_test_data["stock_code"], stable_test_data["trade_date"], raw_data
         )
 
-        super_factors = await real_data_pipeline_service.calculate_super_financial_factors(financial_factors)
+        super_factors = (
+            await real_data_pipeline_service.calculate_super_financial_factors(
+                financial_factors
+            )
+        )
 
         total_time = time.time() - start_time
 
         print(f"⏱️ 真实世界性能测试完成，总耗时: {total_time:.2f}秒")
 
         # 性能要求：整个流程应该在30秒内完成
-        assert total_time < 30.0, f"性能测试失败：总耗时 {total_time:.2f}秒 超过30秒限制"
+        assert (
+            total_time < 30.0
+        ), f"性能测试失败：总耗时 {total_time:.2f}秒 超过30秒限制"
 
         print(f"✅ 性能测试通过：{total_time:.2f}秒 < 30秒")
 

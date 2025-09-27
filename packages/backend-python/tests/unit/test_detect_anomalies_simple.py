@@ -15,18 +15,21 @@ from src.exceptions.workflow_exceptions import QuantDataProviderError
 
 class MockQuantEngine:
     """模拟量化引擎"""
+
     def __init__(self):
         self.detect_anomalies_async = AsyncMock()
 
 
 class MockDataPipeline:
     """模拟数据管道"""
+
     def __init__(self):
         self.get_price_anomalies_async = AsyncMock()
 
 
 class MockMainWorkflow:
     """模拟主工作流类"""
+
     def __init__(self):
         self.logger = MagicMock()
         self.quant_engine = MockQuantEngine()
@@ -51,7 +54,7 @@ class MockMainWorkflow:
             # 并行检测多种异常
             tasks = [
                 self.quant_engine.detect_anomalies_async(trade_date),
-                self.data_pipeline.get_price_anomalies_async(trade_date)
+                self.data_pipeline.get_price_anomalies_async(trade_date),
             ]
 
             results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -91,10 +94,16 @@ class TestDetectAnomalies:
     async def test_detect_anomalies_success(self, mock_workflow):
         """测试成功检测异常股票"""
         # 模拟量化引擎返回异常股票
-        mock_workflow.quant_engine.detect_anomalies_async.return_value = ["000001", "000002"]
+        mock_workflow.quant_engine.detect_anomalies_async.return_value = [
+            "000001",
+            "000002",
+        ]
 
         # 模拟数据管道返回异常股票
-        mock_workflow.data_pipeline.get_price_anomalies_async.return_value = ["000002", "600036"]
+        mock_workflow.data_pipeline.get_price_anomalies_async.return_value = [
+            "000002",
+            "600036",
+        ]
 
         trade_date = "2025-01-17"
         result = await mock_workflow._detect_anomalies(trade_date)
@@ -106,14 +115,20 @@ class TestDetectAnomalies:
         assert "600036" in result
 
         # 验证并行调用
-        mock_workflow.quant_engine.detect_anomalies_async.assert_called_once_with(trade_date)
-        mock_workflow.data_pipeline.get_price_anomalies_async.assert_called_once_with(trade_date)
+        mock_workflow.quant_engine.detect_anomalies_async.assert_called_once_with(
+            trade_date
+        )
+        mock_workflow.data_pipeline.get_price_anomalies_async.assert_called_once_with(
+            trade_date
+        )
 
     @pytest.mark.asyncio
     async def test_detect_anomalies_quant_engine_failure(self, mock_workflow):
         """测试量化引擎失败时快速失败"""
         # 模拟量化引擎抛出异常
-        mock_workflow.quant_engine.detect_anomalies_async.side_effect = Exception("量化引擎错误")
+        mock_workflow.quant_engine.detect_anomalies_async.side_effect = Exception(
+            "量化引擎错误"
+        )
 
         # 模拟数据管道正常
         mock_workflow.data_pipeline.get_price_anomalies_async.return_value = ["600036"]
@@ -134,7 +149,9 @@ class TestDetectAnomalies:
         mock_workflow.quant_engine.detect_anomalies_async.return_value = ["000001"]
 
         # 模拟数据管道抛出异常
-        mock_workflow.data_pipeline.get_price_anomalies_async.side_effect = Exception("数据管道错误")
+        mock_workflow.data_pipeline.get_price_anomalies_async.side_effect = Exception(
+            "数据管道错误"
+        )
 
         trade_date = "2025-01-17"
 
@@ -165,6 +182,7 @@ class TestDetectAnomalies:
     @pytest.mark.asyncio
     async def test_detect_anomalies_parallel_execution(self, mock_workflow):
         """测试并行执行"""
+
         # 模拟两个引擎都有延迟
         async def delayed_quant_engine(_trade_date):
             await asyncio.sleep(0.1)
@@ -174,8 +192,12 @@ class TestDetectAnomalies:
             await asyncio.sleep(0.1)
             return ["000002"]
 
-        mock_workflow.quant_engine.detect_anomalies_async.side_effect = delayed_quant_engine
-        mock_workflow.data_pipeline.get_price_anomalies_async.side_effect = delayed_data_pipeline
+        mock_workflow.quant_engine.detect_anomalies_async.side_effect = (
+            delayed_quant_engine
+        )
+        mock_workflow.data_pipeline.get_price_anomalies_async.side_effect = (
+            delayed_data_pipeline
+        )
 
         trade_date = "2025-01-17"
 
@@ -215,7 +237,9 @@ class TestDetectAnomalies:
         mock_workflow.quant_engine.detect_anomalies_async.return_value = ["000001"]
 
         # 模拟一个非Exception类型的错误,这样会触发critical日志
-        mock_workflow.data_pipeline.get_price_anomalies_async.side_effect = ValueError("测试错误")
+        mock_workflow.data_pipeline.get_price_anomalies_async.side_effect = ValueError(
+            "测试错误"
+        )
 
         trade_date = "2025-01-17"
 

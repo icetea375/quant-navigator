@@ -95,9 +95,15 @@ class ArbitrationService:
             disagreement_score = min(confidence_diff * 2, 1.0)  # 限制在0-1之间
 
         # 将Pydantic对象转换为字典以兼容Pydantic v2
-        qwen_analysis_dict = case_data.qwen_analysis.model_dump() if case_data.qwen_analysis else None
-        doubao_analysis_dict = case_data.doubao_analysis.model_dump() if case_data.doubao_analysis else None
-        
+        qwen_analysis_dict = (
+            case_data.qwen_analysis.model_dump() if case_data.qwen_analysis else None
+        )
+        doubao_analysis_dict = (
+            case_data.doubao_analysis.model_dump()
+            if case_data.doubao_analysis
+            else None
+        )
+
         case = ArbitrationCase(
             case_id=case_id,
             report_type=case_data.report_type,

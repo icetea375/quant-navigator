@@ -14,5 +14,5 @@ __all__ = [
     "DataSourceContractTester",
     "LlmProviderContractTester",
     "run_data_source_contract_tests",
-    "run_llm_provider_contract_tests"
+    "run_llm_provider_contract_tests",
 ]

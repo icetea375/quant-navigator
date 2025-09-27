@@ -42,14 +42,14 @@ python3 "$SCRIPT_DIR/update_docs_index.py"
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✅ 文档索引更新成功！${NC}"
-    
+
     # 显示更新后的统计信息
     echo -e "${BLUE}📊 文档统计:${NC}"
     echo -e "   - 核心开发文档: $(find "$DOCS_DIR" -name "开发文档第*章*.md" | wc -l) 个"
     echo -e "   - 架构设计文档: $(find "$DOCS_DIR" -name "架构设计*.md" | wc -l) 个"
     echo -e "   - 项目管理文档: $(find "$DOCS_DIR" -name "*.md" | grep -E "(ADR|API_CHANGELOG|LINTING_PHILOSOPHY|测试宪法)" | wc -l) 个"
     echo -e "   - 完成报告: $(find "$DOCS_DIR" -name "v*_完成报告.md" | wc -l) 个"
-    
+
     echo -e "${GREEN}🎉 文档索引更新完成！${NC}"
 else
     echo -e "${RED}❌ 文档索引更新失败！${NC}"

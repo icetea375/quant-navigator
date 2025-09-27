@@ -14,4 +14,4 @@ sys.path.insert(0, str(project_root))
 from config.settings import settings, get_settings, validate_critical_config
 
 # 向后兼容：保持原有的settings实例
-__all__ = ['settings', 'get_settings', 'validate_critical_config']
+__all__ = ["settings", "get_settings", "validate_critical_config"]

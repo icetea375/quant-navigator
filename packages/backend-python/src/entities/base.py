@@ -19,8 +19,16 @@ class DatabaseEntityMixin:
     """数据库实体混入类 - 提供通用字段"""
 
     id = Column(String(255), primary_key=True, comment="唯一标识符")
-    created_at = Column(DateTime, default=func.now(), nullable=False, comment="创建时间")
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间")
+    created_at = Column(
+        DateTime, default=func.now(), nullable=False, comment="创建时间"
+    )
+    updated_at = Column(
+        DateTime,
+        default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+        comment="更新时间",
+    )
     metadata_json = Column(JSON, default=dict, comment="元数据")
 
 
@@ -35,7 +43,9 @@ class PydanticMixin:
             if isinstance(value, datetime):
                 # 处理时间戳字段
                 if column.name in ["timestamp"]:
-                    data[column.name] = int(value.timestamp() * 1000)  # 转换为毫秒时间戳
+                    data[column.name] = int(
+                        value.timestamp() * 1000
+                    )  # 转换为毫秒时间戳
                 else:
                     data[column.name] = value.isoformat()
             elif column.name == "metadata_json":
@@ -66,6 +76,7 @@ class PydanticMixin:
 
 class BaseEntity(Base, DatabaseEntityMixin, PydanticMixin):
     """基础实体类 - 所有实体的基类"""
+
     __abstract__ = True
 
     def __repr__(self):

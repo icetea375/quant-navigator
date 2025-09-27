@@ -196,6 +196,14 @@ export interface MoneyFlowData {
   dataSource: string;
   dataUpdatedAt: string;
   metadata?: Record<string, any>;
+  // 兼容旧版本字段
+  superLargeNetInflow?: number;
+  largeNetInflow?: number;
+  mediumNetInflow?: number;
+  smallNetInflow?: number;
+  mainInflow?: number;
+  retailInflow?: number;
+  institutionalInflow?: number;
 }
 
 export interface TopListData {
@@ -266,6 +274,12 @@ export interface ChipDistributionData {
   dataSource: string;
   dataUpdatedAt: string;
   metadata?: Record<string, any>;
+  // 兼容旧版本字段
+  high_cost_ratio?: number;
+  medium_cost_ratio?: number;
+  low_cost_ratio?: number;
+  avg_cost?: number;
+  cost_concentration?: number;
 }
 
 export interface HistoricalArbitrations {
@@ -324,6 +338,12 @@ export interface ArbitrationCaseData {
     flowAndChipsViewer: FlowAndChipsData;
     precedentViewer: HistoricalArbitrations[];
   };
+  // 兼容旧版本数据结构
+  case_id?: string;
+  report_type?: string;
+  target_code?: string;
+  qwen_analysis?: any;
+  doubao_analysis?: any;
 }
 
 // ==================== 组件Props类型 ====================

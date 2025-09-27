@@ -13,6 +13,7 @@ from src.exceptions.workflow_exceptions import LLMServiceError
 
 class MockMainWorkflow:
     """模拟主工作流类"""
+
     def __init__(self, config):
         self.config = config
         self.logger = MagicMock()
@@ -55,13 +56,13 @@ class TestInitializeLLMServices:
                 "qwen": {
                     "api_key": "qwen_test_key",
                     "base_url": "https://dashscope.aliyuncs.com/api/v1",
-                    "model": "qwen-plus"
+                    "model": "qwen-plus",
                 },
                 "doubao": {
                     "api_key": "doubao_test_key",
                     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-                    "model": "doubao-seed-1-6"
-                }
+                    "model": "doubao-seed-1-6",
+                },
             }
         }
 
@@ -73,10 +74,7 @@ class TestInitializeLLMServices:
 
     def test_initialize_llm_services_missing_llm_service_config(self):
         """测试缺少LLM服务配置时快速失败"""
-        config = {
-            "database": {},
-            "quant_engine": {}
-        }
+        config = {"database": {}, "quant_engine": {}}
 
         workflow = MockMainWorkflow(config)
 
@@ -93,13 +91,13 @@ class TestInitializeLLMServices:
             "llm_service": {
                 "qwen": {
                     "base_url": "https://dashscope.aliyuncs.com/api/v1",
-                    "model": "qwen-plus"
+                    "model": "qwen-plus",
                 },
                 "doubao": {
                     "api_key": "doubao_test_key",
                     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-                    "model": "doubao-seed-1-6"
-                }
+                    "model": "doubao-seed-1-6",
+                },
             }
         }
 
@@ -119,12 +117,12 @@ class TestInitializeLLMServices:
                 "qwen": {
                     "api_key": "qwen_test_key",
                     "base_url": "https://dashscope.aliyuncs.com/api/v1",
-                    "model": "qwen-plus"
+                    "model": "qwen-plus",
                 },
                 "doubao": {
                     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-                    "model": "doubao-seed-1-6"
-                }
+                    "model": "doubao-seed-1-6",
+                },
             }
         }
 
@@ -145,8 +143,8 @@ class TestInitializeLLMServices:
                 "doubao": {
                     "api_key": "doubao_test_key",
                     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-                    "model": "doubao-seed-1-6"
-                }
+                    "model": "doubao-seed-1-6",
+                },
             }
         }
 
@@ -166,9 +164,9 @@ class TestInitializeLLMServices:
                 "qwen": {
                     "api_key": "qwen_test_key",
                     "base_url": "https://dashscope.aliyuncs.com/api/v1",
-                    "model": "qwen-plus"
+                    "model": "qwen-plus",
                 },
-                "doubao": {}
+                "doubao": {},
             }
         }
 
@@ -188,13 +186,13 @@ class TestInitializeLLMServices:
                 "qwen": {
                     "api_key": None,
                     "base_url": "https://dashscope.aliyuncs.com/api/v1",
-                    "model": "qwen-plus"
+                    "model": "qwen-plus",
                 },
                 "doubao": {
                     "api_key": "doubao_test_key",
                     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-                    "model": "doubao-seed-1-6"
-                }
+                    "model": "doubao-seed-1-6",
+                },
             }
         }
 
@@ -214,13 +212,13 @@ class TestInitializeLLMServices:
                 "qwen": {
                     "api_key": "",
                     "base_url": "https://dashscope.aliyuncs.com/api/v1",
-                    "model": "qwen-plus"
+                    "model": "qwen-plus",
                 },
                 "doubao": {
                     "api_key": "",
                     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-                    "model": "doubao-seed-1-6"
-                }
+                    "model": "doubao-seed-1-6",
+                },
             }
         }
 
@@ -240,13 +238,13 @@ class TestInitializeLLMServices:
                 "qwen": {
                     "api_key": "qwen_test_key",
                     "base_url": "https://dashscope.aliyuncs.com/api/v1",
-                    "model": "qwen-plus"
+                    "model": "qwen-plus",
                 },
                 "doubao": {
                     "api_key": "doubao_test_key",
                     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-                    "model": "doubao-seed-1-6"
-                }
+                    "model": "doubao-seed-1-6",
+                },
             }
         }
 
@@ -263,9 +261,9 @@ class TestInitializeLLMServices:
                 "qwen": {
                     "api_key": "qwen_test_key",
                     "base_url": "https://dashscope.aliyuncs.com/api/v1",
-                    "model": "qwen-plus"
+                    "model": "qwen-plus",
                 },
-                "doubao": {}
+                "doubao": {},
             }
         }
 
@@ -285,9 +283,9 @@ class TestInitializeLLMServices:
                 "qwen": {
                     "api_key": "qwen_test_key",
                     "base_url": "https://dashscope.aliyuncs.com/api/v1",
-                    "model": "qwen-plus"
+                    "model": "qwen-plus",
                 },
-                "doubao": {}
+                "doubao": {},
             }
         }
 

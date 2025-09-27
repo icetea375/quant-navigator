@@ -16,23 +16,34 @@ from src.exceptions.workflow_exceptions import QuantDataProviderError
 
 class MockMainWorkflow:
     """模拟主工作流类(带并发控制)"""
+
     def __init__(self, config):
         self.config = config
         self.logger = MagicMock()
 
         # 初始化并发控制器
-        self.db_semaphore = asyncio.Semaphore(config.get("concurrency", {}).get("max_db_connections", 10))
-        self.llm_semaphore = asyncio.Semaphore(config.get("concurrency", {}).get("max_llm_requests", 5))
-        self.stock_processing_semaphore = asyncio.Semaphore(config.get("concurrency", {}).get("max_stock_processing", 20))
+        self.db_semaphore = asyncio.Semaphore(
+            config.get("concurrency", {}).get("max_db_connections", 10)
+        )
+        self.llm_semaphore = asyncio.Semaphore(
+            config.get("concurrency", {}).get("max_llm_requests", 5)
+        )
+        self.stock_processing_semaphore = asyncio.Semaphore(
+            config.get("concurrency", {}).get("max_stock_processing", 20)
+        )
 
         # 模拟数据库管理器
         self.db_manager = AsyncMock()
 
-    async def _load_stock_data_with_semaphore(self, stock_code: str, trade_date: str) -> dict:
+    async def _load_stock_data_with_semaphore(
+        self, stock_code: str, trade_date: str
+    ) -> dict:
         """带信号量控制的数据加载方法"""
         async with self.db_semaphore:
             try:
-                self.logger.info(f"加载股票数据: {stock_code} (并发控制: {self.db_semaphore._value})")
+                self.logger.info(
+                    f"加载股票数据: {stock_code} (并发控制: {self.db_semaphore._value})"
+                )
 
                 # 模拟数据库调用
                 await asyncio.sleep(0.1)  # 模拟数据库延迟
@@ -41,14 +52,24 @@ class MockMainWorkflow:
                     "stock_code": stock_code,
                     "trade_date": trade_date,
                     "financial_data": {"revenue": 1000},
-                    "price_data": {"close": 10.5}
+                    "price_data": {"close": 10.5},
                 }
 
             except Exception as e:
                 self.logger.error(f"加载股票数据失败: {stock_code} - {e}")
-                raise QuantDataProviderError(f"加载股票数据失败: {stock_code} - {e}") from e
+                raise QuantDataProviderError(
+                    f"加载股票数据失败: {stock_code} - {e}"
+                ) from e
 
-    async def _retry_wrapper(self, func, *args, retries: int = 3, delay: int = 0.1, operation_name: str = "操作", **kwargs):
+    async def _retry_wrapper(
+        self,
+        func,
+        *args,
+        retries: int = 3,
+        delay: int = 0.1,
+        operation_name: str = "操作",
+        **kwargs,
+    ):
         """重试包装器"""
         last_exception = None
 
@@ -71,10 +92,14 @@ class MockMainWorkflow:
                     self.logger.critical(f"{operation_name} - 所有重试失败,操作终止")
 
         # 所有重试都失败了
-        await self._send_critical_alert(f"{operation_name}重试失败", str(last_exception))
+        await self._send_critical_alert(
+            f"{operation_name}重试失败", str(last_exception)
+        )
         raise last_exception
 
-    async def _send_critical_alert(self, title: str, message: str, trade_date: Optional[str] = None):
+    async def _send_critical_alert(
+        self, title: str, message: str, trade_date: Optional[str] = None
+    ):
         """发送告警"""
         self.logger.critical(f"🚨 最高级别告警: {title} - {message}")
         self.logger.info("告警已发送")
@@ -90,7 +115,7 @@ class TestConcurrencyControl:
             "concurrency": {
                 "max_db_connections": 3,
                 "max_llm_requests": 2,
-                "max_stock_processing": 5
+                "max_stock_processing": 5,
             }
         }
         return MockMainWorkflow(config)
@@ -127,7 +152,7 @@ class TestConcurrencyControl:
         tasks = [
             mock_workflow._load_stock_data_with_semaphore("000001", "2025-01-17"),
             mock_workflow._load_stock_data_with_semaphore("000002", "2025-01-17"),
-            mock_workflow._load_stock_data_with_semaphore("000003", "2025-01-17")
+            mock_workflow._load_stock_data_with_semaphore("000003", "2025-01-17"),
         ]
 
         await asyncio.gather(*tasks)
@@ -139,14 +164,12 @@ class TestConcurrencyControl:
     @pytest.mark.asyncio
     async def test_retry_wrapper_success_on_first_attempt(self, mock_workflow):
         """测试重试包装器第一次尝试成功"""
+
         async def successful_operation():
             return "success"
 
         result = await mock_workflow._retry_wrapper(
-            successful_operation,
-            retries=3,
-            delay=0.01,
-            operation_name="测试操作"
+            successful_operation, retries=3, delay=0.01, operation_name="测试操作"
         )
 
         assert result == "success"
@@ -168,7 +191,7 @@ class TestConcurrencyControl:
             failing_then_successful_operation,
             retries=3,
             delay=0.01,
-            operation_name="测试操作"
+            operation_name="测试操作",
         )
 
         assert result == "success"
@@ -180,6 +203,7 @@ class TestConcurrencyControl:
     @pytest.mark.asyncio
     async def test_retry_wrapper_all_retries_fail(self, mock_workflow):
         """测试重试包装器所有重试都失败"""
+
         async def always_failing_operation():
             raise Exception("永久失败")
 
@@ -188,13 +212,15 @@ class TestConcurrencyControl:
                 always_failing_operation,
                 retries=2,
                 delay=0.01,
-                operation_name="测试操作"
+                operation_name="测试操作",
             )
 
         assert "永久失败" in str(exc_info.value)
 
         # 验证告警被发送
-        mock_workflow.logger.critical.assert_called_with("🚨 最高级别告警: 测试操作重试失败 - 永久失败")
+        mock_workflow.logger.critical.assert_called_with(
+            "🚨 最高级别告警: 测试操作重试失败 - 永久失败"
+        )
 
     @pytest.mark.asyncio
     async def test_retry_wrapper_logging(self, mock_workflow):
@@ -209,10 +235,7 @@ class TestConcurrencyControl:
             return "success"
 
         await mock_workflow._retry_wrapper(
-            failing_operation,
-            retries=3,
-            delay=0.01,
-            operation_name="测试操作"
+            failing_operation, retries=3, delay=0.01, operation_name="测试操作"
         )
 
         # 验证日志调用
@@ -228,7 +251,9 @@ class TestConcurrencyControl:
         await mock_workflow._send_critical_alert("测试告警", "测试消息", "2025-01-17")
 
         # 验证告警日志
-        mock_workflow.logger.critical.assert_called_with("🚨 最高级别告警: 测试告警 - 测试消息")
+        mock_workflow.logger.critical.assert_called_with(
+            "🚨 最高级别告警: 测试告警 - 测试消息"
+        )
         mock_workflow.logger.info.assert_called_with("告警已发送")
 
     @pytest.mark.asyncio

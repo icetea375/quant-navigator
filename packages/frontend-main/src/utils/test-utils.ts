@@ -4,6 +4,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
 import ElementPlus from 'element-plus'
 import type { App } from 'vue'
+import { vi } from 'vitest'
 
 // 测试路由
 const createTestRouter = () => {
@@ -47,6 +48,7 @@ export const createTestWrapper = (component: any, options: any = {}) => {
       stubs: {
         'router-link': true,
         'router-view': true,
+        ...mockElementPlusComponents(),
       },
     },
   }
@@ -170,8 +172,14 @@ export const mockElementPlusComponents = () => {
   return {
     'el-button': { template: '<button><slot /></button>' },
     'el-input': { template: '<input v-model="modelValue" />' },
-    'el-form': { template: '<form><slot /></form>' },
-    'el-form-item': { template: '<div><slot /></div>' },
+    'el-form': {
+      template: '<form><slot /></form>',
+      props: ['model', 'rules', 'ref']
+    },
+    'el-form-item': {
+      template: '<div><label>{{ label }}</label><slot /></div>',
+      props: ['label', 'prop']
+    },
     'el-card': { template: '<div class="el-card"><slot /></div>' },
     'el-table': {
       template: '<table><slot /></table>',
@@ -184,7 +192,10 @@ export const mockElementPlusComponents = () => {
     'el-pagination': { template: '<div class="el-pagination"></div>' },
     'el-loading': { template: '<div v-if="loading">Loading...</div>' },
     'el-message': { template: '<div></div>' },
-    'el-dialog': { template: '<div v-if="visible"><slot /></div>' },
+    'el-dialog': {
+      template: '<div v-if="modelValue"><h2>{{ title }}</h2><slot /></div>',
+      props: ['modelValue', 'title', 'width', 'beforeClose']
+    },
     'el-empty': {
       template: '<div class="el-empty"><slot>{{ description }}</slot></div>',
       props: ['description']
@@ -196,6 +207,30 @@ export const mockElementPlusComponents = () => {
     'el-statistic': {
       template: '<div class="el-statistic"><div class="el-statistic__title">{{ title }}</div><div class="el-statistic__content">{{ value }}{{ suffix }}</div></div>',
       props: ['title', 'value', 'suffix', 'precision']
+    },
+    'el-radio-group': {
+      template: '<div class="el-radio-group"><slot /></div>',
+      props: ['modelValue']
+    },
+    'el-radio': {
+      template: '<label class="el-radio"><input type="radio" :value="value" /><span><slot /></span></label>',
+      props: ['value']
+    },
+    'el-select': {
+      template: '<select v-model="modelValue" class="el-select"><slot /></select>',
+      props: ['modelValue', 'placeholder']
+    },
+    'el-option': {
+      template: '<option :value="value"><slot /></option>',
+      props: ['value', 'label']
+    },
+    'el-textarea': {
+      template: '<textarea v-model="modelValue" :maxlength="maxlength" class="el-textarea"></textarea>',
+      props: ['modelValue', 'maxlength', 'placeholder']
+    },
+    'el-skeleton': {
+      template: '<div class="el-skeleton">Loading skeleton...</div>',
+      props: ['rows', 'animated']
     },
   }
 }

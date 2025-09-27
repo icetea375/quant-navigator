@@ -34,6 +34,7 @@ class LLMService:
         # 依赖注入:使用抽象接口,不依赖具体实现
         if llm_provider is None:
             from src.services.llm_providers import QwenProvider
+
             self.llm_provider = QwenProvider()
         else:
             self.llm_provider = llm_provider
@@ -44,7 +45,7 @@ class LLMService:
             "status": "healthy",
             "call_count": self._call_count,
             "error_count": self._error_count,
-            "error_rate": self._error_count / max(self._call_count, 1)
+            "error_rate": self._error_count / max(self._call_count, 1),
         }
 
     async def analyze_fact(self, input_data: dict[str, Any]) -> AnalysisResult:
@@ -84,27 +85,25 @@ class LLMService:
 
             # 使用抽象接口调用LLM提供商
             response_text = await self.llm_provider.generate_text(
-                prompt=prompt,
-                model="qwen-plus",
-                max_tokens=1000,
-                temperature=0.3
+                prompt=prompt, model="qwen-plus", max_tokens=1000, temperature=0.3
             )
 
             # 解析响应(这里简化处理,实际应该更robust)
             import json
+
             try:
                 result = json.loads(response_text)
                 return AnalysisResult(
                     analysis=result.get("analysis", "无法进行分析"),
                     confidence=result.get("confidence", 0.5),
-                    reasoning=result.get("reasoning", "无法获取推理过程")
+                    reasoning=result.get("reasoning", "无法获取推理过程"),
                 )
             except json.JSONDecodeError:
                 # 如果解析失败,返回默认结果
                 return AnalysisResult(
                     analysis=f"基于{stock_code}的基本面分析",
                     confidence=0.6,
-                    reasoning="无法解析模型响应,使用默认分析"
+                    reasoning="无法解析模型响应,使用默认分析",
                 )
 
         except Exception as e:
@@ -142,28 +141,30 @@ class LLMService:
 
             # 使用抽象接口调用LLM提供商
             response_text = await self.llm_provider.generate_text(
-                prompt=prompt,
-                model="qwen-plus",
-                max_tokens=500,
-                temperature=0.3
+                prompt=prompt, model="qwen-plus", max_tokens=500, temperature=0.3
             )
 
             # 解析响应(这里简化处理,实际应该更robust)
             import json
+
             try:
                 result = json.loads(response_text)
                 return SentimentAnalysis(
                     sentiment=result.get("sentiment", "neutral"),
                     score=result.get("score", 0.5),
-                    reasoning=result.get("reasoning", "无法获取推理过程")
+                    reasoning=result.get("reasoning", "无法获取推理过程"),
                 )
             except json.JSONDecodeError:
                 # 如果解析失败,使用简单的情感分析逻辑
                 positive_words = ["上涨", "利好", "增长", "盈利", "突破"]
                 negative_words = ["下跌", "利空", "亏损", "风险", "危机"]
 
-                positive_count = sum(1 for word in positive_words if word in news_content)
-                negative_count = sum(1 for word in negative_words if word in news_content)
+                positive_count = sum(
+                    1 for word in positive_words if word in news_content
+                )
+                negative_count = sum(
+                    1 for word in negative_words if word in news_content
+                )
 
                 if positive_count > negative_count:
                     sentiment = "positive"
@@ -178,9 +179,7 @@ class LLMService:
                 reasoning = f"基于关键词的情感分析,{stock_code}市场情绪{sentiment}"
 
                 return SentimentAnalysis(
-                    sentiment=sentiment,
-                    score=score,
-                    reasoning=reasoning
+                    sentiment=sentiment, score=score, reasoning=reasoning
                 )
 
         except Exception as e:
@@ -188,7 +187,9 @@ class LLMService:
             self.logger.error(f"情感分析失败: {e!s}")
             raise Exception(f"情感分析失败: {e!s}") from e
 
-    async def analyze_with_retry(self, analysis_func, input_data: dict[str, Any], max_retries: int = 3) -> Any:
+    async def analyze_with_retry(
+        self, analysis_func, input_data: dict[str, Any], max_retries: int = 3
+    ) -> Any:
         """
         带重试机制的分析方法
 
@@ -210,14 +211,16 @@ class LLMService:
                 self.logger.warning(f"分析尝试 {attempt + 1} 失败: {e!s}")
 
                 if attempt < max_retries - 1:
-                    await asyncio.sleep(2 ** attempt)  # 指数退避
+                    await asyncio.sleep(2**attempt)  # 指数退避
                 else:
                     self.logger.error(f"分析失败,已重试 {max_retries} 次")
                     raise last_exception from last_exception
 
         raise last_exception
 
-    async def batch_analyze_facts(self, batch_data: list[dict[str, Any]]) -> list[AnalysisResult]:
+    async def batch_analyze_facts(
+        self, batch_data: list[dict[str, Any]]
+    ) -> list[AnalysisResult]:
         """
         批量事实分析
 
@@ -230,7 +233,9 @@ class LLMService:
         tasks = [self.analyze_fact(data) for data in batch_data]
         return await asyncio.gather(*tasks, return_exceptions=True)
 
-    async def batch_analyze_sentiments(self, batch_data: list[dict[str, Any]]) -> list[SentimentAnalysis]:
+    async def batch_analyze_sentiments(
+        self, batch_data: list[dict[str, Any]]
+    ) -> list[SentimentAnalysis]:
         """
         批量情感分析
 

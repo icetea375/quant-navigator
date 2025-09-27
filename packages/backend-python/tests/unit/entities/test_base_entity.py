@@ -15,6 +15,7 @@ from src.entities.base import Base, BaseEntity, DatabaseEntityMixin
 
 class TestEntity(BaseEntity):
     """测试实体类"""
+
     __tablename__ = "test_entities"
 
     name = Column(String(255), nullable=False)
@@ -23,6 +24,7 @@ class TestEntity(BaseEntity):
 
 class TestPydanticModel(BaseModel):
     """测试Pydantic模型"""
+
     id: str
     name: str
     value: int = 0
@@ -55,7 +57,7 @@ class TestPydanticMixin:
             value=42,
             created_at=datetime.now(),
             updated_at=datetime.now(),
-            metadata_json={"source": "test"}
+            metadata_json={"source": "test"},
         )
 
     def test_to_pydantic_conversion(self, test_entity):
@@ -78,7 +80,7 @@ class TestPydanticMixin:
             value=100,
             created_at=datetime.now(),
             updated_at=datetime.now(),
-            metadata={"source": "pydantic"}
+            metadata={"source": "pydantic"},
         )
 
         entity = TestEntity.from_pydantic(pydantic_model)
@@ -97,7 +99,7 @@ class TestPydanticMixin:
             value=200,
             created_at=datetime.now(),
             updated_at=datetime.now(),
-            metadata={"timestamp": 1640995200000}  # 2022-01-01 00:00:00 UTC
+            metadata={"timestamp": 1640995200000},  # 2022-01-01 00:00:00 UTC
         )
 
         entity = TestEntity.from_pydantic(pydantic_model)
@@ -116,7 +118,7 @@ class TestPydanticMixin:
             value=300,
             created_at=datetime.now(),
             updated_at=datetime.now(),
-            metadata={"extra": "data"}
+            metadata={"extra": "data"},
         )
 
         # 注意: SQLAlchemy实体不支持额外字段,所以只测试基本转换
@@ -141,7 +143,7 @@ class TestBaseEntity:
             value=500,
             created_at=datetime.now(),
             updated_at=datetime.now(),
-            metadata_json={"type": "base_test"}
+            metadata_json={"type": "base_test"},
         )
 
     def test_repr(self, test_entity):
@@ -204,7 +206,7 @@ class TestBaseEntityIntegration:
             id="db_test_001",
             name="Database Test",
             value=999,
-            metadata_json={"test": "database"}
+            metadata_json={"test": "database"},
         )
 
         # 保存到数据库
@@ -241,7 +243,7 @@ class TestBaseEntityIntegration:
             value=777,
             created_at=datetime.now(),
             updated_at=datetime.now(),
-            metadata={"round_trip": True}
+            metadata={"round_trip": True},
         )
 
         # 转换为实体

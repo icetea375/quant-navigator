@@ -253,4 +253,3 @@ packages/backend-python/
 - **data_contract/**: 数据契约定义目录
 - **htmlcov/**: 测试覆盖率HTML报告目录
 - **tests_legacy/**: 遗留测试目录，包含旧版本的测试文件
-

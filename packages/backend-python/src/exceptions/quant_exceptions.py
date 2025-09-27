@@ -26,7 +26,13 @@ class QuantServiceError(Exception):
 class QuantDatabaseError(QuantServiceError):
     """数据库操作异常"""
 
-    def __init__(self, message: str, operation: str, entity: Optional[str] = None, context: Optional[dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str,
+        operation: str,
+        entity: Optional[str] = None,
+        context: Optional[dict[str, Any]] = None,
+    ):
         super().__init__(message, context)
         self.operation = operation
         self.entity = entity
@@ -44,7 +50,13 @@ class QuantDatabaseError(QuantServiceError):
 class QuantDataProviderError(QuantServiceError):
     """数据提供者异常"""
 
-    def __init__(self, message: str, provider: str, data_type: Optional[str] = None, context: Optional[dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str,
+        provider: str,
+        data_type: Optional[str] = None,
+        context: Optional[dict[str, Any]] = None,
+    ):
         super().__init__(message, context)
         self.provider = provider
         self.data_type = data_type
@@ -62,7 +74,13 @@ class QuantDataProviderError(QuantServiceError):
 class QuantCalculationError(QuantServiceError):
     """计算异常"""
 
-    def __init__(self, message: str, calculation_type: str, inputs: Optional[dict[str, Any]] = None, context: Optional[dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str,
+        calculation_type: str,
+        inputs: Optional[dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
+    ):
         super().__init__(message, context)
         self.calculation_type = calculation_type
         self.inputs = inputs or {}
@@ -81,7 +99,13 @@ class QuantCalculationError(QuantServiceError):
 class QuantValidationError(QuantServiceError):
     """数据验证异常"""
 
-    def __init__(self, message: str, field: Optional[str] = None, value: Optional[Any] = None, context: Optional[dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str,
+        field: Optional[str] = None,
+        value: Optional[Any] = None,
+        context: Optional[dict[str, Any]] = None,
+    ):
         super().__init__(message, context)
         self.field = field
         self.value = value
@@ -101,7 +125,13 @@ class QuantValidationError(QuantServiceError):
 class QuantConfigurationError(QuantServiceError):
     """配置异常"""
 
-    def __init__(self, message: str, config_key: Optional[str] = None, config_value: Optional[Any] = None, context: Optional[dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str,
+        config_key: Optional[str] = None,
+        config_value: Optional[Any] = None,
+        context: Optional[dict[str, Any]] = None,
+    ):
         super().__init__(message, context)
         self.config_key = config_key
         self.config_value = config_value
@@ -121,7 +151,13 @@ class QuantConfigurationError(QuantServiceError):
 class QuantSignalError(QuantServiceError):
     """量化信号异常"""
 
-    def __init__(self, message: str, signal_id: Optional[str] = None, signal_type: Optional[str] = None, context: Optional[dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str,
+        signal_id: Optional[str] = None,
+        signal_type: Optional[str] = None,
+        context: Optional[dict[str, Any]] = None,
+    ):
         super().__init__(message, context)
         self.signal_id = signal_id
         self.signal_type = signal_type
@@ -141,7 +177,13 @@ class QuantSignalError(QuantServiceError):
 class QuantAnomalyDetectionError(QuantServiceError):
     """异常检测异常"""
 
-    def __init__(self, message: str, stock_code: Optional[str] = None, anomaly_type: Optional[str] = None, context: Optional[dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str,
+        stock_code: Optional[str] = None,
+        anomaly_type: Optional[str] = None,
+        context: Optional[dict[str, Any]] = None,
+    ):
         super().__init__(message, context)
         self.stock_code = stock_code
         self.anomaly_type = anomaly_type

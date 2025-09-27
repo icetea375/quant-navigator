@@ -10,7 +10,9 @@ def fix_anomaly_tests():
     """修复AnomalyEvent测试文件"""
 
     # 读取文件
-    with open("tests/unit/entities/test_anomaly_event_entity.py", encoding="utf-8") as f:
+    with open(
+        "tests/unit/entities/test_anomaly_event_entity.py", encoding="utf-8"
+    ) as f:
         content = f.read()
 
     # 修复模式1: 添加id字段和完整context
@@ -53,7 +55,9 @@ def fix_anomaly_tests():
 {indent1})"""
 
     # 应用修复
-    content = re.sub(pattern1, replace_entity_creation, content, flags=re.MULTILINE | re.DOTALL)
+    content = re.sub(
+        pattern1, replace_entity_creation, content, flags=re.MULTILINE | re.DOTALL
+    )
 
     # 修复模式2: 修复AnomalyEvent创建
     pattern2 = r'(anomaly_event = AnomalyEvent\(\s*\n)(\s+)(id="[^"]+",\s*\n)(\s+)(stock_code="[^"]+",\s*\n)(\s+)(timestamp=datetime\.now\(\),\s*\n)(\s+)(anomaly_type=AnomalyType\.[^,]+,\s*\n)(\s+)(severity=SeverityLevel\.[^,]+,\s*\n)(\s+)(description="[^"]+",\s*\n)(\s+)(z_score=[^,]+,\s*\n)(\s+)(current_value=[^,]+,\s*\n)(\s+)(expected_value=[^,]+,\s*\n)(\s+)(deviation=[^,]+,\s*\n)(\s+)(confidence=[^,]+,\s*\n)(\s+)(context=\{[^}]+\},\s*\n)(\s+)(metadata=\{[^}]+\}\s*\n)(\s+\))'
@@ -94,13 +98,18 @@ def fix_anomaly_tests():
 )"""
 
     # 应用修复
-    content = re.sub(pattern2, replace_anomaly_event, content, flags=re.MULTILINE | re.DOTALL)
+    content = re.sub(
+        pattern2, replace_anomaly_event, content, flags=re.MULTILINE | re.DOTALL
+    )
 
     # 写回文件
-    with open("tests/unit/entities/test_anomaly_event_entity.py", "w", encoding="utf-8") as f:
+    with open(
+        "tests/unit/entities/test_anomaly_event_entity.py", "w", encoding="utf-8"
+    ) as f:
         f.write(content)
 
     print("AnomalyEvent测试文件修复完成")
+
 
 if __name__ == "__main__":
     fix_anomaly_tests()

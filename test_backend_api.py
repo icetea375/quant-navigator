@@ -7,7 +7,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Optional
 
 app = FastAPI(title="Sprint 1 仲裁API", version="1.0.0")
 
@@ -29,12 +29,12 @@ MOCK_CASES = [
         "qwen_analysis": {
             "analysis": "基于财务数据分析，该股票基本面表现稳定：营收增长15%，利润率维持在35%以上，现金流为正。建议持有观望。",
             "confidence": 0.85,
-            "reasoning": "基本面稳定，建议持有"
+            "reasoning": "基本面稳定，建议持有",
         },
         "doubao_analysis": {
             "sentiment": "positive",
             "score": 0.75,
-            "reasoning": "市场情绪谨慎，建议观望"
+            "reasoning": "市场情绪谨慎，建议观望",
         },
         "disagreement_score": 0.65,
         "status": "pending",
@@ -44,16 +44,18 @@ MOCK_CASES = [
         "created_at": "2025-09-25T15:43:43.848182",
         "updated_at": "2025-09-25T15:43:43.848182",
         "human_decision": None,
-        "human_reasoning": None
+        "human_reasoning": None,
     }
 ]
 
 # 全局变量跟踪案件状态
 case_status = "pending"
 
+
 @app.get("/health")
 async def health():
     return {"status": "healthy", "version": "1.0.0"}
+
 
 @app.get("/api/v1/admin/arbitration-cases")
 async def get_cases(
@@ -64,7 +66,7 @@ async def get_cases(
     startDate: Optional[str] = None,
     endDate: Optional[str] = None,
     sortBy: str = "priority_score",
-    sortOrder: str = "DESC"
+    sortOrder: str = "DESC",
 ):
     """获取仲裁案件列表 - 让测试通过的最简单实现"""
     global case_status
@@ -77,8 +79,9 @@ async def get_cases(
         "data": cases,
         "total": len(cases),
         "page": page,
-        "size": limit
+        "size": limit,
     }
+
 
 @app.get("/api/v1/admin/arbitration-cases/{case_id}")
 async def get_case_detail(case_id: str):
@@ -111,7 +114,7 @@ async def get_case_detail(case_id: str):
                     "sentiment_score": 0.6,
                     "keywords": ["财务数据", "营收增长", "利润率"],
                     "entities": ["公司A", "投资者", "媒体"],
-                    "investment_recommendation": "HOLD"
+                    "investment_recommendation": "HOLD",
                 },
                 "doubao_analysis": {
                     "analysis": "基于市场情绪分析：投资者情绪偏向谨慎，媒体关注度中等，技术面在关键支撑位震荡。建议等待明确信号。市场情绪分析显示投资者对该公司持谨慎态度，媒体关注度中等，投资者信心需要进一步观察。",
@@ -120,14 +123,15 @@ async def get_case_detail(case_id: str):
                     "sentiment_score": 0.75,
                     "keywords": ["市场情绪", "投资者", "媒体"],
                     "entities": ["公司A", "投资者", "媒体"],
-                    "investment_recommendation": "HOLD"
+                    "investment_recommendation": "HOLD",
                 },
                 "created_at": "2025-09-25T15:43:43.848182",
-                "updated_at": "2025-09-25T15:43:43.848182"
-            }
+                "updated_at": "2025-09-25T15:43:43.848182",
+            },
         }
     else:
         raise HTTPException(status_code=404, detail="案件不存在")
+
 
 @app.post("/api/v1/admin/arbitration-cases/{case_id}/feedback")
 async def submit_arbitration_feedback(case_id: str, feedback_data: dict):
@@ -142,15 +146,20 @@ async def submit_arbitration_feedback(case_id: str, feedback_data: dict):
             "data": {
                 "case_id": case_id,
                 "arbitrator_id": feedback_data.get("arbitrator_id", "admin_001"),
-                "final_recommendation": feedback_data.get("final_recommendation", "BUY"),
+                "final_recommendation": feedback_data.get(
+                    "final_recommendation", "BUY"
+                ),
                 "final_confidence": feedback_data.get("final_confidence", 0.9),
-                "human_decision": feedback_data.get("human_decision", "基于双脑分析，建议买入"),
+                "human_decision": feedback_data.get(
+                    "human_decision", "基于双脑分析，建议买入"
+                ),
                 "decision_factors": feedback_data.get("decision_factors", {}),
-                "submitted_at": datetime.now().isoformat()
-            }
+                "submitted_at": datetime.now().isoformat(),
+            },
         }
     else:
         raise HTTPException(status_code=404, detail="案件不存在")
+
 
 @app.get("/api/v1/admin/arbitration-cases/statistics")
 async def get_statistics():
@@ -165,9 +174,10 @@ async def get_statistics():
             "ignored_cases": 0,
             "status_breakdown": {"PENDING_HUMAN": 1},
             "avg_divergence_score": 0.65,
-            "avg_priority_score": 0.72
-        }
+            "avg_priority_score": 0.72,
+        },
     }
+
 
 if __name__ == "__main__":
     print("🚀 启动Sprint 1后端API服务...")

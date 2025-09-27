@@ -18,7 +18,9 @@ class TestConfigIntegrity:
     @pytest.fixture
     def config_path(self):
         """获取配置文件路径"""
-        return os.path.join(os.path.dirname(__file__), "..", "config", "scoring_rules.yml")
+        return os.path.join(
+            os.path.dirname(__file__), "..", "config", "scoring_rules.yml"
+        )
 
     @pytest.fixture
     def config_data(self, config_path):
@@ -112,17 +114,25 @@ class TestConfigIntegrity:
     def test_dividend_yield_rules_value_range(self, config_data):
         """测试:股息率规则数值范围合理性"""
         dividend_rules = config_data["value_score_rules"]["dividend_yield"]
-        self._validate_value_range(dividend_rules, "股息率", expected_min=-10, expected_max=50)
+        self._validate_value_range(
+            dividend_rules, "股息率", expected_min=-10, expected_max=50
+        )
 
     def test_default_score_rules_structure(self, config_data):
         """测试:默认评分规则结构"""
-        required_defaults = ["growth_score_rules", "profitability_score_rules", "financial_health_score_rules"]
+        required_defaults = [
+            "growth_score_rules",
+            "profitability_score_rules",
+            "financial_health_score_rules",
+        ]
 
         for rule_name in required_defaults:
             assert rule_name in config_data, f"缺少{rule_name}"
             assert "default" in config_data[rule_name], f"{rule_name}缺少default字段"
             default_value = config_data[rule_name]["default"]
-            assert isinstance(default_value, (int, float)), f"{rule_name}.default必须是数字"
+            assert isinstance(
+                default_value, (int, float)
+            ), f"{rule_name}.default必须是数字"
             assert 0 <= default_value <= 100, f"{rule_name}.default必须在0-100之间"
 
     def test_business_logic_consistency(self, config_data):
@@ -152,7 +162,9 @@ class TestConfigIntegrity:
             current_max = sorted_rules[i][1]
             next_min = sorted_rules[i + 1][0]
             if current_max > next_min:
-                pytest.fail(f"{rule_name}规则存在重叠: [{sorted_rules[i][0]}, {current_max}) 与 [{next_min}, {sorted_rules[i + 1][1]})")
+                pytest.fail(
+                    f"{rule_name}规则存在重叠: [{sorted_rules[i][0]}, {current_max}) 与 [{next_min}, {sorted_rules[i + 1][1]})"
+                )
 
         # 检查是否有间隙(警告,但不失败)
         for i in range(len(sorted_rules) - 1):
@@ -175,13 +187,19 @@ class TestConfigIntegrity:
         """验证数值范围合理性"""
         for i, rule in enumerate(rules):
             min_val, max_val, _score = rule
-            assert isinstance(min_val, (int, float)), f"{rule_name}规则{i}最小值必须是数字"
-            assert isinstance(max_val, (int, float)), f"{rule_name}规则{i}最大值必须是数字"
+            assert isinstance(
+                min_val, (int, float)
+            ), f"{rule_name}规则{i}最小值必须是数字"
+            assert isinstance(
+                max_val, (int, float)
+            ), f"{rule_name}规则{i}最大值必须是数字"
             assert min_val < max_val, f"{rule_name}规则{i}最小值必须小于最大值"
 
             # 检查范围是否合理
             if min_val < expected_min or max_val > expected_max:
-                print(f"警告: {rule_name}规则{i}范围[{min_val}, {max_val})可能超出合理范围[{expected_min}, {expected_max})")
+                print(
+                    f"警告: {rule_name}规则{i}范围[{min_val}, {max_val})可能超出合理范围[{expected_min}, {expected_max})"
+                )
 
     def _get_score_for_value(self, rules, value):
         """获取指定值的得分"""

@@ -10,6 +10,7 @@ from typing import Any, Optional
 
 class LlmModelType(str, Enum):
     """LLM模型类型枚举"""
+
     TEXT_GENERATION = "text_generation"
     CHAT_COMPLETION = "chat_completion"
     EMBEDDING = "embedding"
@@ -33,7 +34,7 @@ class LlmProviderInterface(ABC):
         model: str,
         max_tokens: Optional[int] = None,
         temperature: Optional[float] = None,
-        **kwargs
+        **kwargs,
     ) -> str:
         """
         生成文本内容
@@ -57,7 +58,7 @@ class LlmProviderInterface(ABC):
         model: str,
         max_tokens: Optional[int] = None,
         temperature: Optional[float] = None,
-        **kwargs
+        **kwargs,
     ) -> str:
         """
         聊天完成接口
@@ -76,10 +77,7 @@ class LlmProviderInterface(ABC):
 
     @abstractmethod
     async def generate_embeddings(
-        self,
-        texts: list[str],
-        model: str,
-        **kwargs
+        self, texts: list[str], model: str, **kwargs
     ) -> list[list[float]]:
         """
         生成文本嵌入向量
@@ -96,10 +94,7 @@ class LlmProviderInterface(ABC):
 
     @abstractmethod
     async def analyze_sentiment(
-        self,
-        text: str,
-        model: str,
-        **kwargs
+        self, text: str, model: str, **kwargs
     ) -> dict[str, Any]:
         """
         情感分析
@@ -120,11 +115,7 @@ class LlmProviderInterface(ABC):
 
     @abstractmethod
     async def analyze_fact(
-        self,
-        text: str,
-        context: Optional[str] = None,
-        model: str = "default",
-        **kwargs
+        self, text: str, context: Optional[str] = None, model: str = "default", **kwargs
     ) -> dict[str, Any]:
         """
         事实分析
@@ -146,10 +137,7 @@ class LlmProviderInterface(ABC):
 
     @abstractmethod
     async def batch_process(
-        self,
-        requests: list[dict[str, Any]],
-        model: str,
-        **kwargs
+        self, requests: list[dict[str, Any]], model: str, **kwargs
     ) -> list[dict[str, Any]]:
         """
         批量处理请求
@@ -211,24 +199,29 @@ class LlmProviderInterface(ABC):
 
 class LlmProviderError(Exception):
     """LLM提供商相关异常"""
+
     pass
 
 
 class LlmProviderTimeoutError(LlmProviderError):
     """LLM提供商超时异常"""
+
     pass
 
 
 class LlmProviderRateLimitError(LlmProviderError):
     """LLM提供商限流异常"""
+
     pass
 
 
 class LlmProviderAuthenticationError(LlmProviderError):
     """LLM提供商认证异常"""
+
     pass
 
 
 class LlmProviderModelNotFoundError(LlmProviderError):
     """LLM提供商模型不存在异常"""
+
     pass

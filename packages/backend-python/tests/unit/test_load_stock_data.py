@@ -15,6 +15,7 @@ from src.exceptions.workflow_exceptions import QuantDataProviderError
 
 class MockDatabaseManager:
     """模拟数据库管理器"""
+
     def __init__(self):
         self.get_financial_data_async = AsyncMock()
         self.get_price_data_async = AsyncMock()
@@ -24,6 +25,7 @@ class MockDatabaseManager:
 
 class MockMainWorkflow:
     """模拟主工作流类"""
+
     def __init__(self):
         self.logger = MagicMock()
         self.db_manager = MockDatabaseManager()
@@ -50,7 +52,7 @@ class MockMainWorkflow:
                 self.db_manager.get_financial_data_async(stock_code, trade_date),
                 self.db_manager.get_price_data_async(stock_code, trade_date),
                 self.db_manager.get_news_data_async(stock_code, trade_date),
-                self.db_manager.get_announcement_data_async(stock_code, trade_date)
+                self.db_manager.get_announcement_data_async(stock_code, trade_date),
             ]
 
             results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -67,7 +69,7 @@ class MockMainWorkflow:
                 "news_data": results[2],
                 "announcement_data": results[3],
                 "stock_code": stock_code,
-                "trade_date": trade_date
+                "trade_date": trade_date,
             }
 
             # 验证数据完整性
@@ -97,10 +99,14 @@ class TestLoadStockData:
     async def test_load_stock_data_success(self, mock_workflow):
         """测试成功加载股票数据"""
         # 模拟数据库返回数据
-        mock_workflow.db_manager.get_financial_data_async.return_value = {"revenue": 1000}
+        mock_workflow.db_manager.get_financial_data_async.return_value = {
+            "revenue": 1000
+        }
         mock_workflow.db_manager.get_price_data_async.return_value = {"close": 10.5}
         mock_workflow.db_manager.get_news_data_async.return_value = [{"title": "新闻1"}]
-        mock_workflow.db_manager.get_announcement_data_async.return_value = [{"content": "公告1"}]
+        mock_workflow.db_manager.get_announcement_data_async.return_value = [
+            {"content": "公告1"}
+        ]
 
         stock_code = "000001"
         trade_date = "2025-01-17"
@@ -115,16 +121,26 @@ class TestLoadStockData:
         assert result["announcement_data"] == [{"content": "公告1"}]
 
         # 验证并行调用
-        mock_workflow.db_manager.get_financial_data_async.assert_called_once_with(stock_code, trade_date)
-        mock_workflow.db_manager.get_price_data_async.assert_called_once_with(stock_code, trade_date)
-        mock_workflow.db_manager.get_news_data_async.assert_called_once_with(stock_code, trade_date)
-        mock_workflow.db_manager.get_announcement_data_async.assert_called_once_with(stock_code, trade_date)
+        mock_workflow.db_manager.get_financial_data_async.assert_called_once_with(
+            stock_code, trade_date
+        )
+        mock_workflow.db_manager.get_price_data_async.assert_called_once_with(
+            stock_code, trade_date
+        )
+        mock_workflow.db_manager.get_news_data_async.assert_called_once_with(
+            stock_code, trade_date
+        )
+        mock_workflow.db_manager.get_announcement_data_async.assert_called_once_with(
+            stock_code, trade_date
+        )
 
     @pytest.mark.asyncio
     async def test_load_stock_data_financial_data_failure(self, mock_workflow):
         """测试财务数据加载失败时快速失败"""
         # 模拟财务数据加载失败
-        mock_workflow.db_manager.get_financial_data_async.side_effect = Exception("财务数据错误")
+        mock_workflow.db_manager.get_financial_data_async.side_effect = Exception(
+            "财务数据错误"
+        )
 
         # 其他数据正常
         mock_workflow.db_manager.get_price_data_async.return_value = {"close": 10.5}
@@ -145,10 +161,14 @@ class TestLoadStockData:
     async def test_load_stock_data_price_data_failure(self, mock_workflow):
         """测试价格数据加载失败时快速失败"""
         # 模拟价格数据加载失败
-        mock_workflow.db_manager.get_price_data_async.side_effect = Exception("价格数据错误")
+        mock_workflow.db_manager.get_price_data_async.side_effect = Exception(
+            "价格数据错误"
+        )
 
         # 其他数据正常
-        mock_workflow.db_manager.get_financial_data_async.return_value = {"revenue": 1000}
+        mock_workflow.db_manager.get_financial_data_async.return_value = {
+            "revenue": 1000
+        }
         mock_workflow.db_manager.get_news_data_async.return_value = []
         mock_workflow.db_manager.get_announcement_data_async.return_value = []
 
@@ -185,7 +205,9 @@ class TestLoadStockData:
     async def test_load_stock_data_with_financial_data_only(self, mock_workflow):
         """测试只有财务数据时成功"""
         # 模拟只有财务数据
-        mock_workflow.db_manager.get_financial_data_async.return_value = {"revenue": 1000}
+        mock_workflow.db_manager.get_financial_data_async.return_value = {
+            "revenue": 1000
+        }
         mock_workflow.db_manager.get_price_data_async.return_value = None
         mock_workflow.db_manager.get_news_data_async.return_value = []
         mock_workflow.db_manager.get_announcement_data_async.return_value = []
@@ -222,27 +244,32 @@ class TestLoadStockData:
     @pytest.mark.asyncio
     async def test_load_stock_data_parallel_execution(self, mock_workflow):
         """测试并行执行"""
+
         # 模拟所有数据都有延迟
-        async def delayed_financial_data(_stock_code,_trade_datee):
+        async def delayed_financial_data(_stock_code, _trade_datee):
             await asyncio.sleep(0.1)
             return {"revenue": 1000}
 
-        async def delayed_price_data(_stock_code,_trade_datee):
+        async def delayed_price_data(_stock_code, _trade_datee):
             await asyncio.sleep(0.1)
             return {"close": 10.5}
 
-        async def delayed_news_data(_stock_code,_trade_datee):
+        async def delayed_news_data(_stock_code, _trade_datee):
             await asyncio.sleep(0.1)
             return [{"title": "新闻1"}]
 
-        async def delayed_announcement_data(_stock_code,_trade_datee):
+        async def delayed_announcement_data(_stock_code, _trade_datee):
             await asyncio.sleep(0.1)
             return [{"content": "公告1"}]
 
-        mock_workflow.db_manager.get_financial_data_async.side_effect = delayed_financial_data
+        mock_workflow.db_manager.get_financial_data_async.side_effect = (
+            delayed_financial_data
+        )
         mock_workflow.db_manager.get_price_data_async.side_effect = delayed_price_data
         mock_workflow.db_manager.get_news_data_async.side_effect = delayed_news_data
-        mock_workflow.db_manager.get_announcement_data_async.side_effect = delayed_announcement_data
+        mock_workflow.db_manager.get_announcement_data_async.side_effect = (
+            delayed_announcement_data
+        )
 
         stock_code = "000001"
         trade_date = "2025-01-17"
@@ -263,7 +290,9 @@ class TestLoadStockData:
     @pytest.mark.asyncio
     async def test_load_stock_data_logging(self, mock_workflow):
         """测试日志记录"""
-        mock_workflow.db_manager.get_financial_data_async.return_value = {"revenue": 1000}
+        mock_workflow.db_manager.get_financial_data_async.return_value = {
+            "revenue": 1000
+        }
         mock_workflow.db_manager.get_price_data_async.return_value = {"close": 10.5}
         mock_workflow.db_manager.get_news_data_async.return_value = []
         mock_workflow.db_manager.get_announcement_data_async.return_value = []
@@ -278,7 +307,9 @@ class TestLoadStockData:
     @pytest.mark.asyncio
     async def test_load_stock_data_exception_logging(self, mock_workflow):
         """测试异常时的日志记录"""
-        mock_workflow.db_manager.get_financial_data_async.side_effect = ValueError("测试错误")
+        mock_workflow.db_manager.get_financial_data_async.side_effect = ValueError(
+            "测试错误"
+        )
         mock_workflow.db_manager.get_price_data_async.return_value = {"close": 10.5}
         mock_workflow.db_manager.get_news_data_async.return_value = []
         mock_workflow.db_manager.get_announcement_data_async.return_value = []

@@ -7,15 +7,15 @@ DataPipeline PostgreSQL真实数据库测试脚本
 import asyncio
 import os
 import sys
-import psycopg2
 from datetime import datetime
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 # 添加项目路径
-sys.path.append('/Users/pengcheng/Documents/papa/packages/backend-python/src')
+sys.path.append("/Users/pengcheng/Documents/papa/packages/backend-python/src")
 
 from services.data_pipeline_service import DataPipelineService
+
 
 async def test_datapipeline_postgresql():
     """测试DataPipeline处理真实数据并存储到PostgreSQL数据库"""
@@ -24,32 +24,29 @@ async def test_datapipeline_postgresql():
     print("=" * 70)
 
     # 设置真实Tushare token
-    os.environ['TUSHARE_TOKEN'] = '6b16b1a0173eb26abd4cf12a4ad0e70e344c0c1808a310487c0f70ab'
+    os.environ["TUSHARE_TOKEN"] = (
+        "6b16b1a0173eb26abd4cf12a4ad0e70e344c0c1808a310487c0f70ab"
+    )
 
     # PostgreSQL数据库配置
     DATABASE_URL = "postgresql://postgres:password@localhost:5432/quant_navigator"
 
     # 创建DataPipelineService
     config = {
-        "tushare": {
-            "token": os.environ['TUSHARE_TOKEN'],
-            "timeout": 30
-        },
-        "database": {
-            "url": DATABASE_URL
-        }
+        "tushare": {"token": os.environ["TUSHARE_TOKEN"], "timeout": 30},
+        "database": {"url": DATABASE_URL},
     }
 
     service = DataPipelineService(config)
 
     # 测试数据
     stock_code = "601398.SH"  # 工商银行
-    trade_date = "20230104"   # 2023年1月4日
+    trade_date = "20230104"  # 2023年1月4日
 
     try:
         print(f"📊 测试股票: {stock_code}")
         print(f"📅 测试日期: {trade_date}")
-        print(f"🗄️ 数据库: PostgreSQL")
+        print("🗄️ 数据库: PostgreSQL")
         print()
 
         # 步骤1: 从Tushare获取真实数据
@@ -62,7 +59,7 @@ async def test_datapipeline_postgresql():
         print(f"✅ API调用完成，耗时: {api_time:.2f}秒")
 
         # 展示原始数据结构
-        print(f"📋 原始数据结构:")
+        print("📋 原始数据结构:")
         for key, value in raw_data.items():
             if isinstance(value, list):
                 print(f"   {key}: {len(value)} 条记录")
@@ -82,7 +79,7 @@ async def test_datapipeline_postgresql():
         print(f"✅ 财务因子提取完成，耗时: {process_time:.2f}秒")
 
         # 展示财务因子数据
-        print(f"📊 财务因子数据:")
+        print("📊 财务因子数据:")
         for key, value in financial_factors.items():
             if isinstance(value, float):
                 print(f"   {key}: {value:.4f}")
@@ -94,13 +91,15 @@ async def test_datapipeline_postgresql():
         print("🧮 步骤3: 计算超级财务因子...")
         start_time = datetime.now()
 
-        super_factors = await service.calculate_super_financial_factors(financial_factors)
+        super_factors = await service.calculate_super_financial_factors(
+            financial_factors
+        )
 
         calc_time = (datetime.now() - start_time).total_seconds()
         print(f"✅ 超级财务因子计算完成，耗时: {calc_time:.2f}秒")
 
         # 展示超级财务因子数据
-        print(f"🎯 超级财务因子数据:")
+        print("🎯 超级财务因子数据:")
         for key, value in super_factors.items():
             if isinstance(value, float):
                 print(f"   {key}: {value:.4f}")
@@ -119,7 +118,8 @@ async def test_datapipeline_postgresql():
             session = Session()
 
             # 创建表结构
-            session.execute(text('''
+            session.execute(
+                text("""
                 CREATE TABLE IF NOT EXISTS financial_factors (
                     stock_code VARCHAR(20) NOT NULL,
                     trade_date VARCHAR(8) NOT NULL,
@@ -146,9 +146,11 @@ async def test_datapipeline_postgresql():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     PRIMARY KEY (stock_code, trade_date)
                 )
-            '''))
+            """)
+            )
 
-            session.execute(text('''
+            session.execute(
+                text("""
                 CREATE TABLE IF NOT EXISTS super_financial_factors (
                     stock_code VARCHAR(20) NOT NULL,
                     trade_date VARCHAR(8) NOT NULL,
@@ -181,7 +183,8 @@ async def test_datapipeline_postgresql():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     PRIMARY KEY (stock_code, trade_date)
                 )
-            '''))
+            """)
+            )
 
             session.commit()
             print("✅ PostgreSQL数据库连接成功，表结构创建完成")
@@ -196,7 +199,8 @@ async def test_datapipeline_postgresql():
         start_time = datetime.now()
 
         # 存储财务因子
-        session.execute(text('''
+        session.execute(
+            text("""
             INSERT INTO financial_factors
             (stock_code, trade_date, pe_ratio, pb_ratio, ps_ratio, dividend_yield,
              market_cap, turnover_rate, volume_ratio, float_market_cap, total_shares,
@@ -228,10 +232,13 @@ async def test_datapipeline_postgresql():
                 price_change_pct = EXCLUDED.price_change_pct,
                 volume = EXCLUDED.volume,
                 amount = EXCLUDED.amount
-        '''), financial_factors)
+        """),
+            financial_factors,
+        )
 
         # 存储超级财务因子
-        session.execute(text('''
+        session.execute(
+            text("""
             INSERT INTO super_financial_factors
             (stock_code, trade_date, pe_ratio, pb_ratio, ps_ratio, dividend_yield,
              market_cap, turnover_rate, volume_ratio, float_market_cap, total_shares,
@@ -273,7 +280,9 @@ async def test_datapipeline_postgresql():
                 financial_health_score = EXCLUDED.financial_health_score,
                 overall_score = EXCLUDED.overall_score,
                 calculated_at = EXCLUDED.calculated_at
-        '''), super_factors)
+        """),
+            super_factors,
+        )
 
         session.commit()
         store_time = (datetime.now() - start_time).total_seconds()
@@ -284,16 +293,19 @@ async def test_datapipeline_postgresql():
         print("🔍 步骤6: 验证PostgreSQL中的数据...")
 
         # 查询财务因子
-        result = session.execute(text('''
+        result = session.execute(
+            text("""
             SELECT stock_code, trade_date, pe_ratio, pb_ratio, ps_ratio, dividend_yield,
                    market_cap, turnover_rate, volume_ratio
             FROM financial_factors
             WHERE stock_code = :stock_code AND trade_date = :trade_date
-        '''), {"stock_code": stock_code, "trade_date": trade_date})
+        """),
+            {"stock_code": stock_code, "trade_date": trade_date},
+        )
 
         financial_result = result.fetchone()
         if financial_result:
-            print(f"📊 PostgreSQL中的财务因子:")
+            print("📊 PostgreSQL中的财务因子:")
             print(f"   股票代码: {financial_result[0]}")
             print(f"   交易日期: {financial_result[1]}")
             print(f"   PE比率: {financial_result[2]:.4f}")
@@ -309,16 +321,19 @@ async def test_datapipeline_postgresql():
         print()
 
         # 查询超级财务因子
-        result = session.execute(text('''
+        result = session.execute(
+            text("""
             SELECT stock_code, trade_date, overall_score, value_score, growth_score,
                    profitability_score, financial_health_score, calculated_at
             FROM super_financial_factors
             WHERE stock_code = :stock_code AND trade_date = :trade_date
-        '''), {"stock_code": stock_code, "trade_date": trade_date})
+        """),
+            {"stock_code": stock_code, "trade_date": trade_date},
+        )
 
         super_result = result.fetchone()
         if super_result:
-            print(f"🎯 PostgreSQL中的超级财务因子:")
+            print("🎯 PostgreSQL中的超级财务因子:")
             print(f"   股票代码: {super_result[0]}")
             print(f"   交易日期: {super_result[1]}")
             print(f"   综合评分: {super_result[2]:.4f}")
@@ -337,17 +352,27 @@ async def test_datapipeline_postgresql():
 
         # 验证财务因子一致性
         if financial_result:
-            assert financial_result[0] == financial_factors['stock_code'], "股票代码不一致"
-            assert financial_result[1] == financial_factors['trade_date'], "交易日期不一致"
-            assert abs(float(financial_result[2]) - financial_factors['pe_ratio']) < 0.0001, "PE比率不一致"
-            assert abs(float(financial_result[3]) - financial_factors['pb_ratio']) < 0.0001, "PB比率不一致"
+            assert (
+                financial_result[0] == financial_factors["stock_code"]
+            ), "股票代码不一致"
+            assert (
+                financial_result[1] == financial_factors["trade_date"]
+            ), "交易日期不一致"
+            assert (
+                abs(float(financial_result[2]) - financial_factors["pe_ratio"]) < 0.0001
+            ), "PE比率不一致"
+            assert (
+                abs(float(financial_result[3]) - financial_factors["pb_ratio"]) < 0.0001
+            ), "PB比率不一致"
             print("✅ 财务因子数据一致性验证通过")
 
         # 验证超级财务因子一致性
         if super_result:
-            assert super_result[0] == super_factors['stock_code'], "股票代码不一致"
-            assert super_result[1] == super_factors['trade_date'], "交易日期不一致"
-            assert abs(float(super_result[2]) - super_factors['overall_score']) < 0.0001, "综合评分不一致"
+            assert super_result[0] == super_factors["stock_code"], "股票代码不一致"
+            assert super_result[1] == super_factors["trade_date"], "交易日期不一致"
+            assert (
+                abs(float(super_result[2]) - super_factors["overall_score"]) < 0.0001
+            ), "综合评分不一致"
             print("✅ 超级财务因子数据一致性验证通过")
 
         session.close()
@@ -358,7 +383,7 @@ async def test_datapipeline_postgresql():
         print("🎉 DataPipeline PostgreSQL真实数据库测试完成！")
         print(f"📊 测试股票: {stock_code}")
         print(f"📅 测试日期: {trade_date}")
-        print(f"🗄️ 数据库: PostgreSQL")
+        print("🗄️ 数据库: PostgreSQL")
         print(f"⏱️ 总耗时: {total_time:.2f}秒")
         print(f"   - API调用: {api_time:.2f}秒")
         print(f"   - 数据处理: {process_time:.2f}秒")
@@ -369,7 +394,9 @@ async def test_datapipeline_postgresql():
     except Exception as e:
         print(f"❌ 测试失败: {e}")
         import traceback
+
         traceback.print_exc()
+
 
 if __name__ == "__main__":
     asyncio.run(test_datapipeline_postgresql())

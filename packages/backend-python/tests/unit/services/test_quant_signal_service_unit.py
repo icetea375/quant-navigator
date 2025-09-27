@@ -31,7 +31,7 @@ class TestQuantSignalServiceUnit:
             "quant_signal": {
                 "z_score_threshold": 2.0,
                 "anomaly_threshold": 0.8,
-                "model_version": "v1.0"
+                "model_version": "v1.0",
             }
         }
         return QuantSignalService(config)
@@ -49,12 +49,14 @@ class TestQuantSignalServiceUnit:
             "pe_ratio": 15.0,
             "pb_ratio": 2.0,
             "ps_ratio": 3.0,
-            "dividend_yield": 2.0
+            "dividend_yield": 2.0,
         }
         price_data = [{"pct_chg": 2.5, "vol": 150000000}]
         trade_date = datetime(2024, 1, 17)
 
-        signal = await service.calculate_quant_signal("000001.SZ", trade_date, financial_factors, price_data)
+        signal = await service.calculate_quant_signal(
+            "000001.SZ", trade_date, financial_factors, price_data
+        )
 
         assert isinstance(signal, QuantSignal)
         assert signal.target_code == "000001.SZ"
@@ -206,7 +208,9 @@ class TestQuantSignalServiceUnit:
         trade_date = datetime(2024, 1, 17)
         price_info = {"pct_chg": 2.5}
         basic_info = {"volume_ratio": 4.0}  # 超过3倍阈值
-        anomaly = service._detect_volume_anomaly(stock_code, trade_date, price_info, basic_info)
+        anomaly = service._detect_volume_anomaly(
+            stock_code, trade_date, price_info, basic_info
+        )
 
         assert anomaly is not None  # 1.5 < 2.0
 
@@ -226,7 +230,9 @@ class TestQuantSignalServiceUnit:
         price_data = [{"pct_chg": 2.5, "vol": 150000000}]
         trade_date = datetime(2024, 1, 17)
 
-        signal = await service.calculate_quant_signal("000001.SZ", trade_date, financial_factors, price_data)
+        signal = await service.calculate_quant_signal(
+            "000001.SZ", trade_date, financial_factors, price_data
+        )
 
         assert isinstance(signal, QuantSignal)
         assert signal.signal_type == SignalType.INDIVIDUAL
@@ -239,7 +245,9 @@ class TestQuantSignalServiceUnit:
         price_data = [{"pct_chg": 2.5, "vol": 150000000}]
         trade_date = datetime(2024, 1, 17)
 
-        signal = await service.calculate_quant_signal("000001.SZ", trade_date, financial_factors, price_data)
+        signal = await service.calculate_quant_signal(
+            "000001.SZ", trade_date, financial_factors, price_data
+        )
 
         assert isinstance(signal, QuantSignal)
         assert signal.signal_type == SignalType.INDIVIDUAL
@@ -253,8 +261,12 @@ class TestQuantSignalServiceUnit:
         price_data = [{"pct_chg": 2.5, "vol": 150000000}]
         trade_date = datetime(2024, 1, 17)
 
-        signal1 = await service.calculate_quant_signal("000001.SZ", trade_date, financial_factors1, price_data)
-        signal2 = await service.calculate_quant_signal("000002.SZ", trade_date, financial_factors2, price_data)
+        signal1 = await service.calculate_quant_signal(
+            "000001.SZ", trade_date, financial_factors1, price_data
+        )
+        signal2 = await service.calculate_quant_signal(
+            "000002.SZ", trade_date, financial_factors2, price_data
+        )
 
         assert signal1.signal_id != signal2.signal_id
         assert "sig_" in signal1.signal_id
@@ -267,7 +279,9 @@ class TestQuantSignalServiceUnit:
         price_data = [{"pct_chg": 2.5, "vol": 150000000}]
         trade_date = datetime(2024, 1, 17)
 
-        signal = await service.calculate_quant_signal("000001.SZ", trade_date, financial_factors, price_data)
+        signal = await service.calculate_quant_signal(
+            "000001.SZ", trade_date, financial_factors, price_data
+        )
 
         assert signal.validity_days == 30  # 默认值
 
@@ -278,7 +292,9 @@ class TestQuantSignalServiceUnit:
         price_data = [{"pct_chg": 2.5, "vol": 150000000}]
         trade_date = datetime(2024, 1, 17)
 
-        signal = await service.calculate_quant_signal("000001.SZ", trade_date, financial_factors, price_data)
+        signal = await service.calculate_quant_signal(
+            "000001.SZ", trade_date, financial_factors, price_data
+        )
 
         assert signal.source == "quant_signal_service"
 
@@ -289,7 +305,9 @@ class TestQuantSignalServiceUnit:
         price_data = [{"pct_chg": 2.5, "vol": 150000000}]
         trade_date = datetime(2024, 1, 17)
 
-        signal = await service.calculate_quant_signal("000001.SZ", trade_date, financial_factors, price_data)
+        signal = await service.calculate_quant_signal(
+            "000001.SZ", trade_date, financial_factors, price_data
+        )
 
         assert signal.metadata is not None
         assert "calculated_at" in signal.metadata
@@ -301,13 +319,17 @@ class TestQuantSignalServiceUnit:
     async def test_should_handle_calculate_quant_signal_exception(self, service):
         """测试:应该正确处理calculate_quant_signal的异常"""
         # 使用patch来模拟内部方法抛出异常
-        with patch.object(service, "_calculate_return_z_score", side_effect=Exception("模拟计算异常")):
+        with patch.object(
+            service, "_calculate_return_z_score", side_effect=Exception("模拟计算异常")
+        ):
             trade_date = datetime(2024, 1, 17)
             financial_factors = {"pe_ratio": 15.0}
             price_data = [{"pct_chg": 2.5}]
 
             with pytest.raises(QuantSignalError) as exc_info:
-                await service.calculate_quant_signal("000001.SZ", trade_date, financial_factors, price_data)
+                await service.calculate_quant_signal(
+                    "000001.SZ", trade_date, financial_factors, price_data
+                )
 
             # 验证异常信息
             assert "量化信号计算失败" in str(exc_info.value)
@@ -319,13 +341,17 @@ class TestQuantSignalServiceUnit:
     async def test_should_handle_detect_anomalies_exception(self, service):
         """测试:应该正确处理detect_anomalies的异常"""
         # 使用patch来模拟内部方法抛出异常
-        with patch.object(service, "_detect_price_anomaly", side_effect=Exception("模拟异常检测错误")):
+        with patch.object(
+            service, "_detect_price_anomaly", side_effect=Exception("模拟异常检测错误")
+        ):
             trade_date = datetime(2024, 1, 17)
             price_data = [{"pct_chg": 2.5}]
             basic_data = [{"volume_ratio": 1.5}]
 
             with pytest.raises(QuantAnomalyDetectionError) as exc_info:
-                await service.detect_anomalies("000001.SZ", trade_date, price_data, basic_data)
+                await service.detect_anomalies(
+                    "000001.SZ", trade_date, price_data, basic_data
+                )
 
             # 验证异常信息
             assert "异常检测失败" in str(exc_info.value)
@@ -349,6 +375,7 @@ class TestQuantSignalServiceUnit:
                 SignalStatus,
                 SignalType,
             )
+
             valid_signal = QuantSignal(
                 signal_id="test_signal_123",
                 target_code="000001.SZ",
@@ -377,13 +404,15 @@ class TestQuantSignalServiceUnit:
                 model_version="v1.0.0",
                 calculation_params={"z_score_threshold": 2.0, "lookback_days": 30},
                 source="test",
-                metadata={"test": "data"}
+                metadata={"test": "data"},
             )
 
             # 模拟QuantSignalEntity.from_quant_signal返回一个实体对象
             mock_entity = Mock()
             mock_entity.signal_id = "test_signal_123"
-            with patch("src.services.quant_signal_service.QuantSignalEntity") as mock_entity_class:
+            with patch(
+                "src.services.quant_signal_service.QuantSignalEntity"
+            ) as mock_entity_class:
                 mock_entity_class.from_quant_signal.return_value = mock_entity
 
                 # 执行保存操作
@@ -400,7 +429,9 @@ class TestQuantSignalServiceUnit:
         """测试:应该正确处理save_quant_signal的异常"""
         # 使用patch来模拟数据库操作抛出异常
         with patch.object(service, "Session") as mock_session:
-            mock_session.return_value.__enter__.return_value.add.side_effect = Exception("模拟数据库错误")
+            mock_session.return_value.__enter__.return_value.add.side_effect = (
+                Exception("模拟数据库错误")
+            )
 
             # 创建一个有效的QuantSignal对象
             from quant_navigator_shared_types.quant_signals import (
@@ -408,6 +439,7 @@ class TestQuantSignalServiceUnit:
                 SignalStatus,
                 SignalType,
             )
+
             valid_signal = QuantSignal(
                 signal_id="test_signal_123",
                 target_code="000001.SZ",
@@ -436,7 +468,7 @@ class TestQuantSignalServiceUnit:
                 model_version="v1.0.0",
                 calculation_params={"z_score_threshold": 2.0, "lookback_days": 30},
                 source="test",
-                metadata={"test": "data"}
+                metadata={"test": "data"},
             )
 
             with pytest.raises(QuantDatabaseError) as exc_info:
@@ -453,7 +485,9 @@ class TestQuantSignalServiceUnit:
         """测试:应该正确处理get_quant_signal_by_id的异常"""
         # 使用patch来模拟数据库查询抛出异常
         with patch.object(service, "Session") as mock_session:
-            mock_session.return_value.__enter__.return_value.query.return_value.filter.return_value.first.side_effect = Exception("模拟数据库查询错误")
+            mock_session.return_value.__enter__.return_value.query.return_value.filter.return_value.first.side_effect = Exception(
+                "模拟数据库查询错误"
+            )
 
             signal_id = "test_signal_123"
 
@@ -517,7 +551,9 @@ class TestQuantSignalServiceUnit:
         ma_signal = service._calculate_ma_signal(empty_price_data)
         assert ma_signal == 0.0
 
-    def test_should_calculate_signal_confidence_with_rich_financial_factors(self, service):
+    def test_should_calculate_signal_confidence_with_rich_financial_factors(
+        self, service
+    ):
         """测试:应该正确计算丰富财务因子的信号置信度"""
         rich_financial_factors = {
             "pe_ratio": 15.0,
@@ -526,10 +562,12 @@ class TestQuantSignalServiceUnit:
             "dividend_yield": 2.0,
             "roe": 0.15,
             "roa": 0.08,
-            "debt_ratio": 0.3
+            "debt_ratio": 0.3,
         }
         price_data = [{"pct_chg": 2.5}]
-        confidence = service._calculate_signal_confidence(rich_financial_factors, price_data)
+        confidence = service._calculate_signal_confidence(
+            rich_financial_factors, price_data
+        )
         assert confidence == 1.0  # 0.5 + 0.2 + 0.3 = 1.0
 
     # ===== P2 优先级测试:异常检测方法边界条件 =====
@@ -550,7 +588,9 @@ class TestQuantSignalServiceUnit:
         price_info = {"pct_chg": 2.5}
         basic_info = {"volume_ratio": 2.0}  # 在3倍阈值内
 
-        anomaly = service._detect_volume_anomaly(stock_code, trade_date, price_info, basic_info)
+        anomaly = service._detect_volume_anomaly(
+            stock_code, trade_date, price_info, basic_info
+        )
         assert anomaly is None
 
     def test_should_not_detect_volatility_anomaly_when_within_threshold(self, service):
@@ -570,7 +610,9 @@ class TestQuantSignalServiceUnit:
         empty_price_data = []
         empty_basic_data = []
 
-        anomalies = await service.detect_anomalies(stock_code, trade_date, empty_price_data, empty_basic_data)
+        anomalies = await service.detect_anomalies(
+            stock_code, trade_date, empty_price_data, empty_basic_data
+        )
         assert anomalies == []
 
     @pytest.mark.asyncio
@@ -581,5 +623,7 @@ class TestQuantSignalServiceUnit:
         price_data = [{"pct_chg": 12.5}]  # 超过价格阈值
         basic_data = [{"volume_ratio": 4.0}]  # 超过成交量阈值
 
-        anomalies = await service.detect_anomalies(stock_code, trade_date, price_data, basic_data)
+        anomalies = await service.detect_anomalies(
+            stock_code, trade_date, price_data, basic_data
+        )
         assert len(anomalies) >= 2  # 至少检测到价格和成交量异常

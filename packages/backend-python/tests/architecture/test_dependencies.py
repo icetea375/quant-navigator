@@ -24,7 +24,7 @@ class TestArchitectureDependencies:
             "from src.services.data_sources.",
             "from src.services.llm_providers.",
             "import.*tushare_fetcher",
-            "import.*qwen_provider"
+            "import.*qwen_provider",
         ]
 
         # 扫描业务逻辑层文件
@@ -38,7 +38,9 @@ class TestArchitectureDependencies:
                     if py_file.name == "__init__.py":
                         continue
 
-                    violations.extend(self._scan_file_for_violations(py_file, forbidden_patterns))
+                    violations.extend(
+                        self._scan_file_for_violations(py_file, forbidden_patterns)
+                    )
 
         # 断言没有违规
         assert len(violations) == 0, f"发现直接导入具体实现的违规行为: {violations}"
@@ -54,7 +56,7 @@ class TestArchitectureDependencies:
             "src/core/infra_proposals",
             "ServiceBase",
             "ServiceManager",
-            "ServiceRegistry"
+            "ServiceRegistry",
         ]
 
         violations = []
@@ -64,7 +66,9 @@ class TestArchitectureDependencies:
             if py_file.name == "__init__.py":
                 continue
 
-            violations.extend(self._scan_file_for_violations(py_file, archived_patterns))
+            violations.extend(
+                self._scan_file_for_violations(py_file, archived_patterns)
+            )
 
         # 断言没有违规
         assert len(violations) == 0, f"发现对已归档预研方案的引用: {violations}"
@@ -76,10 +80,7 @@ class TestArchitectureDependencies:
         这个测试确保业务逻辑层通过抽象接口访问外部依赖
         """
         # 定义应该使用的接口模式
-        required_patterns = [
-            "DataSourceInterface",
-            "LlmProviderInterface"
-        ]
+        required_patterns = ["DataSourceInterface", "LlmProviderInterface"]
 
         # 扫描业务逻辑层文件
         business_logic_dirs = ["src/services", "src/analysis", "src/workflow"]
@@ -132,13 +133,15 @@ class TestArchitectureDependencies:
         # 检查契约测试文件是否存在
         contract_test_files = [
             "tests/contracts/test_tushare_fetcher_contract.py",
-            "tests/contracts/test_qwen_provider_contract.py"
+            "tests/contracts/test_qwen_provider_contract.py",
         ]
 
         for test_file in contract_test_files:
             assert Path(test_file).exists(), f"缺少契约测试文件: {test_file}"
 
-    def _scan_file_for_violations(self, file_path: Path, patterns: list[str]) -> list[dict[str, Any]]:
+    def _scan_file_for_violations(
+        self, file_path: Path, patterns: list[str]
+    ) -> list[dict[str, Any]]:
         """
         扫描单个文件的违规行为
 
@@ -158,20 +161,24 @@ class TestArchitectureDependencies:
             for line_num, line in enumerate(lines, 1):
                 for pattern in patterns:
                     if pattern in line:
-                        violations.append({
-                            "file": str(file_path),
-                            "line": line_num,
-                            "content": line.strip(),
-                            "pattern": pattern
-                        })
+                        violations.append(
+                            {
+                                "file": str(file_path),
+                                "line": line_num,
+                                "content": line.strip(),
+                                "pattern": pattern,
+                            }
+                        )
 
         except Exception as e:
-            violations.append({
-                "file": str(file_path),
-                "line": 0,
-                "content": f"文件读取失败: {e!s}",
-                "pattern": "file_read_error"
-            })
+            violations.append(
+                {
+                    "file": str(file_path),
+                    "line": 0,
+                    "content": f"文件读取失败: {e!s}",
+                    "pattern": "file_read_error",
+                }
+            )
 
         return violations
 
@@ -192,10 +199,8 @@ class TestArchitectureDependencies:
 
             # 使用简单的正则表达式提取导入
             import re
-            import_patterns = [
-                r"from\s+([^\s]+)\s+import",
-                r"import\s+([^\s]+)"
-            ]
+
+            import_patterns = [r"from\s+([^\s]+)\s+import", r"import\s+([^\s]+)"]
 
             for pattern in import_patterns:
                 matches = re.findall(pattern, content)
@@ -257,7 +262,7 @@ class TestRuffIntegration:
                 ["python", "-m", "ruff", "check", "--help"],
                 capture_output=True,
                 text=True,
-                timeout=10
+                timeout=10,
             )
             assert result.returncode == 0, f"Ruff运行失败: {result.stderr}"
         except subprocess.TimeoutExpired:
@@ -272,7 +277,7 @@ class TestRuffIntegration:
                 ["python", "-m", "ruff", "format", "--help"],
                 capture_output=True,
                 text=True,
-                timeout=10
+                timeout=10,
             )
             assert result.returncode == 0, f"Ruff格式化运行失败: {result.stderr}"
         except subprocess.TimeoutExpired:

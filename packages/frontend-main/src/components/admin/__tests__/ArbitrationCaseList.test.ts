@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import ArbitrationCaseList from '@/components/admin/ArbitrationCaseList.vue'
+import ArbitrationCaseList from '../ArbitrationCaseList.vue'
 import { mockElementPlusComponents } from '@/utils/test-utils'
 import type { ArbitrationCaseInfo } from '@/types/arbitration'
 

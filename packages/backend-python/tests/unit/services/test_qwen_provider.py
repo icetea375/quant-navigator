@@ -35,7 +35,7 @@ class TestQwenProvider:
         return QwenProvider(
             api_key="test_api_key",
             base_url="https://test.api.com",
-            client=mock_httpx_client
+            client=mock_httpx_client,
         )
 
     # ==================== 初始化测试 ====================
@@ -45,7 +45,7 @@ class TestQwenProvider:
         provider = QwenProvider(
             api_key="custom_key",
             base_url="https://custom.api.com",
-            client=mock_httpx_client
+            client=mock_httpx_client,
         )
 
         assert provider.api_key == "custom_key"
@@ -56,7 +56,9 @@ class TestQwenProvider:
 
     def test_initialization_with_defaults(self, mock_httpx_client):
         """测试使用默认值初始化"""
-        with patch("src.services.llm_providers.qwen_provider.settings") as mock_settings:
+        with patch(
+            "src.services.llm_providers.qwen_provider.settings"
+        ) as mock_settings:
             mock_settings.QWEN_API_KEY = "default_key"
             provider = QwenProvider(client=mock_httpx_client)
 
@@ -78,14 +80,8 @@ class TestQwenProvider:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
-            "output": {
-                "text": "这是生成的文本内容"
-            },
-            "usage": {
-                "total_tokens": 100,
-                "input_tokens": 50,
-                "output_tokens": 50
-            }
+            "output": {"text": "这是生成的文本内容"},
+            "usage": {"total_tokens": 100, "input_tokens": 50, "output_tokens": 50},
         }
         mock_httpx_client.post.return_value = mock_response
 
@@ -99,27 +95,28 @@ class TestQwenProvider:
         mock_httpx_client.post.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_generate_text_with_custom_parameters(self, provider, mock_httpx_client):
+    async def test_generate_text_with_custom_parameters(
+        self, provider, mock_httpx_client
+    ):
         """测试使用自定义参数生成文本"""
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "output": {"text": "自定义文本"},
-            "usage": {"total_tokens": 200}
+            "usage": {"total_tokens": 200},
         }
         mock_httpx_client.post.return_value = mock_response
 
         result = await provider.generate_text(
-            "测试提示词",
-            model="qwen-turbo",
-            max_tokens=1000,
-            temperature=0.7
+            "测试提示词", model="qwen-turbo", max_tokens=1000, temperature=0.7
         )
 
         assert result == "自定义文本"
 
     @pytest.mark.asyncio
-    async def test_generate_text_authentication_error(self, provider, mock_httpx_client):
+    async def test_generate_text_authentication_error(
+        self, provider, mock_httpx_client
+    ):
         """测试认证错误"""
         mock_response = Mock()
         mock_response.status_code = 401
@@ -162,7 +159,9 @@ class TestQwenProvider:
         """测试HTTP错误"""
         mock_response = Mock()
         mock_response.status_code = 500
-        mock_response.json.return_value = {"error": {"message": "Internal server error"}}
+        mock_response.json.return_value = {
+            "error": {"message": "Internal server error"}
+        }
         mock_httpx_client.post.return_value = mock_response
 
         with pytest.raises(LlmProviderError) as exc_info:
@@ -190,10 +189,8 @@ class TestQwenProvider:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
-            "output": {
-                "text": "这是聊天回复"
-            },
-            "usage": {"total_tokens": 150}
+            "output": {"text": "这是聊天回复"},
+            "usage": {"total_tokens": 150},
         }
         mock_httpx_client.post.return_value = mock_response
 
@@ -203,19 +200,21 @@ class TestQwenProvider:
         assert result == "这是聊天回复"
 
     @pytest.mark.asyncio
-    async def test_chat_completion_with_system_message(self, provider, mock_httpx_client):
+    async def test_chat_completion_with_system_message(
+        self, provider, mock_httpx_client
+    ):
         """测试包含系统消息的聊天完成"""
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "output": {"text": "系统回复"},
-            "usage": {"total_tokens": 200}
+            "usage": {"total_tokens": 200},
         }
         mock_httpx_client.post.return_value = mock_response
 
         messages = [
             {"role": "system", "content": "你是一个助手"},
-            {"role": "user", "content": "你好"}
+            {"role": "user", "content": "你好"},
         ]
         result = await provider.chat_completion(messages)
 
@@ -241,12 +240,11 @@ class TestQwenProvider:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "output": {
-                "embeddings": [{
-                    "embedding": [0.1, 0.2, 0.3, 0.4, 0.5],
-                    "text_index": 0
-                }]
+                "embeddings": [
+                    {"embedding": [0.1, 0.2, 0.3, 0.4, 0.5], "text_index": 0}
+                ]
             },
-            "usage": {"total_tokens": 10}
+            "usage": {"total_tokens": 10},
         }
         mock_httpx_client.post.return_value = mock_response
 
@@ -257,7 +255,9 @@ class TestQwenProvider:
         assert result[0]["embedding"] == [0.1, 0.2, 0.3, 0.4, 0.5]
 
     @pytest.mark.asyncio
-    async def test_generate_embeddings_multiple_texts(self, provider, mock_httpx_client):
+    async def test_generate_embeddings_multiple_texts(
+        self, provider, mock_httpx_client
+    ):
         """测试生成多个文本的嵌入向量"""
         mock_response = Mock()
         mock_response.status_code = 200
@@ -265,10 +265,10 @@ class TestQwenProvider:
             "output": {
                 "embeddings": [
                     {"embedding": [0.1, 0.2], "text_index": 0},
-                    {"embedding": [0.3, 0.4], "text_index": 1}
+                    {"embedding": [0.3, 0.4], "text_index": 1},
                 ]
             },
-            "usage": {"total_tokens": 20}
+            "usage": {"total_tokens": 20},
         }
         mock_httpx_client.post.return_value = mock_response
 
@@ -298,10 +298,8 @@ class TestQwenProvider:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
-            "output": {
-                "text": '{"sentiment": "positive", "confidence": 0.85}'
-            },
-            "usage": {"total_tokens": 50}
+            "output": {"text": '{"sentiment": "positive", "confidence": 0.85}'},
+            "usage": {"total_tokens": 50},
         }
         mock_httpx_client.post.return_value = mock_response
 
@@ -316,10 +314,8 @@ class TestQwenProvider:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
-            "output": {
-                "text": '{"sentiment": "negative", "confidence": 0.92}'
-            },
-            "usage": {"total_tokens": 50}
+            "output": {"text": '{"sentiment": "negative", "confidence": 0.92}'},
+            "usage": {"total_tokens": 50},
         }
         mock_httpx_client.post.return_value = mock_response
 
@@ -350,7 +346,7 @@ class TestQwenProvider:
             "output": {
                 "text": '{"factual": true, "confidence": 0.95, "reasoning": "基于可靠数据"}'
             },
-            "usage": {"total_tokens": 100}
+            "usage": {"total_tokens": 100},
         }
         mock_httpx_client.post.return_value = mock_response
 
@@ -369,7 +365,7 @@ class TestQwenProvider:
             "output": {
                 "text": '{"factual": false, "confidence": 0.88, "reasoning": "缺乏证据支持"}'
             },
-            "usage": {"total_tokens": 100}
+            "usage": {"total_tokens": 100},
         }
         mock_httpx_client.post.return_value = mock_response
 
@@ -397,16 +393,14 @@ class TestQwenProvider:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
-            "output": {
-                "text": "批量处理结果"
-            },
-            "usage": {"total_tokens": 200}
+            "output": {"text": "批量处理结果"},
+            "usage": {"total_tokens": 200},
         }
         mock_httpx_client.post.return_value = mock_response
 
         tasks = [
             {"type": "text_generation", "prompt": "任务1"},
-            {"type": "sentiment_analysis", "text": "任务2"}
+            {"type": "sentiment_analysis", "text": "任务2"},
         ]
         result = await provider.batch_process(tasks)
 
@@ -418,7 +412,9 @@ class TestQwenProvider:
         """测试批量处理错误"""
         mock_response = Mock()
         mock_response.status_code = 400
-        mock_response.json.return_value = {"error": {"message": "Batch processing failed"}}
+        mock_response.json.return_value = {
+            "error": {"message": "Batch processing failed"}
+        }
         mock_httpx_client.post.return_value = mock_response
 
         result = await provider.batch_process([{"type": "test", "data": "test"}])
@@ -462,7 +458,7 @@ class TestQwenProvider:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "output": {"text": "健康"},
-            "usage": {"total_tokens": 10}
+            "usage": {"total_tokens": 10},
         }
         mock_httpx_client.post.return_value = mock_response
 
@@ -503,7 +499,7 @@ class TestQwenProvider:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "output": {"text": "测试"},
-            "usage": {"total_tokens": 10}
+            "usage": {"total_tokens": 10},
         }
         mock_httpx_client.post.return_value = mock_response
 
@@ -540,7 +536,7 @@ class TestQwenProvider:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "output": {"text": ""},
-            "usage": {"total_tokens": 0}
+            "usage": {"total_tokens": 0},
         }
         mock_httpx_client.post.return_value = mock_response
 
@@ -556,7 +552,7 @@ class TestQwenProvider:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "output": {"text": "处理完成"},
-            "usage": {"total_tokens": 50000}
+            "usage": {"total_tokens": 50000},
         }
         mock_httpx_client.post.return_value = mock_response
 
@@ -572,7 +568,7 @@ class TestQwenProvider:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "output": {"text": "特殊字符处理完成"},
-            "usage": {"total_tokens": 50}
+            "usage": {"total_tokens": 50},
         }
         mock_httpx_client.post.return_value = mock_response
 

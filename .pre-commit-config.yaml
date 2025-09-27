@@ -78,6 +78,19 @@ repos:
         description: 检查Python依赖包的安全漏洞
         files: requirements\.txt$
 
+  # 【新增】pnpm 锁文件同步检查 - 防止CI失败
+  - repo: local
+    hooks:
+      - id: pnpm-lockfile-check
+        name: Check pnpm lockfile sync
+        entry: bash -c 'pnpm install --frozen-lockfile'
+        language: system
+        types: [json]
+        files: package\.json$|packages/.*/package\.json$
+        pass_filenames: false
+        always_run: true
+        description: 检查pnpm-lock.yaml与package.json是否同步，防止CI失败
+
 # 全局配置
-default_stages: [commit]
+default_stages: [pre-commit]
 fail_fast: false  # 即使某个钩子失败，也继续运行其他钩子

@@ -45,11 +45,15 @@ class DataPipelineService:
         """
         try:
             # 获取配置文件路径
-            config_path = os.path.join(os.path.dirname(__file__), "..", "..", "config", "scoring_rules.yml")
+            config_path = os.path.join(
+                os.path.dirname(__file__), "..", "..", "config", "scoring_rules.yml"
+            )
             config_path = os.path.abspath(config_path)
 
             if not os.path.exists(config_path):
-                self.logger.warning(f"评分规则配置文件不存在: {config_path},使用默认规则")
+                self.logger.warning(
+                    f"评分规则配置文件不存在: {config_path},使用默认规则"
+                )
                 return self._get_default_scoring_rules()
 
             with open(config_path, encoding="utf-8") as file:
@@ -85,36 +89,38 @@ class DataPipelineService:
                     ScoringRule(min_value=10, max_value=20, score=20.0),
                     ScoringRule(min_value=20, max_value=30, score=15.0),
                     ScoringRule(min_value=30, max_value=50, score=10.0),
-                    ScoringRule(min_value=50, max_value=9999, score=5.0)
+                    ScoringRule(min_value=50, max_value=9999, score=5.0),
                 ],
                 pb=[
                     ScoringRule(min_value=0, max_value=1, score=25.0),
                     ScoringRule(min_value=1, max_value=2, score=20.0),
                     ScoringRule(min_value=2, max_value=3, score=15.0),
                     ScoringRule(min_value=3, max_value=5, score=10.0),
-                    ScoringRule(min_value=5, max_value=9999, score=5.0)
+                    ScoringRule(min_value=5, max_value=9999, score=5.0),
                 ],
                 ps=[
                     ScoringRule(min_value=0, max_value=2, score=25.0),
                     ScoringRule(min_value=2, max_value=5, score=20.0),
                     ScoringRule(min_value=5, max_value=10, score=15.0),
                     ScoringRule(min_value=10, max_value=20, score=10.0),
-                    ScoringRule(min_value=20, max_value=9999, score=5.0)
+                    ScoringRule(min_value=20, max_value=9999, score=5.0),
                 ],
                 dividend_yield=[
                     ScoringRule(min_value=5, max_value=9999, score=25.0),
                     ScoringRule(min_value=3, max_value=5, score=20.0),
                     ScoringRule(min_value=1, max_value=3, score=15.0),
                     ScoringRule(min_value=0, max_value=1, score=10.0),
-                    ScoringRule(min_value=-9999, max_value=0, score=5.0)
-                ]
+                    ScoringRule(min_value=-9999, max_value=0, score=5.0),
+                ],
             ),
             growth_score_rules=DefaultScoreRules(default=50.0),
             profitability_score_rules=DefaultScoreRules(default=50.0),
-            financial_health_score_rules=DefaultScoreRules(default=50.0)
+            financial_health_score_rules=DefaultScoreRules(default=50.0),
         )
 
-    async def fetch_tushare_data(self, stock_code: str, trade_date: str) -> dict[str, Any]:
+    async def fetch_tushare_data(
+        self, stock_code: str, trade_date: str
+    ) -> dict[str, Any]:
         """
         从Tushare获取原始数据
 
@@ -141,34 +147,36 @@ class DataPipelineService:
             # 获取股票基本信息
             stock_basic = self.pro.stock_basic(
                 ts_code=stock_code,
-                fields="ts_code,symbol,name,area,industry,market,list_date"
+                fields="ts_code,symbol,name,area,industry,market,list_date",
             )
 
             # 获取日度基本面数据
             daily_basic = self.pro.daily_basic(
                 ts_code=stock_code,
                 trade_date=trade_date,
-                fields="ts_code,trade_date,close,turnover_rate,volume_ratio,pe,pe_ttm,pb,ps,ps_ttm,dv_ratio,dv_ttm,total_share,float_share,free_share,total_mv,circ_mv"
+                fields="ts_code,trade_date,close,turnover_rate,volume_ratio,pe,pe_ttm,pb,ps,ps_ttm,dv_ratio,dv_ttm,total_share,float_share,free_share,total_mv,circ_mv",
             )
 
             # 获取日度行情数据
             daily = self.pro.daily(
                 ts_code=stock_code,
                 trade_date=trade_date,
-                fields="ts_code,trade_date,open,high,low,close,pre_close,change,pct_chg,vol,amount"
+                fields="ts_code,trade_date,open,high,low,close,pre_close,change,pct_chg,vol,amount",
             )
 
             return {
                 "stock_basic": stock_basic.to_dict("records"),
                 "daily_basic": daily_basic.to_dict("records"),
-                "daily": daily.to_dict("records")
+                "daily": daily.to_dict("records"),
             }
 
         except Exception as e:
             self.logger.error(f"获取Tushare数据失败: {e}")
             raise Exception(f"API调用失败: {e}") from e
 
-    async def extract_financial_factors(self, stock_code: str, trade_date: str, raw_data: dict[str, Any]) -> dict[str, Any]:
+    async def extract_financial_factors(
+        self, stock_code: str, trade_date: str, raw_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         从原始数据中提取财务因子
 
@@ -204,7 +212,9 @@ class DataPipelineService:
             def safe_get(data, key, default=0.0):
                 """安全获取值,处理None和NaN"""
                 value = data.get(key, default)
-                if value is None or (isinstance(value, float) and str(value).lower() == "nan"):
+                if value is None or (
+                    isinstance(value, float) and str(value).lower() == "nan"
+                ):
                     return default
                 return value
 
@@ -221,24 +231,26 @@ class DataPipelineService:
                 "float_market_cap": safe_get(basic_data, "circ_mv", 0.0),
                 "total_shares": safe_get(basic_data, "total_share", 0.0),
                 "float_shares": safe_get(basic_data, "float_share", 0.0),
-                "free_shares": safe_get(basic_data, "free_share", 0.0)
+                "free_shares": safe_get(basic_data, "free_share", 0.0),
             }
 
             # 从daily数据中提取价格信息
             daily = raw_data.get("daily", [])
             if daily:
                 price_data = daily[0]
-                financial_factors.update({
-                    "open_price": price_data.get("open", 0.0),
-                    "high_price": price_data.get("high", 0.0),
-                    "low_price": price_data.get("low", 0.0),
-                    "close_price": price_data.get("close", 0.0),
-                    "pre_close": price_data.get("pre_close", 0.0),
-                    "price_change": price_data.get("change", 0.0),
-                    "price_change_pct": price_data.get("pct_chg", 0.0),
-                    "volume": price_data.get("vol", 0.0),
-                    "amount": price_data.get("amount", 0.0)
-                })
+                financial_factors.update(
+                    {
+                        "open_price": price_data.get("open", 0.0),
+                        "high_price": price_data.get("high", 0.0),
+                        "low_price": price_data.get("low", 0.0),
+                        "close_price": price_data.get("close", 0.0),
+                        "pre_close": price_data.get("pre_close", 0.0),
+                        "price_change": price_data.get("change", 0.0),
+                        "price_change_pct": price_data.get("pct_chg", 0.0),
+                        "volume": price_data.get("vol", 0.0),
+                        "amount": price_data.get("amount", 0.0),
+                    }
+                )
 
             self.logger.info(f"财务因子提取完成: {len(financial_factors)} 个指标")
             return financial_factors
@@ -247,7 +259,9 @@ class DataPipelineService:
             self.logger.error(f"提取财务因子失败: {e}")
             raise Exception(f"财务因子提取失败: {e}") from e
 
-    async def calculate_super_financial_factors(self, financial_factors: dict[str, Any]) -> dict[str, Any]:
+    async def calculate_super_financial_factors(
+        self, financial_factors: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         计算超级财务因子 - 重构后的版本
 
@@ -263,7 +277,9 @@ class DataPipelineService:
             scores = await self._calculate_all_scores(financial_factors)
             result = self._build_super_factors_result(financial_factors, scores)
 
-            self.logger.info(f"超级财务因子计算完成: 综合评分 {result['overall_score']:.2f}")
+            self.logger.info(
+                f"超级财务因子计算完成: 综合评分 {result['overall_score']:.2f}"
+            )
             return result
 
         except Exception as e:
@@ -287,13 +303,17 @@ class DataPipelineService:
         dividend_yield = factors.get("dividend_yield", 0.0)
 
         return {
-            "value_score": self._calculate_value_score(pe_ratio, pb_ratio, ps_ratio, dividend_yield),
+            "value_score": self._calculate_value_score(
+                pe_ratio, pb_ratio, ps_ratio, dividend_yield
+            ),
             "growth_score": self._calculate_growth_score(factors),
             "profitability_score": self._calculate_profitability_score(factors),
-            "financial_health_score": self._calculate_financial_health_score(factors)
+            "financial_health_score": self._calculate_financial_health_score(factors),
         }
 
-    def _build_super_factors_result(self, factors: dict[str, Any], scores: dict[str, float]) -> dict[str, Any]:
+    def _build_super_factors_result(
+        self, factors: dict[str, Any], scores: dict[str, float]
+    ) -> dict[str, Any]:
         """
         构建最终结果 - 可独立测试
 
@@ -310,10 +330,12 @@ class DataPipelineService:
             **factors,
             **scores,
             "overall_score": overall_score,
-            "calculated_at": datetime.now().isoformat()
+            "calculated_at": datetime.now().isoformat(),
         }
 
-    def _calculate_value_score(self, pe: float, pb: float, ps: float, dividend_yield: float) -> float:
+    def _calculate_value_score(
+        self, pe: float, pb: float, ps: float, dividend_yield: float
+    ) -> float:
         """
         计算价值评分 - 重构后的配置驱动版本
 
@@ -427,7 +449,9 @@ class DataPipelineService:
         Returns:
             是否保存成功
         """
-        self.logger.info(f"开始保存财务因子: {financial_factors.get('stock_code', 'unknown')}")
+        self.logger.info(
+            f"开始保存财务因子: {financial_factors.get('stock_code', 'unknown')}"
+        )
 
         try:
             # 这里应该实现数据库保存逻辑
@@ -454,7 +478,9 @@ class DataPipelineService:
         Returns:
             是否保存成功
         """
-        self.logger.info(f"开始保存超级财务因子: {super_factors.get('stock_code', 'unknown')}")
+        self.logger.info(
+            f"开始保存超级财务因子: {super_factors.get('stock_code', 'unknown')}"
+        )
 
         try:
             # 模拟数据库保存操作
@@ -467,7 +493,9 @@ class DataPipelineService:
             self.logger.error(f"保存超级财务因子失败: {e}")
             raise Exception(f"超级财务因子保存失败: {e}") from e
 
-    async def _persist_financial_factors(self, financial_factors: dict[str, Any]) -> None:
+    async def _persist_financial_factors(
+        self, financial_factors: dict[str, Any]
+    ) -> None:
         """
         持久化财务因子到数据库
 
@@ -477,6 +505,7 @@ class DataPipelineService:
         # 这里应该实现具体的数据库操作
         # 为了测试目的，我们模拟一个简单的保存操作
         import asyncio
+
         await asyncio.sleep(0.01)  # 模拟数据库操作延迟
 
         # 验证必要字段
@@ -485,7 +514,9 @@ class DataPipelineService:
             if field not in financial_factors:
                 raise ValueError(f"缺少必要字段: {field}")
 
-    async def _persist_super_financial_factors(self, super_factors: dict[str, Any]) -> None:
+    async def _persist_super_financial_factors(
+        self, super_factors: dict[str, Any]
+    ) -> None:
         """
         持久化超级财务因子到数据库
 
@@ -495,6 +526,7 @@ class DataPipelineService:
         # 这里应该实现具体的数据库操作
         # 为了测试目的，我们模拟一个简单的保存操作
         import asyncio
+
         await asyncio.sleep(0.01)  # 模拟数据库操作延迟
 
         # 验证必要字段

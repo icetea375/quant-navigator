@@ -15,6 +15,7 @@ from src.schemas.arbitration import AnalysisResult
 @dataclass
 class MetaCognitionResult:
     """元认知仲裁结果"""
+
     requires_human_review: bool
     final_conclusion: dict[str, Any]
     confidence: float
@@ -39,9 +40,7 @@ class MetaCognitionEngine:
         self.arbitration_prompt = self._load_arbitration_prompt()
 
     async def arbitrate_and_summarize(
-        self,
-        qwen_report: AnalysisResult,
-        doubao_report: AnalysisResult
+        self, qwen_report: AnalysisResult, doubao_report: AnalysisResult
     ) -> MetaCognitionResult:
         """
         仲裁并总结双脑报告
@@ -60,15 +59,16 @@ class MetaCognitionEngine:
             prompt = self._build_arbitration_prompt(qwen_report, doubao_report)
 
             # 调用LLM进行元认知仲裁
-            response = await self.llm_service.analyze_fact({
-                "news_content": prompt,
-                "context": "元认知仲裁分析"
-            })
+            response = await self.llm_service.analyze_fact(
+                {"news_content": prompt, "context": "元认知仲裁分析"}
+            )
 
             # 解析LLM响应
             result = self._parse_arbitration_response(response.analysis)
 
-            self.logger.info(f"元认知仲裁完成: 需要人工审查={result.requires_human_review}")
+            self.logger.info(
+                f"元认知仲裁完成: 需要人工审查={result.requires_human_review}"
+            )
             return result
 
         except Exception as e:
@@ -104,7 +104,9 @@ class MetaCognitionEngine:
 }
 """
 
-    def _build_arbitration_prompt(self, qwen_report: AnalysisResult, doubao_report: AnalysisResult) -> str:
+    def _build_arbitration_prompt(
+        self, qwen_report: AnalysisResult, doubao_report: AnalysisResult
+    ) -> str:
         """构建仲裁提示词"""
         return f"""
 {self.arbitration_prompt}
@@ -133,7 +135,7 @@ class MetaCognitionEngine:
                 final_conclusion=response_data.get("final_conclusion", {}),
                 confidence=response_data.get("confidence", 0.0),
                 reasoning=response_data.get("reasoning", ""),
-                created_at=datetime.now()
+                created_at=datetime.now(),
             )
 
         except json.JSONDecodeError as e:
@@ -148,9 +150,9 @@ class MetaCognitionEngine:
                 "summary": "元认知仲裁过程发生错误",
                 "consensus_points": [],
                 "key_conflicts": [],
-                "reasoning": error_msg
+                "reasoning": error_msg,
             },
             confidence=0.0,
             reasoning=f"错误: {error_msg}",
-            created_at=datetime.now()
+            created_at=datetime.now(),
         )

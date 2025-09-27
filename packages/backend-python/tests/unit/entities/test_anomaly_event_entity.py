@@ -49,9 +49,9 @@ class TestAnomalyEventEntity:
                 "market_state": "trading",
                 "sector_performance": 0.05,
                 "news_count": 10,
-                "volume_ratio": 1.5
+                "volume_ratio": 1.5,
             },
-            metadata_json={"source": "test"}
+            metadata_json={"source": "test"},
         )
 
         session.add(entity)
@@ -82,9 +82,9 @@ class TestAnomalyEventEntity:
                 "market_state": "trading",
                 "sector_performance": 0.03,
                 "news_count": 5,
-                "volume_ratio": 2.0
+                "volume_ratio": 2.0,
             },
-            "metadata_json": {"source": "test"}
+            "metadata_json": {"source": "test"},
         }
 
         entity = AnomalyEventEntity(**valid_data)
@@ -113,9 +113,9 @@ class TestAnomalyEventEntity:
                 "market_state": "trading",
                 "sector_performance": 0.03,
                 "news_count": 5,
-                "volume_ratio": 2.0
+                "volume_ratio": 2.0,
             },
-            "metadata_json": {"source": "test"}
+            "metadata_json": {"source": "test"},
         }
 
         with pytest.raises(ValueError) as exc_info:
@@ -141,9 +141,9 @@ class TestAnomalyEventEntity:
                 "market_state": "trading",
                 "sector_performance": 0.05,
                 "news_count": 10,
-                "volume_ratio": 1.5
+                "volume_ratio": 1.5,
             },
-            metadata_json={"source": "test"}
+            metadata_json={"source": "test"},
         )
 
         session.add(entity)
@@ -161,7 +161,7 @@ class TestAnomalyEventEntity:
             "market_state": "trading",
             "sector_performance": 0.05,
             "news_count": 10,
-            "volume_ratio": 1.5
+            "volume_ratio": 1.5,
         }
         assert anomaly_event.metadata == {"source": "test"}
 
@@ -183,9 +183,9 @@ class TestAnomalyEventEntity:
                 "market_state": "trading",
                 "sector_performance": 0.05,
                 "news_count": 10,
-                "volume_ratio": 1.5
+                "volume_ratio": 1.5,
             },
-            metadata={"source": "test"}
+            metadata={"source": "test"},
         )
 
         entity = AnomalyEventEntity.from_anomaly_event(anomaly_event)
@@ -203,7 +203,7 @@ class TestAnomalyEventEntity:
             "market_state": "trading",
             "sector_performance": 0.05,
             "news_count": 10,
-            "volume_ratio": 1.5
+            "volume_ratio": 1.5,
         }
         assert entity.metadata_json == {"source": "test"}
 
@@ -225,9 +225,9 @@ class TestAnomalyEventEntity:
                 "market_state": "trading",
                 "sector_performance": 0.05,
                 "news_count": 10,
-                "volume_ratio": 1.5
+                "volume_ratio": 1.5,
             },
-            metadata_json={"source": "test"}
+            metadata_json={"source": "test"},
         )
 
         # 转换为Pydantic模型
@@ -263,9 +263,9 @@ class TestAnomalyEventEntity:
                 "market_state": "trading",
                 "sector_performance": 0.05,
                 "news_count": 10,
-                "volume_ratio": 1.5
+                "volume_ratio": 1.5,
             },
-            metadata_json={}  # 测试可空字段,使用空字典而不是None
+            metadata_json={},  # 测试可空字段,使用空字典而不是None
         )
 
         session.add(entity)
@@ -296,9 +296,9 @@ class TestAnomalyEventEntity:
                 "market_state": "trading",
                 "sector_performance": 0.05,
                 "news_count": 10,
-                "volume_ratio": 1.5
+                "volume_ratio": 1.5,
             },
-            metadata_json={"source": "test"}
+            metadata_json={"source": "test"},
         )
 
         session.add(entity)
@@ -324,12 +324,12 @@ class TestAnomalyEventEntity:
                 deviation=2.50,
                 confidence=0.85,
                 context_json={
-                "market_state": "trading",
-                "sector_performance": 0.05,
-                "news_count": 10,
-                "volume_ratio": 1.5
-            },
-                metadata_json={"source": "test"}
+                    "market_state": "trading",
+                    "sector_performance": 0.05,
+                    "news_count": 10,
+                    "volume_ratio": 1.5,
+                },
+                metadata_json={"source": "test"},
             )
 
             session.add(entity)
@@ -355,12 +355,12 @@ class TestAnomalyEventEntity:
                 deviation=2.50,
                 confidence=0.85,
                 context_json={
-                "market_state": "trading",
-                "sector_performance": 0.05,
-                "news_count": 10,
-                "volume_ratio": 1.5
-            },
-                metadata_json={"source": "test"}
+                    "market_state": "trading",
+                    "sector_performance": 0.05,
+                    "news_count": 10,
+                    "volume_ratio": 1.5,
+                },
+                metadata_json={"source": "test"},
             )
 
             session.add(entity)
@@ -386,9 +386,9 @@ class TestAnomalyEventEntity:
                 "market_state": "trading",
                 "sector_performance": 0.05,
                 "news_count": 10,
-                "volume_ratio": 1.5
+                "volume_ratio": 1.5,
             },
-            metadata_json={"source": "test"}
+            metadata_json={"source": "test"},
         )
 
         session.add(entity)

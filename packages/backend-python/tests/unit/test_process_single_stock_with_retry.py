@@ -17,6 +17,7 @@ from src.exceptions.workflow_exceptions import (
 
 class MockMainWorkflow:
     """模拟主工作流类(带单股票处理重试)"""
+
     def __init__(self, config):
         self.config = config
         self.logger = MagicMock()
@@ -38,7 +39,7 @@ class MockMainWorkflow:
             "stock_code": stock_code,
             "trade_date": trade_date,
             "financial_data": {"revenue": 1000},
-            "price_data": {"close": 10.5}
+            "price_data": {"close": 10.5},
         }
 
     async def _save_report_to_db_async(self, report: dict, report_type: str):
@@ -46,7 +47,9 @@ class MockMainWorkflow:
         await asyncio.sleep(0.01)  # 模拟延迟
         return {"id": f"{report_type}_{report['stock_code']}"}
 
-    async def _create_arbitration_case_async(self, stock_code: str, trade_date: str, qwen_report: dict, doubao_report: dict):
+    async def _create_arbitration_case_async(
+        self, stock_code: str, trade_date: str, qwen_report: dict, doubao_report: dict
+    ):
         """模拟创建仲裁案件"""
         await asyncio.sleep(0.01)  # 模拟延迟
         return {"case_id": f"case_{stock_code}_{trade_date}"}
@@ -70,7 +73,9 @@ class MockMainWorkflow:
         """
         for attempt in range(max_retries):
             try:
-                self.logger.info(f"处理股票 {stock_code} (尝试 {attempt + 1}/{max_retries})")
+                self.logger.info(
+                    f"处理股票 {stock_code} (尝试 {attempt + 1}/{max_retries})"
+                )
 
                 # 1. 加载数据
                 await self._load_stock_data(stock_code, trade_date)
@@ -89,7 +94,9 @@ class MockMainWorkflow:
 
                 # 3. 保存报告
                 await self._save_report_to_db_async(qwen_report, "qwen_fact_based")
-                await self._save_report_to_db_async(doubao_report, "doubao_sentiment_based")
+                await self._save_report_to_db_async(
+                    doubao_report, "doubao_sentiment_based"
+                )
 
                 # 4. 创建仲裁案件
                 await self._create_arbitration_case_async(
@@ -100,14 +107,18 @@ class MockMainWorkflow:
                 return {"stock_code": stock_code, "status": "success"}
 
             except Exception as e:
-                self.logger.warning(f"处理股票 {stock_code} 失败 (尝试 {attempt + 1}): {e}")
+                self.logger.warning(
+                    f"处理股票 {stock_code} 失败 (尝试 {attempt + 1}): {e}"
+                )
 
                 if attempt == max_retries - 1:
                     # 最后一次尝试失败
-                    raise ArbitrationWorkflowError(f"股票 {stock_code} 处理失败: {e}") from e
+                    raise ArbitrationWorkflowError(
+                        f"股票 {stock_code} 处理失败: {e}"
+                    ) from e
 
                 # 等待后重试
-                await asyncio.sleep(2 ** attempt)  # 指数退避
+                await asyncio.sleep(2**attempt)  # 指数退避
 
 
 class TestProcessSingleStockWithRetry:
@@ -125,11 +136,11 @@ class TestProcessSingleStockWithRetry:
         # 模拟分析器返回报告
         mock_workflow.qwen_analyzer.analyze_async.return_value = {
             "stock_code": "000001",
-            "analysis": "Qwen分析结果"
+            "analysis": "Qwen分析结果",
         }
         mock_workflow.doubao_analyzer.analyze_async.return_value = {
             "stock_code": "000001",
-            "analysis": "豆包分析结果"
+            "analysis": "豆包分析结果",
         }
 
         result = await mock_workflow._process_single_stock_with_retry(
@@ -156,11 +167,15 @@ class TestProcessSingleStockWithRetry:
                 raise Exception("分析器临时失败")
             return {
                 "stock_code": stock_code,
-                "analysis": f"分析结果 (尝试 {attempt_count})"
+                "analysis": f"分析结果 (尝试 {attempt_count})",
             }
 
-        mock_workflow.qwen_analyzer.analyze_async.side_effect = failing_then_successful_analyzer
-        mock_workflow.doubao_analyzer.analyze_async.side_effect = failing_then_successful_analyzer
+        mock_workflow.qwen_analyzer.analyze_async.side_effect = (
+            failing_then_successful_analyzer
+        )
+        mock_workflow.doubao_analyzer.analyze_async.side_effect = (
+            failing_then_successful_analyzer
+        )
 
         result = await mock_workflow._process_single_stock_with_retry(
             "000001", "2025-01-17", 3
@@ -173,15 +188,21 @@ class TestProcessSingleStockWithRetry:
         assert attempt_count >= 2
 
         # 验证日志调用
-        mock_workflow.logger.warning.assert_any_call("处理股票 000001 失败 (尝试 1): 分析器临时失败")
+        mock_workflow.logger.warning.assert_any_call(
+            "处理股票 000001 失败 (尝试 1): 分析器临时失败"
+        )
         mock_workflow.logger.info.assert_any_call("成功处理股票 000001")
 
     @pytest.mark.asyncio
     async def test_process_single_stock_all_retries_fail(self, mock_workflow):
         """测试所有重试都失败"""
         # 模拟分析器总是失败
-        mock_workflow.qwen_analyzer.analyze_async.side_effect = Exception("分析器永久失败")
-        mock_workflow.doubao_analyzer.analyze_async.side_effect = Exception("分析器永久失败")
+        mock_workflow.qwen_analyzer.analyze_async.side_effect = Exception(
+            "分析器永久失败"
+        )
+        mock_workflow.doubao_analyzer.analyze_async.side_effect = Exception(
+            "分析器永久失败"
+        )
 
         with pytest.raises(ArbitrationWorkflowError) as exc_info:
             await mock_workflow._process_single_stock_with_retry(
@@ -193,14 +214,19 @@ class TestProcessSingleStockWithRetry:
         assert "分析器永久失败" in str(exc_info.value)
 
         # 验证日志调用
-        mock_workflow.logger.warning.assert_any_call("处理股票 000001 失败 (尝试 1): 分析器永久失败")
-        mock_workflow.logger.warning.assert_any_call("处理股票 000001 失败 (尝试 2): 分析器永久失败")
+        mock_workflow.logger.warning.assert_any_call(
+            "处理股票 000001 失败 (尝试 1): 分析器永久失败"
+        )
+        mock_workflow.logger.warning.assert_any_call(
+            "处理股票 000001 失败 (尝试 2): 分析器永久失败"
+        )
 
     @pytest.mark.asyncio
     async def test_process_single_stock_data_loading_failure(self, mock_workflow):
         """测试数据加载失败"""
+
         # 模拟数据加载失败
-        async def failing_data_loader(_stock_code,_trade_datee):
+        async def failing_data_loader(_stock_code, _trade_datee):
             raise Exception("数据加载失败")
 
         mock_workflow._load_stock_data = failing_data_loader
@@ -217,6 +243,7 @@ class TestProcessSingleStockWithRetry:
     @pytest.mark.asyncio
     async def test_process_single_stock_parallel_analysis(self, mock_workflow):
         """测试并行分析"""
+
         # 模拟分析器有延迟
         async def delayed_qwen_analyzer(stock_code, _trade_date):
             await asyncio.sleep(0.1)
@@ -227,7 +254,9 @@ class TestProcessSingleStockWithRetry:
             return {"stock_code": stock_code, "analysis": "豆包分析结果"}
 
         mock_workflow.qwen_analyzer.analyze_async.side_effect = delayed_qwen_analyzer
-        mock_workflow.doubao_analyzer.analyze_async.side_effect = delayed_doubao_analyzer
+        mock_workflow.doubao_analyzer.analyze_async.side_effect = (
+            delayed_doubao_analyzer
+        )
 
         # 记录开始时间
         start_time = datetime.now()
@@ -248,7 +277,9 @@ class TestProcessSingleStockWithRetry:
         """测试指数退避"""
         # 模拟分析器总是失败
         mock_workflow.qwen_analyzer.analyze_async.side_effect = Exception("分析器失败")
-        mock_workflow.doubao_analyzer.analyze_async.side_effect = Exception("分析器失败")
+        mock_workflow.doubao_analyzer.analyze_async.side_effect = Exception(
+            "分析器失败"
+        )
 
         # 记录重试次数
         retry_count = 0
@@ -276,16 +307,14 @@ class TestProcessSingleStockWithRetry:
         """测试日志记录"""
         mock_workflow.qwen_analyzer.analyze_async.return_value = {
             "stock_code": "000001",
-            "analysis": "Qwen分析结果"
+            "analysis": "Qwen分析结果",
         }
         mock_workflow.doubao_analyzer.analyze_async.return_value = {
             "stock_code": "000001",
-            "analysis": "豆包分析结果"
+            "analysis": "豆包分析结果",
         }
 
-        await mock_workflow._process_single_stock_with_retry(
-            "000001", "2025-01-17", 3
-        )
+        await mock_workflow._process_single_stock_with_retry("000001", "2025-01-17", 3)
 
         # 验证日志调用
         mock_workflow.logger.info.assert_any_call("处理股票 000001 (尝试 1/3)")
@@ -306,13 +335,13 @@ class TestProcessSingleStockWithRetry:
         mock_workflow.qwen_analyzer.analyze_async.side_effect = failing_analyzer
         mock_workflow.doubao_analyzer.analyze_async.side_effect = failing_analyzer
 
-        await mock_workflow._process_single_stock_with_retry(
-            "000001", "2025-01-17", 3
-        )
+        await mock_workflow._process_single_stock_with_retry("000001", "2025-01-17", 3)
 
         # 验证日志调用
         mock_workflow.logger.info.assert_any_call("处理股票 000001 (尝试 1/3)")
-        mock_workflow.logger.warning.assert_any_call("处理股票 000001 失败 (尝试 1): 分析器失败")
+        mock_workflow.logger.warning.assert_any_call(
+            "处理股票 000001 失败 (尝试 1): 分析器失败"
+        )
         mock_workflow.logger.info.assert_any_call("处理股票 000001 (尝试 2/3)")
         mock_workflow.logger.info.assert_any_call("成功处理股票 000001")
 
@@ -321,16 +350,14 @@ class TestProcessSingleStockWithRetry:
         """测试数据库操作"""
         mock_workflow.qwen_analyzer.analyze_async.return_value = {
             "stock_code": "000001",
-            "analysis": "Qwen分析结果"
+            "analysis": "Qwen分析结果",
         }
         mock_workflow.doubao_analyzer.analyze_async.return_value = {
             "stock_code": "000001",
-            "analysis": "豆包分析结果"
+            "analysis": "豆包分析结果",
         }
 
-        await mock_workflow._process_single_stock_with_retry(
-            "000001", "2025-01-17", 3
-        )
+        await mock_workflow._process_single_stock_with_retry("000001", "2025-01-17", 3)
 
         # 验证数据库操作被调用
         # 注意:这些方法在测试中被替换为函数,所以无法直接检查call_count
@@ -341,7 +368,9 @@ class TestProcessSingleStockWithRetry:
     async def test_process_single_stock_exception_chain(self, mock_workflow):
         """测试异常链"""
         mock_workflow.qwen_analyzer.analyze_async.side_effect = Exception("分析器失败")
-        mock_workflow.doubao_analyzer.analyze_async.side_effect = Exception("分析器失败")
+        mock_workflow.doubao_analyzer.analyze_async.side_effect = Exception(
+            "分析器失败"
+        )
 
         with pytest.raises(ArbitrationWorkflowError) as exc_info:
             await mock_workflow._process_single_stock_with_retry(
