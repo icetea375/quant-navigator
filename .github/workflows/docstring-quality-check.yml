@@ -33,7 +33,7 @@ jobs:
         python tools/scripts/check_docstring_quality.py --path packages/backend-python/src --output docstring_quality_report.md
 
     - name: 上传质量报告
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: docstring-quality-report
