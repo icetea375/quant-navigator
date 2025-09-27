@@ -7,16 +7,28 @@
     </div>
 
     <!-- 系统状态概览 -->
-    <el-row :gutter="20" class="status-overview">
-      <el-col :xs="24" :sm="12" :md="6">
+    <el-row
+      :gutter="20"
+      class="status-overview"
+    >
+      <el-col
+        :xs="24"
+        :sm="12"
+        :md="6"
+      >
         <el-card class="status-card">
           <div class="status-item">
             <div class="status-icon running">
               <el-icon><CircleCheck /></el-icon>
             </div>
             <div class="status-content">
-              <div class="status-title">系统状态</div>
-              <div class="status-value" :class="systemStatus.isRunning ? 'success' : 'error'">
+              <div class="status-title">
+                系统状态
+              </div>
+              <div
+                class="status-value"
+                :class="systemStatus.isRunning ? 'success' : 'error'"
+              >
                 {{ systemStatus.isRunning ? '运行中' : '已停止' }}
               </div>
             </div>
@@ -24,43 +36,67 @@
         </el-card>
       </el-col>
 
-      <el-col :xs="24" :sm="12" :md="6">
+      <el-col
+        :xs="24"
+        :sm="12"
+        :md="6"
+      >
         <el-card class="status-card">
           <div class="status-item">
             <div class="status-icon">
               <el-icon><Clock /></el-icon>
             </div>
             <div class="status-content">
-              <div class="status-title">最后更新</div>
-              <div class="status-value">{{ formatTime(systemStatus.lastUpdate) }}</div>
+              <div class="status-title">
+                最后更新
+              </div>
+              <div class="status-value">
+                {{ formatTime(systemStatus.lastUpdate) }}
+              </div>
             </div>
           </div>
         </el-card>
       </el-col>
 
-      <el-col :xs="24" :sm="12" :md="6">
+      <el-col
+        :xs="24"
+        :sm="12"
+        :md="6"
+      >
         <el-card class="status-card">
           <div class="status-item">
             <div class="status-icon error">
               <el-icon><Warning /></el-icon>
             </div>
             <div class="status-content">
-              <div class="status-title">错误数量</div>
-              <div class="status-value error">{{ systemStatus.errorCount }}</div>
+              <div class="status-title">
+                错误数量
+              </div>
+              <div class="status-value error">
+                {{ systemStatus.errorCount }}
+              </div>
             </div>
           </div>
         </el-card>
       </el-col>
 
-      <el-col :xs="24" :sm="12" :md="6">
+      <el-col
+        :xs="24"
+        :sm="12"
+        :md="6"
+      >
         <el-card class="status-card">
           <div class="status-item">
             <div class="status-icon warning">
               <el-icon><InfoFilled /></el-icon>
             </div>
             <div class="status-content">
-              <div class="status-title">警告数量</div>
-              <div class="status-value warning">{{ systemStatus.warningCount }}</div>
+              <div class="status-title">
+                警告数量
+              </div>
+              <div class="status-value warning">
+                {{ systemStatus.warningCount }}
+              </div>
             </div>
           </div>
         </el-card>
@@ -68,13 +104,23 @@
     </el-row>
 
     <!-- 功能模块 -->
-    <el-row :gutter="20" class="modules-section">
-      <el-col :xs="24" :md="12">
+    <el-row
+      :gutter="20"
+      class="modules-section"
+    >
+      <el-col
+        :xs="24"
+        :md="12"
+      >
         <el-card class="module-card">
           <template #header>
             <div class="card-header">
               <h3>数据管道监控</h3>
-              <el-button type="primary" size="small" @click="refreshDataPipeline">
+              <el-button
+                type="primary"
+                size="small"
+                @click="refreshDataPipeline"
+              >
                 <el-icon><Refresh /></el-icon>
                 刷新
               </el-button>
@@ -84,12 +130,19 @@
         </el-card>
       </el-col>
 
-      <el-col :xs="24" :md="12">
+      <el-col
+        :xs="24"
+        :md="12"
+      >
         <el-card class="module-card">
           <template #header>
             <div class="card-header">
               <h3>AI引擎状态</h3>
-              <el-button type="primary" size="small" @click="refreshAIEngines">
+              <el-button
+                type="primary"
+                size="small"
+                @click="refreshAIEngines"
+              >
                 <el-icon><Refresh /></el-icon>
                 刷新
               </el-button>
@@ -106,11 +159,18 @@
         <div class="card-header">
           <h3>系统配置</h3>
           <div class="header-actions">
-            <el-button type="primary" size="small" @click="saveConfig">
+            <el-button
+              type="primary"
+              size="small"
+              @click="saveConfig"
+            >
               <el-icon><Check /></el-icon>
               保存配置
             </el-button>
-            <el-button size="small" @click="resetConfig">
+            <el-button
+              size="small"
+              @click="resetConfig"
+            >
               <el-icon><RefreshLeft /></el-icon>
               重置
             </el-button>
@@ -126,13 +186,34 @@
         <div class="card-header">
           <h3>系统日志</h3>
           <div class="header-actions">
-            <el-select v-model="logLevel" placeholder="日志级别" size="small" style="width: 120px; margin-right: 10px;">
-              <el-option label="全部" value="all" />
-              <el-option label="错误" value="error" />
-              <el-option label="警告" value="warning" />
-              <el-option label="信息" value="info" />
+            <el-select
+              v-model="logLevel"
+              placeholder="日志级别"
+              size="small"
+              style="width: 120px; margin-right: 10px;"
+            >
+              <el-option
+                label="全部"
+                value="all"
+              />
+              <el-option
+                label="错误"
+                value="error"
+              />
+              <el-option
+                label="警告"
+                value="warning"
+              />
+              <el-option
+                label="信息"
+                value="info"
+              />
             </el-select>
-            <el-button type="primary" size="small" @click="refreshLogs">
+            <el-button
+              type="primary"
+              size="small"
+              @click="refreshLogs"
+            >
               <el-icon><Refresh /></el-icon>
               刷新日志
             </el-button>

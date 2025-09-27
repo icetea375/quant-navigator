@@ -8,9 +8,26 @@
           <span>量化导航仪</span>
         </div>
         <div class="nav-menu">
-          <el-button type="text" @click="$router.push('/market-radar')">市场雷达</el-button>
-          <el-button type="text" @click="$router.push('/login')" v-if="!authStore.isAuthenticated">登录</el-button>
-          <el-button type="text" @click="$router.push('/register')" v-if="!authStore.isAuthenticated">注册</el-button>
+          <el-button
+            type="text"
+            @click="$router.push('/market-radar')"
+          >
+            市场雷达
+          </el-button>
+          <el-button
+            v-if="!authStore.isAuthenticated"
+            type="text"
+            @click="$router.push('/login')"
+          >
+            登录
+          </el-button>
+          <el-button
+            v-if="!authStore.isAuthenticated"
+            type="text"
+            @click="$router.push('/register')"
+          >
+            注册
+          </el-button>
           <el-dropdown v-else>
             <el-button type="text">
               {{ authStore.user?.name }}
@@ -18,8 +35,12 @@
             </el-button>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="$router.push('/private')">我的助理</el-dropdown-item>
-                <el-dropdown-item @click="authStore.logout()">退出登录</el-dropdown-item>
+                <el-dropdown-item @click="$router.push('/private')">
+                  我的助理
+                </el-dropdown-item>
+                <el-dropdown-item @click="authStore.logout()">
+                  退出登录
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -32,13 +53,25 @@
       <!-- 英雄区域 -->
       <section class="hero">
         <div class="hero-content">
-          <h1 class="hero-title">智能量化投资导航</h1>
-          <p class="hero-subtitle">基于AI的市场分析，为您的投资决策提供专业指导</p>
+          <h1 class="hero-title">
+            智能量化投资导航
+          </h1>
+          <p class="hero-subtitle">
+            基于AI的市场分析，为您的投资决策提供专业指导
+          </p>
           <div class="hero-actions">
-            <el-button type="primary" size="large" @click="$router.push('/market-radar')">
+            <el-button
+              type="primary"
+              size="large"
+              @click="$router.push('/market-radar')"
+            >
               体验市场雷达
             </el-button>
-            <el-button size="large" @click="$router.push('/login')" v-if="!authStore.isAuthenticated">
+            <el-button
+              v-if="!authStore.isAuthenticated"
+              size="large"
+              @click="$router.push('/login')"
+            >
               立即登录
             </el-button>
           </div>
@@ -48,7 +81,9 @@
       <!-- 功能特色 -->
       <section class="features">
         <div class="container">
-          <h2 class="section-title">核心功能</h2>
+          <h2 class="section-title">
+            核心功能
+          </h2>
           <div class="features-grid">
             <div class="feature-card">
               <div class="feature-icon">
@@ -56,7 +91,12 @@
               </div>
               <h3>市场雷达</h3>
               <p>实时监控市场动态，智能识别投资机会和风险信号</p>
-              <el-button type="text" @click="$router.push('/market-radar')">了解更多</el-button>
+              <el-button
+                type="text"
+                @click="$router.push('/market-radar')"
+              >
+                了解更多
+              </el-button>
             </div>
             <div class="feature-card">
               <div class="feature-icon">
@@ -64,7 +104,12 @@
               </div>
               <h3>AI投研助理</h3>
               <p>个性化投资分析，基于您的持仓提供专业建议</p>
-              <el-button type="text" @click="$router.push('/login')">立即体验</el-button>
+              <el-button
+                type="text"
+                @click="$router.push('/login')"
+              >
+                立即体验
+              </el-button>
             </div>
             <div class="feature-card">
               <div class="feature-icon">
@@ -82,20 +127,36 @@
         <div class="container">
           <div class="stats-grid">
             <div class="stat-item">
-              <div class="stat-number">99.9%</div>
-              <div class="stat-label">系统可用性</div>
+              <div class="stat-number">
+                99.9%
+              </div>
+              <div class="stat-label">
+                系统可用性
+              </div>
             </div>
             <div class="stat-item">
-              <div class="stat-number">10K+</div>
-              <div class="stat-label">实时数据点</div>
+              <div class="stat-number">
+                10K+
+              </div>
+              <div class="stat-label">
+                实时数据点
+              </div>
             </div>
             <div class="stat-item">
-              <div class="stat-number">500+</div>
-              <div class="stat-label">监控股票</div>
+              <div class="stat-number">
+                500+
+              </div>
+              <div class="stat-label">
+                监控股票
+              </div>
             </div>
             <div class="stat-item">
-              <div class="stat-number">24/7</div>
-              <div class="stat-label">智能监控</div>
+              <div class="stat-number">
+                24/7
+              </div>
+              <div class="stat-label">
+                智能监控
+              </div>
             </div>
           </div>
         </div>

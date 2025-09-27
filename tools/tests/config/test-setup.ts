@@ -3,7 +3,7 @@
  * 基于全流程测试计划v1.0
  */
 
-import { Logger } from '@nestjs/common';
+// import { Logger } from '@nestjs/common'; // 暂时注释掉，因为@nestjs/common不存在
 
 // 设置测试环境变量
 process.env.NODE_ENV = 'test';
@@ -43,11 +43,10 @@ const globalTestConfig = {
 // 设置全局测试配置
 (global as any).testConfig = globalTestConfig;
 
-// 使用NestJS Logger
-const logger = new Logger('TestSetup');
-logger.log('测试环境初始化完成');
-logger.log(`数据库: ${globalTestConfig.database.host}:${globalTestConfig.database.port}/${globalTestConfig.database.database}`);
-logger.log(`Redis: ${globalTestConfig.redis.host}:${globalTestConfig.redis.port}`);
+// 使用简单的console.log替代NestJS Logger
+console.log('测试环境初始化完成');
+console.log(`数据库: ${globalTestConfig.database.host}:${globalTestConfig.database.port}/${globalTestConfig.database.database}`);
+console.log(`Redis: ${globalTestConfig.redis.host}:${globalTestConfig.redis.port}`);
 
 // 导出配置供测试使用
 export { globalTestConfig };

@@ -1,34 +1,60 @@
 <template>
-  <el-card class="briefing-card" v-loading="loading">
+  <el-card
+    v-loading="loading"
+    class="briefing-card"
+  >
     <template #header>
       <div class="card-header">
         <h3>市场简报</h3>
-        <el-tag type="success" size="small">实时更新</el-tag>
+        <el-tag
+          type="success"
+          size="small"
+        >
+          实时更新
+        </el-tag>
       </div>
     </template>
 
     <div class="briefing-content">
       <div class="summary-section">
         <h4>今日市场概览</h4>
-        <p class="summary-text">{{ briefing.summary || '正在加载市场数据...' }}</p>
+        <p class="summary-text">
+          {{ briefing.summary || '正在加载市场数据...' }}
+        </p>
       </div>
 
       <div class="stats-grid">
         <div class="stat-item">
-          <div class="stat-value">{{ briefing.events?.length || 0 }}</div>
-          <div class="stat-label">重要事件</div>
+          <div class="stat-value">
+            {{ briefing.events?.length || 0 }}
+          </div>
+          <div class="stat-label">
+            重要事件
+          </div>
         </div>
         <div class="stat-item">
-          <div class="stat-value">{{ briefing.hotspots?.length || 0 }}</div>
-          <div class="stat-label">热点股票</div>
+          <div class="stat-value">
+            {{ briefing.hotspots?.length || 0 }}
+          </div>
+          <div class="stat-label">
+            热点股票
+          </div>
         </div>
         <div class="stat-item">
-          <div class="stat-value">{{ getHighImpactCount() }}</div>
-          <div class="stat-label">高影响事件</div>
+          <div class="stat-value">
+            {{ getHighImpactCount() }}
+          </div>
+          <div class="stat-label">
+            高影响事件
+          </div>
         </div>
         <div class="stat-item">
-          <div class="stat-value">{{ getPositiveCount() }}</div>
-          <div class="stat-label">正面影响</div>
+          <div class="stat-value">
+            {{ getPositiveCount() }}
+          </div>
+          <div class="stat-label">
+            正面影响
+          </div>
         </div>
       </div>
 

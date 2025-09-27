@@ -3,18 +3,17 @@ ReportService单元测试 - 遵循TDD原则
 先写测试，后写实现
 """
 
-import pytest
-from datetime import date, datetime
-from unittest.mock import patch, MagicMock
+from datetime import date
 
-from src.services.report_service import ReportService
+import pytest
+
 from src.schemas.reports import (
-    GeneratedReport,
     ReportCreate,
     ReportStatus,
     ReportType,
     ReportUpdate,
 )
+from src.services.report_service import ReportService
 
 
 class TestReportServiceUnit:
@@ -48,7 +47,7 @@ class TestReportServiceUnit:
         """测试服务初始化时包含示例数据"""
         # Act
         reports = await report_service.get_reports()
-        
+
         # Assert
         assert reports["total"] == 1
         assert len(reports["data"]) == 1
@@ -97,7 +96,7 @@ class TestReportServiceUnit:
         )
         await report_service.create_report(daily_report)
         await report_service.create_report(fact_report)
-        
+
         # Act
         daily_reports = await report_service.get_reports(report_type="daily_analysis")
         fact_reports = await report_service.get_reports(report_type="fact_analysis")
@@ -109,11 +108,13 @@ class TestReportServiceUnit:
             assert report.report_type == ReportType.DAILY_ANALYSIS
 
     @pytest.mark.asyncio
-    async def test_should_filter_reports_by_target_code(self, report_service, sample_report_data):
+    async def test_should_filter_reports_by_target_code(
+        self, report_service, sample_report_data
+    ):
         """测试按目标代码过滤报告"""
         # Arrange
         await report_service.create_report(sample_report_data)
-        
+
         # Act
         filtered_reports = await report_service.get_reports(target_code="000001.SZ")
 
@@ -154,9 +155,11 @@ class TestReportServiceUnit:
         """测试更新报告"""
         # Arrange
         report_id = 1
-        
+
         # Act
-        updated_report = await report_service.update_report(report_id, sample_update_data)
+        updated_report = await report_service.update_report(
+            report_id, sample_update_data
+        )
         non_existent = await report_service.update_report(999, sample_update_data)
 
         # Assert
@@ -198,10 +201,14 @@ class TestReportServiceUnit:
         )
         await report_service.create_report(daily_report)
         await report_service.create_report(fact_report)
-        
+
         # Act
-        daily_reports = await report_service.get_reports_by_type(ReportType.DAILY_ANALYSIS)
-        fact_reports = await report_service.get_reports_by_type(ReportType.FACT_ANALYSIS)
+        daily_reports = await report_service.get_reports_by_type(
+            ReportType.DAILY_ANALYSIS
+        )
+        fact_reports = await report_service.get_reports_by_type(
+            ReportType.FACT_ANALYSIS
+        )
 
         # Assert
         assert len(daily_reports) == 2  # 1个示例 + 1个新创建
@@ -214,9 +221,21 @@ class TestReportServiceUnit:
         """测试根据日期范围获取报告"""
         # Arrange - 创建不同日期的报告
         today = date.today()
-        yesterday = date.today().replace(day=today.day-1) if today.day > 1 else date(today.year, today.month-1, 28) if today.month > 1 else date(today.year-1, 12, 28)
-        tomorrow = date.today().replace(day=today.day+1) if today.day < 28 else date(today.year, today.month+1, 1) if today.month < 12 else date(today.year+1, 1, 1)
-        
+        yesterday = (
+            date.today().replace(day=today.day - 1)
+            if today.day > 1
+            else date(today.year, today.month - 1, 28)
+            if today.month > 1
+            else date(today.year - 1, 12, 28)
+        )
+        tomorrow = (
+            date.today().replace(day=today.day + 1)
+            if today.day < 28
+            else date(today.year, today.month + 1, 1)
+            if today.month < 12
+            else date(today.year + 1, 1, 1)
+        )
+
         yesterday_report = ReportCreate(
             report_type=ReportType.DAILY_ANALYSIS,
             target_code="000001.SZ",
@@ -235,11 +254,11 @@ class TestReportServiceUnit:
             report_date=tomorrow,
             content="明天的报告",
         )
-        
+
         await report_service.create_report(yesterday_report)
         await report_service.create_report(today_report)
         await report_service.create_report(tomorrow_report)
-        
+
         # Act
         range_reports = await report_service.get_reports_by_date_range(yesterday, today)
 
@@ -259,11 +278,10 @@ class TestReportServiceUnit:
             content="测试报告",
         )
         await report_service.create_report(report_data)
-        
+
         # 更新一个报告为已完成
         await report_service.update_report(
-            1, 
-            ReportUpdate(status=ReportStatus.COMPLETED)
+            1, ReportUpdate(status=ReportStatus.COMPLETED)
         )
 
         # Act
@@ -314,7 +332,7 @@ class TestReportServiceUnit:
             ReportType.FACT_ANALYSIS,
             ReportType.SENTIMENT_ANALYSIS,
         ]
-        
+
         for i, report_type in enumerate(report_types):
             report_data = ReportCreate(
                 report_type=report_type,
@@ -357,11 +375,10 @@ class TestReportServiceUnit:
             content="待处理报告",
         )
         await report_service.create_report(pending_report)
-        
+
         # 更新示例报告为已完成
         await report_service.update_report(
-            1, 
-            ReportUpdate(status=ReportStatus.COMPLETED)
+            1, ReportUpdate(status=ReportStatus.COMPLETED)
         )
 
         # Act

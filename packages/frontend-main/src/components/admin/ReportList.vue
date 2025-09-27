@@ -9,19 +9,30 @@
     </div>
 
     <!-- 加载状态 -->
-    <div v-if="loading" class="loading-state">
-      <div class="spinner"></div>
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
+      <div class="spinner" />
       <p>加载中...</p>
     </div>
 
     <!-- 空状态 -->
-    <div v-else-if="reports.length === 0" class="empty-state">
-      <div class="empty-icon">📄</div>
+    <div
+      v-else-if="reports.length === 0"
+      class="empty-state"
+    >
+      <div class="empty-icon">
+        📄
+      </div>
       <p>暂无报告数据</p>
     </div>
 
     <!-- 报告列表 -->
-    <div v-else class="report-items">
+    <div
+      v-else
+      class="report-items"
+    >
       <div
         v-for="report in reports"
         :key="report.reportId"
@@ -40,7 +51,7 @@
           <div
             class="status-dot"
             :class="report.feedbackStatus"
-          ></div>
+          />
         </div>
 
         <!-- 报告信息 -->
@@ -74,8 +85,14 @@
     </div>
 
     <!-- 加载更多 -->
-    <div v-if="hasMore && !loading" class="load-more">
-      <button @click="handleLoadMore" class="load-more-btn">
+    <div
+      v-if="hasMore && !loading"
+      class="load-more"
+    >
+      <button
+        class="load-more-btn"
+        @click="handleLoadMore"
+      >
         加载更多
       </button>
     </div>

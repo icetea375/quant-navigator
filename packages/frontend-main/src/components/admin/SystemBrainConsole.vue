@@ -1,8 +1,12 @@
 <template>
   <div class="system-brain-console">
     <div class="header">
-      <h1 class="title">系统大脑控制台</h1>
-      <p class="subtitle">统一管理所有系统配置，支持可视化编辑、版本控制和热更新</p>
+      <h1 class="title">
+        系统大脑控制台
+      </h1>
+      <p class="subtitle">
+        统一管理所有系统配置，支持可视化编辑、版本控制和热更新
+      </p>
     </div>
 
     <div class="config-panel">
@@ -20,26 +24,45 @@
       </div>
 
       <div class="tab-content">
-        <div v-for="(tab, index) in tabs" :key="index" v-show="activeTab === index" class="tab-panel">
+        <div
+          v-for="(tab, index) in tabs"
+          v-show="activeTab === index"
+          :key="index"
+          class="tab-panel"
+        >
           <div class="panel-header">
-            <h2 class="panel-title">{{ tab.label }}管理</h2>
+            <h2 class="panel-title">
+              {{ tab.label }}管理
+            </h2>
             <div class="panel-actions">
-              <button class="btn btn-outline" @click="handleRefresh">
-                <i class="icon-refresh"></i>
+              <button
+                class="btn btn-outline"
+                @click="handleRefresh"
+              >
+                <i class="icon-refresh" />
                 刷新
               </button>
-              <button class="btn btn-primary" @click="handleAddNew">
-                <i class="icon-add"></i>
+              <button
+                class="btn btn-primary"
+                @click="handleAddNew"
+              >
+                <i class="icon-add" />
                 新增配置
               </button>
             </div>
           </div>
 
           <div class="config-table-container">
-            <div v-if="loading" class="loading">
-              <div class="spinner"></div>
+            <div
+              v-if="loading"
+              class="loading"
+            >
+              <div class="spinner" />
             </div>
-            <div v-else class="table-wrapper">
+            <div
+              v-else
+              class="table-wrapper"
+            >
               <table class="config-table">
                 <thead>
                   <tr>
@@ -49,11 +72,16 @@
                     <th>状态</th>
                     <th>创建者</th>
                     <th>更新时间</th>
-                    <th class="actions">操作</th>
+                    <th class="actions">
+                      操作
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="config in configs" :key="config.configId">
+                  <tr
+                    v-for="config in configs"
+                    :key="config.configId"
+                  >
                     <td>
                       <span class="config-key">{{ config.configKey }}</span>
                     </td>
@@ -68,10 +96,10 @@
                         <input
                           type="checkbox"
                           :checked="config.isActive"
-                          @change="handleToggleActive(config)"
                           class="switch-input"
-                        />
-                        <span class="switch-slider"></span>
+                          @change="handleToggleActive(config)"
+                        >
+                        <span class="switch-slider" />
                         <span class="switch-text">{{ config.isActive ? '启用' : '禁用' }}</span>
                       </label>
                     </td>
@@ -87,31 +115,46 @@
                           class="menu-trigger"
                           @click="handleMenuClick($event, config)"
                         >
-                          <i class="icon-more"></i>
+                          <i class="icon-more" />
                         </button>
                         <div
                           v-if="menuConfig && menuConfig.configId === config.configId"
                           class="menu-dropdown"
                           :style="{ top: menuPosition.top + 'px', left: menuPosition.left + 'px' }"
                         >
-                          <button @click="handleEdit(config)" class="menu-item">
-                            <i class="icon-edit"></i>
+                          <button
+                            class="menu-item"
+                            @click="handleEdit(config)"
+                          >
+                            <i class="icon-edit" />
                             编辑
                           </button>
-                          <button @click="handlePublish(config)" class="menu-item">
-                            <i class="icon-publish"></i>
+                          <button
+                            class="menu-item"
+                            @click="handlePublish(config)"
+                          >
+                            <i class="icon-publish" />
                             发布
                           </button>
-                          <button @click="handleViewHistory(config)" class="menu-item">
-                            <i class="icon-history"></i>
+                          <button
+                            class="menu-item"
+                            @click="handleViewHistory(config)"
+                          >
+                            <i class="icon-history" />
                             历史版本
                           </button>
-                          <button @click="handleCopy(config)" class="menu-item">
-                            <i class="icon-copy"></i>
+                          <button
+                            class="menu-item"
+                            @click="handleCopy(config)"
+                          >
+                            <i class="icon-copy" />
                             复制
                           </button>
-                          <button @click="handleDelete(config)" class="menu-item danger">
-                            <i class="icon-delete"></i>
+                          <button
+                            class="menu-item danger"
+                            @click="handleDelete(config)"
+                          >
+                            <i class="icon-delete" />
                             删除
                           </button>
                         </div>
@@ -127,11 +170,23 @@
     </div>
 
     <!-- 编辑对话框 -->
-    <div v-if="editDialogOpen" class="dialog-overlay" @click="closeEditDialog">
-      <div class="dialog" @click.stop>
+    <div
+      v-if="editDialogOpen"
+      class="dialog-overlay"
+      @click="closeEditDialog"
+    >
+      <div
+        class="dialog"
+        @click.stop
+      >
         <div class="dialog-header">
           <h3>{{ selectedConfig ? '编辑配置' : '新增配置' }}</h3>
-          <button class="dialog-close" @click="closeEditDialog">&times;</button>
+          <button
+            class="dialog-close"
+            @click="closeEditDialog"
+          >
+            &times;
+          </button>
         </div>
         <div class="dialog-content">
           <div class="form-group">
@@ -141,7 +196,7 @@
               type="text"
               :disabled="!!selectedConfig"
               class="form-input"
-            />
+            >
           </div>
           <div class="form-group">
             <label>描述</label>
@@ -149,7 +204,7 @@
               v-model="editForm.description"
               type="text"
               class="form-input"
-            />
+            >
           </div>
           <div class="form-group">
             <label>配置值</label>
@@ -157,7 +212,7 @@
               v-model="editForm.configValue"
               class="form-textarea"
               rows="6"
-            ></textarea>
+            />
           </div>
           <div class="form-group">
             <label class="checkbox-label">
@@ -165,26 +220,52 @@
                 v-model="editForm.isActive"
                 type="checkbox"
                 class="checkbox-input"
-              />
+              >
               <span class="checkbox-text">启用配置</span>
             </label>
           </div>
         </div>
         <div class="dialog-actions">
-          <button class="btn btn-outline" @click="closeEditDialog">取消</button>
-          <button class="btn btn-primary" @click="handleSave">保存</button>
+          <button
+            class="btn btn-outline"
+            @click="closeEditDialog"
+          >
+            取消
+          </button>
+          <button
+            class="btn btn-primary"
+            @click="handleSave"
+          >
+            保存
+          </button>
         </div>
       </div>
     </div>
 
     <!-- 消息提示 -->
-    <div v-if="error" class="alert alert-error">
+    <div
+      v-if="error"
+      class="alert alert-error"
+    >
       {{ error }}
-      <button @click="error = null" class="alert-close">&times;</button>
+      <button
+        class="alert-close"
+        @click="error = null"
+      >
+        &times;
+      </button>
     </div>
-    <div v-if="success" class="alert alert-success">
+    <div
+      v-if="success"
+      class="alert alert-success"
+    >
       {{ success }}
-      <button @click="success = null" class="alert-close">&times;</button>
+      <button
+        class="alert-close"
+        @click="success = null"
+      >
+        &times;
+      </button>
     </div>
   </div>
 </template>

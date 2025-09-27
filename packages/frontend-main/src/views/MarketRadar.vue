@@ -8,8 +8,19 @@
           <span>量化导航仪</span>
         </div>
         <div class="nav-menu">
-          <el-button type="text" @click="$router.push('/')">首页</el-button>
-          <el-button type="text" @click="$router.push('/login')" v-if="!authStore.isAuthenticated">登录</el-button>
+          <el-button
+            type="text"
+            @click="$router.push('/')"
+          >
+            首页
+          </el-button>
+          <el-button
+            v-if="!authStore.isAuthenticated"
+            type="text"
+            @click="$router.push('/login')"
+          >
+            登录
+          </el-button>
           <el-dropdown v-else>
             <el-button type="text">
               {{ authStore.user?.name }}
@@ -17,8 +28,12 @@
             </el-button>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="$router.push('/private')">我的助理</el-dropdown-item>
-                <el-dropdown-item @click="authStore.logout()">退出登录</el-dropdown-item>
+                <el-dropdown-item @click="$router.push('/private')">
+                  我的助理
+                </el-dropdown-item>
+                <el-dropdown-item @click="authStore.logout()">
+                  退出登录
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -38,11 +53,18 @@
         <MarketBriefingCard />
 
         <!-- 盘前高能事件 -->
-        <el-card class="section-card" v-loading="eventsLoading">
+        <el-card
+          v-loading="eventsLoading"
+          class="section-card"
+        >
           <template #header>
             <div class="card-header">
               <h3>盘前高能事件</h3>
-              <el-button type="primary" size="small" @click="refreshEvents">
+              <el-button
+                type="primary"
+                size="small"
+                @click="refreshEvents"
+              >
                 <el-icon><Refresh /></el-icon>
                 刷新
               </el-button>
@@ -52,11 +74,18 @@
         </el-card>
 
         <!-- 盘后热点复盘 -->
-        <el-card class="section-card" v-loading="hotspotsLoading">
+        <el-card
+          v-loading="hotspotsLoading"
+          class="section-card"
+        >
           <template #header>
             <div class="card-header">
               <h3>盘后热点复盘</h3>
-              <el-button type="primary" size="small" @click="refreshHotspots">
+              <el-button
+                type="primary"
+                size="small"
+                @click="refreshHotspots"
+              >
                 <el-icon><Refresh /></el-icon>
                 刷新
               </el-button>

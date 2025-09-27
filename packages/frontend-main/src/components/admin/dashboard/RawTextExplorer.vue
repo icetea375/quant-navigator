@@ -1,7 +1,9 @@
 <template>
   <div class="raw-text-explorer">
     <h3>📄 原始文本探索器</h3>
-    <p class="description">深入分析双脑报告的原始文本内容，提取关键信息和模式</p>
+    <p class="description">
+      深入分析双脑报告的原始文本内容，提取关键信息和模式
+    </p>
 
     <div class="explorer-content">
       <!-- 文本对比视图 -->
@@ -126,31 +128,45 @@
         <h4>📊 文本相似度分析</h4>
         <div class="similarity-metrics">
           <div class="metric-card">
-            <div class="metric-title">余弦相似度</div>
-            <div class="metric-value">{{ getCosineSimilarity() }}%</div>
+            <div class="metric-title">
+              余弦相似度
+            </div>
+            <div class="metric-value">
+              {{ getCosineSimilarity() }}%
+            </div>
             <div class="metric-bar">
               <div
                 class="metric-fill"
                 :style="{ width: getCosineSimilarity() + '%' }"
-              ></div>
+              />
             </div>
           </div>
 
           <div class="metric-card">
-            <div class="metric-title">Jaccard相似度</div>
-            <div class="metric-value">{{ getJaccardSimilarity() }}%</div>
+            <div class="metric-title">
+              Jaccard相似度
+            </div>
+            <div class="metric-value">
+              {{ getJaccardSimilarity() }}%
+            </div>
             <div class="metric-bar">
               <div
                 class="metric-fill"
                 :style="{ width: getJaccardSimilarity() + '%' }"
-              ></div>
+              />
             </div>
           </div>
 
           <div class="metric-card">
-            <div class="metric-title">编辑距离</div>
-            <div class="metric-value">{{ getEditDistance() }}</div>
-            <div class="metric-description">越小越相似</div>
+            <div class="metric-title">
+              编辑距离
+            </div>
+            <div class="metric-value">
+              {{ getEditDistance() }}
+            </div>
+            <div class="metric-description">
+              越小越相似
+            </div>
           </div>
         </div>
       </div>

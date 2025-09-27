@@ -8,7 +8,10 @@
 
     <!-- 操作栏 -->
     <div class="action-bar">
-      <el-button type="primary" @click="showCreateDialog = true">
+      <el-button
+        type="primary"
+        @click="showCreateDialog = true"
+      >
         <el-icon><Plus /></el-icon>
         创建股票池
       </el-button>
@@ -24,10 +27,19 @@
     </div>
 
     <!-- 股票池列表 -->
-    <div class="stock-pools-grid" v-loading="loading">
-      <div v-if="filteredStockPools.length === 0 && !loading" class="empty-state">
+    <div
+      v-loading="loading"
+      class="stock-pools-grid"
+    >
+      <div
+        v-if="filteredStockPools.length === 0 && !loading"
+        class="empty-state"
+      >
         <el-empty description="暂无股票池">
-          <el-button type="primary" @click="showCreateDialog = true">
+          <el-button
+            type="primary"
+            @click="showCreateDialog = true"
+          >
             创建第一个股票池
           </el-button>
         </el-empty>
@@ -41,17 +53,27 @@
         <div class="card-header">
           <h3>{{ pool.name }}</h3>
           <div class="card-actions">
-            <el-button type="text" size="small" @click="editPool(pool)">
+            <el-button
+              type="text"
+              size="small"
+              @click="editPool(pool)"
+            >
               <el-icon><Edit /></el-icon>
             </el-button>
-            <el-button type="text" size="small" @click="deletePool(pool)">
+            <el-button
+              type="text"
+              size="small"
+              @click="deletePool(pool)"
+            >
               <el-icon><Delete /></el-icon>
             </el-button>
           </div>
         </div>
 
         <div class="card-content">
-          <p class="pool-description">{{ pool.description || '暂无描述' }}</p>
+          <p class="pool-description">
+            {{ pool.description || '暂无描述' }}
+          </p>
 
           <div class="pool-stats">
             <div class="stat-item">
@@ -67,7 +89,11 @@
           <div class="pool-symbols">
             <div class="symbols-header">
               <span>股票列表</span>
-              <el-button type="text" size="small" @click="viewPoolDetails(pool)">
+              <el-button
+                type="text"
+                size="small"
+                @click="viewPoolDetails(pool)"
+              >
                 查看全部
               </el-button>
             </div>
@@ -80,7 +106,11 @@
               >
                 {{ symbol }}
               </el-tag>
-              <el-tag v-if="pool.symbols.length > 5" size="small" type="info">
+              <el-tag
+                v-if="pool.symbols.length > 5"
+                size="small"
+                type="info"
+              >
                 +{{ pool.symbols.length - 5 }}
               </el-tag>
             </div>
@@ -101,11 +131,20 @@
         :rules="poolRules"
         label-width="80px"
       >
-        <el-form-item label="名称" prop="name">
-          <el-input v-model="poolForm.name" placeholder="请输入股票池名称" />
+        <el-form-item
+          label="名称"
+          prop="name"
+        >
+          <el-input
+            v-model="poolForm.name"
+            placeholder="请输入股票池名称"
+          />
         </el-form-item>
 
-        <el-form-item label="描述" prop="description">
+        <el-form-item
+          label="描述"
+          prop="description"
+        >
           <el-input
             v-model="poolForm.description"
             type="textarea"
@@ -114,22 +153,30 @@
           />
         </el-form-item>
 
-        <el-form-item label="股票代码" prop="symbols">
+        <el-form-item
+          label="股票代码"
+          prop="symbols"
+        >
           <div class="symbols-input">
             <el-input
               v-model="newSymbol"
               placeholder="输入股票代码，按回车添加"
               @keyup.enter="addSymbol"
             />
-            <el-button type="primary" @click="addSymbol">添加</el-button>
+            <el-button
+              type="primary"
+              @click="addSymbol"
+            >
+              添加
+            </el-button>
           </div>
           <div class="symbols-display">
             <el-tag
               v-for="(symbol, index) in poolForm.symbols"
               :key="index"
               closable
-              @close="removeSymbol(index)"
               class="symbol-tag"
+              @close="removeSymbol(index)"
             >
               {{ symbol }}
             </el-tag>
@@ -138,16 +185,29 @@
       </el-form>
 
       <template #footer>
-        <el-button @click="cancelEdit">取消</el-button>
-        <el-button type="primary" @click="savePool" :loading="saving">
+        <el-button @click="cancelEdit">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          :loading="saving"
+          @click="savePool"
+        >
           {{ editingPool ? '更新' : '创建' }}
         </el-button>
       </template>
     </el-dialog>
 
     <!-- 股票池详情对话框 -->
-    <el-dialog v-model="showDetailsDialog" title="股票池详情" width="800px">
-      <div v-if="selectedPool" class="pool-details">
+    <el-dialog
+      v-model="showDetailsDialog"
+      title="股票池详情"
+      width="800px"
+    >
+      <div
+        v-if="selectedPool"
+        class="pool-details"
+      >
         <div class="details-header">
           <h3>{{ selectedPool.name }}</h3>
           <p>{{ selectedPool.description }}</p>
@@ -155,16 +215,28 @@
 
         <div class="details-stats">
           <div class="stat-card">
-            <div class="stat-number">{{ selectedPool.symbols.length }}</div>
-            <div class="stat-label">股票数量</div>
+            <div class="stat-number">
+              {{ selectedPool.symbols.length }}
+            </div>
+            <div class="stat-label">
+              股票数量
+            </div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">{{ formatDate(selectedPool.createdAt) }}</div>
-            <div class="stat-label">创建时间</div>
+            <div class="stat-number">
+              {{ formatDate(selectedPool.createdAt) }}
+            </div>
+            <div class="stat-label">
+              创建时间
+            </div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">{{ formatDate(selectedPool.updatedAt) }}</div>
-            <div class="stat-label">更新时间</div>
+            <div class="stat-number">
+              {{ formatDate(selectedPool.updatedAt) }}
+            </div>
+            <div class="stat-label">
+              更新时间
+            </div>
           </div>
         </div>
 

@@ -19,11 +19,17 @@
     </div>
 
     <div class="logs-container">
-      <div v-if="filteredLogs.length === 0" class="empty-logs">
+      <div
+        v-if="filteredLogs.length === 0"
+        class="empty-logs"
+      >
         <el-empty description="暂无日志数据" />
       </div>
 
-      <div v-else class="logs-list">
+      <div
+        v-else
+        class="logs-list"
+      >
         <div
           v-for="log in filteredLogs"
           :key="log.id"
@@ -32,17 +38,29 @@
         >
           <div class="log-header">
             <div class="log-level">
-              <el-tag :type="getLevelType(log.level)" size="small">
+              <el-tag
+                :type="getLevelType(log.level)"
+                size="small"
+              >
                 {{ log.level.toUpperCase() }}
               </el-tag>
             </div>
-            <div class="log-time">{{ formatTime(log.timestamp) }}</div>
-            <div class="log-source">{{ log.source }}</div>
+            <div class="log-time">
+              {{ formatTime(log.timestamp) }}
+            </div>
+            <div class="log-source">
+              {{ log.source }}
+            </div>
           </div>
 
           <div class="log-content">
-            <div class="log-message">{{ log.message }}</div>
-            <div v-if="log.details" class="log-details">
+            <div class="log-message">
+              {{ log.message }}
+            </div>
+            <div
+              v-if="log.details"
+              class="log-details"
+            >
               <el-button
                 type="text"
                 size="small"
@@ -50,7 +68,10 @@
               >
                 {{ expandedLogs.includes(log.id) ? '隐藏详情' : '显示详情' }}
               </el-button>
-              <div v-if="expandedLogs.includes(log.id)" class="details-content">
+              <div
+                v-if="expandedLogs.includes(log.id)"
+                class="details-content"
+              >
                 <pre>{{ log.details }}</pre>
               </div>
             </div>

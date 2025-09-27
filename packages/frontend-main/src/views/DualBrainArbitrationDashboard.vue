@@ -3,7 +3,9 @@
     <!-- 页面标题 -->
     <div class="dashboard-header">
       <h1>🧠 双脑分治仲裁仪表盘</h1>
-      <p class="subtitle">Qwen事实归因流 vs 豆包舆情感知流 - 人类智慧仲裁</p>
+      <p class="subtitle">
+        Qwen事实归因流 vs 豆包舆情感知流 - 人类智慧仲裁
+      </p>
     </div>
 
     <!-- 待仲裁案件列表 -->
@@ -11,24 +13,27 @@
       <h2>📋 待仲裁案件</h2>
       <div class="cases-grid">
         <div
-          v-for="case in pendingCases"
-          :key="case.id"
+          v-for="caseItem in pendingCases"
+          :key="caseItem.id"
           class="case-card"
-          :class="{ 'selected': selectedCase?.id === case.id }"
-          @click="selectCase(case)"
+          :class="{ 'selected': selectedCase?.id === caseItem.id }"
+          @click="selectCase(caseItem)"
         >
           <div class="case-header">
-            <span class="stock-code">{{ case.stock_code }}</span>
-            <span class="trade-date">{{ case.trade_date }}</span>
-            <span class="status-badge" :class="case.status">{{ case.status }}</span>
+            <span class="stock-code">{{ caseItem.stock_code }}</span>
+            <span class="trade-date">{{ caseItem.trade_date }}</span>
+            <span
+              class="status-badge"
+              :class="caseItem.status"
+            >{{ caseItem.status }}</span>
           </div>
           <div class="case-info">
             <div class="analyzer-info">
-              <span class="qwen-info">Qwen: {{ case.qwen_confidence }}%</span>
-              <span class="doubao-info">豆包: {{ case.doubao_confidence }}%</span>
+              <span class="qwen-info">Qwen: {{ caseItem.qwen_confidence }}%</span>
+              <span class="doubao-info">豆包: {{ caseItem.doubao_confidence }}%</span>
             </div>
             <div class="days-pending">
-              待处理: {{ case.days_pending }}天
+              待处理: {{ caseItem.days_pending }}天
             </div>
           </div>
         </div>
@@ -36,7 +41,10 @@
     </div>
 
     <!-- 双报告对比分析区域 -->
-    <div v-if="selectedCase" class="comparison-section">
+    <div
+      v-if="selectedCase"
+      class="comparison-section"
+    >
       <div class="comparison-header">
         <h2>🔍 双脑报告对比分析</h2>
         <div class="case-details">
@@ -90,7 +98,7 @@
                     <div
                       class="score-fill"
                       :style="{ width: (qwenReport?.mda_scores?.completeness_score || 0) + '%' }"
-                    ></div>
+                    />
                   </div>
                   <span class="score-value">{{ qwenReport?.mda_scores?.completeness_score || 0 }}%</span>
                 </div>
@@ -100,7 +108,7 @@
                     <div
                       class="score-fill"
                       :style="{ width: (qwenReport?.mda_scores?.consistency_score || 0) + '%' }"
-                    ></div>
+                    />
                   </div>
                   <span class="score-value">{{ qwenReport?.mda_scores?.consistency_score || 0 }}%</span>
                 </div>
@@ -110,7 +118,10 @@
             <!-- 投资建议 -->
             <div class="report-section">
               <h4>💼 投资建议</h4>
-              <div class="recommendation-box" :class="qwenReport?.investment_recommendation?.toLowerCase()">
+              <div
+                class="recommendation-box"
+                :class="qwenReport?.investment_recommendation?.toLowerCase()"
+              >
                 {{ qwenReport?.investment_recommendation || 'HOLD' }}
               </div>
             </div>
@@ -137,7 +148,7 @@
                     class="gauge-fill"
                     :class="getSentimentClass(doubaoReport?.sentiment_analysis?.sentiment_score)"
                     :style="{ width: Math.abs(doubaoReport?.sentiment_analysis?.sentiment_score || 0) + '%' }"
-                  ></div>
+                  />
                 </div>
                 <span class="sentiment-value">{{ doubaoReport?.sentiment_analysis?.sentiment_score || 0 }}</span>
               </div>
@@ -189,7 +200,10 @@
             <!-- 投资建议 -->
             <div class="report-section">
               <h4>💼 投资建议</h4>
-              <div class="recommendation-box" :class="doubaoReport?.investment_implications?.position_recommendation?.toLowerCase()">
+              <div
+                class="recommendation-box"
+                :class="doubaoReport?.investment_implications?.position_recommendation?.toLowerCase()"
+              >
                 {{ doubaoReport?.investment_implications?.position_recommendation || 'HOLD' }}
               </div>
             </div>
@@ -207,7 +221,7 @@
               <div
                 class="metric-fill"
                 :style="{ width: getRecommendationConsistency() + '%' }"
-              ></div>
+              />
             </div>
             <span class="metric-value">{{ getRecommendationConsistency() }}%</span>
           </div>
@@ -217,7 +231,7 @@
               <div
                 class="metric-fill"
                 :style="{ width: getRiskDifference() + '%' }"
-              ></div>
+              />
             </div>
             <span class="metric-value">{{ getRiskDifference() }}%</span>
           </div>
@@ -231,21 +245,27 @@
           <div class="form-group">
             <label>最终投资建议</label>
             <select v-model="arbitrationDecision.finalRecommendation">
-              <option value="BUY">买入 (BUY)</option>
-              <option value="HOLD">持有 (HOLD)</option>
-              <option value="SELL">卖出 (SELL)</option>
+              <option value="BUY">
+                买入 (BUY)
+              </option>
+              <option value="HOLD">
+                持有 (HOLD)
+              </option>
+              <option value="SELL">
+                卖出 (SELL)
+              </option>
             </select>
           </div>
 
           <div class="form-group">
             <label>置信度评估</label>
             <input
+              v-model="arbitrationDecision.confidenceLevel"
               type="range"
               min="0"
               max="100"
-              v-model="arbitrationDecision.confidenceLevel"
               class="confidence-slider"
-            />
+            >
             <span class="confidence-display">{{ arbitrationDecision.confidenceLevel }}%</span>
           </div>
 
@@ -255,7 +275,7 @@
               v-model="arbitrationDecision.reasoning"
               placeholder="请详细说明您的仲裁理由..."
               rows="4"
-            ></textarea>
+            />
           </div>
 
           <div class="form-group">
@@ -264,18 +284,21 @@
               v-model="arbitrationDecision.keyDisagreements"
               placeholder="记录两个AI分析的关键分歧点..."
               rows="3"
-            ></textarea>
+            />
           </div>
 
           <div class="form-actions">
             <button
-              @click="submitArbitrationDecision"
               class="submit-btn"
               :disabled="!isDecisionValid"
+              @click="submitArbitrationDecision"
             >
               提交仲裁决策
             </button>
-            <button @click="resetDecision" class="reset-btn">
+            <button
+              class="reset-btn"
+              @click="resetDecision"
+            >
               重置
             </button>
           </div>
@@ -284,8 +307,11 @@
     </div>
 
     <!-- 加载状态 -->
-    <div v-if="loading" class="loading-overlay">
-      <div class="loading-spinner"></div>
+    <div
+      v-if="loading"
+      class="loading-overlay"
+    >
+      <div class="loading-spinner" />
       <p>加载中...</p>
     </div>
   </div>
@@ -374,17 +400,17 @@ const loadPendingCases = async () => {
   }
 }
 
-const selectCase = async (case: PendingCase) => {
-  selectedCase.value = case
+const selectCase = async (caseItem: PendingCase) => {
+  selectedCase.value = caseItem
   loading.value = true
 
   try {
     // 加载Qwen报告
-    const qwenResponse = await fetch(`/api/reports/${case.qwen_report_id}`)
+    const qwenResponse = await fetch(`/api/reports/${caseItem.qwen_report_id}`)
     qwenReport.value = await qwenResponse.json()
 
     // 加载豆包报告
-    const doubaoResponse = await fetch(`/api/reports/${case.doubao_report_id}`)
+    const doubaoResponse = await fetch(`/api/reports/${caseItem.doubao_report_id}`)
     doubaoReport.value = await doubaoResponse.json()
   } catch (error) {
     console.error('加载报告失败:', error)

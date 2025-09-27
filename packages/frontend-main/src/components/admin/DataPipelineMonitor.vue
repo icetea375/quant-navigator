@@ -1,7 +1,10 @@
 <template>
   <div class="data-pipeline-monitor">
     <div class="pipeline-status">
-      <div class="status-indicator" :class="pipelineStatus.status">
+      <div
+        class="status-indicator"
+        :class="pipelineStatus.status"
+      >
         <el-icon><component :is="getStatusIcon(pipelineStatus.status)" /></el-icon>
         <span>{{ getStatusText(pipelineStatus.status) }}</span>
       </div>
@@ -9,16 +12,28 @@
 
     <div class="pipeline-metrics">
       <div class="metric-item">
-        <div class="metric-label">处理速度</div>
-        <div class="metric-value">{{ pipelineStatus.processingSpeed }}/秒</div>
+        <div class="metric-label">
+          处理速度
+        </div>
+        <div class="metric-value">
+          {{ pipelineStatus.processingSpeed }}/秒
+        </div>
       </div>
       <div class="metric-item">
-        <div class="metric-label">队列长度</div>
-        <div class="metric-value">{{ pipelineStatus.queueLength }}</div>
+        <div class="metric-label">
+          队列长度
+        </div>
+        <div class="metric-value">
+          {{ pipelineStatus.queueLength }}
+        </div>
       </div>
       <div class="metric-item">
-        <div class="metric-label">成功率</div>
-        <div class="metric-value">{{ pipelineStatus.successRate }}%</div>
+        <div class="metric-label">
+          成功率
+        </div>
+        <div class="metric-value">
+          {{ pipelineStatus.successRate }}%
+        </div>
       </div>
     </div>
 

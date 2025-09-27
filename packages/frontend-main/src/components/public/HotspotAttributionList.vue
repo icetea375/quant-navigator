@@ -1,10 +1,16 @@
 <template>
   <div class="hotspot-list">
-    <div v-if="events.length === 0" class="empty-state">
+    <div
+      v-if="events.length === 0"
+      class="empty-state"
+    >
       <el-empty description="暂无数据" />
     </div>
 
-    <div v-else class="events-grid">
+    <div
+      v-else
+      class="events-grid"
+    >
       <div
         v-for="event in events"
         :key="event.id"
@@ -12,7 +18,9 @@
         :class="getEventClass(event)"
       >
         <div class="event-header">
-          <div class="event-title">{{ event.title }}</div>
+          <div class="event-title">
+            {{ event.title }}
+          </div>
           <div class="event-meta">
             <el-tag
               :type="getImportanceType(event.importance)"
@@ -30,7 +38,9 @@
         </div>
 
         <div class="event-content">
-          <p class="event-description">{{ event.description }}</p>
+          <p class="event-description">
+            {{ event.description }}
+          </p>
 
           <div class="event-details">
             <div class="detail-item">

@@ -1,7 +1,9 @@
 <template>
   <div class="technical-analysis">
     <h3>📈 技术指标分析</h3>
-    <p class="description">基于技术指标的综合分析，为仲裁决策提供技术面支撑</p>
+    <p class="description">
+      基于技术指标的综合分析，为仲裁决策提供技术面支撑
+    </p>
 
     <div class="analysis-content">
       <!-- 主要技术指标 -->
@@ -9,36 +11,61 @@
         <h4>📊 主要技术指标</h4>
         <div class="indicators-grid">
           <div class="indicator-card">
-            <div class="indicator-title">移动平均线</div>
+            <div class="indicator-title">
+              移动平均线
+            </div>
             <div class="indicator-values">
               <div class="value-item">
                 <span class="label">MA5:</span>
-                <span class="value" :class="getTrendClass(technicalData.ma5Trend)">{{ technicalData.ma5 }}</span>
+                <span
+                  class="value"
+                  :class="getTrendClass(technicalData.ma5Trend)"
+                >{{ technicalData.ma5 }}</span>
               </div>
               <div class="value-item">
                 <span class="label">MA20:</span>
-                <span class="value" :class="getTrendClass(technicalData.ma20Trend)">{{ technicalData.ma20 }}</span>
+                <span
+                  class="value"
+                  :class="getTrendClass(technicalData.ma20Trend)"
+                >{{ technicalData.ma20 }}</span>
               </div>
               <div class="value-item">
                 <span class="label">MA60:</span>
-                <span class="value" :class="getTrendClass(technicalData.ma60Trend)">{{ technicalData.ma60 }}</span>
+                <span
+                  class="value"
+                  :class="getTrendClass(technicalData.ma60Trend)"
+                >{{ technicalData.ma60 }}</span>
               </div>
             </div>
           </div>
 
           <div class="indicator-card">
-            <div class="indicator-title">相对强弱指数 (RSI)</div>
+            <div class="indicator-title">
+              相对强弱指数 (RSI)
+            </div>
             <div class="rsi-container">
-              <div class="rsi-value" :class="getRSIClass(technicalData.rsi)">{{ technicalData.rsi }}</div>
-              <div class="rsi-bar">
-                <div class="rsi-fill" :style="{ width: technicalData.rsi + '%' }"></div>
+              <div
+                class="rsi-value"
+                :class="getRSIClass(technicalData.rsi)"
+              >
+                {{ technicalData.rsi }}
               </div>
-              <div class="rsi-status">{{ getRSIStatus(technicalData.rsi) }}</div>
+              <div class="rsi-bar">
+                <div
+                  class="rsi-fill"
+                  :style="{ width: technicalData.rsi + '%' }"
+                />
+              </div>
+              <div class="rsi-status">
+                {{ getRSIStatus(technicalData.rsi) }}
+              </div>
             </div>
           </div>
 
           <div class="indicator-card">
-            <div class="indicator-title">MACD</div>
+            <div class="indicator-title">
+              MACD
+            </div>
             <div class="macd-container">
               <div class="macd-values">
                 <div class="value-item">
@@ -51,14 +78,19 @@
                 </div>
                 <div class="value-item">
                   <span class="label">MACD:</span>
-                  <span class="value" :class="technicalData.macd > 0 ? 'positive' : 'negative'">{{ technicalData.macd }}</span>
+                  <span
+                    class="value"
+                    :class="technicalData.macd > 0 ? 'positive' : 'negative'"
+                  >{{ technicalData.macd }}</span>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="indicator-card">
-            <div class="indicator-title">布林带</div>
+            <div class="indicator-title">
+              布林带
+            </div>
             <div class="bollinger-container">
               <div class="bollinger-band">
                 <span class="band-label">上轨:</span>
@@ -90,17 +122,23 @@
             class="signal-item"
             :class="signal.type"
           >
-            <div class="signal-icon">{{ getSignalIcon(signal.type) }}</div>
+            <div class="signal-icon">
+              {{ getSignalIcon(signal.type) }}
+            </div>
             <div class="signal-content">
-              <div class="signal-title">{{ signal.title }}</div>
-              <div class="signal-description">{{ signal.description }}</div>
+              <div class="signal-title">
+                {{ signal.title }}
+              </div>
+              <div class="signal-description">
+                {{ signal.description }}
+              </div>
               <div class="signal-strength">
                 强度: {{ signal.strength }}/10
                 <div class="strength-bar">
                   <div
                     class="strength-fill"
                     :style="{ width: (signal.strength * 10) + '%' }"
-                  ></div>
+                  />
                 </div>
               </div>
             </div>
@@ -152,17 +190,23 @@
             class="pattern-card"
             :class="pattern.confidence > 70 ? 'high-confidence' : pattern.confidence > 40 ? 'medium-confidence' : 'low-confidence'"
           >
-            <div class="pattern-icon">{{ getPatternIcon(pattern.type) }}</div>
+            <div class="pattern-icon">
+              {{ getPatternIcon(pattern.type) }}
+            </div>
             <div class="pattern-content">
-              <div class="pattern-name">{{ pattern.name }}</div>
-              <div class="pattern-description">{{ pattern.description }}</div>
+              <div class="pattern-name">
+                {{ pattern.name }}
+              </div>
+              <div class="pattern-description">
+                {{ pattern.description }}
+              </div>
               <div class="pattern-confidence">
                 置信度: {{ pattern.confidence }}%
                 <div class="confidence-bar">
                   <div
                     class="confidence-fill"
                     :style="{ width: pattern.confidence + '%' }"
-                  ></div>
+                  />
                 </div>
               </div>
             </div>

@@ -1,19 +1,30 @@
 <template>
   <div class="annotation-panel">
     <!-- 空状态 -->
-    <div v-if="!report" class="empty-state">
-      <div class="empty-icon">📋</div>
+    <div
+      v-if="!report"
+      class="empty-state"
+    >
+      <div class="empty-icon">
+        📋
+      </div>
       <p>请选择一个报告进行标注</p>
     </div>
 
     <!-- 加载状态 -->
-    <div v-else-if="loading" class="loading-state">
-      <div class="spinner"></div>
+    <div
+      v-else-if="loading"
+      class="loading-state"
+    >
+      <div class="spinner" />
       <p>加载报告详情中...</p>
     </div>
 
     <!-- 报告详情和标注表单 -->
-    <div v-else class="panel-content">
+    <div
+      v-else
+      class="panel-content"
+    >
       <!-- 报告头部 -->
       <div class="report-header">
         <h3>{{ report.title || '报告详情' }}</h3>
@@ -27,19 +38,31 @@
       <div class="report-content">
         <div class="content-section">
           <h4>核心结论</h4>
-          <div class="content-text" v-html="formatMarkdown(report.contentMarkdown)"></div>
+          <div
+            class="content-text"
+            v-html="formatMarkdown(report.contentMarkdown)"
+          />
         </div>
 
         <!-- 证据链展示 -->
-        <div v-if="report.evidencePayload" class="content-section">
+        <div
+          v-if="report.evidencePayload"
+          class="content-section"
+        >
           <h4>证据链</h4>
           <div class="evidence-chain">
-            <div class="evidence-item" v-for="(evidence, index) in getEvidenceItems()" :key="index">
+            <div
+              v-for="(evidence, index) in getEvidenceItems()"
+              :key="index"
+              class="evidence-item"
+            >
               <div class="evidence-header">
                 <span class="evidence-type">{{ evidence.type }}</span>
                 <span class="evidence-confidence">置信度: {{ evidence.confidence }}%</span>
               </div>
-              <div class="evidence-content">{{ evidence.content }}</div>
+              <div class="evidence-content">
+                {{ evidence.content }}
+              </div>
             </div>
           </div>
         </div>
@@ -56,31 +79,31 @@
             <div class="rating-options">
               <label class="rating-option good">
                 <input
-                  type="radio"
                   v-model="feedback.rating"
+                  type="radio"
                   value="GOOD"
                   required
-                />
+                >
                 <span class="rating-icon">🟢</span>
                 <span class="rating-text">准确</span>
               </label>
 
               <label class="rating-option partial">
                 <input
-                  type="radio"
                   v-model="feedback.rating"
+                  type="radio"
                   value="PARTIAL"
-                />
+                >
                 <span class="rating-icon">🟠</span>
                 <span class="rating-text">部分准确</span>
               </label>
 
               <label class="rating-option bad">
                 <input
-                  type="radio"
                   v-model="feedback.rating"
+                  type="radio"
                   value="BAD"
-                />
+                >
                 <span class="rating-icon">🔴</span>
                 <span class="rating-text">错误</span>
               </label>
@@ -88,42 +111,45 @@
           </div>
 
           <!-- 错误类型（仅在评级为部分准确或错误时显示） -->
-          <div v-if="feedback.rating === 'PARTIAL' || feedback.rating === 'BAD'" class="form-group">
+          <div
+            v-if="feedback.rating === 'PARTIAL' || feedback.rating === 'BAD'"
+            class="form-group"
+          >
             <label class="form-label">错误类型</label>
             <div class="error-types">
               <label class="error-type-option">
                 <input
-                  type="checkbox"
                   v-model="feedback.errorTypes"
+                  type="checkbox"
                   value="MISSING_KEY_INFO"
-                />
+                >
                 <span>遗漏关键信息</span>
               </label>
 
               <label class="error-type-option">
                 <input
-                  type="checkbox"
                   v-model="feedback.errorTypes"
+                  type="checkbox"
                   value="FACTUAL_ERROR"
-                />
+                >
                 <span>事实判断错误</span>
               </label>
 
               <label class="error-type-option">
                 <input
-                  type="checkbox"
                   v-model="feedback.errorTypes"
+                  type="checkbox"
                   value="CAUSAL_FALLACY"
-                />
+                >
                 <span>因果逻辑混乱</span>
               </label>
 
               <label class="error-type-option">
                 <input
-                  type="checkbox"
                   v-model="feedback.errorTypes"
+                  type="checkbox"
                   value="EXPRESSION_POOR"
-                />
+                >
                 <span>表达方式不佳</span>
               </label>
             </div>
@@ -138,15 +164,15 @@
               rows="4"
               required
               class="form-textarea"
-            ></textarea>
+            />
           </div>
 
           <!-- 提交按钮 -->
           <div class="form-actions">
             <button
               type="button"
-              @click="resetForm"
               class="btn btn-secondary"
+              @click="resetForm"
             >
               重置
             </button>

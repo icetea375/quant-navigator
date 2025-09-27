@@ -1,7 +1,9 @@
 <template>
   <div class="risk-factor-analysis">
     <h3>⚠️ 风险因子分析</h3>
-    <p class="description">全面分析各类风险因子，为仲裁决策提供风险控制依据</p>
+    <p class="description">
+      全面分析各类风险因子，为仲裁决策提供风险控制依据
+    </p>
 
     <div class="analysis-content">
       <!-- 风险概览 -->
@@ -9,25 +11,45 @@
         <h4>📊 风险概览</h4>
         <div class="risk-summary">
           <div class="summary-card">
-            <div class="summary-title">总体风险等级</div>
-            <div class="summary-value" :class="getRiskLevelClass(riskData.overallRisk)">
+            <div class="summary-title">
+              总体风险等级
+            </div>
+            <div
+              class="summary-value"
+              :class="getRiskLevelClass(riskData.overallRisk)"
+            >
               {{ getRiskLevelText(riskData.overallRisk) }}
             </div>
-            <div class="summary-score">{{ riskData.overallRisk }}/100</div>
+            <div class="summary-score">
+              {{ riskData.overallRisk }}/100
+            </div>
           </div>
 
           <div class="summary-card">
-            <div class="summary-title">风险变化趋势</div>
-            <div class="summary-value" :class="getTrendClass(riskData.riskTrend)">
+            <div class="summary-title">
+              风险变化趋势
+            </div>
+            <div
+              class="summary-value"
+              :class="getTrendClass(riskData.riskTrend)"
+            >
               {{ getTrendText(riskData.riskTrend) }}
             </div>
-            <div class="summary-score">{{ riskData.riskChange }}%</div>
+            <div class="summary-score">
+              {{ riskData.riskChange }}%
+            </div>
           </div>
 
           <div class="summary-card">
-            <div class="summary-title">关键风险数量</div>
-            <div class="summary-value">{{ riskData.criticalRisks }}</div>
-            <div class="summary-score">个</div>
+            <div class="summary-title">
+              关键风险数量
+            </div>
+            <div class="summary-value">
+              {{ riskData.criticalRisks }}
+            </div>
+            <div class="summary-score">
+              个
+            </div>
           </div>
         </div>
       </div>
@@ -43,9 +65,16 @@
             :class="getCategoryClass(category.level)"
           >
             <div class="category-header">
-              <div class="category-icon">{{ category.icon }}</div>
-              <div class="category-title">{{ category.name }}</div>
-              <div class="category-level" :class="getLevelClass(category.level)">
+              <div class="category-icon">
+                {{ category.icon }}
+              </div>
+              <div class="category-title">
+                {{ category.name }}
+              </div>
+              <div
+                class="category-level"
+                :class="getLevelClass(category.level)"
+              >
                 {{ getLevelText(category.level) }}
               </div>
             </div>
@@ -58,12 +87,14 @@
                   <div
                     class="score-fill"
                     :style="{ width: category.score + '%' }"
-                  ></div>
+                  />
                 </div>
               </div>
 
               <div class="risk-factors">
-                <div class="factors-title">主要风险因子:</div>
+                <div class="factors-title">
+                  主要风险因子:
+                </div>
                 <div class="factors-list">
                   <span
                     v-for="(factor, factorIndex) in category.factors"
@@ -95,14 +126,21 @@
             :class="event.severity"
           >
             <div class="event-header">
-              <div class="event-title">{{ event.title }}</div>
-              <div class="event-severity" :class="getSeverityClass(event.severity)">
+              <div class="event-title">
+                {{ event.title }}
+              </div>
+              <div
+                class="event-severity"
+                :class="getSeverityClass(event.severity)"
+              >
                 {{ getSeverityText(event.severity) }}
               </div>
             </div>
 
             <div class="event-content">
-              <div class="event-description">{{ event.description }}</div>
+              <div class="event-description">
+                {{ event.description }}
+              </div>
               <div class="event-meta">
                 <span class="event-time">{{ formatTime(event.time) }}</span>
                 <span class="event-source">{{ event.source }}</span>
@@ -111,8 +149,12 @@
             </div>
 
             <div class="event-actions">
-              <button class="action-btn primary">查看详情</button>
-              <button class="action-btn secondary">标记处理</button>
+              <button class="action-btn primary">
+                查看详情
+              </button>
+              <button class="action-btn secondary">
+                标记处理
+              </button>
             </div>
           </div>
         </div>
@@ -128,14 +170,24 @@
             class="alert-item"
             :class="alert.type"
           >
-            <div class="alert-icon">{{ getAlertIcon(alert.type) }}</div>
+            <div class="alert-icon">
+              {{ getAlertIcon(alert.type) }}
+            </div>
             <div class="alert-content">
-              <div class="alert-title">{{ alert.title }}</div>
-              <div class="alert-description">{{ alert.description }}</div>
-              <div class="alert-time">{{ formatTime(alert.time) }}</div>
+              <div class="alert-title">
+                {{ alert.title }}
+              </div>
+              <div class="alert-description">
+                {{ alert.description }}
+              </div>
+              <div class="alert-time">
+                {{ formatTime(alert.time) }}
+              </div>
             </div>
             <div class="alert-actions">
-              <button class="alert-btn">处理</button>
+              <button class="alert-btn">
+                处理
+              </button>
             </div>
           </div>
         </div>
@@ -152,14 +204,21 @@
             :class="suggestion.priority"
           >
             <div class="suggestion-header">
-              <div class="suggestion-title">{{ suggestion.title }}</div>
-              <div class="suggestion-priority" :class="getPriorityClass(suggestion.priority)">
+              <div class="suggestion-title">
+                {{ suggestion.title }}
+              </div>
+              <div
+                class="suggestion-priority"
+                :class="getPriorityClass(suggestion.priority)"
+              >
                 {{ getPriorityText(suggestion.priority) }}
               </div>
             </div>
 
             <div class="suggestion-content">
-              <div class="suggestion-description">{{ suggestion.description }}</div>
+              <div class="suggestion-description">
+                {{ suggestion.description }}
+              </div>
               <div class="suggestion-actions">
                 <div class="action-item">
                   <span class="action-label">预期效果:</span>

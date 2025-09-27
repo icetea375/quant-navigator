@@ -9,6 +9,16 @@ on:
 env:
   NODE_VERSION: '18'
   PNPM_VERSION: '8.15.0'
+  # CI环境测试配置 - 遵循测试宪法
+  DATABASE_URL: 'postgresql://test:test@localhost:5432/quant_navigator_test'
+  REDIS_URL: 'redis://localhost:6379/1'
+  QWEN_API_KEY: 'test_qwen_key_ci'
+  DOUBAO_API_KEY: 'test_doubao_key_ci'
+  OPENAI_API_KEY: 'test_openai_key_ci'
+  TUSHARE_TOKEN: 'test_tushare_token_ci'
+  Z_SCORE_THRESHOLD: '2.5'
+  ROLLING_WINDOW_SIZE: '90'
+  MACRO_RISK_CALCULATION_ENABLED: 'true'
 
 jobs:
   # 代码质量检查

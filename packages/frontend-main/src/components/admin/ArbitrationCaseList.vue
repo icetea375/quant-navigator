@@ -4,37 +4,63 @@
     <div class="list-header">
       <div class="header-content">
         <h1>⚖️ AI仲裁案件管理</h1>
-        <p class="subtitle">智能仲裁预处理 - 人类智慧决策</p>
+        <p class="subtitle">
+          智能仲裁预处理 - 人类智慧决策
+        </p>
       </div>
 
       <!-- 统计卡片 -->
       <div class="stats-cards">
         <div class="stat-card pending">
-          <div class="stat-icon">⏳</div>
+          <div class="stat-icon">
+            ⏳
+          </div>
           <div class="stat-content">
-            <div class="stat-number">{{ statistics.pendingCases }}</div>
-            <div class="stat-label">待仲裁</div>
+            <div class="stat-number">
+              {{ statistics?.pendingCases || 0 }}
+            </div>
+            <div class="stat-label">
+              待仲裁
+            </div>
           </div>
         </div>
         <div class="stat-card arbitrated">
-          <div class="stat-icon">✅</div>
+          <div class="stat-icon">
+            ✅
+          </div>
           <div class="stat-content">
-            <div class="stat-number">{{ statistics.arbitratedCases }}</div>
-            <div class="stat-label">已仲裁</div>
+            <div class="stat-number">
+              {{ statistics?.arbitratedCases || 0 }}
+            </div>
+            <div class="stat-label">
+              已仲裁
+            </div>
           </div>
         </div>
         <div class="stat-card ignored">
-          <div class="stat-icon">❌</div>
+          <div class="stat-icon">
+            ❌
+          </div>
           <div class="stat-content">
-            <div class="stat-number">{{ statistics.ignoredCases }}</div>
-            <div class="stat-label">已忽略</div>
+            <div class="stat-number">
+              {{ statistics?.ignoredCases || 0 }}
+            </div>
+            <div class="stat-label">
+              已忽略
+            </div>
           </div>
         </div>
         <div class="stat-card total">
-          <div class="stat-icon">📊</div>
+          <div class="stat-icon">
+            📊
+          </div>
           <div class="stat-content">
-            <div class="stat-number">{{ statistics.totalCases }}</div>
-            <div class="stat-label">总计</div>
+            <div class="stat-number">
+              {{ statistics?.totalCases || 0 }}
+            </div>
+            <div class="stat-label">
+              总计
+            </div>
           </div>
         </div>
       </div>
@@ -45,11 +71,23 @@
       <div class="filter-controls">
         <div class="filter-group">
           <label>状态筛选</label>
-          <select v-model="filters.status" @change="loadCases">
-            <option value="">全部状态</option>
-            <option value="PENDING_HUMAN">待仲裁</option>
-            <option value="ARBITRATED">已仲裁</option>
-            <option value="IGNORED">已忽略</option>
+          <select
+            v-model="filters.status"
+            data-testid="status-filter"
+            @change="loadCases"
+          >
+            <option value="">
+              全部状态
+            </option>
+            <option value="PENDING_HUMAN">
+              待仲裁
+            </option>
+            <option value="ARBITRATED">
+              已仲裁
+            </option>
+            <option value="IGNORED">
+              已忽略
+            </option>
           </select>
         </div>
 
@@ -60,7 +98,7 @@
             type="text"
             placeholder="输入股票代码"
             @input="debouncedLoadCases"
-          />
+          >
         </div>
 
         <div class="filter-group">
@@ -70,35 +108,59 @@
               v-model="filters.startDate"
               type="date"
               @change="loadCases"
-            />
+            >
             <span>至</span>
             <input
               v-model="filters.endDate"
               type="date"
               @change="loadCases"
-            />
+            >
           </div>
         </div>
 
         <div class="filter-group">
           <label>排序方式</label>
-          <select v-model="filters.sortBy" @change="loadCases">
-            <option value="priority_score">优先级</option>
-            <option value="created_at">创建时间</option>
-            <option value="report_date">报告日期</option>
+          <select
+            v-model="filters.sortBy"
+            @change="loadCases"
+          >
+            <option value="priority_score">
+              优先级
+            </option>
+            <option value="created_at">
+              创建时间
+            </option>
+            <option value="report_date">
+              报告日期
+            </option>
           </select>
-          <select v-model="filters.sortOrder" @change="loadCases">
-            <option value="DESC">降序</option>
-            <option value="ASC">升序</option>
+          <select
+            v-model="filters.sortOrder"
+            @change="loadCases"
+          >
+            <option value="DESC">
+              降序
+            </option>
+            <option value="ASC">
+              升序
+            </option>
           </select>
         </div>
       </div>
 
       <div class="action-buttons">
-        <button @click="refreshCases" class="refresh-btn" :disabled="loading">
+        <button
+          class="refresh-btn"
+          :disabled="loading"
+          @click="refreshCases"
+        >
           🔄 刷新
         </button>
-        <button @click="batchIgnore" class="batch-ignore-btn" :disabled="!selectedCases.length">
+        <button
+          class="batch-ignore-btn"
+          :disabled="!selectedCases.length"
+          @click="batchIgnore"
+        >
           ❌ 批量忽略 ({{ selectedCases.length }})
         </button>
       </div>
@@ -114,47 +176,64 @@
       </div>
 
       <!-- 加载状态 -->
-      <div v-if="loading" class="loading-state">
-        <div class="loading-spinner"></div>
+      <div
+        v-if="loading"
+        class="loading-state"
+      >
+        <div class="loading-spinner" />
         <p>加载中...</p>
       </div>
 
       <!-- 案件卡片列表 -->
-      <div v-else-if="cases.length > 0" class="cases-grid" data-testid="case-list">
+      <div
+        v-else-if="cases.length > 0"
+        class="cases-grid"
+        data-testid="case-list"
+      >
         <div
           v-for="caseItem in cases"
           :key="caseItem.id"
           class="case-card"
           data-testid="case-card"
           :class="{
-            'selected': selectedCases.includes(caseItem.id),
+            'selected': selectedCases.includes(caseItem.case_id),
             'pending': caseItem.status === 'PENDING_HUMAN',
             'arbitrated': caseItem.status === 'ARBITRATED',
             'ignored': caseItem.status === 'IGNORED'
           }"
-          @click="toggleSelection(caseItem.id)"
+          @click="toggleSelection(caseItem.case_id)"
         >
           <!-- 选择框 -->
           <div class="selection-checkbox">
             <input
               type="checkbox"
-              :checked="selectedCases.includes(caseItem.id)"
-              @click.stop="toggleSelection(caseItem.id)"
-            />
+              :checked="selectedCases.includes(caseItem.case_id)"
+              @click.stop="toggleSelection(caseItem.case_id)"
+            >
           </div>
 
           <!-- 案件头部信息 -->
           <div class="case-header">
-          <div class="case-title">
-            <span class="stock-code" data-testid="stock-code">{{ caseItem.target_code }}</span>
-            <span class="case-id" data-testid="case-id">{{ caseItem.case_id }}</span>
-          </div>
-          <div class="case-meta">
-            <span class="report-date">{{ formatDate(caseItem.created_at) }}</span>
-            <span class="status-badge" :class="caseItem.status" data-testid="case-status">
-              {{ getStatusText(caseItem.status) }}
-            </span>
-          </div>
+            <div class="case-title">
+              <span
+                class="stock-code"
+                data-testid="stock-code"
+              >{{ caseItem.target_code }}</span>
+              <span
+                class="case-id"
+                data-testid="case-id"
+              >{{ caseItem.case_id }}</span>
+            </div>
+            <div class="case-meta">
+              <span class="report-date">{{ formatDate(caseItem.created_at) }}</span>
+              <span
+                class="status-badge"
+                :class="caseItem.status"
+                data-testid="case-status"
+              >
+                {{ getStatusText(caseItem.status) }}
+              </span>
+            </div>
           </div>
 
           <!-- 优先级和分歧度 -->
@@ -162,22 +241,28 @@
             <div class="metric-item">
               <span class="metric-label">优先级</span>
               <div class="metric-bar">
-              <div
-                class="metric-fill priority"
-                :style="{ width: (caseItem.priority_score * 100) + '%' }"
-              ></div>
+                <div
+                  class="metric-fill priority"
+                  :style="{ width: (caseItem.priority_score * 100) + '%' }"
+                />
+              </div>
+              <span
+                class="metric-value"
+                data-testid="priority-score"
+              >{{ Math.round(caseItem.priority_score * 100) }}%</span>
             </div>
-            <span class="metric-value" data-testid="priority-score">{{ Math.round(caseItem.priority_score * 100) }}%</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-label">分歧度</span>
-            <div class="metric-bar">
-              <div
-                class="metric-fill divergence"
-                :style="{ width: (caseItem.disagreement_score * 100) + '%' }"
-              ></div>
-            </div>
-            <span class="metric-value" data-testid="divergence-score">{{ Math.round(caseItem.disagreement_score * 100) }}%</span>
+            <div class="metric-item">
+              <span class="metric-label">分歧度</span>
+              <div class="metric-bar">
+                <div
+                  class="metric-fill divergence"
+                  :style="{ width: (caseItem.disagreement_score * 100) + '%' }"
+                />
+              </div>
+              <span
+                class="metric-value"
+                data-testid="divergence-score"
+              >{{ Math.round(caseItem.disagreement_score * 100) }}%</span>
             </div>
           </div>
 
@@ -185,33 +270,37 @@
           <div class="case-summary">
             <div class="summary-item">
               <h4>🤝 共识点</h4>
-              <p data-testid="consensus-summary">{{ truncateText(caseItem.consensus_summary, 100) }}</p>
+              <p data-testid="consensus-summary">
+                {{ truncateText(caseItem.consensus_summary, 100) }}
+              </p>
             </div>
             <div class="summary-item">
               <h4>⚡ 争议点</h4>
-              <p data-testid="conflict-summary">{{ truncateText(caseItem.conflict_summary, 100) }}</p>
+              <p data-testid="conflict-summary">
+                {{ truncateText(caseItem.conflict_summary, 100) }}
+              </p>
             </div>
           </div>
 
           <!-- 操作按钮 -->
           <div class="case-actions">
             <button
-              @click.stop="viewCaseDetail(caseItem)"
               class="view-btn"
+              @click.stop="viewCaseDetail(caseItem)"
             >
               👁️ 查看详情
             </button>
             <button
               v-if="caseItem.status === 'PENDING_HUMAN'"
-              @click.stop="arbitrateCase(caseItem)"
               class="arbitrate-btn"
+              @click.stop="arbitrateCase(caseItem)"
             >
               ⚖️ 开始仲裁
             </button>
             <button
               v-if="caseItem.status === 'PENDING_HUMAN'"
-              @click.stop="ignoreCase(caseItem)"
               class="ignore-btn"
+              @click.stop="ignoreCase(caseItem)"
             >
               ❌ 忽略
             </button>
@@ -227,22 +316,33 @@
       </div>
 
       <!-- 空状态 -->
-      <div v-else class="empty-state">
-        <div class="empty-icon">📋</div>
+      <div
+        v-else
+        class="empty-state"
+      >
+        <div class="empty-icon">
+          📋
+        </div>
         <h3>暂无案件</h3>
         <p>当前筛选条件下没有找到案件</p>
-        <button @click="clearFilters" class="clear-filters-btn">
+        <button
+          class="clear-filters-btn"
+          @click="clearFilters"
+        >
           清除筛选条件
         </button>
       </div>
     </div>
 
     <!-- 分页 -->
-    <div v-if="pagination.totalPages > 1" class="pagination">
+    <div
+      v-if="pagination.totalPages > 1"
+      class="pagination"
+    >
       <button
-        @click="goToPage(pagination.page - 1)"
         :disabled="pagination.page <= 1"
         class="page-btn"
+        @click="goToPage(pagination.page - 1)"
       >
         上一页
       </button>
@@ -251,18 +351,19 @@
         <button
           v-for="page in visiblePages"
           :key="page"
-          @click="goToPage(page)"
           :class="{ active: page === pagination.page }"
           class="page-number"
+          @click="goToPage(page)"
         >
           {{ page }}
         </button>
       </div>
 
       <button
-        @click="goToPage(pagination.page + 1)"
         :disabled="pagination.page >= pagination.totalPages"
         class="page-btn"
+        data-testid="next-page"
+        @click="goToPage(pagination.page + 1)"
       >
         下一页
       </button>
@@ -273,40 +374,8 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-
-// 类型定义
-interface ArbitrationCase {
-  case_id: string
-  report_type: string
-  target_code: string
-  qwen_analysis: {
-    analysis: string
-    confidence: number
-    reasoning: string
-  }
-  doubao_analysis: {
-    sentiment: string
-    score: number
-    reasoning: string
-  }
-  disagreement_score: number
-  status: string
-  consensus_summary: string
-  conflict_summary: string
-  priority_score: number
-  created_at: string
-  updated_at: string
-  human_decision: any
-  human_reasoning: any
-}
-
-interface Statistics {
-  totalCases: number
-  pendingCases: number
-  arbitratedCases: number
-  ignoredCases: number
-  averageProcessingTime: number
-}
+import { arbitrationApi } from '@/services/arbitration'
+import type { ArbitrationCase, ArbitrationStatistics } from '@/services/arbitration'
 
 interface Filters {
   status: string
@@ -331,12 +400,11 @@ const router = useRouter()
 const loading = ref(false)
 const cases = ref<ArbitrationCase[]>([])
 const selectedCases = ref<string[]>([])
-const statistics = ref<Statistics>({
+const statistics = ref<ArbitrationStatistics>({
   totalCases: 0,
   pendingCases: 0,
   arbitratedCases: 0,
-  ignoredCases: 0,
-  averageProcessingTime: 0
+  ignoredCases: 0
 })
 
 const filters = reactive<Filters>({
@@ -382,29 +450,28 @@ const debouncedLoadCases = () => {
 const loadCases = async () => {
   loading.value = true
   try {
-    const queryParams = new URLSearchParams({
-      page: pagination.page.toString(),
-      limit: pagination.limit.toString(),
-      ...filters
+    const response = await arbitrationApi.getCases({
+      page: pagination.page,
+      limit: pagination.limit,
+      status: filters.status || undefined,
+      stockCode: filters.stockCode || undefined,
+      startDate: filters.startDate || undefined,
+      endDate: filters.endDate || undefined,
+      sortBy: filters.sortBy,
+      sortOrder: filters.sortOrder
     })
 
-    const response = await fetch(`/api/v1/admin/arbitration-cases?${queryParams}`)
-    const data = await response.json()
-
-    if (data.success) {
-      cases.value = data.data || []
-      pagination.total = data.total || 0
-      pagination.totalPages = Math.ceil(pagination.total / pagination.limit)
-      pagination.start = (pagination.page - 1) * pagination.limit + 1
-      pagination.end = Math.min(pagination.page * pagination.limit, pagination.total)
-    } else {
-      cases.value = []
-      pagination.total = 0
-      pagination.totalPages = 0
-    }
+    cases.value = response.data || []
+    pagination.total = response.total || 0
+    pagination.totalPages = Math.ceil(pagination.total / pagination.limit)
+    pagination.start = (pagination.page - 1) * pagination.limit + 1
+    pagination.end = Math.min(pagination.page * pagination.limit, pagination.total)
 
   } catch (error) {
     console.error('加载案件列表失败:', error)
+    cases.value = []
+    pagination.total = 0
+    pagination.totalPages = 0
   } finally {
     loading.value = false
   }
@@ -412,8 +479,8 @@ const loadCases = async () => {
 
 const loadStatistics = async () => {
   try {
-    const response = await fetch('/api/v1/admin/arbitration-cases/statistics')
-    statistics.value = await response.json()
+    const response = await arbitrationApi.getStatistics()
+    statistics.value = response
   } catch (error) {
     console.error('加载统计信息失败:', error)
   }
@@ -540,9 +607,9 @@ watch(filters, () => {
 }, { deep: true })
 
 // 生命周期
-onMounted(() => {
-  loadCases()
-  loadStatistics()
+onMounted(async () => {
+  await loadCases()
+  await loadStatistics()
 })
 </script>
 

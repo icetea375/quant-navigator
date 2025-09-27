@@ -18,45 +18,60 @@
 
       <div class="tab-content">
         <!-- 原始文本探索器 -->
-        <div v-if="activeTab === 0" class="tab-panel">
+        <div
+          v-if="activeTab === 0"
+          class="tab-panel"
+        >
           <RawTextExplorer
-            :stockCode="stockCode"
-            :reportDate="reportDate"
-            :qwenReport="qwenReport"
-            :doubaoReport="doubaoReport"
+            :stock-code="stockCode"
+            :report-date="reportDate"
+            :qwen-report="qwenReport"
+            :doubao-report="doubaoReport"
           />
         </div>
 
         <!-- 财务快照 -->
-        <div v-if="activeTab === 1" class="tab-panel">
+        <div
+          v-if="activeTab === 1"
+          class="tab-panel"
+        >
           <FinancialSnapshot
-            :stockCode="stockCode"
-            :reportDate="reportDate"
+            :stock-code="stockCode"
+            :report-date="reportDate"
           />
         </div>
 
         <!-- 技术指标分析 -->
-        <div v-if="activeTab === 2" class="tab-panel">
+        <div
+          v-if="activeTab === 2"
+          class="tab-panel"
+        >
           <TechnicalAnalysis
-            :stockCode="stockCode"
-            :reportDate="reportDate"
+            :stock-code="stockCode"
+            :report-date="reportDate"
           />
         </div>
 
         <!-- 市场情绪监控 -->
-        <div v-if="activeTab === 3" class="tab-panel">
+        <div
+          v-if="activeTab === 3"
+          class="tab-panel"
+        >
           <MarketSentimentMonitor
-            :stockCode="stockCode"
-            :reportDate="reportDate"
+            :stock-code="stockCode"
+            :report-date="reportDate"
           />
         </div>
 
         <!-- 风险因子分析 -->
-        <div v-if="activeTab === 4" class="tab-panel">
+        <div
+          v-if="activeTab === 4"
+          class="tab-panel"
+        >
           <RiskFactorAnalysis
-            :stockCode="stockCode"
-            :reportDate="reportDate"
-            :arbitrationCase="arbitrationCase"
+            :stock-code="stockCode"
+            :report-date="reportDate"
+            :arbitration-case="arbitrationCase"
           />
         </div>
       </div>

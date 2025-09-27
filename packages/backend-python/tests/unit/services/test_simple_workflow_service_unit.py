@@ -3,9 +3,10 @@ SimpleWorkflowService单元测试 - 遵循TDD原则
 先写测试，后写实现
 """
 
-import pytest
 from datetime import datetime, timedelta
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import patch
+
+import pytest
 
 from src.services.simple_workflow_service import SimpleWorkflowService
 
@@ -58,7 +59,9 @@ class TestSimpleWorkflowServiceUnit:
         end_date = "2024-01-31"
 
         # Act
-        workflow_id = await workflow_service.run_historical_backfill(start_date, end_date)
+        workflow_id = await workflow_service.run_historical_backfill(
+            start_date, end_date
+        )
 
         # Assert
         assert workflow_id.startswith("backfill_")
@@ -81,7 +84,7 @@ class TestSimpleWorkflowServiceUnit:
         # Arrange
         target_date = "2024-01-15"
 
-        with patch('asyncio.sleep', side_effect=Exception("模拟异常")):
+        with patch("asyncio.sleep", side_effect=Exception("模拟异常")):
             # Act & Assert
             with pytest.raises(Exception, match="模拟异常"):
                 await workflow_service.run_daily_flow(target_date)
@@ -100,7 +103,7 @@ class TestSimpleWorkflowServiceUnit:
         start_date = "2024-01-01"
         end_date = "2024-01-31"
 
-        with patch('asyncio.sleep', side_effect=Exception("模拟回填异常")):
+        with patch("asyncio.sleep", side_effect=Exception("模拟回填异常")):
             # Act & Assert
             with pytest.raises(Exception, match="模拟回填异常"):
                 await workflow_service.run_historical_backfill(start_date, end_date)
@@ -184,7 +187,7 @@ class TestSimpleWorkflowServiceUnit:
         # Assert
         assert success is True
         assert failed is False
-        
+
         # 验证工作流状态
         status = await workflow_service.get_workflow_status(workflow_id)
         assert status["status"] == "cancelled"
@@ -278,7 +281,7 @@ class TestSimpleWorkflowServiceUnit:
         # Assert
         logs = await workflow_service.get_workflow_logs(workflow_id)
         assert len(logs) >= 2
-        
+
         # 检查日志内容
         log_messages = [log["message"] for log in logs]
         assert "工作流启动" in log_messages
@@ -313,7 +316,9 @@ class TestSimpleWorkflowServiceUnit:
 
         # Act
         daily_id = await workflow_service.run_daily_flow(target_date)
-        backfill_id = await workflow_service.run_historical_backfill(start_date, end_date)
+        backfill_id = await workflow_service.run_historical_backfill(
+            start_date, end_date
+        )
 
         # Assert
         daily_status = await workflow_service.get_workflow_status(daily_id)
@@ -326,7 +331,9 @@ class TestSimpleWorkflowServiceUnit:
         assert backfill_status["end_date"] == end_date
 
     @pytest.mark.asyncio
-    async def test_should_handle_edge_case_workflow_id_generation(self, workflow_service):
+    async def test_should_handle_edge_case_workflow_id_generation(
+        self, workflow_service
+    ):
         """测试工作流ID生成的边界情况"""
         # Act - 快速创建多个工作流
         workflow_ids = []
@@ -350,7 +357,7 @@ class TestSimpleWorkflowServiceUnit:
         # Assert
         status = await workflow_service.get_workflow_status(workflow_id)
         result = status["result"]
-        
+
         assert "message" in result
         assert target_date in result["message"]
         assert "日常分析完成" in result["message"]

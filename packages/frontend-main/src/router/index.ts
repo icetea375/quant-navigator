@@ -59,21 +59,15 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/admin/arbitration',
-    name: 'ArbitrationList',
-    component: () => import('@components/admin/ArbitrationCaseList.vue'),
-    meta: { title: 'AI仲裁案件管理', requiresAuth: true, requiresAdmin: true }
+    name: 'ArbitrationDashboard',
+    component: () => import('@components/admin/ArbitrationDashboard.vue'),
+    meta: { title: 'AI治理中心 - 仲裁仪表盘', requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/admin/arbitration/:caseId',
-    name: 'ArbitrationDetail',
-    component: () => import('@components/admin/ArbitrationCaseDetail.vue'),
+    name: 'ArbitrationCaseDetail',
+    component: () => import('@components/admin/ArbitrationDashboard.vue'),
     meta: { title: '仲裁案件详情', requiresAuth: true, requiresAdmin: true }
-  },
-  {
-    path: '/admin/arbitration/:caseId/arbitrate',
-    name: 'ArbitrationArbitrate',
-    component: () => import('@components/admin/ArbitrationCaseDetail.vue'),
-    meta: { title: '仲裁决策', requiresAuth: true, requiresAdmin: true }
   }
 ]
 

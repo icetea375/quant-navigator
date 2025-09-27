@@ -13,7 +13,10 @@
             <p>{{ engine.description }}</p>
           </div>
           <div class="engine-status">
-            <el-tag :type="getStatusType(engine.status)" size="small">
+            <el-tag
+              :type="getStatusType(engine.status)"
+              size="small"
+            >
               {{ getStatusText(engine.status) }}
             </el-tag>
           </div>
@@ -27,7 +30,7 @@
                 class="metric-fill"
                 :style="{ width: engine.cpuUsage + '%' }"
                 :class="getUsageClass(engine.cpuUsage)"
-              ></div>
+              />
             </div>
             <span class="metric-value">{{ engine.cpuUsage }}%</span>
           </div>
@@ -39,7 +42,7 @@
                 class="metric-fill"
                 :style="{ width: engine.memoryUsage + '%' }"
                 :class="getUsageClass(engine.memoryUsage)"
-              ></div>
+              />
             </div>
             <span class="metric-value">{{ engine.memoryUsage }}%</span>
           </div>
@@ -58,7 +61,10 @@
           >
             {{ engine.status === 'running' ? '停止' : '启动' }}
           </el-button>
-          <el-button size="small" @click="viewEngineLogs(engine)">
+          <el-button
+            size="small"
+            @click="viewEngineLogs(engine)"
+          >
             查看日志
           </el-button>
         </div>

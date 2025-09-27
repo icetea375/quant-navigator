@@ -4,11 +4,24 @@ import { publicApi, privateApi, adminApi, authApi } from '@/services'
 import { mockApiResponse, mockApiError } from '@/utils/test-utils'
 
 // 模拟fetch
-global.fetch = vi.fn()
+const mockFetch = vi.fn()
+global.fetch = mockFetch
+
+// 创建模拟响应工厂
+const createMockResponse = (data: any, ok = true, status = 200) => ({
+  ok,
+  status,
+  json: () => Promise.resolve(data),
+  text: () => Promise.resolve(JSON.stringify(data)),
+  headers: new Headers(),
+  statusText: ok ? 'OK' : 'Error'
+} as Response)
 
 describe('API Services', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // 设置默认的成功响应
+    mockFetch.mockResolvedValue(createMockResponse(mockApiResponse({})))
   })
 
   describe('Public API', () => {
@@ -19,13 +32,17 @@ describe('API Services', () => {
         publish_time: '2024-01-15T09:00:00Z'
       }
 
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockApiResponse(mockData))
-      } as Response)
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockApiResponse(mockData)))
 
       const result = await publicApi.getMarketBriefing()
       expect(result).toEqual(mockData)
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/public/market-briefing'),
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.any(Object)
+        })
+      )
     })
 
     it('should fetch hotspot attribution', async () => {
@@ -44,13 +61,17 @@ describe('API Services', () => {
         }
       ]
 
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockApiResponse(mockData))
-      } as Response)
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockApiResponse(mockData)))
 
       const result = await publicApi.getHotspotAttribution()
       expect(result).toEqual(mockData)
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/public/hotspot-attribution'),
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.any(Object)
+        })
+      )
     })
   })
 

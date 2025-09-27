@@ -1,7 +1,10 @@
 <template>
   <div class="private-layout">
     <!-- 侧边栏 -->
-    <el-aside :width="sidebarWidth" class="sidebar">
+    <el-aside
+      :width="sidebarWidth"
+      class="sidebar"
+    >
       <div class="sidebar-header">
         <div class="logo">
           <el-icon><TrendCharts /></el-icon>
@@ -9,8 +12,8 @@
         </div>
         <el-button
           type="text"
-          @click="toggleSidebar"
           class="collapse-btn"
+          @click="toggleSidebar"
         >
           <el-icon>
             <component :is="collapsed ? 'Expand' : 'Fold'" />
@@ -27,11 +30,15 @@
       >
         <el-menu-item index="/private/assistant">
           <el-icon><User /></el-icon>
-          <template #title>AI投研助理</template>
+          <template #title>
+            AI投研助理
+          </template>
         </el-menu-item>
         <el-menu-item index="/private/stock-pool">
           <el-icon><DataAnalysis /></el-icon>
-          <template #title>股票池管理</template>
+          <template #title>
+            股票池管理
+          </template>
         </el-menu-item>
       </el-menu>
     </el-aside>
@@ -42,20 +49,28 @@
       <el-header class="top-header">
         <div class="header-left">
           <el-breadcrumb separator="/">
-            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/' }">
+              首页
+            </el-breadcrumb-item>
             <el-breadcrumb-item>{{ currentPageTitle }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
 
         <div class="header-right">
-          <el-button type="text" @click="$router.push('/market-radar')">
+          <el-button
+            type="text"
+            @click="$router.push('/market-radar')"
+          >
             <el-icon><Monitor /></el-icon>
             市场雷达
           </el-button>
 
           <el-dropdown>
             <el-button type="text">
-              <el-avatar :size="32" :src="userAvatar">
+              <el-avatar
+                :size="32"
+                :src="userAvatar"
+              >
                 {{ authStore.user?.name?.charAt(0) }}
               </el-avatar>
               <span class="user-name">{{ authStore.user?.name }}</span>
@@ -71,7 +86,10 @@
                   <el-icon><Setting /></el-icon>
                   设置
                 </el-dropdown-item>
-                <el-dropdown-item divided @click="handleLogout">
+                <el-dropdown-item
+                  divided
+                  @click="handleLogout"
+                >
                   <el-icon><SwitchButton /></el-icon>
                   退出登录
                 </el-dropdown-item>
@@ -88,14 +106,27 @@
     </div>
 
     <!-- 个人资料对话框 -->
-    <el-dialog v-model="showProfile" title="个人资料" width="500px">
+    <el-dialog
+      v-model="showProfile"
+      title="个人资料"
+      width="500px"
+    >
       <div class="profile-content">
-        <el-form :model="profileForm" label-width="80px">
+        <el-form
+          :model="profileForm"
+          label-width="80px"
+        >
           <el-form-item label="姓名">
-            <el-input v-model="profileForm.name" disabled />
+            <el-input
+              v-model="profileForm.name"
+              disabled
+            />
           </el-form-item>
           <el-form-item label="邮箱">
-            <el-input v-model="profileForm.email" disabled />
+            <el-input
+              v-model="profileForm.email"
+              disabled
+            />
           </el-form-item>
           <el-form-item label="角色">
             <el-tag :type="profileForm.role === 'admin' ? 'danger' : 'primary'">
@@ -103,30 +134,54 @@
             </el-tag>
           </el-form-item>
           <el-form-item label="注册时间">
-            <el-input :value="formatDate(profileForm.createdAt)" disabled />
+            <el-input
+              :value="formatDate(profileForm.createdAt)"
+              disabled
+            />
           </el-form-item>
         </el-form>
       </div>
       <template #footer>
-        <el-button @click="showProfile = false">关闭</el-button>
+        <el-button @click="showProfile = false">
+          关闭
+        </el-button>
       </template>
     </el-dialog>
 
     <!-- 设置对话框 -->
-    <el-dialog v-model="showSettings" title="设置" width="500px">
+    <el-dialog
+      v-model="showSettings"
+      title="设置"
+      width="500px"
+    >
       <div class="settings-content">
-        <el-form :model="settingsForm" label-width="100px">
+        <el-form
+          :model="settingsForm"
+          label-width="100px"
+        >
           <el-form-item label="主题">
             <el-radio-group v-model="settingsForm.theme">
-              <el-radio label="light">浅色</el-radio>
-              <el-radio label="dark">深色</el-radio>
-              <el-radio label="auto">跟随系统</el-radio>
+              <el-radio label="light">
+                浅色
+              </el-radio>
+              <el-radio label="dark">
+                深色
+              </el-radio>
+              <el-radio label="auto">
+                跟随系统
+              </el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="语言">
             <el-select v-model="settingsForm.language">
-              <el-option label="简体中文" value="zh-CN" />
-              <el-option label="English" value="en-US" />
+              <el-option
+                label="简体中文"
+                value="zh-CN"
+              />
+              <el-option
+                label="English"
+                value="en-US"
+              />
             </el-select>
           </el-form-item>
           <el-form-item label="通知">
@@ -135,8 +190,15 @@
         </el-form>
       </div>
       <template #footer>
-        <el-button @click="showSettings = false">取消</el-button>
-        <el-button type="primary" @click="saveSettings">保存</el-button>
+        <el-button @click="showSettings = false">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          @click="saveSettings"
+        >
+          保存
+        </el-button>
       </template>
     </el-dialog>
   </div>

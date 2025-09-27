@@ -7,11 +7,18 @@
     </div>
 
     <!-- 专属盘前雷达 -->
-    <el-card class="section-card" v-loading="briefingLoading">
+    <el-card
+      v-loading="briefingLoading"
+      class="section-card"
+    >
       <template #header>
         <div class="card-header">
           <h3>专属盘前雷达</h3>
-          <el-button type="primary" size="small" @click="refreshBriefing">
+          <el-button
+            type="primary"
+            size="small"
+            @click="refreshBriefing"
+          >
             <el-icon><Refresh /></el-icon>
             刷新
           </el-button>
@@ -21,12 +28,20 @@
     </el-card>
 
     <!-- 持仓异动归因 -->
-    <el-card class="section-card" v-loading="attributionsLoading">
+    <el-card
+      v-loading="attributionsLoading"
+      class="section-card"
+    >
       <template #header>
         <div class="card-header">
           <h3>持仓异动归因</h3>
           <div class="header-actions">
-            <el-select v-model="selectedDate" placeholder="选择日期" size="small" style="width: 150px; margin-right: 10px;">
+            <el-select
+              v-model="selectedDate"
+              placeholder="选择日期"
+              size="small"
+              style="width: 150px; margin-right: 10px;"
+            >
               <el-option
                 v-for="date in dateOptions"
                 :key="date.value"
@@ -34,7 +49,11 @@
                 :value="date.value"
               />
             </el-select>
-            <el-button type="primary" size="small" @click="refreshAttributions">
+            <el-button
+              type="primary"
+              size="small"
+              @click="refreshAttributions"
+            >
               <el-icon><Refresh /></el-icon>
               刷新
             </el-button>
@@ -49,17 +68,27 @@
       <template #header>
         <div class="card-header">
           <h3>AI投资建议</h3>
-          <el-button type="primary" size="small" @click="generateAdvice">
+          <el-button
+            type="primary"
+            size="small"
+            @click="generateAdvice"
+          >
             <el-icon><MagicStick /></el-icon>
             生成建议
           </el-button>
         </div>
       </template>
       <div class="advice-content">
-        <div v-if="aiAdvice" class="advice-text">
+        <div
+          v-if="aiAdvice"
+          class="advice-text"
+        >
           <p>{{ aiAdvice }}</p>
         </div>
-        <div v-else class="no-advice">
+        <div
+          v-else
+          class="no-advice"
+        >
           <el-empty description="暂无AI建议，点击上方按钮生成" />
         </div>
       </div>

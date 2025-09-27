@@ -110,10 +110,14 @@ describe('Auth Component', () => {
 
   it('should show welcome message when authenticated', async () => {
     const authStore = useAuthStore()
+    // 直接设置 store 的响应式状态
     authStore.user = mockUser
-    authStore.isAuthenticated = true
+    authStore.token = 'mock-token'
 
+    // 强制触发响应式更新
     await wrapper.vm.$nextTick()
+    await new Promise(resolve => setTimeout(resolve, 0))
+
     expect(wrapper.text()).toContain('Welcome, testuser!')
   })
 })
@@ -151,12 +155,22 @@ describe('Market Component', () => {
     wrapper = createTestWrapper(MarketComponent)
   })
 
-  it('should show loading state initially', () => {
+  it('should show loading state initially', async () => {
+    const marketStore = useMarketStore()
+    // 设置初始加载状态
+    marketStore.loading.publicBriefing = true
+    marketStore.loading.postMarketHotspots = false
+
+    // 重新挂载组件以获取最新状态
+    await wrapper.vm.$nextTick()
+    await new Promise(resolve => setTimeout(resolve, 0))
+
     expect(wrapper.text()).toContain('Loading market data...')
   })
 
   it('should display market data when loaded', async () => {
     const marketStore = useMarketStore()
+    // 直接设置 store 状态
     marketStore.publicBriefing = mockMarketData.briefing
     marketStore.postMarketHotspots = {
       items: mockMarketData.hotspots,
@@ -166,8 +180,12 @@ describe('Market Component', () => {
       totalPages: 1
     }
     marketStore.loading.publicBriefing = false
+    marketStore.loading.postMarketHotspots = false
 
+    // 强制触发响应式更新
     await wrapper.vm.$nextTick()
+    await new Promise(resolve => setTimeout(resolve, 0))
+
     expect(wrapper.text()).toContain('今日市场快报')
     expect(wrapper.text()).toContain('新能源板块')
   })

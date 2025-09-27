@@ -58,11 +58,17 @@
           <el-form-item>
             <el-checkbox v-model="agreeTerms">
               我已阅读并同意
-              <el-button type="text" @click="showTerms = true">
+              <el-button
+                type="text"
+                @click="showTerms = true"
+              >
                 《用户协议》
               </el-button>
               和
-              <el-button type="text" @click="showPrivacy = true">
+              <el-button
+                type="text"
+                @click="showPrivacy = true"
+              >
                 《隐私政策》
               </el-button>
             </el-checkbox>
@@ -84,7 +90,10 @@
         <div class="form-footer">
           <p>
             已有账户？
-            <el-button type="text" @click="$router.push('/login')">
+            <el-button
+              type="text"
+              @click="$router.push('/login')"
+            >
               立即登录
             </el-button>
           </p>
@@ -123,7 +132,12 @@
     </div>
 
     <!-- 用户协议对话框 -->
-    <el-dialog v-model="showTerms" title="用户协议" width="80%" max-width="600px">
+    <el-dialog
+      v-model="showTerms"
+      title="用户协议"
+      width="80%"
+      max-width="600px"
+    >
       <div class="terms-content">
         <h4>1. 服务条款</h4>
         <p>欢迎使用量化导航仪平台。通过注册和使用我们的服务，您同意遵守以下条款和条件。</p>
@@ -138,12 +152,19 @@
         <p>我们重视您的隐私，会按照隐私政策保护您的个人信息。</p>
       </div>
       <template #footer>
-        <el-button @click="showTerms = false">关闭</el-button>
+        <el-button @click="showTerms = false">
+          关闭
+        </el-button>
       </template>
     </el-dialog>
 
     <!-- 隐私政策对话框 -->
-    <el-dialog v-model="showPrivacy" title="隐私政策" width="80%" max-width="600px">
+    <el-dialog
+      v-model="showPrivacy"
+      title="隐私政策"
+      width="80%"
+      max-width="600px"
+    >
       <div class="privacy-content">
         <h4>1. 信息收集</h4>
         <p>我们收集您主动提供的信息，如注册信息、投资偏好等。</p>
@@ -158,7 +179,9 @@
         <p>我们不会向第三方出售或分享您的个人信息，除非法律要求。</p>
       </div>
       <template #footer>
-        <el-button @click="showPrivacy = false">关闭</el-button>
+        <el-button @click="showPrivacy = false">
+          关闭
+        </el-button>
       </template>
     </el-dialog>
   </div>

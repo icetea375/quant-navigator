@@ -2,37 +2,64 @@
   <div class="my-briefing-card">
     <div class="briefing-header">
       <h4>个性化市场分析</h4>
-      <el-tag type="success" size="small">专属定制</el-tag>
+      <el-tag
+        type="success"
+        size="small"
+      >
+        专属定制
+      </el-tag>
     </div>
 
     <div class="briefing-content">
       <div class="summary-section">
-        <p class="summary-text">{{ briefing.summary || '正在生成个性化分析...' }}</p>
+        <p class="summary-text">
+          {{ briefing.summary || '正在生成个性化分析...' }}
+        </p>
       </div>
 
       <div class="personalized-stats">
         <div class="stat-item">
-          <div class="stat-value">{{ getRelevantEventsCount() }}</div>
-          <div class="stat-label">相关事件</div>
+          <div class="stat-value">
+            {{ getRelevantEventsCount() }}
+          </div>
+          <div class="stat-label">
+            相关事件
+          </div>
         </div>
         <div class="stat-item">
-          <div class="stat-value">{{ getHighConfidenceCount() }}</div>
-          <div class="stat-label">高置信度</div>
+          <div class="stat-value">
+            {{ getHighConfidenceCount() }}
+          </div>
+          <div class="stat-label">
+            高置信度
+          </div>
         </div>
         <div class="stat-item">
-          <div class="stat-value">{{ getRiskLevel() }}</div>
-          <div class="stat-label">风险等级</div>
+          <div class="stat-value">
+            {{ getRiskLevel() }}
+          </div>
+          <div class="stat-label">
+            风险等级
+          </div>
         </div>
         <div class="stat-item">
-          <div class="stat-value">{{ getOpportunityScore() }}</div>
-          <div class="stat-label">机会评分</div>
+          <div class="stat-value">
+            {{ getOpportunityScore() }}
+          </div>
+          <div class="stat-label">
+            机会评分
+          </div>
         </div>
       </div>
 
       <div class="personalized-insights">
         <h5>个性化洞察</h5>
         <ul class="insights-list">
-          <li v-for="insight in personalizedInsights" :key="insight.id" class="insight-item">
+          <li
+            v-for="insight in personalizedInsights"
+            :key="insight.id"
+            class="insight-item"
+          >
             <el-icon :class="insight.type">
               <component :is="insight.icon" />
             </el-icon>

@@ -4,53 +4,94 @@
       <!-- 时间范围选择器 -->
       <div class="filter-group">
         <label>时间范围</label>
-        <select v-model="filters.dateRange" @change="handleFilterChange">
-          <option value="7">过去7天</option>
-          <option value="1">昨天</option>
-          <option value="30">过去30天</option>
-          <option value="custom">自定义</option>
+        <select
+          v-model="filters.dateRange"
+          @change="handleFilterChange"
+        >
+          <option value="7">
+            过去7天
+          </option>
+          <option value="1">
+            昨天
+          </option>
+          <option value="30">
+            过去30天
+          </option>
+          <option value="custom">
+            自定义
+          </option>
         </select>
       </div>
 
       <!-- 自定义日期范围 -->
-      <div v-if="filters.dateRange === 'custom'" class="filter-group">
+      <div
+        v-if="filters.dateRange === 'custom'"
+        class="filter-group"
+      >
         <label>开始日期</label>
         <input
-          type="date"
           v-model="filters.startDate"
+          type="date"
           @change="handleFilterChange"
-        />
+        >
       </div>
 
-      <div v-if="filters.dateRange === 'custom'" class="filter-group">
+      <div
+        v-if="filters.dateRange === 'custom'"
+        class="filter-group"
+      >
         <label>结束日期</label>
         <input
-          type="date"
           v-model="filters.endDate"
+          type="date"
           @change="handleFilterChange"
-        />
+        >
       </div>
 
       <!-- 报告类型筛选 -->
       <div class="filter-group">
         <label>报告类型</label>
-        <select v-model="filters.reportType" @change="handleFilterChange">
-          <option value="">全部</option>
-          <option value="anomaly_snapshot">异动归因快照</option>
-          <option value="daily_brief">每日市场快报</option>
-          <option value="attribution_analysis">归因分析</option>
+        <select
+          v-model="filters.reportType"
+          @change="handleFilterChange"
+        >
+          <option value="">
+            全部
+          </option>
+          <option value="anomaly_snapshot">
+            异动归因快照
+          </option>
+          <option value="daily_brief">
+            每日市场快报
+          </option>
+          <option value="attribution_analysis">
+            归因分析
+          </option>
         </select>
       </div>
 
       <!-- 审核状态筛选 -->
       <div class="filter-group">
         <label>审核状态</label>
-        <select v-model="filters.feedbackStatus" @change="handleFilterChange">
-          <option value="">全部</option>
-          <option value="pending">待审核</option>
-          <option value="good">准确</option>
-          <option value="partial">部分准确</option>
-          <option value="bad">错误</option>
+        <select
+          v-model="filters.feedbackStatus"
+          @change="handleFilterChange"
+        >
+          <option value="">
+            全部
+          </option>
+          <option value="pending">
+            待审核
+          </option>
+          <option value="good">
+            准确
+          </option>
+          <option value="partial">
+            部分准确
+          </option>
+          <option value="bad">
+            错误
+          </option>
         </select>
       </div>
 
@@ -58,16 +99,19 @@
       <div class="filter-group">
         <label>股票代码</label>
         <input
-          type="text"
           v-model="filters.stockCode"
+          type="text"
           placeholder="输入股票代码"
           @input="handleStockCodeChange"
-        />
+        >
       </div>
 
       <!-- 重置按钮 -->
       <div class="filter-group">
-        <button @click="resetFilters" class="reset-btn">
+        <button
+          class="reset-btn"
+          @click="resetFilters"
+        >
           重置
         </button>
       </div>

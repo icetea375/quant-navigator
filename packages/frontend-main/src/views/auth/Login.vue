@@ -39,8 +39,13 @@
 
           <el-form-item>
             <div class="form-options">
-              <el-checkbox v-model="rememberMe">记住我</el-checkbox>
-              <el-button type="text" @click="$router.push('/forgot-password')">
+              <el-checkbox v-model="rememberMe">
+                记住我
+              </el-checkbox>
+              <el-button
+                type="text"
+                @click="$router.push('/forgot-password')"
+              >
                 忘记密码？
               </el-button>
             </div>
@@ -72,7 +77,10 @@
         <div class="form-footer">
           <p>
             还没有账户？
-            <el-button type="text" @click="$router.push('/register')">
+            <el-button
+              type="text"
+              @click="$router.push('/register')"
+            >
               立即注册
             </el-button>
           </p>

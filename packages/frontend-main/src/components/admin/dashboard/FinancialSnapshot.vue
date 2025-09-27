@@ -1,7 +1,9 @@
 <template>
   <div class="financial-snapshot">
     <h3>💰 财务快照</h3>
-    <p class="description">基于最新财务数据的深度分析，为仲裁决策提供财务依据</p>
+    <p class="description">
+      基于最新财务数据的深度分析，为仲裁决策提供财务依据
+    </p>
 
     <div class="snapshot-content">
       <!-- 财务指标概览 -->
@@ -9,44 +11,80 @@
         <h4>📊 财务指标概览</h4>
         <div class="metrics-grid">
           <div class="metric-card revenue">
-            <div class="metric-icon">💰</div>
+            <div class="metric-icon">
+              💰
+            </div>
             <div class="metric-content">
-              <div class="metric-label">营业收入</div>
-              <div class="metric-value">{{ financialData.revenue || 'N/A' }}</div>
-              <div class="metric-change" :class="getChangeClass(financialData.revenueChange)">
+              <div class="metric-label">
+                营业收入
+              </div>
+              <div class="metric-value">
+                {{ financialData.revenue || 'N/A' }}
+              </div>
+              <div
+                class="metric-change"
+                :class="getChangeClass(financialData.revenueChange)"
+              >
                 {{ formatChange(financialData.revenueChange) }}
               </div>
             </div>
           </div>
 
           <div class="metric-card profit">
-            <div class="metric-icon">📈</div>
+            <div class="metric-icon">
+              📈
+            </div>
             <div class="metric-content">
-              <div class="metric-label">净利润</div>
-              <div class="metric-value">{{ financialData.profit || 'N/A' }}</div>
-              <div class="metric-change" :class="getChangeClass(financialData.profitChange)">
+              <div class="metric-label">
+                净利润
+              </div>
+              <div class="metric-value">
+                {{ financialData.profit || 'N/A' }}
+              </div>
+              <div
+                class="metric-change"
+                :class="getChangeClass(financialData.profitChange)"
+              >
                 {{ formatChange(financialData.profitChange) }}
               </div>
             </div>
           </div>
 
           <div class="metric-card assets">
-            <div class="metric-icon">🏦</div>
+            <div class="metric-icon">
+              🏦
+            </div>
             <div class="metric-content">
-              <div class="metric-label">总资产</div>
-              <div class="metric-value">{{ financialData.totalAssets || 'N/A' }}</div>
-              <div class="metric-change" :class="getChangeClass(financialData.assetsChange)">
+              <div class="metric-label">
+                总资产
+              </div>
+              <div class="metric-value">
+                {{ financialData.totalAssets || 'N/A' }}
+              </div>
+              <div
+                class="metric-change"
+                :class="getChangeClass(financialData.assetsChange)"
+              >
                 {{ formatChange(financialData.assetsChange) }}
               </div>
             </div>
           </div>
 
           <div class="metric-card debt">
-            <div class="metric-icon">📉</div>
+            <div class="metric-icon">
+              📉
+            </div>
             <div class="metric-content">
-              <div class="metric-label">负债率</div>
-              <div class="metric-value">{{ financialData.debtRatio || 'N/A' }}%</div>
-              <div class="metric-change" :class="getChangeClass(financialData.debtRatioChange)">
+              <div class="metric-label">
+                负债率
+              </div>
+              <div class="metric-value">
+                {{ financialData.debtRatio || 'N/A' }}%
+              </div>
+              <div
+                class="metric-change"
+                :class="getChangeClass(financialData.debtRatioChange)"
+              >
                 {{ formatChange(financialData.debtRatioChange) }}
               </div>
             </div>
@@ -64,7 +102,7 @@
               <div
                 class="metric-fill"
                 :style="{ width: Math.min((financialData.grossMargin || 0) * 2, 100) + '%' }"
-              ></div>
+              />
             </div>
             <span class="metric-value">{{ financialData.grossMargin || 0 }}%</span>
           </div>
@@ -75,7 +113,7 @@
               <div
                 class="metric-fill"
                 :style="{ width: Math.min((financialData.netMargin || 0) * 5, 100) + '%' }"
-              ></div>
+              />
             </div>
             <span class="metric-value">{{ financialData.netMargin || 0 }}%</span>
           </div>
@@ -86,7 +124,7 @@
               <div
                 class="metric-fill"
                 :style="{ width: Math.min((financialData.roe || 0) * 2, 100) + '%' }"
-              ></div>
+              />
             </div>
             <span class="metric-value">{{ financialData.roe || 0 }}%</span>
           </div>
@@ -97,7 +135,7 @@
               <div
                 class="metric-fill"
                 :style="{ width: Math.min((financialData.roa || 0) * 3, 100) + '%' }"
-              ></div>
+              />
             </div>
             <span class="metric-value">{{ financialData.roa || 0 }}%</span>
           </div>
@@ -109,35 +147,71 @@
         <h4>🏥 财务健康度评估</h4>
         <div class="health-scores">
           <div class="score-card">
-            <div class="score-title">流动性评分</div>
-            <div class="score-circle" :class="getScoreClass(financialData.liquidityScore)">
-              <div class="score-value">{{ financialData.liquidityScore || 0 }}</div>
+            <div class="score-title">
+              流动性评分
             </div>
-            <div class="score-description">基于流动比率和速动比率</div>
+            <div
+              class="score-circle"
+              :class="getScoreClass(financialData.liquidityScore)"
+            >
+              <div class="score-value">
+                {{ financialData.liquidityScore || 0 }}
+              </div>
+            </div>
+            <div class="score-description">
+              基于流动比率和速动比率
+            </div>
           </div>
 
           <div class="score-card">
-            <div class="score-title">偿债能力评分</div>
-            <div class="score-circle" :class="getScoreClass(financialData.solvencyScore)">
-              <div class="score-value">{{ financialData.solvencyScore || 0 }}</div>
+            <div class="score-title">
+              偿债能力评分
             </div>
-            <div class="score-description">基于资产负债率和利息保障倍数</div>
+            <div
+              class="score-circle"
+              :class="getScoreClass(financialData.solvencyScore)"
+            >
+              <div class="score-value">
+                {{ financialData.solvencyScore || 0 }}
+              </div>
+            </div>
+            <div class="score-description">
+              基于资产负债率和利息保障倍数
+            </div>
           </div>
 
           <div class="score-card">
-            <div class="score-title">盈利能力评分</div>
-            <div class="score-circle" :class="getScoreClass(financialData.profitabilityScore)">
-              <div class="score-value">{{ financialData.profitabilityScore || 0 }}</div>
+            <div class="score-title">
+              盈利能力评分
             </div>
-            <div class="score-description">基于ROE、ROA和净利率</div>
+            <div
+              class="score-circle"
+              :class="getScoreClass(financialData.profitabilityScore)"
+            >
+              <div class="score-value">
+                {{ financialData.profitabilityScore || 0 }}
+              </div>
+            </div>
+            <div class="score-description">
+              基于ROE、ROA和净利率
+            </div>
           </div>
 
           <div class="score-card">
-            <div class="score-title">成长性评分</div>
-            <div class="score-circle" :class="getScoreClass(financialData.growthScore)">
-              <div class="score-value">{{ financialData.growthScore || 0 }}</div>
+            <div class="score-title">
+              成长性评分
             </div>
-            <div class="score-description">基于营收和利润增长率</div>
+            <div
+              class="score-circle"
+              :class="getScoreClass(financialData.growthScore)"
+            >
+              <div class="score-value">
+                {{ financialData.growthScore || 0 }}
+              </div>
+            </div>
+            <div class="score-description">
+              基于营收和利润增长率
+            </div>
           </div>
         </div>
       </div>
@@ -152,10 +226,16 @@
             class="risk-item"
             :class="risk.level"
           >
-            <div class="risk-icon">{{ getRiskIcon(risk.level) }}</div>
+            <div class="risk-icon">
+              {{ getRiskIcon(risk.level) }}
+            </div>
             <div class="risk-content">
-              <div class="risk-title">{{ risk.title }}</div>
-              <div class="risk-description">{{ risk.description }}</div>
+              <div class="risk-title">
+                {{ risk.title }}
+              </div>
+              <div class="risk-description">
+                {{ risk.description }}
+              </div>
             </div>
           </div>
         </div>
@@ -169,7 +249,10 @@
             <h5>营收趋势</h5>
             <div class="chart-placeholder">
               <p>营收增长趋势图</p>
-              <div class="trend-indicator" :class="getTrendClass(financialData.revenueTrend)">
+              <div
+                class="trend-indicator"
+                :class="getTrendClass(financialData.revenueTrend)"
+              >
                 {{ getTrendText(financialData.revenueTrend) }}
               </div>
             </div>
@@ -179,7 +262,10 @@
             <h5>利润趋势</h5>
             <div class="chart-placeholder">
               <p>利润增长趋势图</p>
-              <div class="trend-indicator" :class="getTrendClass(financialData.profitTrend)">
+              <div
+                class="trend-indicator"
+                :class="getTrendClass(financialData.profitTrend)"
+              >
                 {{ getTrendText(financialData.profitTrend) }}
               </div>
             </div>

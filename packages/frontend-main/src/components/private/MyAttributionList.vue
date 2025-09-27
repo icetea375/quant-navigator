@@ -1,10 +1,16 @@
 <template>
   <div class="my-attribution-list">
-    <div v-if="attributions.length === 0" class="empty-state">
+    <div
+      v-if="attributions.length === 0"
+      class="empty-state"
+    >
       <el-empty description="暂无持仓异动数据" />
     </div>
 
-    <div v-else class="attributions-grid">
+    <div
+      v-else
+      class="attributions-grid"
+    >
       <div
         v-for="attribution in attributions"
         :key="attribution.id"
@@ -13,14 +19,24 @@
       >
         <div class="attribution-header">
           <div class="stock-info">
-            <div class="stock-symbol">{{ attribution.symbol }}</div>
-            <div class="stock-name">{{ attribution.name }}</div>
+            <div class="stock-symbol">
+              {{ attribution.symbol }}
+            </div>
+            <div class="stock-name">
+              {{ attribution.name }}
+            </div>
           </div>
           <div class="price-change">
-            <div class="change-value" :class="getChangeClass(attribution.change)">
+            <div
+              class="change-value"
+              :class="getChangeClass(attribution.change)"
+            >
               {{ attribution.change > 0 ? '+' : '' }}{{ attribution.change.toFixed(2) }}
             </div>
-            <div class="change-percent" :class="getChangeClass(attribution.changePercent)">
+            <div
+              class="change-percent"
+              :class="getChangeClass(attribution.changePercent)"
+            >
               {{ attribution.changePercent > 0 ? '+' : '' }}{{ attribution.changePercent.toFixed(2) }}%
             </div>
           </div>
@@ -48,10 +64,17 @@
           </div>
 
           <div class="attribution-actions">
-            <el-button size="small" type="primary" @click="viewDetails(attribution)">
+            <el-button
+              size="small"
+              type="primary"
+              @click="viewDetails(attribution)"
+            >
               查看详情
             </el-button>
-            <el-button size="small" @click="addToWatchlist(attribution)">
+            <el-button
+              size="small"
+              @click="addToWatchlist(attribution)"
+            >
               加入关注
             </el-button>
           </div>

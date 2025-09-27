@@ -1,7 +1,9 @@
 <template>
   <div class="market-sentiment-monitor">
     <h3>😊 市场情绪监控</h3>
-    <p class="description">实时监控市场情绪变化，为仲裁决策提供情绪面参考</p>
+    <p class="description">
+      实时监控市场情绪变化，为仲裁决策提供情绪面参考
+    </p>
 
     <div class="monitor-content">
       <!-- 情绪指标概览 -->
@@ -9,27 +11,48 @@
         <h4>📊 情绪指标概览</h4>
         <div class="sentiment-metrics">
           <div class="metric-card">
-            <div class="metric-title">整体情绪指数</div>
-            <div class="metric-value" :class="getSentimentClass(sentimentData.overallSentiment)">
+            <div class="metric-title">
+              整体情绪指数
+            </div>
+            <div
+              class="metric-value"
+              :class="getSentimentClass(sentimentData.overallSentiment)"
+            >
               {{ sentimentData.overallSentiment }}
             </div>
-            <div class="metric-description">{{ getSentimentDescription(sentimentData.overallSentiment) }}</div>
+            <div class="metric-description">
+              {{ getSentimentDescription(sentimentData.overallSentiment) }}
+            </div>
           </div>
 
           <div class="metric-card">
-            <div class="metric-title">恐慌指数 (VIX)</div>
-            <div class="metric-value" :class="getVIXClass(sentimentData.vix)">
+            <div class="metric-title">
+              恐慌指数 (VIX)
+            </div>
+            <div
+              class="metric-value"
+              :class="getVIXClass(sentimentData.vix)"
+            >
               {{ sentimentData.vix }}
             </div>
-            <div class="metric-description">{{ getVIXDescription(sentimentData.vix) }}</div>
+            <div class="metric-description">
+              {{ getVIXDescription(sentimentData.vix) }}
+            </div>
           </div>
 
           <div class="metric-card">
-            <div class="metric-title">贪婪指数</div>
-            <div class="metric-value" :class="getGreedClass(sentimentData.greedIndex)">
+            <div class="metric-title">
+              贪婪指数
+            </div>
+            <div
+              class="metric-value"
+              :class="getGreedClass(sentimentData.greedIndex)"
+            >
               {{ sentimentData.greedIndex }}
             </div>
-            <div class="metric-description">{{ getGreedDescription(sentimentData.greedIndex) }}</div>
+            <div class="metric-description">
+              {{ getGreedDescription(sentimentData.greedIndex) }}
+            </div>
           </div>
         </div>
       </div>
@@ -39,41 +62,73 @@
         <h4>🔍 情绪来源分析</h4>
         <div class="sources-grid">
           <div class="source-card">
-            <div class="source-title">新闻情绪</div>
-            <div class="source-score" :class="getScoreClass(sentimentData.newsSentiment)">
+            <div class="source-title">
+              新闻情绪
+            </div>
+            <div
+              class="source-score"
+              :class="getScoreClass(sentimentData.newsSentiment)"
+            >
               {{ sentimentData.newsSentiment }}
             </div>
-            <div class="source-trend" :class="getTrendClass(sentimentData.newsTrend)">
+            <div
+              class="source-trend"
+              :class="getTrendClass(sentimentData.newsTrend)"
+            >
               {{ getTrendText(sentimentData.newsTrend) }}
             </div>
           </div>
 
           <div class="source-card">
-            <div class="source-title">社交媒体</div>
-            <div class="source-score" :class="getScoreClass(sentimentData.socialSentiment)">
+            <div class="source-title">
+              社交媒体
+            </div>
+            <div
+              class="source-score"
+              :class="getScoreClass(sentimentData.socialSentiment)"
+            >
               {{ sentimentData.socialSentiment }}
             </div>
-            <div class="source-trend" :class="getTrendClass(sentimentData.socialTrend)">
+            <div
+              class="source-trend"
+              :class="getTrendClass(sentimentData.socialTrend)"
+            >
               {{ getTrendText(sentimentData.socialTrend) }}
             </div>
           </div>
 
           <div class="source-card">
-            <div class="source-title">分析师观点</div>
-            <div class="source-score" :class="getScoreClass(sentimentData.analystSentiment)">
+            <div class="source-title">
+              分析师观点
+            </div>
+            <div
+              class="source-score"
+              :class="getScoreClass(sentimentData.analystSentiment)"
+            >
               {{ sentimentData.analystSentiment }}
             </div>
-            <div class="source-trend" :class="getTrendClass(sentimentData.analystTrend)">
+            <div
+              class="source-trend"
+              :class="getTrendClass(sentimentData.analystTrend)"
+            >
               {{ getTrendText(sentimentData.analystTrend) }}
             </div>
           </div>
 
           <div class="source-card">
-            <div class="source-title">机构资金</div>
-            <div class="source-score" :class="getScoreClass(sentimentData.institutionalSentiment)">
+            <div class="source-title">
+              机构资金
+            </div>
+            <div
+              class="source-score"
+              :class="getScoreClass(sentimentData.institutionalSentiment)"
+            >
               {{ sentimentData.institutionalSentiment }}
             </div>
-            <div class="source-trend" :class="getTrendClass(sentimentData.institutionalTrend)">
+            <div
+              class="source-trend"
+              :class="getTrendClass(sentimentData.institutionalTrend)"
+            >
               {{ getTrendText(sentimentData.institutionalTrend) }}
             </div>
           </div>
@@ -90,21 +145,30 @@
             class="event-item"
             :class="event.impact"
           >
-            <div class="event-time">{{ formatTime(event.time) }}</div>
+            <div class="event-time">
+              {{ formatTime(event.time) }}
+            </div>
             <div class="event-content">
-              <div class="event-title">{{ event.title }}</div>
-              <div class="event-description">{{ event.description }}</div>
+              <div class="event-title">
+                {{ event.title }}
+              </div>
+              <div class="event-description">
+                {{ event.description }}
+              </div>
               <div class="event-impact">
                 影响程度: {{ event.impactLevel }}/10
                 <div class="impact-bar">
                   <div
                     class="impact-fill"
                     :style="{ width: (event.impactLevel * 10) + '%' }"
-                  ></div>
+                  />
                 </div>
               </div>
             </div>
-            <div class="event-sentiment" :class="getEventSentimentClass(event.sentiment)">
+            <div
+              class="event-sentiment"
+              :class="getEventSentimentClass(event.sentiment)"
+            >
               {{ event.sentiment }}
             </div>
           </div>
@@ -128,12 +192,18 @@
                     bottom: (point.value * 2) + 'px'
                   }"
                   :class="getPredictionClass(point.value)"
-                ></div>
+                />
               </div>
               <div class="prediction-labels">
-                <div class="label">今天</div>
-                <div class="label">+3天</div>
-                <div class="label">+7天</div>
+                <div class="label">
+                  今天
+                </div>
+                <div class="label">
+                  +3天
+                </div>
+                <div class="label">
+                  +7天
+                </div>
               </div>
             </div>
           </div>
@@ -142,7 +212,10 @@
             <h5>预测摘要</h5>
             <div class="summary-item">
               <span class="label">趋势方向:</span>
-              <span class="value" :class="getTrendClass(predictionSummary.trend)">
+              <span
+                class="value"
+                :class="getTrendClass(predictionSummary.trend)"
+              >
                 {{ getTrendText(predictionSummary.trend) }}
               </span>
             </div>

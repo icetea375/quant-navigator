@@ -3,34 +3,60 @@
     <!-- 页面标题 -->
     <div class="page-header">
       <h1>AI训练中心</h1>
-      <p class="subtitle">人机协同的智能进化平台</p>
+      <p class="subtitle">
+        人机协同的智能进化平台
+      </p>
     </div>
 
     <!-- 统计概览 -->
     <div class="stats-overview">
       <div class="stat-card">
-        <div class="stat-number">{{ stats.totalReports }}</div>
-        <div class="stat-label">总报告数</div>
+        <div class="stat-number">
+          {{ stats.totalReports }}
+        </div>
+        <div class="stat-label">
+          总报告数
+        </div>
       </div>
       <div class="stat-card pending">
-        <div class="stat-number">{{ stats.pendingReviews }}</div>
-        <div class="stat-label">待审核</div>
+        <div class="stat-number">
+          {{ stats.pendingReviews }}
+        </div>
+        <div class="stat-label">
+          待审核
+        </div>
       </div>
       <div class="stat-card good">
-        <div class="stat-number">{{ stats.goodReviews }}</div>
-        <div class="stat-label">准确</div>
+        <div class="stat-number">
+          {{ stats.goodReviews }}
+        </div>
+        <div class="stat-label">
+          准确
+        </div>
       </div>
       <div class="stat-card partial">
-        <div class="stat-number">{{ stats.partialReviews }}</div>
-        <div class="stat-label">部分准确</div>
+        <div class="stat-number">
+          {{ stats.partialReviews }}
+        </div>
+        <div class="stat-label">
+          部分准确
+        </div>
       </div>
       <div class="stat-card bad">
-        <div class="stat-number">{{ stats.badReviews }}</div>
-        <div class="stat-label">错误</div>
+        <div class="stat-number">
+          {{ stats.badReviews }}
+        </div>
+        <div class="stat-label">
+          错误
+        </div>
       </div>
       <div class="stat-card">
-        <div class="stat-number">{{ stats.averageRating.toFixed(1) }}</div>
-        <div class="stat-label">平均评分</div>
+        <div class="stat-number">
+          {{ stats.averageRating.toFixed(1) }}
+        </div>
+        <div class="stat-label">
+          平均评分
+        </div>
       </div>
     </div>
 
@@ -40,8 +66,8 @@
       <div class="left-panel">
         <!-- 筛选栏 -->
         <FilterBar
-          @filter-change="handleFilterChange"
           :loading="loading"
+          @filter-change="handleFilterChange"
         />
 
         <!-- 报告列表 -->

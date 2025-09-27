@@ -4,18 +4,15 @@ ArbitrationService单元测试 - 遵循TDD原则
 """
 
 import pytest
-from datetime import datetime
-from unittest.mock import patch, MagicMock
 
-from src.services.arbitration_service import ArbitrationService
 from src.schemas.arbitration import (
     AnalysisResult,
-    ArbitrationCase,
     ArbitrationCaseCreate,
     ArbitrationCaseUpdate,
     ArbitrationStatus,
     SentimentAnalysis,
 )
+from src.services.arbitration_service import ArbitrationService
 
 
 class TestArbitrationServiceUnit:
@@ -59,7 +56,7 @@ class TestArbitrationServiceUnit:
         """测试服务初始化时包含示例数据"""
         # Act
         cases = await arbitration_service.get_cases()
-        
+
         # Assert
         assert cases["total"] == 1
         assert len(cases["data"]) == 1
@@ -99,11 +96,13 @@ class TestArbitrationServiceUnit:
         assert len(page2["data"]) == 3
 
     @pytest.mark.asyncio
-    async def test_should_filter_cases_by_status(self, arbitration_service, sample_case_data):
+    async def test_should_filter_cases_by_status(
+        self, arbitration_service, sample_case_data
+    ):
         """测试按状态过滤案件"""
         # Arrange
         await arbitration_service.create_case(sample_case_data)
-        
+
         # Act
         pending_cases = await arbitration_service.get_cases(status="pending")
         completed_cases = await arbitration_service.get_cases(status="resolved")
@@ -113,11 +112,13 @@ class TestArbitrationServiceUnit:
         assert completed_cases["total"] == 0
 
     @pytest.mark.asyncio
-    async def test_should_filter_cases_by_target_code(self, arbitration_service, sample_case_data):
+    async def test_should_filter_cases_by_target_code(
+        self, arbitration_service, sample_case_data
+    ):
         """测试按目标代码过滤案件"""
         # Arrange
         await arbitration_service.create_case(sample_case_data)
-        
+
         # Act
         filtered_cases = await arbitration_service.get_cases(target_code="000001.SZ")
 
@@ -157,10 +158,14 @@ class TestArbitrationServiceUnit:
         """测试更新案件"""
         # Arrange
         case_id = "case_001"
-        
+
         # Act
-        updated_case = await arbitration_service.update_case(case_id, sample_update_data)
-        non_existent = await arbitration_service.update_case("non_existent", sample_update_data)
+        updated_case = await arbitration_service.update_case(
+            case_id, sample_update_data
+        )
+        non_existent = await arbitration_service.update_case(
+            "non_existent", sample_update_data
+        )
 
         # Assert
         assert updated_case is not None
@@ -201,7 +206,9 @@ class TestArbitrationServiceUnit:
         assert "recommendation" in summary
 
     @pytest.mark.asyncio
-    async def test_should_raise_error_for_preprocess_nonexistent_case(self, arbitration_service):
+    async def test_should_raise_error_for_preprocess_nonexistent_case(
+        self, arbitration_service
+    ):
         """测试预处理不存在的案件时抛出错误"""
         # Act & Assert
         with pytest.raises(ValueError, match="仲裁案件不存在"):
@@ -212,11 +219,10 @@ class TestArbitrationServiceUnit:
         """测试获取统计信息"""
         # Arrange - 创建一些测试数据
         await arbitration_service.create_case(sample_case_data)
-        
+
         # 更新一个案件为已完成
         await arbitration_service.update_case(
-            "case_001", 
-            ArbitrationCaseUpdate(status=ArbitrationStatus.RESOLVED)
+            "case_001", ArbitrationCaseUpdate(status=ArbitrationStatus.RESOLVED)
         )
 
         # Act

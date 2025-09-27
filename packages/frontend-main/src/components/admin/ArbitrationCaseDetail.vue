@@ -3,12 +3,20 @@
     <!-- 页面头部 -->
     <div class="detail-header">
       <div class="header-content">
-        <button @click="goBack" class="back-btn">← 返回列表</button>
+        <button
+          class="back-btn"
+          @click="goBack"
+        >
+          ← 返回列表
+        </button>
         <div class="case-info">
           <h1>{{ caseDetail?.stockCode }} - {{ caseDetail?.caseId }}</h1>
           <div class="case-meta">
             <span class="report-date">{{ formatDate(caseDetail?.reportDate) }}</span>
-            <span class="status-badge" :class="caseDetail?.status">
+            <span
+              class="status-badge"
+              :class="caseDetail?.status"
+            >
               {{ getStatusText(caseDetail?.status) }}
             </span>
           </div>
@@ -18,36 +26,50 @@
       <!-- 优先级和分歧度指标 -->
       <div class="case-metrics">
         <div class="metric-card">
-          <div class="metric-label">优先级</div>
-          <div class="metric-value">{{ Math.round((caseDetail?.priorityScore || 0) * 100) }}%</div>
+          <div class="metric-label">
+            优先级
+          </div>
+          <div class="metric-value">
+            {{ Math.round((caseDetail?.priorityScore || 0) * 100) }}%
+          </div>
           <div class="metric-bar">
             <div
               class="metric-fill priority"
               :style="{ width: (caseDetail?.priorityScore || 0) * 100 + '%' }"
-            ></div>
+            />
           </div>
         </div>
         <div class="metric-card">
-          <div class="metric-label">分歧度</div>
-          <div class="metric-value">{{ Math.round((caseDetail?.divergenceScore || 0) * 100) }}%</div>
+          <div class="metric-label">
+            分歧度
+          </div>
+          <div class="metric-value">
+            {{ Math.round((caseDetail?.divergenceScore || 0) * 100) }}%
+          </div>
           <div class="metric-bar">
             <div
               class="metric-fill divergence"
               :style="{ width: (caseDetail?.divergenceScore || 0) * 100 + '%' }"
-            ></div>
+            />
           </div>
         </div>
       </div>
     </div>
 
     <!-- 加载状态 -->
-    <div v-if="loading" class="loading-state">
-      <div class="loading-spinner"></div>
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
+      <div class="loading-spinner" />
       <p>加载案件详情中...</p>
     </div>
 
     <!-- 案件详情内容 -->
-    <div v-else-if="caseDetail" class="detail-content">
+    <div
+      v-else-if="caseDetail"
+      class="detail-content"
+    >
       <!-- 核心争议摘要 -->
       <div class="conflict-summary-section">
         <h2>⚡ 核心争议摘要</h2>
@@ -70,16 +92,25 @@
         <!-- 左右分栏布局 -->
         <div class="comparison-layout">
           <!-- 左侧：Qwen事实归因报告 -->
-          <div class="report-panel qwen-panel" data-testid="qwen-panel">
+          <div
+            class="report-panel qwen-panel"
+            data-testid="qwen-panel"
+          >
             <div class="panel-header">
               <h3>🧠 Qwen事实归因流</h3>
               <div class="analyzer-badge qwen-badge">
                 <span class="analyzer-type">事实归因</span>
-                <span class="confidence" data-testid="qwen-confidence">{{ Math.round((caseDetail.qwenReport?.confidenceScore || 0) * 100) }}%</span>
+                <span
+                  class="confidence"
+                  data-testid="qwen-confidence"
+                >{{ Math.round((caseDetail.qwenReport?.confidenceScore || 0) * 100) }}%</span>
               </div>
             </div>
 
-            <div class="report-content" data-testid="qwen-analysis">
+            <div
+              class="report-content"
+              data-testid="qwen-analysis"
+            >
               <!-- 执行摘要 -->
               <div class="report-section">
                 <h4>📊 执行摘要</h4>
@@ -111,7 +142,7 @@
                       class="gauge-fill"
                       :class="getSentimentClass(caseDetail.qwenReport?.sentimentScore)"
                       :style="{ width: Math.abs(caseDetail.qwenReport?.sentimentScore || 0) * 100 + '%' }"
-                    ></div>
+                    />
                   </div>
                   <span class="sentiment-value">{{ Math.round((caseDetail.qwenReport?.sentimentScore || 0) * 100) }}</span>
                 </div>
@@ -120,7 +151,10 @@
               <!-- 投资建议 -->
               <div class="report-section">
                 <h4>💼 投资建议</h4>
-                <div class="recommendation-box" :class="caseDetail.qwenReport?.investmentRecommendation?.toLowerCase()">
+                <div
+                  class="recommendation-box"
+                  :class="caseDetail.qwenReport?.investmentRecommendation?.toLowerCase()"
+                >
                   {{ caseDetail.qwenReport?.investmentRecommendation || 'HOLD' }}
                 </div>
               </div>
@@ -128,16 +162,25 @@
           </div>
 
           <!-- 右侧：豆包舆情感知报告 -->
-          <div class="report-panel doubao-panel" data-testid="doubao-panel">
+          <div
+            class="report-panel doubao-panel"
+            data-testid="doubao-panel"
+          >
             <div class="panel-header">
               <h3>🌊 豆包舆情感知流</h3>
               <div class="analyzer-badge doubao-badge">
                 <span class="analyzer-type">舆情感知</span>
-                <span class="confidence" data-testid="doubao-confidence">{{ Math.round((caseDetail.doubaoReport?.confidenceScore || 0) * 100) }}%</span>
+                <span
+                  class="confidence"
+                  data-testid="doubao-confidence"
+                >{{ Math.round((caseDetail.doubaoReport?.confidenceScore || 0) * 100) }}%</span>
               </div>
             </div>
 
-            <div class="report-content" data-testid="doubao-analysis">
+            <div
+              class="report-content"
+              data-testid="doubao-analysis"
+            >
               <!-- 执行摘要 -->
               <div class="report-section">
                 <h4>📊 执行摘要</h4>
@@ -155,7 +198,7 @@
                       class="gauge-fill"
                       :class="getSentimentClass(caseDetail.doubaoReport?.sentimentScore)"
                       :style="{ width: Math.abs(caseDetail.doubaoReport?.sentimentScore || 0) * 100 + '%' }"
-                    ></div>
+                    />
                   </div>
                   <span class="sentiment-value">{{ Math.round((caseDetail.doubaoReport?.sentimentScore || 0) * 100) }}</span>
                 </div>
@@ -207,7 +250,10 @@
               <!-- 投资建议 -->
               <div class="report-section">
                 <h4>💼 投资建议</h4>
-                <div class="recommendation-box" :class="caseDetail.doubaoReport?.investmentRecommendation?.toLowerCase()">
+                <div
+                  class="recommendation-box"
+                  :class="caseDetail.doubaoReport?.investmentRecommendation?.toLowerCase()"
+                >
                   {{ caseDetail.doubaoReport?.investmentRecommendation || 'HOLD' }}
                 </div>
               </div>
@@ -226,7 +272,7 @@
               <div
                 class="metric-fill"
                 :style="{ width: getRecommendationConsistency() + '%' }"
-              ></div>
+              />
             </div>
             <span class="metric-value">{{ getRecommendationConsistency() }}%</span>
           </div>
@@ -236,7 +282,7 @@
               <div
                 class="metric-fill"
                 :style="{ width: getSentimentDifference() + '%' }"
-              ></div>
+              />
             </div>
             <span class="metric-value">{{ getSentimentDifference() }}%</span>
           </div>
@@ -244,15 +290,30 @@
       </div>
 
       <!-- 人类仲裁决策区域 -->
-      <div v-if="caseDetail.status === 'PENDING_HUMAN'" class="arbitration-decision">
+      <div
+        v-if="caseDetail.status === 'PENDING_HUMAN'"
+        class="arbitration-decision"
+      >
         <h2>⚖️ 人类仲裁决策</h2>
-        <div class="decision-form" data-testid="arbitration-decision-form">
+        <div
+          class="decision-form"
+          data-testid="arbitration-decision-form"
+        >
           <div class="form-group">
             <label>最终投资建议</label>
-            <select v-model="arbitrationDecision.finalRecommendation" data-testid="final-recommendation-select">
-              <option value="BUY">买入 (BUY)</option>
-              <option value="HOLD">持有 (HOLD)</option>
-              <option value="SELL">卖出 (SELL)</option>
+            <select
+              v-model="arbitrationDecision.finalRecommendation"
+              data-testid="final-recommendation-select"
+            >
+              <option value="BUY">
+                买入 (BUY)
+              </option>
+              <option value="HOLD">
+                持有 (HOLD)
+              </option>
+              <option value="SELL">
+                卖出 (SELL)
+              </option>
             </select>
           </div>
 
@@ -260,13 +321,13 @@
             <label>置信度评估</label>
             <div class="confidence-input">
               <input
+                v-model="arbitrationDecision.confidenceLevel"
                 type="range"
                 min="0"
                 max="100"
-                v-model="arbitrationDecision.confidenceLevel"
                 class="confidence-slider"
                 data-testid="confidence-slider"
-              />
+              >
               <span class="confidence-display">{{ arbitrationDecision.confidenceLevel }}%</span>
             </div>
           </div>
@@ -278,7 +339,7 @@
               placeholder="请详细说明您的仲裁理由..."
               rows="4"
               data-testid="reasoning-textarea"
-            ></textarea>
+            />
           </div>
 
           <div class="form-group full-width">
@@ -288,22 +349,28 @@
               placeholder="记录两个AI分析的关键分歧点..."
               rows="3"
               data-testid="key-disagreements-textarea"
-            ></textarea>
+            />
           </div>
 
           <div class="form-actions">
             <button
-              @click="submitArbitrationDecision"
               class="submit-btn"
               :disabled="!isDecisionValid"
               data-testid="submit-arbitration-button"
+              @click="submitArbitrationDecision"
             >
               提交仲裁决策
             </button>
-            <button @click="resetDecision" class="reset-btn">
+            <button
+              class="reset-btn"
+              @click="resetDecision"
+            >
               重置
             </button>
-            <button @click="ignoreCase" class="ignore-btn">
+            <button
+              class="ignore-btn"
+              @click="ignoreCase"
+            >
               忽略此案件
             </button>
           </div>
@@ -311,13 +378,19 @@
       </div>
 
       <!-- 已仲裁决策显示 -->
-      <div v-else-if="caseDetail.humanDecision" class="arbitration-result">
+      <div
+        v-else-if="caseDetail.humanDecision"
+        class="arbitration-result"
+      >
         <h2>⚖️ 仲裁决策结果</h2>
         <div class="decision-result">
           <div class="decision-summary">
             <div class="decision-item">
               <span class="label">最终建议:</span>
-              <span class="value recommendation" :class="caseDetail.humanDecision.finalRecommendation.toLowerCase()">
+              <span
+                class="value recommendation"
+                :class="caseDetail.humanDecision.finalRecommendation.toLowerCase()"
+              >
                 {{ caseDetail.humanDecision.finalRecommendation }}
               </span>
             </div>
@@ -341,20 +414,30 @@
 
       <!-- 超级仪表盘集成 -->
       <SuperDashboard
-        :stockCode="caseDetail?.stockCode || ''"
-        :reportDate="caseDetail?.reportDate || ''"
-        :qwenReport="caseDetail?.qwenReport"
-        :doubaoReport="caseDetail?.doubaoReport"
-        :arbitrationCase="caseDetail"
+        :stock-code="caseDetail?.stockCode || ''"
+        :report-date="caseDetail?.reportDate || ''"
+        :qwen-report="caseDetail?.qwenReport"
+        :doubao-report="caseDetail?.doubaoReport"
+        :arbitration-case="caseDetail"
       />
     </div>
 
     <!-- 错误状态 -->
-    <div v-else class="error-state">
-      <div class="error-icon">❌</div>
+    <div
+      v-else
+      class="error-state"
+    >
+      <div class="error-icon">
+        ❌
+      </div>
       <h3>案件不存在</h3>
       <p>请求的案件不存在或已被删除</p>
-      <button @click="goBack" class="back-btn">返回列表</button>
+      <button
+        class="back-btn"
+        @click="goBack"
+      >
+        返回列表
+      </button>
     </div>
   </div>
 </template>
