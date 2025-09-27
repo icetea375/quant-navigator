@@ -173,7 +173,7 @@ describe('ArbitrationToolbar - 展示组件单元测试', () => {
       })
 
       const buttons = wrapper.findAll('button')
-      const settingsButton = buttons.find(btn => btn.text().includes('设置'))
+      const settingsButton = buttons.find((btn: any) => btn.text().includes('设置'))
       await settingsButton?.trigger('click')
 
       expect(wrapper.emitted('settings')).toBeTruthy()
@@ -189,7 +189,7 @@ describe('ArbitrationToolbar - 展示组件单元测试', () => {
       })
 
       const buttons = wrapper.findAll('button')
-      const fullscreenButton = buttons.find(btn => btn.text().includes('全屏'))
+      const fullscreenButton = buttons.find((btn: any) => btn.text().includes('全屏'))
       await fullscreenButton?.trigger('click')
 
       expect(wrapper.emitted('toggle-fullscreen')).toBeTruthy()

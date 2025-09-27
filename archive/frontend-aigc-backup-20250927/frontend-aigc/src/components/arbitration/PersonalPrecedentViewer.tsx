@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { List, Card, Tag, Tooltip, Typography, Divider, Button, Space, Rate, Progress } from 'antd';
+import { List, Card, Tag, Tooltip, Typography, Divider, Button, Space, Rate, Progress, Row, Col, Statistic } from 'antd';
 import {
   HistoryOutlined,
   StarOutlined,

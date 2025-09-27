@@ -172,7 +172,7 @@ const ArbitrationDashboard: React.FC<ArbitrationDashboardProps> = ({
       <ArbitrationCaseList
         cases={[]} // 这里应该从store获取案例列表
         loading={loading}
-        error={error}
+        error={error ?? undefined}
         selectedCaseId={currentCaseId}
         onCaseSelect={handleCaseChange}
         onCaseFilter={() => {}}
@@ -226,7 +226,7 @@ const ArbitrationDashboard: React.FC<ArbitrationDashboardProps> = ({
           <DataPanelContainer
             title="原始文本浏览器"
             loading={loading}
-            error={error}
+            error={error ?? undefined}
             onMaximize={() => handlePanelMaximize('raw-text')}
             onMinimize={() => handlePanelMinimize('raw-text')}
             onClose={() => handlePanelClose('raw-text')}
@@ -237,7 +237,7 @@ const ArbitrationDashboard: React.FC<ArbitrationDashboardProps> = ({
             <RawTextExplorer
               data={caseData.panels.rawTextExplorer}
               loading={loading}
-              error={error}
+              error={error ?? undefined}
               onTextHighlight={() => {}}
               onEventSelect={() => {}}
             />
@@ -246,7 +246,7 @@ const ArbitrationDashboard: React.FC<ArbitrationDashboardProps> = ({
           <DataPanelContainer
             title="财务数据快照"
             loading={loading}
-            error={error}
+            error={error ?? undefined}
             onMaximize={() => handlePanelMaximize('financial')}
             onMinimize={() => handlePanelMinimize('financial')}
             onClose={() => handlePanelClose('financial')}
@@ -257,7 +257,7 @@ const ArbitrationDashboard: React.FC<ArbitrationDashboardProps> = ({
             <FinancialSnapshot
               data={caseData.panels.financialSnapshot}
               loading={loading}
-              error={error}
+              error={error ?? undefined}
               onPeriodSelect={() => {}}
               onMetricHover={() => {}}
             />
@@ -266,7 +266,7 @@ const ArbitrationDashboard: React.FC<ArbitrationDashboardProps> = ({
           <DataPanelContainer
             title="量化信号仪表盘"
             loading={loading}
-            error={error}
+            error={error ?? undefined}
             onMaximize={() => handlePanelMaximize('quant-signals')}
             onMinimize={() => handlePanelMinimize('quant-signals')}
             onClose={() => handlePanelClose('quant-signals')}
@@ -277,7 +277,7 @@ const ArbitrationDashboard: React.FC<ArbitrationDashboardProps> = ({
             <QuantSignalDashboard
               data={caseData.panels.quantSignalDashboard}
               loading={loading}
-              error={error}
+              error={error ?? undefined}
               onSignalHover={() => {}}
               onSignalClick={() => {}}
             />
@@ -286,7 +286,7 @@ const ArbitrationDashboard: React.FC<ArbitrationDashboardProps> = ({
           <DataPanelContainer
             title="资金流向与筹码分布"
             loading={loading}
-            error={error}
+            error={error ?? undefined}
             onMaximize={() => handlePanelMaximize('flow-chips')}
             onMinimize={() => handlePanelMinimize('flow-chips')}
             onClose={() => handlePanelClose('flow-chips')}
@@ -297,7 +297,7 @@ const ArbitrationDashboard: React.FC<ArbitrationDashboardProps> = ({
             <FlowAndChipsViewer
               data={caseData.panels.flowAndChipsViewer}
               loading={loading}
-              error={error}
+              error={error ?? undefined}
               onFlowHover={() => {}}
               onChipHover={() => {}}
             />
@@ -306,7 +306,7 @@ const ArbitrationDashboard: React.FC<ArbitrationDashboardProps> = ({
           <DataPanelContainer
             title="历史仲裁记录"
             loading={loading}
-            error={error}
+            error={error ?? undefined}
             onMaximize={() => handlePanelMaximize('precedents')}
             onMinimize={() => handlePanelMinimize('precedents')}
             onClose={() => handlePanelClose('precedents')}
@@ -317,7 +317,7 @@ const ArbitrationDashboard: React.FC<ArbitrationDashboardProps> = ({
             <PersonalPrecedentViewer
               data={caseData.panels.precedentViewer}
               loading={loading}
-              error={error}
+              error={error ?? undefined}
               onPrecedentSelect={() => {}}
               onPrecedentHover={() => {}}
             />

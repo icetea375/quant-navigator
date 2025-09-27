@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Card, Row, Col, Statistic, Progress, Tag, Tooltip, Typography, Divider } from 'antd';
-import { GaugeChart, GaugeChartProps } from '@ant-design/charts';
-import { RadarChart, RadarChartProps } from '@ant-design/charts';
+import { Gauge, GaugeConfig } from '@ant-design/charts';
+import { Radar, RadarConfig } from '@ant-design/charts';
 import {
   ThunderboltOutlined,
-  TrendingUpOutlined,
-  TrendingDownOutlined,
+  RiseOutlined,
+  FallOutlined,
   InfoCircleOutlined,
   WarningOutlined
 } from '@ant-design/icons';

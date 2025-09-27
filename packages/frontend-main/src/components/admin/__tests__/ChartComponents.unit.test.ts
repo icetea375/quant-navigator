@@ -1,5 +1,5 @@
 // 图表组件单元测试 - 遵循测试宪法
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 
 // 纯函数测试 - 遵循测试宪法第1条：测试的唯一目的
 const formatChartData = (data: any[]) => {
@@ -11,7 +11,7 @@ const formatChartData = (data: any[]) => {
   }))
 }
 
-const calculateChartOptions = (data: any[], type: string) => {
+const calculateChartOptions = (data: any[], type: string): any => {
   const formattedData = formatChartData(data)
 
   const baseOptions = {
@@ -110,8 +110,8 @@ describe('Chart Components - 纯函数测试', () => {
 
   it('should handle empty data', () => {
     expect(formatChartData([])).toEqual([])
-    expect(formatChartData(null)).toEqual([])
-    expect(formatChartData(undefined)).toEqual([])
+    expect(formatChartData(null as any)).toEqual([])
+    expect(formatChartData(undefined as any)).toEqual([])
   })
 
   it('should handle invalid data gracefully', () => {

@@ -353,7 +353,7 @@ describe('ArbitrationDecisionDialog - 展示组件单元测试', () => {
       })
 
       const textareas = wrapper.findAll('textarea')
-      textareas.forEach(textarea => {
+      textareas.forEach((textarea: any) => {
         expect(textarea.attributes('show-word-limit')).toBeDefined()
       })
     })

@@ -51,19 +51,23 @@ describe('DataPanelContainer - 展示组件单元测试', () => {
     panels: {
       rawTextExplorer: [
         {
-          id: 'event-1',
-          timestamp: '2024-01-15T09:00:00Z',
-          event_type: 'price_change',
+          eventId: 'event-1',
+          eventType: 'news' as const,
           title: '股票价格发生异常波动',
           content: '股票价格发生异常波动',
-          source: 'market_data',
-          confidence: 0.9
+          sourceUrl: 'https://example.com',
+          publishedAt: '2024-01-15T09:00:00Z',
+          relatedStocks: ['000001'],
+          keywords: ['价格', '波动', '异常'],
+          importanceScore: 0.9,
+          sentimentScore: 0.5,
+          dataSource: 'market_data'
         }
       ],
       financialSnapshot: [
         {
-          reportPeriod: '2024-Q1',
-          fiscalYear: '2024',
+          reportPeriod: 'Q1' as const,
+          fiscalYear: 2024,
           basicInfo: {
             stock_name: '平安银行',
             stock_code: '000001',
@@ -83,8 +87,8 @@ describe('DataPanelContainer - 展示组件单元测试', () => {
           signalId: 'signal-1',
           targetCode: '000001',
           signalDate: '2024-01-15T09:00:00Z',
-          signalType: 'individual',
-          status: 'active',
+          signalType: 'individual' as const,
+          status: 'active' as const,
           returnZScore: 2.5,
           volumeZScore: 1.8,
           momentumZScore: 2.2,
@@ -126,7 +130,7 @@ describe('DataPanelContainer - 展示组件单元测试', () => {
           largeNetInflow: 300000,
           mediumNetInflow: 200000,
           smallNetInflow: 100000
-        },
+        } as any,
         topList: [
           {
             rank: 1,

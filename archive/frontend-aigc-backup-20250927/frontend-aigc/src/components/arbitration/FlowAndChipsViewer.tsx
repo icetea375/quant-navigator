@@ -3,8 +3,8 @@ import { Card, Row, Col, Statistic, Progress, Tag, Tooltip, Typography, Divider,
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, Area, AreaChart } from 'recharts';
 import {
   MoneyCollectOutlined,
-  TrendingUpOutlined,
-  TrendingDownOutlined,
+  RiseOutlined,
+  FallOutlined,
   InfoCircleOutlined,
   ThunderboltOutlined
 } from '@ant-design/icons';
@@ -97,7 +97,7 @@ const FlowAndChipsViewer: React.FC<FlowAndChipsViewerProps> = ({
               precision={2}
               valueStyle={{ color: amountColor, fontSize: '20px' }}
               suffix="万元"
-              prefix={netAmount > 0 ? <TrendingUpOutlined /> : <TrendingDownOutlined />}
+              prefix={netAmount > 0 ? <RiseOutlined /> : <FallOutlined />}
             />
           </Col>
           <Col span={6}>
