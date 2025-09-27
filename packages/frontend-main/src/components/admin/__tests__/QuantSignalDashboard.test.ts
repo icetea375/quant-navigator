@@ -1,7 +1,6 @@
 // 量化信号仪表盘组件测试
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { createTestWrapper, mockElementPlusComponents } from '@/utils/test-utils'
-import { useArbitrationStore } from '@/stores/arbitration'
 import QuantSignalDashboard from '../QuantSignalDashboard.vue'
 
 // 模拟量化信号数据

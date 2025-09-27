@@ -357,7 +357,7 @@ const getTrendClass = (trend: string) => {
 }
 
 const getTrendText = (trend: string) => {
-  const texts = {
+  const texts: Record<string, string> = {
     up: '上升',
     down: '下降',
     stable: '稳定'

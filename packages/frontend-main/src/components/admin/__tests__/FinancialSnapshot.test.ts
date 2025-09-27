@@ -1,7 +1,6 @@
 // 财务数据快照组件测试
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { createTestWrapper, mockElementPlusComponents } from '@/utils/test-utils'
-import { useArbitrationStore } from '@/stores/arbitration'
 import FinancialSnapshot from '../FinancialSnapshot.vue'
 
 // 模拟财务数据

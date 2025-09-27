@@ -375,7 +375,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import { Refresh, Setting } from '@element-plus/icons-vue';
 import { useArbitrationStore } from '@/stores/arbitration';
 import RawTextExplorer from './RawTextExplorer.vue';

@@ -1,7 +1,6 @@
 // 原始文本浏览器组件测试
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { createTestWrapper, mockElementPlusComponents } from '@/utils/test-utils'
-import { useArbitrationStore } from '@/stores/arbitration'
 import RawTextExplorer from '../RawTextExplorer.vue'
 
 // 模拟原始文本数据

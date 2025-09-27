@@ -95,7 +95,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { useArbitrationStore } from '@/stores/arbitration'
 import ArbitrationToolbar from './ArbitrationToolbar.vue'
 import ArbitrationCaseList from './ArbitrationCaseList.vue'

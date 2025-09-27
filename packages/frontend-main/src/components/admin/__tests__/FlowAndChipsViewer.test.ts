@@ -1,7 +1,6 @@
 // 资金流向与筹码查看器组件测试
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { createTestWrapper, mockElementPlusComponents } from '@/utils/test-utils'
-import { useArbitrationStore } from '@/stores/arbitration'
 import FlowAndChipsViewer from '../FlowAndChipsViewer.vue'
 
 // 模拟资金流向和筹码数据

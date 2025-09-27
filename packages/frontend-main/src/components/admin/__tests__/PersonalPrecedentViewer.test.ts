@@ -1,7 +1,6 @@
 // 历史仲裁记录查看器组件测试
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { createTestWrapper, mockElementPlusComponents } from '@/utils/test-utils'
-import { useArbitrationStore } from '@/stores/arbitration'
 import PersonalPrecedentViewer from '../PersonalPrecedentViewer.vue'
 
 // 模拟历史仲裁数据
