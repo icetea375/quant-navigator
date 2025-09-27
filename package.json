@@ -18,6 +18,8 @@
     "lint": "pnpm --recursive lint",
     "lint:fix": "pnpm --recursive lint:fix",
     "type-check": "pnpm --recursive type-check",
+    "format": "pnpm --recursive format",
+    "format:check": "pnpm --recursive format:check",
     "docs:check": "source venv/bin/activate && python tools/scripts/check_docs_quality.py",
     "docs:generate": "source venv/bin/activate && python tools/scripts/generate_docs.py",
     "arch:scan": "dependency-cruiser packages --config .dependency-cruiser.js",

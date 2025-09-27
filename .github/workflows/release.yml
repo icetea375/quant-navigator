@@ -1,0 +1,98 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: '8'
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Build frontend
+      run: |
+        cd packages/frontend-main
+        pnpm run build
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # 获取上一个标签
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+        if [ -n "$PREVIOUS_TAG" ]; then
+          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+          git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..HEAD >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        else
+          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+          echo "- Initial release" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name || inputs.version }}
+        release_name: Release ${{ github.ref_name || inputs.version }}
+        body: |
+          ## Changes
+          ${{ steps.changelog.outputs.CHANGELOG }}
+
+          ## Build Artifacts
+          - Frontend build: `packages/frontend-main/dist/`
+          - Backend package: `packages/backend-python/`
+
+          ## Installation
+          ```bash
+          # Install dependencies
+          pnpm install
+
+          # Build frontend
+          cd packages/frontend-main
+          pnpm run build
+
+          # Run backend
+          cd packages/backend-python
+          python -m pip install -r requirements.txt
+          ```
+        draft: false
+        prerelease: false
+
+    - name: Upload Frontend Build
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: packages/frontend-main/dist/
+        asset_name: frontend-build-${{ github.ref_name || inputs.version }}.tar.gz
+        asset_content_type: application/gzip

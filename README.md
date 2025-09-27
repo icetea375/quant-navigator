@@ -1,5 +1,9 @@
 # 智能分析系统 v13.0 TDD最终版
 
+[![CI/CD Pipeline](https://github.com/icetea375/quant-navigator/actions/workflows/ci.yml/badge.svg)](https://github.com/icetea375/quant-navigator/actions/workflows/ci.yml)
+[![Pre-commit](https://github.com/icetea375/quant-navigator/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/icetea375/quant-navigator/actions/workflows/pre-commit.yml)
+[![Code Coverage](https://codecov.io/gh/icetea375/quant-navigator/branch/main/graph/badge.svg)](https://codecov.io/gh/icetea375/quant-navigator)
+
 ## 项目概述
 
 这是一个**测试驱动开发(TDD)**为核心的智能分析系统，遵循严格的"红-绿-重构"开发流程，确保系统的可靠性由测试而非"希望"来保证。
