@@ -348,7 +348,7 @@ const getScoreClass = (score: number) => {
 }
 
 const getRiskIcon = (level: string) => {
-  const icons = {
+  const icons: Record<string, string> = {
     high: '🔴',
     medium: '🟡',
     low: '🟢'
@@ -361,7 +361,7 @@ const getTrendClass = (trend: string) => {
 }
 
 const getTrendText = (trend: string) => {
-  const texts = {
+  const texts: Record<string, string> = {
     up: '上升趋势',
     down: '下降趋势',
     stable: '稳定趋势'

@@ -152,7 +152,7 @@
               <RawTextExplorer
                 :data="caseData.panels.rawTextExplorer"
                 :loading="loading"
-                :error="error"
+                :error="error ?? undefined"
                 @text-highlight="handleTextHighlight"
                 @event-select="handleEventSelect"
               />
@@ -182,7 +182,7 @@
               <FinancialSnapshot
                 :data="caseData.panels.financialSnapshot"
                 :loading="loading"
-                :error="error"
+                :error="error ?? undefined"
                 @period-select="handlePeriodSelect"
                 @metric-hover="handleMetricHover"
               />
@@ -212,7 +212,7 @@
               <QuantSignalDashboard
                 :data="caseData.panels.quantSignalDashboard"
                 :loading="loading"
-                :error="error"
+                :error="error ?? undefined"
                 @signal-hover="handleSignalHover"
                 @signal-click="handleSignalClick"
               />
@@ -242,7 +242,7 @@
               <FlowAndChipsViewer
                 :data="caseData.panels.flowAndChipsViewer"
                 :loading="loading"
-                :error="error"
+                :error="error ?? undefined"
                 @flow-hover="handleFlowHover"
                 @chip-hover="handleChipHover"
               />
@@ -272,7 +272,7 @@
               <PersonalPrecedentViewer
                 :data="caseData.panels.precedentViewer"
                 :loading="loading"
-                :error="error"
+                :error="error ?? undefined"
                 @precedent-select="handlePrecedentSelect"
                 @precedent-hover="handlePrecedentHover"
               />

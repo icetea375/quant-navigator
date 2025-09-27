@@ -12,12 +12,12 @@
         <div class="case-info">
           <h1>{{ caseDetail?.stockCode }} - {{ caseDetail?.caseId }}</h1>
           <div class="case-meta">
-            <span class="report-date">{{ formatDate(caseDetail?.reportDate) }}</span>
+            <span class="report-date">{{ formatDate(caseDetail?.reportDate || '') }}</span>
             <span
               class="status-badge"
               :class="caseDetail?.status"
             >
-              {{ getStatusText(caseDetail?.status) }}
+              {{ getStatusText(caseDetail?.status || '') }}
             </span>
           </div>
         </div>
@@ -741,7 +741,7 @@ const formatDateTime = (dateString: string) => {
 }
 
 const getStatusText = (status: string) => {
-  const statusMap = {
+  const statusMap: Record<string, string> = {
     'PENDING_HUMAN': '待仲裁',
     'ARBITRATED': '已仲裁',
     'IGNORED': '已忽略'

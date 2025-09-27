@@ -318,6 +318,16 @@ export interface HistoricalArbitrations {
   dataSource: string;
   createdAt: string;
   updatedAt: string;
+  // 兼容旧版本字段
+  case_id?: string;
+  target_code?: string;
+  target_name?: string;
+  report_type?: string;
+  created_at?: string;
+  human_decision?: string;
+  human_reasoning?: string;
+  qwen_analysis?: any;
+  doubao_analysis?: any;
 }
 
 // ==================== 仲裁案例完整数据类型 ====================
@@ -344,6 +354,13 @@ export interface ArbitrationCaseData {
   target_code?: string;
   qwen_analysis?: any;
   doubao_analysis?: any;
+  disagreement_score?: number;
+  status?: string;
+  consensus_summary?: string;
+  conflict_summary?: string;
+  priority_score?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // ==================== 组件Props类型 ====================

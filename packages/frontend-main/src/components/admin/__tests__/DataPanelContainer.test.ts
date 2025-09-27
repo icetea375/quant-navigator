@@ -28,6 +28,33 @@ describe('DataPanelContainer - 展示组件单元测试', () => {
   let wrapper: any
 
   const mockCaseData: ArbitrationCaseData = {
+    caseInfo: {
+      caseId: 'test-case-1',
+      stockCode: '000001',
+      stockName: '平安银行',
+      reportDate: '2024-01-15T09:00:00Z',
+      reportType: 'anomaly',
+      status: 'pending',
+      priority: 1,
+      createdAt: '2024-01-15T09:00:00Z',
+      updatedAt: '2024-01-15T09:00:00Z'
+    },
+    aiDebate: {
+      reportId: 'report-1',
+      reportType: 'anomaly',
+      title: '测试报告',
+      summary: '测试摘要',
+      content: '测试内容',
+      confidenceScore: 0.85,
+      qualityScore: 0.8,
+      modelUsed: 'qwen',
+      version: '1.0.0',
+      keyFindings: ['测试发现1', '测试发现2'],
+      riskFactors: ['测试风险1', '测试风险2'],
+      createdAt: '2024-01-15T09:00:00Z',
+      updatedAt: '2024-01-15T09:00:00Z'
+    },
+    // 兼容旧版本字段
     case_id: 'test-case-1',
     report_type: 'anomaly',
     target_code: '000001',
@@ -66,20 +93,35 @@ describe('DataPanelContainer - 展示组件单元测试', () => {
       ],
       financialSnapshot: [
         {
+          reportId: 'report-1',
+          stockCode: '000001',
+          reportDate: '2024-01-15T09:00:00Z',
           reportPeriod: 'Q1' as const,
           fiscalYear: 2024,
-          basicInfo: {
-            stock_name: '平安银行',
-            stock_code: '000001',
-            current_price: 12.50
-          },
-          metrics: {
-            revenue: 1000000,
-            revenue_growth: 0.15,
-            profit: 200000,
-            profit_growth: 0.12,
-            roe: 0.08
-          }
+          status: 'published' as const,
+          revenue: 1000000,
+          revenueGrowthRate: 0.15,
+          netProfitExcludingNonRecurring: 200000,
+          netProfitGrowthRate: 0.12,
+          grossMargin: 0.25,
+          netMargin: 0.20,
+          operatingCashFlow: 150000,
+          rdExpenses: 50000,
+          rdRatio: 0.05,
+          contractLiabilities: 100000,
+          totalAssets: 5000000,
+          totalLiabilities: 2000000,
+          netAssets: 3000000,
+          debtToAssetRatio: 0.4,
+          roe: 0.08,
+          roa: 0.04,
+          eps: 0.50,
+          bookValuePerShare: 6.25,
+          revenueCagr3y: 0.12,
+          profitCagr3y: 0.10,
+          dataCompletenessScore: 0.95,
+          dataSource: 'financial_data',
+          dataUpdatedAt: '2024-01-15T09:00:00Z'
         }
       ],
       quantSignalDashboard: [
@@ -93,33 +135,25 @@ describe('DataPanelContainer - 展示组件单元测试', () => {
           volumeZScore: 1.8,
           momentumZScore: 2.2,
           volatilityZScore: 1.5,
-          marketBackground: {
-            macroRiskZScore: 1.2,
-            marketStyleZScore: 0.8,
-            industryRotationZScore: 1.5,
-            conceptHeatZScore: 0.9
-          },
-          managementCredibility: {
-            mdaComplianceRate: 0.85,
-            managementCredibility: 0.78,
-            disclosureQuality: 0.82,
-            financialTransparency: 0.88
-          },
-          technicalAnalysis: {
-            rsi: 65.5,
-            macdSignal: 0.12,
-            bollingerPosition: 0.75,
-            movingAverageSignal: 0.68
-          },
-          riskAssessment: {
-            overallRisk: 'medium',
-            riskScore: 0.6,
-            riskFactors: ['市场波动', '政策风险']
-          },
-          confidence: 0.85,
-          priority: 'high',
-          createdAt: '2024-01-15T09:00:00Z',
-          updatedAt: '2024-01-15T09:00:00Z'
+          macroRiskZScore: 1.2,
+          marketStyleZScore: 0.8,
+          industryRotationZScore: 1.5,
+          conceptZScore: 0.9,
+          mdaFulfillmentRate: 0.85,
+          managementCredibilityScore: 0.78,
+          disclosureQualityScore: 0.82,
+          financialTransparencyScore: 0.88,
+          rsi: 65.5,
+          macdSignal: 0.12,
+          bollingerPosition: 0.75,
+          maSignal: 0.68,
+          overallSignalStrength: 0.85,
+          signalConfidence: 0.85,
+          validityDays: 30,
+          modelVersion: '1.0.0',
+          calculationParams: {},
+          source: 'quant_signal_engine',
+          metadata: {}
         }
       ],
       flowAndChipsViewer: {
@@ -133,30 +167,125 @@ describe('DataPanelContainer - 展示组件单元测试', () => {
         } as any,
         topList: [
           {
-            rank: 1,
-            stock_code: '000001',
-            stock_name: '平安银行',
-            net_inflow: 500000,
-            net_inflow_ratio: 0.05,
-            change_pct: 2.5
+            listId: 'list-1',
+            stockCode: '000001',
+            listDate: '2024-01-15T09:00:00Z',
+            listType: 'dragon_tiger' as const,
+            seatType: 'buy' as const,
+            seatName: '平安银行',
+            seatCode: '000001',
+            seatCategory: 'institutional',
+            buyAmount: 500000,
+            sellAmount: 200000,
+            netAmount: 300000,
+            totalAmount: 700000,
+            buyRatio: 0.71,
+            sellRatio: 0.29,
+            netRatio: 0.43,
+            buyRank: 1,
+            sellRank: 5,
+            netRank: 1,
+            totalRank: 2,
+            priceImpactScore: 0.8,
+            attentionScore: 0.9,
+            anomalyScore: 0.7,
+            changeVsHistorical: 0.15,
+            consecutiveDays: 3,
+            monthlyCount: 5,
+            listReason: '机构大额买入',
+            dataSource: 'top_list_data',
+            dataUpdatedAt: '2024-01-15T09:00:00Z'
           }
         ],
-        chipDistribution: {
-          high_cost_ratio: 0.3,
-          medium_cost_ratio: 0.5,
-          low_cost_ratio: 0.2,
-          avg_cost: 12.5,
-          cost_concentration: 0.7
-        }
+        chipDistribution: [
+          {
+            distributionId: 'chip-1',
+            stockCode: '000001',
+            distributionDate: '2024-01-15T09:00:00Z',
+            distributionType: 'cost_distribution' as const,
+            chipStatus: 'active' as const,
+            priceLower: 10.0,
+            priceUpper: 15.0,
+            priceMedian: 12.5,
+            chipQuantity: 1000000,
+            chipRatio: 0.3,
+            chipAmount: 12500000,
+            chipAmountRatio: 0.3,
+            averageCost: 12.5,
+            costConcentration: 0.7,
+            costDispersion: 0.3,
+            currentPrice: 12.5,
+            profitLossRatio: 0.0,
+            profitLossAmount: 0,
+            profitLossStatus: 'break_even',
+            chipInflow: 500000,
+            chipOutflow: 300000,
+            netChipFlow: 200000,
+            chipFlowIntensity: 0.6,
+            changeVs5d: 0.1,
+            changeVs10d: 0.15,
+            changeVs20d: 0.2,
+            changeVsHistorical: 0.25,
+            distributionStd: 1.2,
+            distributionSkewness: 0.1,
+            distributionKurtosis: 2.8,
+            modelVersion: '1.0.0',
+            calculationParams: {},
+            dataSource: 'chip_distribution_data',
+            dataUpdatedAt: '2024-01-15T09:00:00Z',
+            high_cost_ratio: 0.3,
+            medium_cost_ratio: 0.5,
+            low_cost_ratio: 0.2,
+            avg_cost: 12.5,
+            cost_concentration: 0.7
+          }
+        ]
       },
       precedentViewer: [
         {
+          feedbackId: 'feedback-1',
+          feedbackType: 'arbitration' as const,
+          sourceType: 'case',
+          sourceId: 'case-1',
+          stockCode: '000001',
+          feedbackDate: '2024-01-10T09:00:00Z',
+          status: 'completed' as const,
+          originalOutput: {},
+          originalSummary: '历史分析1',
+          humanFeedback: {
+            decision: 'arbitrate',
+            reasoning: '基于技术分析，建议仲裁'
+          },
+          feedbackScore: 0.8,
+          feedbackComment: '基于技术分析，建议仲裁',
+          correctAttribution: '技术分析',
+          correctPrediction: '建议仲裁',
+          rating: 'good' as const,
+          accuracyScore: 0.8,
+          completenessScore: 0.85,
+          logicScore: 0.9,
+          innovationScore: 0.75,
+          reviewer: 'reviewer-1',
+          reviewerRole: 'senior_analyst',
+          reviewerLevel: 'expert',
+          reviewComment: '分析合理',
+          reviewTime: '2024-01-10T09:00:00Z',
+          priority: 1,
+          tags: ['技术分析', '仲裁'],
+          industry: '金融',
+          concept: '银行',
+          learningValue: 0.8,
+          usedForTraining: true,
+          trainingEffectiveness: 0.85,
+          dataSource: 'arbitration_data',
+          createdAt: '2024-01-10T09:00:00Z',
+          updatedAt: '2024-01-10T09:00:00Z',
+          // 兼容旧版本字段
           case_id: 'case-1',
           target_code: '000001',
           target_name: '平安银行',
           report_type: 'anomaly',
           created_at: '2024-01-10T09:00:00Z',
-          status: 'completed',
           human_decision: 'arbitrate',
           human_reasoning: '基于技术分析，建议仲裁',
           qwen_analysis: {
@@ -239,7 +368,7 @@ describe('DataPanelContainer - 展示组件单元测试', () => {
       })
 
       const buttons = wrapper.findAll('button')
-      const maximizeButton = buttons.find(btn => btn.text().includes('+'))
+      const maximizeButton = buttons.find((btn: any) => btn.text().includes('+'))
       await maximizeButton?.trigger('click')
 
       expect(wrapper.emitted('toggle-maximize')).toBeTruthy()
@@ -256,7 +385,7 @@ describe('DataPanelContainer - 展示组件单元测试', () => {
       })
 
       const buttons = wrapper.findAll('button')
-      const closeButton = buttons.find(btn => btn.text().includes('Close'))
+      const closeButton = buttons.find((btn: any) => btn.text().includes('Close'))
       await closeButton?.trigger('click')
 
       expect(wrapper.emitted('close-panel')).toBeTruthy()
@@ -273,7 +402,7 @@ describe('DataPanelContainer - 展示组件单元测试', () => {
       })
 
       const buttons = wrapper.findAll('button')
-      const maximizeButton = buttons.find(btn => btn.text().includes('-'))
+      const maximizeButton = buttons.find((btn: any) => btn.text().includes('-'))
       expect(maximizeButton).toBeTruthy()
     })
   })
