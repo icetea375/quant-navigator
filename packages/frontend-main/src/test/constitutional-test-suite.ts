@@ -2,17 +2,15 @@
 // 遵循所有6条测试宪法条款
 
 import { describe, it, expect, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { createPinia, setActivePinia } from 'pinia'
 import { nextTick } from 'vue'
 import { useArbitrationStore } from '@/stores/arbitration'
-import { mockElementPlusComponents } from '@/utils/test-utils'
+import { createTestWrapper } from '@/utils/test-utils'
 
 // 遵循测试宪法第1条：测试的唯一目的 - 验证生产代码是否履行设计契约
 describe('测试宪法100%合规测试套件', () => {
   beforeEach(() => {
     // 遵循测试宪法第6条：模拟铁律 - 只模拟外部边界
-    setActivePinia(createPinia())
+    // 使用createTestWrapper确保环境一致性
   })
 
   // 遵循测试宪法第4条：简单性优先 - 选择最简单直接的测试方案
@@ -227,12 +225,7 @@ describe('测试宪法100%合规测试套件', () => {
         }
       }
 
-      const wrapper = mount(TestComponent, {
-        global: {
-          plugins: [createPinia()],
-          stubs: mockElementPlusComponents()
-        }
-      })
+      const wrapper = createTestWrapper(TestComponent)
 
       await nextTick()
 
