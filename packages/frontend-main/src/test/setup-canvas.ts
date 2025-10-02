@@ -12,6 +12,7 @@ const mockCanvas = {
     moveTo: vi.fn(),
     lineTo: vi.fn(),
     arc: vi.fn(),
+    rect: vi.fn(), // 添加 rect 方法
     fill: vi.fn(),
     stroke: vi.fn(),
     save: vi.fn(),
@@ -61,9 +62,41 @@ const mockCanvas = {
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
   dispatchEvent: vi.fn(),
+  // DOM 方法 - ECharts 需要这些方法
+  setAttribute: vi.fn(),
+  getAttribute: vi.fn(),
+  removeAttribute: vi.fn(),
+  hasAttribute: vi.fn(() => false),
+  setAttributeNS: vi.fn(),
+  getAttributeNS: vi.fn(),
+  removeAttributeNS: vi.fn(),
+  hasAttributeNS: vi.fn(() => false),
+  appendChild: vi.fn(),
+  removeChild: vi.fn(),
+  insertBefore: vi.fn(),
+  replaceChild: vi.fn(),
+  cloneNode: vi.fn(() => mockCanvas),
+  // DOM 属性
   width: 300,
   height: 150,
-  style: {}
+  style: {},
+  className: '',
+  id: '',
+  nodeType: 1,
+  parentNode: null,
+  childNodes: [],
+  firstChild: null,
+  lastChild: null,
+  nextSibling: null,
+  previousSibling: null,
+  ownerDocument: document,
+  // 客户端尺寸
+  clientWidth: 300,
+  clientHeight: 150,
+  offsetWidth: 300,
+  offsetHeight: 150,
+  scrollWidth: 300,
+  scrollHeight: 150
 }
 
 // 模拟 HTMLCanvasElement
@@ -168,7 +201,21 @@ if (typeof global !== 'undefined') {
 const originalCreateElement = document.createElement
 document.createElement = vi.fn((tagName: string) => {
   if (tagName.toLowerCase() === 'canvas') {
-    return mockCanvas as HTMLCanvasElement
+    // 创建一个真实的DOM元素，然后添加Canvas方法
+    const realElement = originalCreateElement.call(document, tagName)
+    
+    // 只添加非只读的属性和方法
+    Object.keys(mockCanvas).forEach(key => {
+      if (key !== 'tagName' && key !== 'nodeName' && key !== 'nodeType') {
+        try {
+          (realElement as any)[key] = (mockCanvas as any)[key]
+        } catch (e) {
+          // 忽略只读属性的错误
+        }
+      }
+    })
+    
+    return realElement as HTMLCanvasElement
   }
   return originalCreateElement.call(document, tagName)
 })

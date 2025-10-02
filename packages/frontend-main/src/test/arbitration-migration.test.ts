@@ -3,31 +3,39 @@
  * 验证从 React 到 Vue 3 的迁移是否成功
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
-import { createPinia, setActivePinia } from 'pinia';
+import { describe, it, expect } from 'vitest';
+import { createTestWrapper } from '@/utils/test-utils';
 import { useArbitrationStore } from '@/stores/arbitration';
 import type { ArbitrationCaseData, RawTextData, FinancialSnapshot } from '@/types/arbitration';
 
 describe('仲裁功能迁移测试', () => {
-  beforeEach(() => {
-    setActivePinia(createPinia());
-  });
-
   it('应该能够创建仲裁 store', () => {
+    const wrapper = createTestWrapper({
+      template: '<div></div>'
+    });
+    
     const store = useArbitrationStore();
     expect(store).toBeDefined();
-    expect(store.currentCaseId.value).toBeNull();
-    expect(store.caseData.value).toBeNull();
-    expect(store.loading.value).toBe(false);
+    expect(store.currentCaseId).toBeNull();
+    expect(store.caseData).toBeNull();
+    expect(store.loading).toBe(false);
   });
 
   it('应该能够设置当前案例', () => {
+    const wrapper = createTestWrapper({
+      template: '<div></div>'
+    });
+    
     const store = useArbitrationStore();
     store.setCurrentCase('test-case-001');
-    expect(store.currentCaseId.value).toBe('test-case-001');
+    expect(store.currentCaseId).toBe('test-case-001');
   });
 
   it('应该能够设置案例数据', () => {
+    const wrapper = createTestWrapper({
+      template: '<div></div>'
+    });
+    
     const store = useArbitrationStore();
     const mockCaseData: ArbitrationCaseData = {
       caseInfo: {
@@ -82,7 +90,7 @@ describe('仲裁功能迁移测试', () => {
     };
 
     store.setCaseData(mockCaseData);
-    expect(store.caseData.value).toEqual(mockCaseData);
+    expect(store.caseData).toEqual(mockCaseData);
   });
 
   it('应该能够处理原始文本数据', () => {
@@ -146,27 +154,39 @@ describe('仲裁功能迁移测试', () => {
   });
 
   it('应该能够处理错误状态', () => {
+    const wrapper = createTestWrapper({
+      template: '<div></div>'
+    });
+    
     const store = useArbitrationStore();
     store.setError('测试错误信息');
-    expect(store.error.value).toBe('测试错误信息');
+    expect(store.error).toBe('测试错误信息');
     expect(store.hasError).toBe(true);
   });
 
   it('应该能够清除错误状态', () => {
+    const wrapper = createTestWrapper({
+      template: '<div></div>'
+    });
+    
     const store = useArbitrationStore();
     store.setError('测试错误信息');
     store.clearError();
-    expect(store.error.value).toBeNull();
+    expect(store.error).toBeNull();
     expect(store.hasError).toBe(false);
   });
 
   it('应该能够重置 store 状态', () => {
+    const wrapper = createTestWrapper({
+      template: '<div></div>'
+    });
+    
     const store = useArbitrationStore();
     store.setCurrentCase('test-case');
     store.setError('test error');
     store.reset();
-    expect(store.currentCaseId.value).toBeNull();
-    expect(store.error.value).toBeNull();
-    expect(store.caseData.value).toBeNull();
+    expect(store.currentCaseId).toBeNull();
+    expect(store.error).toBeNull();
+    expect(store.caseData).toBeNull();
   });
 });

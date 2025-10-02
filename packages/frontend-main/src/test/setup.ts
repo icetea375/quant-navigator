@@ -1,10 +1,24 @@
-// 测试环境设置
+// 符合测试宪法的测试环境设置
 import { config } from '@vue/test-utils'
 import { vi } from 'vitest'
 import { setupTestEnvironment } from '@/utils/test-utils'
+import { createApp } from 'vue'
 
 // 设置测试环境
 setupTestEnvironment()
+
+// 在浏览器环境中定义Vue相关全局变量
+if (typeof window !== 'undefined') {
+  try {
+    (window as any).Vue = createApp
+    // 添加Vue编译器相关的全局变量
+    (window as any).VueCompilerDOM = {}
+    (window as any).VueCompilerCore = {}
+    (window as any).VueCompilerSFC = {}
+  } catch (error) {
+    console.warn('Vue全局变量设置失败:', error)
+  }
+}
 
 // 浏览器环境中不需要模拟API，使用真实的浏览器API
 
@@ -16,95 +30,9 @@ config.global.stubs = {
   'transition-group': true,
 }
 
-// 模拟Element Plus
-config.global.components = {
-  'el-button': { template: '<button><slot /></button>' },
-  'el-input': { template: '<input v-model="modelValue" />' },
-  'el-form': { template: '<form><slot /></form>' },
-  'el-form-item': { template: '<div><slot /></div>' },
-  'el-card': { template: '<div class="el-card"><slot /></div>' },
-  'el-table': { template: '<table><slot /></table>' },
-  'el-pagination': { template: '<div class="el-pagination"></div>' },
-  'el-loading': { template: '<div v-if="loading">Loading...</div>' },
-  'el-message': { template: '<div></div>' },
-  'el-dialog': { template: '<div v-if="visible"><slot /></div>' },
-  'el-icon': { template: '<i><slot /></i>' },
-  'el-tooltip': { template: '<div><slot /></div>' },
-  'el-popover': { template: '<div><slot /></div>' },
-  'el-dropdown': { template: '<div><slot /></div>' },
-  'el-menu': { template: '<div><slot /></div>' },
-  'el-menu-item': { template: '<div><slot /></div>' },
-  'el-submenu': { template: '<div><slot /></div>' },
-  'el-breadcrumb': { template: '<div><slot /></div>' },
-  'el-breadcrumb-item': { template: '<span><slot /></span>' },
-  'el-tabs': { template: '<div><slot /></div>' },
-  'el-tab-pane': { template: '<div><slot /></div>' },
-  'el-collapse': { template: '<div><slot /></div>' },
-  'el-collapse-item': { template: '<div><slot /></div>' },
-  'el-accordion': { template: '<div><slot /></div>' },
-  'el-accordion-item': { template: '<div><slot /></div>' },
-  'el-timeline': { template: '<div><slot /></div>' },
-  'el-timeline-item': { template: '<div><slot /></div>' },
-  'el-steps': { template: '<div><slot /></div>' },
-  'el-step': { template: '<div><slot /></div>' },
-  'el-progress': { template: '<div><slot /></div>' },
-  'el-badge': { template: '<div><slot /></div>' },
-  'el-avatar': { template: '<div><slot /></div>' },
-  'el-empty': { template: '<div><slot /></div>' },
-  'el-result': { template: '<div><slot /></div>' },
-  'el-skeleton': { template: '<div><slot /></div>' },
-  'el-skeleton-item': { template: '<div><slot /></div>' },
-  'el-backtop': { template: '<div><slot /></div>' },
-  'el-affix': { template: '<div><slot /></div>' },
-  'el-anchor': { template: '<div><slot /></div>' },
-  'el-anchor-link': { template: '<div><slot /></div>' },
-  'el-page-header': { template: '<div><slot /></div>' },
-  'el-divider': { template: '<div><slot /></div>' },
-  'el-space': { template: '<div><slot /></div>' },
-  'el-row': { template: '<div><slot /></div>' },
-  'el-col': { template: '<div><slot /></div>' },
-  'el-container': { template: '<div><slot /></div>' },
-  'el-header': { template: '<div><slot /></div>' },
-  'el-aside': { template: '<div><slot /></div>' },
-  'el-main': { template: '<div><slot /></div>' },
-  'el-footer': { template: '<div><slot /></div>' },
-  'el-scrollbar': { template: '<div><slot /></div>' },
-  'el-watermark': { template: '<div><slot /></div>' },
-  'el-calendar': { template: '<div><slot /></div>' },
-  'el-date-picker': { template: '<input />' },
-  'el-time-picker': { template: '<input />' },
-  'el-time-select': { template: '<select><slot /></select>' },
-  'el-color-picker': { template: '<input />' },
-  'el-transfer': { template: '<div><slot /></div>' },
-  'el-tree': { template: '<div><slot /></div>' },
-  'el-tree-select': { template: '<select><slot /></select>' },
-  'el-cascader': { template: '<select><slot /></select>' },
-  'el-select': { template: '<select><slot /></select>' },
-  'el-option': { template: '<option><slot /></option>' },
-  'el-option-group': { template: '<optgroup><slot /></optgroup>' },
-  'el-checkbox': { template: '<input type="checkbox" />' },
-  'el-checkbox-group': { template: '<div><slot /></div>' },
-  'el-radio': { template: '<input type="radio" />' },
-  'el-radio-group': { template: '<div><slot /></div>' },
-  'el-radio-button': { template: '<button><slot /></button>' },
-  'el-switch': { template: '<input type="checkbox" />' },
-  'el-slider': { template: '<input type="range" />' },
-  'el-rate': { template: '<div><slot /></div>' },
-  'el-upload': { template: '<div><slot /></div>' },
-  'el-upload-dragger': { template: '<div><slot /></div>' },
-  'el-upload-list': { template: '<div><slot /></div>' },
-  'el-upload-list-item': { template: '<div><slot /></div>' },
-  'el-image': { template: '<img />' },
-  'el-image-viewer': { template: '<div><slot /></div>' },
-  'el-carousel': { template: '<div><slot /></div>' },
-  'el-carousel-item': { template: '<div><slot /></div>' },
-  'el-drawer': { template: '<div v-if="visible"><slot /></div>' },
-  'el-popconfirm': { template: '<div><slot /></div>' },
-  'el-alert': { template: '<div><slot /></div>' },
-  'el-notification': { template: '<div><slot /></div>' },
-  'el-message-box': { template: '<div><slot /></div>' },
-  'el-loading-directive': { template: '<div><slot /></div>' },
-}
+// 注意：根据测试宪法第13条，我们禁止模拟Element Plus组件
+// Element Plus组件必须在真实浏览器环境中使用真实组件
+// 因此这里不包含任何Element Plus组件的模拟
 
 // 模拟全局属性
 config.global.mocks = {

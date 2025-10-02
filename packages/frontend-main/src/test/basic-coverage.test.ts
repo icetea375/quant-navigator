@@ -1,42 +1,51 @@
 // 基础覆盖率测试 - 遵循测试宪法
-import { describe, it, expect, beforeEach } from 'vitest'
-import { createPinia, setActivePinia } from 'pinia'
+import { describe, it, expect } from 'vitest'
+import { createTestWrapper } from '@/utils/test-utils'
 import { useArbitrationStore } from '@/stores/arbitration'
 
 describe('基础覆盖率测试 - 遵循测试宪法', () => {
+  let wrapper: any
+  let store: any
+
   beforeEach(() => {
-    setActivePinia(createPinia())
+    // 使用测试宪法规定的createTestWrapper
+    wrapper = createTestWrapper({
+      template: '<div></div>'
+    })
+    
+    // 通过wrapper获取store
+    store = useArbitrationStore()
   })
 
   describe('仲裁 Store 基础功能', () => {
     it('应该能够创建仲裁 store', () => {
-      const store = useArbitrationStore()
+      console.log('Store:', store)
+      console.log('currentCaseId:', store.currentCaseId)
+      console.log('loading:', store.loading)
+      console.log('error:', store.error)
+      
       expect(store).toBeDefined()
-      expect(store.currentCaseId.value).toBeNull()
-      expect(store.loading.value).toBe(false)
-      expect(store.error.value).toBeNull()
+      expect(store.currentCaseId).toBeNull()
+      expect(store.loading).toBe(false)
+      expect(store.error).toBeNull()
     })
 
     it('应该能够设置当前案例', () => {
-      const store = useArbitrationStore()
       store.setCurrentCase('test-case-1')
-      expect(store.currentCaseId.value).toBe('test-case-1')
+      expect(store.currentCaseId).toBe('test-case-1')
     })
 
     it('应该能够设置加载状态', () => {
-      const store = useArbitrationStore()
       store.setLoading(true)
-      expect(store.loading.value).toBe(true)
+      expect(store.loading).toBe(true)
     })
 
     it('应该能够设置错误状态', () => {
-      const store = useArbitrationStore()
       store.setError('测试错误')
-      expect(store.error.value).toBe('测试错误')
+      expect(store.error).toBe('测试错误')
     })
 
     it('应该能够设置案例数据', () => {
-      const store = useArbitrationStore()
       const mockData = {
         caseInfo: {
           caseId: 'test-case-1',
@@ -91,7 +100,7 @@ describe('基础覆盖率测试 - 遵循测试宪法', () => {
         }
       }
       store.setCaseData(mockData)
-      expect(store.caseData.value).toEqual(mockData)
+      expect(store.caseData).toEqual(mockData)
     })
   })
 

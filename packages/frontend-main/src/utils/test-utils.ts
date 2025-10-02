@@ -30,8 +30,8 @@ const createTestPinia = () => {
 // 全局测试配置
 export const createTestApp = () => {
   const app = {
-    use: vi.fn(),
-    mount: vi.fn(),
+    use: mockFn,
+    mount: mockFn,
   } as unknown as App
 
   return app
@@ -142,16 +142,17 @@ export const waitForVueUpdate = async (wrapper: VueWrapper) => {
 // 模拟localStorage
 export const mockLocalStorage = () => {
   const store: Record<string, string> = {}
+  const mockFn = typeof vi !== 'undefined' && vi.fn ? vi.fn : () => {}
 
   return {
-    getItem: vi.fn((key: string) => store[key] || null),
-    setItem: vi.fn((key: string, value: string) => {
+    getItem: mockFn((key: string) => store[key] || null),
+    setItem: mockFn((key: string, value: string) => {
       store[key] = value
     }),
-    removeItem: vi.fn((key: string) => {
+    removeItem: mockFn((key: string) => {
       delete store[key]
     }),
-    clear: vi.fn(() => {
+    clear: mockFn(() => {
       Object.keys(store).forEach(key => delete store[key])
     }),
   }
@@ -159,7 +160,8 @@ export const mockLocalStorage = () => {
 
 // 模拟fetch
 export const mockFetch = (response: unknown, ok = true) => {
-  global.fetch = vi.fn(() =>
+  const mockFn = typeof vi !== 'undefined' && vi.fn ? vi.fn : () => {}
+  global.fetch = mockFn(() =>
     Promise.resolve({
       ok,
       json: () => Promise.resolve(response),
@@ -311,43 +313,88 @@ export const setupTestEnvironment = () => {
   // 设置全局测试变量
   globalObj.vi = globalObj.vi || {}
 
-  // 模拟console方法
-  globalObj.console = {
-    ...console,
-    log: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
+  // 在浏览器环境中，vi.fn可能不可用，使用简单的函数模拟
+  const mockFn = typeof vi !== 'undefined' && vi.fn ? vi.fn : () => {}
+  const mockImplementation = (impl: any) => typeof vi !== 'undefined' && vi.fn ? vi.fn().mockImplementation(impl) : impl
+
+  // 在浏览器环境中，不模拟console方法，使用真实的console
+  // 只在非浏览器环境中模拟
+  if (typeof global !== 'undefined') {
+    globalObj.console = {
+      ...console,
+      log: mockFn,
+      warn: mockFn,
+      error: mockFn,
+    }
   }
 
-  // 模拟localStorage
+  // 模拟localStorage - 使用简单的实现避免vi.fn问题
   Object.defineProperty(window, 'localStorage', {
-    value: mockLocalStorage(),
+    value: {
+      getItem: (key: string) => {
+        const store = (window as any).__mockStorage || {}
+        return store[key] || null
+      },
+      setItem: (key: string, value: string) => {
+        if (!(window as any).__mockStorage) {
+          (window as any).__mockStorage = {}
+        }
+        (window as any).__mockStorage[key] = value
+      },
+      removeItem: (key: string) => {
+        if ((window as any).__mockStorage) {
+          delete (window as any).__mockStorage[key]
+        }
+      },
+      clear: () => {
+        (window as any).__mockStorage = {}
+      }
+    },
     writable: true,
   })
 
-  // 模拟sessionStorage
+  // 模拟sessionStorage - 使用简单的实现避免vi.fn问题
   Object.defineProperty(window, 'sessionStorage', {
-    value: mockLocalStorage(),
+    value: {
+      getItem: (key: string) => {
+        const store = (window as any).__mockSessionStorage || {}
+        return store[key] || null
+      },
+      setItem: (key: string, value: string) => {
+        if (!(window as any).__mockSessionStorage) {
+          (window as any).__mockSessionStorage = {}
+        }
+        (window as any).__mockSessionStorage[key] = value
+      },
+      removeItem: (key: string) => {
+        if ((window as any).__mockSessionStorage) {
+          delete (window as any).__mockSessionStorage[key]
+        }
+      },
+      clear: () => {
+        (window as any).__mockSessionStorage = {}
+      }
+    },
     writable: true,
   })
 
   // 在浏览器环境中不需要模拟IntersectionObserver，使用真实的API
   // 只在非浏览器环境中模拟
   if (typeof global !== 'undefined') {
-    ;(global as any).IntersectionObserver = vi.fn().mockImplementation(() => ({
-      observe: vi.fn(),
-      unobserve: vi.fn(),
-      disconnect: vi.fn(),
+    ;(global as any).IntersectionObserver = mockImplementation(() => ({
+      observe: mockFn(),
+      unobserve: mockFn(),
+      disconnect: mockFn(),
     }))
   }
 
   // 在浏览器环境中不需要模拟ResizeObserver，使用真实的API
   // 只在非浏览器环境中模拟
   if (typeof global !== 'undefined') {
-    ;(global as any).ResizeObserver = vi.fn().mockImplementation(() => ({
-      observe: vi.fn(),
-      unobserve: vi.fn(),
-      disconnect: vi.fn(),
+    ;(global as any).ResizeObserver = mockImplementation(() => ({
+      observe: mockFn(),
+      unobserve: mockFn(),
+      disconnect: mockFn(),
     }))
   }
 }
