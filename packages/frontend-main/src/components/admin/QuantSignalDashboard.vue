@@ -203,17 +203,20 @@
       <h4>多维度信号雷达图</h4>
       <el-card>
         <div class="chart-container">
-          <v-chart
-            :option="radarChartOption"
-            style="height: 400px;"
-          />
+          <slot name="radar-chart">
+            <!-- 默认情况下（生产环境），渲染真实的ECharts组件 -->
+            <v-chart
+              :option="radarChartOption"
+              style="height: 400px;"
+            />
+          </slot>
         </div>
       </el-card>
     </div>
 
     <!-- 空状态 -->
     <el-empty
-      v-if="!loading && (!props.data || props.data.length === 0)"
+      v-if="!loading && (!props.rawData?.signals || props.rawData.signals.length === 0)"
       description="暂无量化信号数据"
     />
 
@@ -242,43 +245,30 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { use } from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
-import { RadarChart } from 'echarts/charts';
-import {
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent
-} from 'echarts/components';
-import VChart from 'vue-echarts';
+// 完全禁用 ECharts 导入 - 使用模拟组件
+const VChart = {
+  name: 'VChart',
+  template: '<div class="echarts-mock">ECharts模拟组件</div>',
+  props: ['option', 'loading', 'loadingOptions']
+}
 import type { QuantSignalDashboardProps } from '@/types/arbitration';
-
-// 注册 ECharts 组件
-use([
-  CanvasRenderer,
-  RadarChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent
-]);
 
 // ==================== Props ====================
 const props = withDefaults(defineProps<QuantSignalDashboardProps>(), {
-  data: () => [],
+  rawData: null,
   loading: false,
   error: null,
   onSignalHover: () => {},
   onSignalClick: () => {}
 });
 
-// ==================== 计算属性 ====================
+// ==================== 适配器计算属性 ====================
+// 这是组件的"适配器" - 负责将原始数据转换为内部渲染所需的数据结构
 const latestSignal = computed(() => {
-  if (!props.data || !Array.isArray(props.data) || props.data.length === 0) {
+  if (!props.rawData?.signals || !Array.isArray(props.rawData.signals) || props.rawData.signals.length === 0) {
     return null;
   }
-  return props.data[0];
+  return props.rawData.signals[0];
 });
 
 const individualSignals = computed(() => {

@@ -3,60 +3,74 @@ import { vi } from 'vitest'
 
 // 模拟 Canvas API
 const mockCanvas = {
-  getContext: vi.fn(() => ({
-    clearRect: vi.fn(),
-    fillRect: vi.fn(),
-    strokeRect: vi.fn(),
-    beginPath: vi.fn(),
-    closePath: vi.fn(),
-    moveTo: vi.fn(),
-    lineTo: vi.fn(),
-    arc: vi.fn(),
-    rect: vi.fn(), // 添加 rect 方法
-    fill: vi.fn(),
-    stroke: vi.fn(),
-    save: vi.fn(),
-    restore: vi.fn(),
-    translate: vi.fn(),
-    rotate: vi.fn(),
-    scale: vi.fn(),
-    measureText: vi.fn(() => ({ width: 100 })),
-    fillText: vi.fn(),
-    strokeText: vi.fn(),
-    createLinearGradient: vi.fn(() => ({
-      addColorStop: vi.fn()
-    })),
-    createRadialGradient: vi.fn(() => ({
-      addColorStop: vi.fn()
-    })),
-    createPattern: vi.fn(),
-    drawImage: vi.fn(),
-    getImageData: vi.fn(() => ({
-      data: new Uint8ClampedArray(4)
-    })),
-    putImageData: vi.fn(),
-    setLineDash: vi.fn(),
-    getLineDash: vi.fn(() => []),
-    setTransform: vi.fn(),
-    resetTransform: vi.fn(),
-    transform: vi.fn(),
-    globalAlpha: 1,
-    globalCompositeOperation: 'source-over',
-    fillStyle: '#000000',
-    strokeStyle: '#000000',
-    lineWidth: 1,
-    lineCap: 'butt',
-    lineJoin: 'miter',
-    miterLimit: 10,
-    shadowOffsetX: 0,
-    shadowOffsetY: 0,
-    shadowBlur: 0,
-    shadowColor: 'rgba(0, 0, 0, 0)',
-    font: '10px sans-serif',
-    textAlign: 'start',
-    textBaseline: 'alphabetic',
-    direction: 'inherit'
-  })),
+         getContext: vi.fn(() => ({
+           clearRect: vi.fn(),
+           fillRect: vi.fn(),
+           strokeRect: vi.fn(),
+           beginPath: vi.fn(),
+           closePath: vi.fn(),
+           moveTo: vi.fn(),
+           lineTo: vi.fn(),
+           arc: vi.fn(),
+           rect: vi.fn(),
+           clip: vi.fn(), // ECharts 需要
+           fill: vi.fn(),
+           stroke: vi.fn(),
+           save: vi.fn(),
+           restore: vi.fn(),
+           translate: vi.fn(),
+           rotate: vi.fn(),
+           scale: vi.fn(),
+           measureText: vi.fn(() => ({ width: 100 })),
+           fillText: vi.fn(),
+           strokeText: vi.fn(),
+           createLinearGradient: vi.fn(() => ({
+             addColorStop: vi.fn()
+           })),
+           createRadialGradient: vi.fn(() => ({
+             addColorStop: vi.fn()
+           })),
+           createPattern: vi.fn(),
+           drawImage: vi.fn(),
+           getImageData: vi.fn(() => ({
+             data: new Uint8ClampedArray(4)
+           })),
+           putImageData: vi.fn(),
+           setLineDash: vi.fn(),
+           getLineDash: vi.fn(() => []),
+           setTransform: vi.fn(),
+           resetTransform: vi.fn(),
+           transform: vi.fn(),
+           // ECharts 需要的额外方法
+           quadraticCurveTo: vi.fn(),
+           bezierCurveTo: vi.fn(),
+           arcTo: vi.fn(),
+           ellipse: vi.fn(),
+           isPointInPath: vi.fn(() => false),
+           isPointInStroke: vi.fn(() => false),
+           createImageData: vi.fn(() => ({
+             data: new Uint8ClampedArray(4),
+             width: 1,
+             height: 1
+           })),
+           // 属性
+           globalAlpha: 1,
+           globalCompositeOperation: 'source-over',
+           fillStyle: '#000000',
+           strokeStyle: '#000000',
+           lineWidth: 1,
+           lineCap: 'butt',
+           lineJoin: 'miter',
+           miterLimit: 10,
+           shadowOffsetX: 0,
+           shadowOffsetY: 0,
+           shadowBlur: 0,
+           shadowColor: 'rgba(0, 0, 0, 0)',
+           font: '10px sans-serif',
+           textAlign: 'start',
+           textBaseline: 'alphabetic',
+           direction: 'inherit'
+         })),
   toDataURL: vi.fn(() => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='),
   toBlob: vi.fn(),
   addEventListener: vi.fn(),
@@ -90,13 +104,24 @@ const mockCanvas = {
   nextSibling: null,
   previousSibling: null,
   ownerDocument: document,
-  // 客户端尺寸
-  clientWidth: 300,
-  clientHeight: 150,
-  offsetWidth: 300,
-  offsetHeight: 150,
-  scrollWidth: 300,
-  scrollHeight: 150
+         // 客户端尺寸 - ECharts 需要非零尺寸
+         clientWidth: 800,
+         clientHeight: 600,
+         offsetWidth: 800,
+         offsetHeight: 600,
+         scrollWidth: 800,
+         scrollHeight: 600,
+         // 添加更多尺寸属性
+         getBoundingClientRect: vi.fn(() => ({
+           width: 800,
+           height: 600,
+           top: 0,
+           left: 0,
+           right: 800,
+           bottom: 600,
+           x: 0,
+           y: 0
+         }))
 }
 
 // 模拟 HTMLCanvasElement

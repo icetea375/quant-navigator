@@ -198,6 +198,7 @@
 <script setup lang="ts">
 import { onMounted, watch } from 'vue'
 import { useFinancialSnapshot } from '@/composables/useFinancialSnapshot'
+import type { FinancialSnapshotProps } from '@/types/arbitration'
 
 // 条件导入ECharts - 只在非测试环境中导入
 let VChart: any = null
@@ -246,14 +247,11 @@ if (!VChart) {
   }
 }
 
-// ==================== Props Types ====================
-import type { FinancialSnapshotProps } from '@/composables/useFinancialSnapshot'
-
 // ==================== Props ====================
 const props = withDefaults(defineProps<FinancialSnapshotProps>(), {
-  rawData: null,
+  data: () => [],
   loading: false,
-  error: null,
+  error: undefined,
   onPeriodSelect: () => {
     // TODO: Implement period selection logic
   },
@@ -389,3 +387,5 @@ h4 {
   font-weight: 600;
 }
 </style>
+
+

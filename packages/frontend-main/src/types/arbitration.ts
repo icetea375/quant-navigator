@@ -170,22 +170,79 @@ export interface LegacyArbitrationFeedback {
 }
 
 // 个人历史记录查看器组件 Props
+// 个人先例查看器原始数据结构（来自API/Store）
+export interface PersonalPrecedentRawData {
+  precedents?: any[] // 临时使用any，稍后导入正确的类型
+  timestamp?: string
+  metadata?: {
+    source?: string
+    version?: string
+    [key: string]: any
+  }
+  [key: string]: any // 允许其他未知字段
+}
+
+// 个人先例查看器组件 Props - 重构后的严格契约
 export interface PersonalPrecedentViewerProps {
-  loading?: boolean
-  error?: string | null
-  onPrecedentSelect?: (precedent: HistoricalArbitrations) => void
-  onPrecedentHover?: (precedent: HistoricalArbitrations | null) => void
+  // 只接收原始数据，组件内部负责适配
+  rawData: PersonalPrecedentRawData | null
+  loading: boolean
+  error: string | null
+  onPrecedentSelect?: (precedent: any) => void
+  onPrecedentHover?: (precedent: any | null) => void
 }
 
 // 资金流向与筹码查看器组件 Props
-export interface FlowAndChipsViewerProps {
-  data?: {
-    moneyFlow?: any
-    topList?: any[]
-    chipDistribution?: any[]
+// 资金流向原始数据结构（来自API/Store）
+export interface FlowAndChipsRawData {
+  moneyFlow?: FlowData
+  topList?: TopListItem[]
+  chipDistribution?: ChipDistributionItem[]
+  timestamp?: string
+  metadata?: {
+    source?: string
+    version?: string
+    [key: string]: any
   }
-  loading?: boolean
-  error?: string | null
+  [key: string]: any // 允许其他未知字段
+}
+
+// 资金流向数据
+export interface FlowData {
+  netAmount: number
+  netInflowRatio: number
+  flowIntensity: number
+  flowAnomalyScore: number
+  inflowAmount?: number
+  outflowAmount?: number
+  [key: string]: any
+}
+
+// 排行榜项
+export interface TopListItem {
+  name: string
+  value: number
+  change?: number
+  changePercent?: number
+  [key: string]: any
+}
+
+// 筹码分布数据（重命名以避免冲突）
+export interface ChipDistributionItem {
+  priceRange: string
+  volume: number
+  percentage: number
+  [key: string]: any
+}
+
+// 资金流向和筹码查看器组件 Props - 重构后的严格契约
+export interface FlowAndChipsViewerProps {
+  // 只接收原始数据，组件内部负责适配
+  rawData: FlowAndChipsRawData | null
+  loading: boolean
+  error: string | null
+  onFlowHover?: (item: string, value: number) => void
+  onChipHover?: (item: string, value: number) => void
 }
 
 // 财务快照组件 Props
@@ -204,9 +261,59 @@ export interface RawTextExplorerProps {
   onEventSelect?: (event: any) => void
 }
 
-// 量化信号仪表盘组件 Props
+// 量化信号原始数据结构（来自API/Store）
+export interface QuantSignalRawData {
+  signals?: QuantSignalItem[]
+  timestamp?: string
+  metadata?: {
+    source?: string
+    version?: string
+    [key: string]: any
+  }
+  [key: string]: any // 允许其他未知字段
+}
+
+// 单个量化信号项
+export interface QuantSignalItem {
+  // 基础信息
+  status: 'active' | 'expired' | 'cancelled' | 'archived'
+  overallSignalStrength: number
+  signalConfidence: number
+  validityDays: number
+  
+  // 个股信号Z分数
+  returnZScore?: number
+  volumeZScore?: number
+  momentumZScore?: number
+  volatilityZScore?: number
+  
+  // 市场背景信号Z分数
+  macroRiskZScore?: number
+  marketStyleZScore?: number
+  industryRotationZScore?: number
+  conceptZScore?: number
+  
+  // 管理层可信度因子
+  mdaFulfillmentRate?: number
+  managementCredibilityScore?: number
+  disclosureQualityScore?: number
+  financialTransparencyScore?: number
+  
+  // 技术分析信号
+  rsi?: number
+  macdSignal?: number
+  bollingerPosition?: number
+  maSignal?: number
+  
+  [key: string]: any // 允许其他未知字段
+}
+
+// 量化信号仪表盘组件 Props - 重构后的严格契约
 export interface QuantSignalDashboardProps {
-  data?: any[]
-  loading?: boolean
-  error?: string | null
+  // 只接收原始数据，组件内部负责适配
+  rawData: QuantSignalRawData | null
+  loading: boolean
+  error: string | null
+  onSignalHover?: (signal: string, value: number) => void
+  onSignalClick?: (signal: string, value: number) => void
 }

@@ -14,25 +14,42 @@ export default defineConfig({
   })],
   test: {
     globals: true,
+    
+    // 分层战场配置 - 自动化指挥系统
+    environmentMatchGlobs: [
+      // 单元测试 - 后方基地 (HappyDOM)
+      ['**/*.test.ts', 'happy-dom'],
+      // 组件测试 - 前线滩头 (Browser)  
+      ['**/*.spec.ts', 'browser']
+    ],
+    
+    // 浏览器环境配置 - 使用Chrome
     browser: {
       enabled: true,
       provider: 'playwright',
-      name: 'chromium',
-      instances: [
-        {
-          browser: 'chromium'
-        }
-      ]
+      name: 'chromium'
     },
-    setupFiles: ['./src/test/setup.ts', './src/test/setup-canvas.ts'],
-    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}', 'tools/tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    
+    // 分层设置文件
+    setupFiles: [
+      // 基础设置 - 所有环境都需要
+      './src/test/setup.ts',
+      // Canvas设置 - 仅浏览器环境需要
+      './src/test/setup-canvas.ts'
+    ],
+    
+    include: [
+      'tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'
+    ],
     exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
+    
     typecheck: {
       tsconfig: './tsconfig.vitest.json'
     },
+    
     coverage: {
-      provider: 'v8',
-      reporter: ['text'],
+      provider: 'istanbul',
+      reporter: ['text', 'html'],
       exclude: [
         'node_modules/',
         'src/test/',

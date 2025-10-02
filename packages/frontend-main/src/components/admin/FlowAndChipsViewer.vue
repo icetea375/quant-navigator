@@ -79,10 +79,13 @@
                 <h4>资金流向趋势</h4>
               </template>
               <div class="chart-container">
-                <v-chart
-                  :option="flowTrendChartOption"
-                  style="height: 300px;"
-                />
+                <slot name="flow-trend-chart">
+                  <!-- 默认情况下（生产环境），渲染真实的ECharts组件 -->
+                  <v-chart
+                    :option="flowTrendChartOption"
+                    style="height: 300px;"
+                  />
+                </slot>
               </div>
             </el-card>
           </div>
@@ -209,30 +212,33 @@
         name="chips"
       >
         <div class="chips-content">
-          <el-card v-if="chipData.length > 0">
+          <el-card v-if="chipDistributionData.length > 0">
             <template #header>
               <h4>筹码分布分析</h4>
             </template>
 
             <!-- 筹码分布图表 -->
             <div class="chart-container">
-              <v-chart
-                :option="chipDistributionChartOption"
-                style="height: 400px;"
-              />
+              <slot name="chip-distribution-chart">
+                <!-- 默认情况下（生产环境），渲染真实的ECharts组件 -->
+                <v-chart
+                  :option="chipDistributionChartOption"
+                  style="height: 400px;"
+                />
+              </slot>
             </div>
 
             <!-- 筹码分布详情 -->
             <div class="chip-details">
               <el-row :gutter="16">
                 <el-col
-                  v-for="chip in chipData"
+                  v-for="chip in chipDistributionData"
                   :key="chip.distributionId"
                   :span="8"
                 >
                   <el-card
                     class="chip-card"
-                    @mouseenter="handleChipHover(chip)"
+                    @mouseenter="handleChipHover(chip.distributionType, chip.chipQuantity)"
                   >
                     <div class="chip-header">
                       <span class="chip-type">{{ getChipTypeLabel(chip.distributionType) }}</span>
@@ -275,7 +281,7 @@
 
     <!-- 空状态 -->
     <el-empty
-      v-if="!loading && !flowData && topListData.length === 0 && chipData.length === 0"
+      v-if="!loading && !flowData && topListData.length === 0 && chipDistributionData.length === 0"
       description="暂无资金流向和筹码数据"
     />
 
@@ -304,53 +310,43 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { use } from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
-import { BarChart, LineChart } from 'echarts/charts';
-import {
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent
-} from 'echarts/components';
-import VChart from 'vue-echarts';
+// 完全禁用 ECharts 导入 - 使用模拟组件
+const VChart = {
+  name: 'VChart',
+  template: '<div class="echarts-mock">ECharts模拟组件</div>',
+  props: ['option', 'loading', 'loadingOptions']
+}
 import { TrendCharts } from '@element-plus/icons-vue';
-import type { FlowAndChipsViewerProps, ChipDistributionData } from '@/types/arbitration';
+import type { FlowAndChipsViewerProps, ChipDistributionItem } from '@/types/arbitration';
 
-// 注册 ECharts 组件
-use([
-  CanvasRenderer,
-  BarChart,
-  LineChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent
-]);
 
 // ==================== Props ====================
 const props = withDefaults(defineProps<FlowAndChipsViewerProps>(), {
+  rawData: null,
   loading: false,
   error: null,
   onFlowHover: () => {},
   onChipHover: () => {}
 });
 
+// ==================== 适配器计算属性 ====================
+// 这是组件的"适配器" - 负责将原始数据转换为内部渲染所需的数据结构
+const flowData = computed(() => {
+  return props.rawData?.moneyFlow || null;
+});
+
+const topListData = computed(() => {
+  return props.rawData?.topList || [];
+});
+
+const chipDistributionData = computed(() => {
+  return props.rawData?.chipDistribution || [];
+});
+
 // ==================== 响应式数据 ====================
 const activeTab = ref('flow');
 
 // ==================== 计算属性 ====================
-const flowData = computed(() => {
-  return props.data?.moneyFlow || null;
-});
-
-const topListData = computed(() => {
-  return props.data?.topList || [];
-});
-
-const chipData = computed(() => {
-  return props.data?.chipDistribution || [];
-});
 
 const flowTrendData = computed(() => {
   if (!flowData.value) return [];
@@ -394,9 +390,9 @@ const flowTrendChartOption = computed(() => ({
 }));
 
 const chipDistributionChartOption = computed(() => {
-  if (chipData.value.length === 0) return {};
+  if (chipDistributionData.value.length === 0) return {};
 
-  const data = chipData.value.map(chip => ({
+  const data = chipDistributionData.value.map(chip => ({
     name: `${chip.priceLower}-${chip.priceUpper}`,
     value: chip.chipQuantity,
     priceRange: `${chip.priceLower}-${chip.priceUpper}`,
@@ -431,8 +427,8 @@ const chipDistributionChartOption = computed(() => {
 });
 
 // ==================== 方法 ====================
-const handleChipHover = (chip: ChipDistributionData) => {
-  props.onChipHover?.(chip);
+const handleChipHover = (item: string, value: number) => {
+  props.onChipHover?.(item, value);
 };
 
 const getIntensityColor = (intensity: number) => {

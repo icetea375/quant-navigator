@@ -5,6 +5,7 @@
     width="600px"
     :before-close="handleDialogClose"
     @update:model-value="handleDialogClose"
+    data-testid="arbitration-decision-dialog"
   >
     <div class="arbitration-form">
       <el-form

@@ -142,7 +142,7 @@
             <el-button
               type="default"
               size="small"
-              :icon="Highlight"
+              :icon="Edit"
               @click.stop="handleTextHighlight(item)"
             >
               高亮分析
@@ -185,7 +185,7 @@
 import { ref, computed, watch } from 'vue';
 import { logger } from "@/utils/logger"
 import { ElMessage } from 'element-plus';
-import { Search, Filter, Highlight, Link } from '@element-plus/icons-vue';
+import { Search, Filter, Edit, Link } from '@element-plus/icons-vue';
 import type { RawTextExplorerProps, RawTextData } from '@/types/arbitration';
 
 // ==================== Props ====================

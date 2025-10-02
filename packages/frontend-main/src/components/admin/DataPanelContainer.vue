@@ -39,7 +39,7 @@
       </el-col>
 
       <!-- 财务数据快照 -->
-      <el-col :span="12">
+      <el-col v-if="caseData?.panels?.financialSnapshot" :span="12">
         <el-card class="panel-card">
           <template #header>
             <div class="panel-header">
@@ -58,18 +58,22 @@
               </div>
             </div>
           </template>
-          <FinancialSnapshot
-            :data="caseData?.panels?.financialSnapshot || []"
-            :loading="loading"
-            :error="error ?? undefined"
-            @period-select="handlePeriodSelect"
-            @metric-hover="handleMetricHover"
-          />
+          <slot name="financial-snapshot">
+            <div style="width: 100%; height: 400px; min-height: 400px;">
+              <FinancialSnapshot
+                :raw-data="caseData?.panels?.financialSnapshot"
+                :loading="loading"
+                :error="error ?? null"
+                @period-select="handlePeriodSelect"
+                @metric-hover="handleMetricHover"
+              />
+            </div>
+          </slot>
         </el-card>
       </el-col>
 
       <!-- 量化信号仪表盘 -->
-      <el-col :span="12">
+      <el-col v-if="caseData?.panels?.quantSignalDashboard" :span="12">
         <el-card class="panel-card">
           <template #header>
             <div class="panel-header">
@@ -88,18 +92,22 @@
               </div>
             </div>
           </template>
-          <QuantSignalDashboard
-            :data="caseData?.panels?.quantSignalDashboard || []"
-            :loading="loading"
-            :error="error ?? undefined"
-            @signal-hover="handleSignalHover"
-            @signal-click="handleSignalClick"
-          />
+          <slot name="quant-signal-dashboard">
+            <div style="width: 100%; height: 400px; min-height: 400px;">
+              <QuantSignalDashboard
+                :raw-data="caseData?.panels?.quantSignalDashboard"
+                :loading="loading"
+                :error="error ?? null"
+                @signal-hover="handleSignalHover"
+                @signal-click="handleSignalClick"
+              />
+            </div>
+          </slot>
         </el-card>
       </el-col>
 
       <!-- 资金流向和筹码查看器 -->
-      <el-col :span="12">
+      <el-col v-if="caseData?.panels?.flowAndChipsViewer" :span="12">
         <el-card class="panel-card">
           <template #header>
             <div class="panel-header">
@@ -118,18 +126,22 @@
               </div>
             </div>
           </template>
-          <FlowAndChipsViewer
-            :data="caseData?.panels?.flowAndChipsViewer || {}"
-            :loading="loading"
-            :error="error ?? undefined"
-            @flow-hover="handleFlowHover"
-            @chip-hover="handleChipHover"
-          />
+          <slot name="flow-and-chips-viewer">
+            <div style="width: 100%; height: 400px; min-height: 400px;">
+              <FlowAndChipsViewer
+                :raw-data="caseData?.panels?.flowAndChipsViewer"
+                :loading="loading"
+                :error="error ?? null"
+                @flow-hover="handleFlowHover"
+                @chip-hover="handleChipHover"
+              />
+            </div>
+          </slot>
         </el-card>
       </el-col>
 
       <!-- 个人先例查看器 -->
-      <el-col :span="24">
+      <el-col v-if="caseData?.panels?.precedentViewer" :span="24">
         <el-card class="panel-card">
           <template #header>
             <div class="panel-header">
@@ -148,13 +160,15 @@
               </div>
             </div>
           </template>
-          <PersonalPrecedentViewer
-            :data="caseData?.panels?.precedentViewer || []"
-            :loading="loading"
-            :error="error ?? undefined"
-            @precedent-select="handlePrecedentSelect"
-            @precedent-hover="handlePrecedentHover"
-          />
+          <slot name="personal-precedent-viewer">
+              <PersonalPrecedentViewer
+                :raw-data="caseData?.panels?.precedentViewer"
+                :loading="loading"
+                :error="error ?? null"
+              @precedent-select="handlePrecedentSelect"
+              @precedent-hover="handlePrecedentHover"
+            />
+          </slot>
         </el-card>
       </el-col>
     </el-row>
@@ -224,8 +238,8 @@ const handleClosePanel = (panelId: string) => {
   emit('close-panel', panelId)
 }
 
-const handleTextHighlight = (text: string, keywords: string[]) => {
-  emit('text-highlight', text, keywords)
+const handleTextHighlight = (text: string) => {
+  emit('text-highlight', text)
 }
 
 const handleEventSelect = (event: RawTextData) => {
@@ -244,16 +258,16 @@ const handleSignalHover = (signal: string, value: number) => {
   emit('signal-hover', signal, value)
 }
 
-const handleSignalClick = (signal: QuantSignalsData) => {
-  emit('signal-click', signal)
+const handleSignalClick = (signal: string, value: number) => {
+  emit('signal-click', signal, value)
 }
 
-const handleFlowHover = (flow: MoneyFlowData) => {
-  emit('flow-hover', flow)
+const handleFlowHover = (item: string, value: number) => {
+  emit('flow-hover', item, value)
 }
 
-const handleChipHover = (chip: ChipDistributionData) => {
-  emit('chip-hover', chip)
+const handleChipHover = (item: string, value: number) => {
+  emit('chip-hover', item, value)
 }
 
 const handlePrecedentSelect = (precedent: HistoricalArbitrations) => {

@@ -46,8 +46,8 @@ export const createTestWrapper = (component: unknown, options: Record<string, un
     global: {
       plugins: [router, pinia, ElementPlus],
       stubs: {
-        'router-link': true,
-        'router-view': true,
+        'router-link': { template: '<a><slot /></a>' },
+        'router-view': { template: '<div class="router-view"><slot /></div>' },
         // 移除 Element Plus 组件的 stub，让真实组件渲染
         // ...mockElementPlusComponents(),
       },
@@ -142,7 +142,7 @@ export const waitForVueUpdate = async (wrapper: VueWrapper) => {
 // 模拟localStorage
 export const mockLocalStorage = () => {
   const store: Record<string, string> = {}
-  const mockFn = typeof vi !== 'undefined' && vi.fn ? vi.fn : () => {}
+  const mockFn = typeof vi !== 'undefined' && vi.fn ? vi.fn() : () => {}
 
   return {
     getItem: mockFn((key: string) => store[key] || null),
@@ -160,7 +160,7 @@ export const mockLocalStorage = () => {
 
 // 模拟fetch
 export const mockFetch = (response: unknown, ok = true) => {
-  const mockFn = typeof vi !== 'undefined' && vi.fn ? vi.fn : () => {}
+  const mockFn = typeof vi !== 'undefined' && vi.fn ? vi.fn() : () => {}
   global.fetch = mockFn(() =>
     Promise.resolve({
       ok,
@@ -174,7 +174,10 @@ export const mockFetch = (response: unknown, ok = true) => {
 export const mockElementPlusComponents = () => {
   return {
     'el-button': { template: '<button><slot /></button>' },
-    'el-input': { template: '<input v-model="modelValue" />' },
+    'el-input': { 
+      template: '<input v-model="modelValue" />',
+      props: ['modelValue', 'placeholder', 'clearable']
+    },
     'el-form': {
       template: '<form><slot /></form>',
       props: ['model', 'rules', 'ref']
@@ -202,6 +205,11 @@ export const mockElementPlusComponents = () => {
     'el-empty': {
       template: '<div class="el-empty"><slot>{{ description }}</slot></div>',
       props: ['description']
+    },
+    'el-icon': { template: '<i class="el-icon"><slot /></i>' },
+    'el-tag': { 
+      template: '<span class="el-tag"><slot /></span>',
+      props: ['type', 'size', 'closable']
     },
     'el-alert': {
       template: '<div class="el-alert" :class="type"><slot>{{ title }}</slot></div>',
@@ -314,12 +322,23 @@ export const setupTestEnvironment = () => {
   globalObj.vi = globalObj.vi || {}
 
   // 在浏览器环境中，vi.fn可能不可用，使用简单的函数模拟
-  const mockFn = typeof vi !== 'undefined' && vi.fn ? vi.fn : () => {}
-  const mockImplementation = (impl: any) => typeof vi !== 'undefined' && vi.fn ? vi.fn().mockImplementation(impl) : impl
+  const mockFn = typeof vi !== 'undefined' && vi.fn ? vi.fn() : () => {}
+  const mockImplementation = (impl: any) => {
+    if (typeof vi !== 'undefined' && vi.fn) {
+      const fn = vi.fn()
+      return fn.mockImplementation ? fn.mockImplementation(impl) : impl
+    }
+    return impl
+  }
 
-  // 在浏览器环境中，不模拟console方法，使用真实的console
-  // 只在非浏览器环境中模拟
-  if (typeof global !== 'undefined') {
+  // 在浏览器环境中，确保console对象可用
+  if (typeof window !== 'undefined') {
+    // 在浏览器环境中，确保console对象存在且可用
+    if (!globalObj.console) {
+      globalObj.console = console
+    }
+  } else if (typeof global !== 'undefined') {
+    // 在Node.js环境中，使用模拟的console
     globalObj.console = {
       ...console,
       log: mockFn,

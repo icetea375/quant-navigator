@@ -50,7 +50,7 @@
     <!-- 统计信息 -->
     <div class="stats">
       <el-tag type="info">
-        总计: {{ (props.data || []).length }} 条
+        总计: {{ precedentsData.length }} 条
       </el-tag>
       <el-tag type="success">
         显示: {{ filteredData.length }} 条
@@ -239,10 +239,17 @@ import type { PersonalPrecedentViewerProps, HistoricalArbitrations } from '@/typ
 
 // ==================== Props ====================
 const props = withDefaults(defineProps<PersonalPrecedentViewerProps>(), {
+  rawData: null,
   loading: false,
   error: null,
   onPrecedentSelect: () => {},
   onPrecedentHover: () => {}
+});
+
+// ==================== 适配器计算属性 ====================
+// 这是组件的"适配器" - 负责将原始数据转换为内部渲染所需的数据结构
+const precedentsData = computed(() => {
+  return props.rawData?.precedents || [];
 });
 
 // ==================== 响应式数据 ====================
@@ -252,7 +259,7 @@ const sortBy = ref('date');
 
 // ==================== 计算属性 ====================
 const feedbackTypes = computed(() => {
-  const types = Array.from(new Set((props.data || []).map(item => item.feedbackType)));
+  const types = Array.from(new Set(precedentsData.value.map(item => item.feedbackType)));
   return types.map(type => ({
     value: type,
     label: getFeedbackTypeLabel(type)
@@ -260,7 +267,7 @@ const feedbackTypes = computed(() => {
 });
 
 const filteredData = computed(() => {
-  let filtered = props.data || [];
+  let filtered = precedentsData.value;
 
   if (filterType.value !== 'all') {
     filtered = filtered.filter(item => item.feedbackType === filterType.value);
@@ -324,7 +331,7 @@ const formatDate = (dateString: string) => {
 
 const handleFilter = () => {
   // 触发过滤逻辑
-  logger.log('应用过滤条件');
+  logger.info('应用过滤条件');
 };
 
 const handlePrecedentSelect = (precedent: HistoricalArbitrations) => {
@@ -338,13 +345,13 @@ const handlePrecedentHover = (precedent: HistoricalArbitrations) => {
 
 const viewPrecedentDetails = (precedent: HistoricalArbitrations) => {
   // 查看详情逻辑
-  logger.log('查看仲裁记录详情:', precedent);
+  logger.info('查看仲裁记录详情:', precedent);
   ElMessage.info('查看详情功能待实现');
 };
 
 const togglePrecedentFavorite = (precedent: HistoricalArbitrations) => {
   // 收藏/取消收藏逻辑
-  logger.log('切换收藏状态:', precedent);
+  logger.info('切换收藏状态:', precedent);
   ElMessage.success(precedent.usedForTraining ? '已取消收藏' : '已收藏');
 };
 
