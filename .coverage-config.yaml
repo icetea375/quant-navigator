@@ -1,0 +1,43 @@
+# 量化导航仪 - 统一覆盖率配置
+# 遵循测试宪法第4条：行覆盖率不得低于85%，分支覆盖率不得低于80%
+
+# 覆盖率门禁标准
+coverage_thresholds:
+  line_coverage: 85      # 行覆盖率不得低于85%
+  branch_coverage: 80    # 分支覆盖率不得低于80%
+
+# 覆盖率报告配置
+coverage_reports:
+  - format: "term-missing"  # 终端显示缺失的行
+  - format: "html"          # HTML报告
+  - format: "xml"           # XML报告（用于CI/CD）
+
+# 覆盖率检查配置
+coverage_options:
+  fail_under: 85           # 低于85%时失败
+  branch: true             # 启用分支覆盖率检查
+  source: "src"            # 覆盖率检查的源代码目录
+
+# 测试标记配置
+test_markers:
+  unit: "Unit tests"
+  integration: "Integration tests"
+  api: "API tests"
+  slow: "Slow tests"
+  auth: "Authentication tests"
+  database: "Database tests"
+
+# 测试路径配置
+test_paths:
+  python_files: ["test_*.py", "*_test.py"]
+  python_classes: ["Test*"]
+  python_functions: ["test_*"]
+  test_directories: ["tests"]
+
+# 遵循测试宪法的原则
+constitutional_principles:
+  - "测试即契约：测试验证生产代码是否履行设计契约"
+  - "禁止为了通过而测试：失败的测试是宝贵的风险信号"
+  - "红灯-绿灯-重构：先写失败的测试，再写最简单的代码"
+  - "覆盖率门禁：行覆盖率≥85%，分支覆盖率≥80%"
+  - "快速失败：任何测试失败都应立即停止构建"

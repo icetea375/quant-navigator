@@ -1,0 +1,96 @@
+# 本地预检配置 - "本地巡警执法手册" v14.6
+# 将CI/CD质量检查左移到开发第一现场，实现即时反馈
+
+repos:
+  # 基础文件检查
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-yaml
+        name: Check YAML syntax
+        description: 检查YAML文件语法正确性
+      - id: end-of-file-fixer
+        name: Fix end of files
+        description: 确保文件以换行符结尾
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+        description: 移除行尾空白字符
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+        description: 检查合并冲突标记
+      - id: check-added-large-files
+        name: Check for large files
+        description: 检查是否添加了过大的文件
+
+  # Python代码风格检查 - Ruff (替代black + isort + flake8)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.0
+    hooks:
+      - id: ruff
+        name: Ruff linting
+        description: 运行Ruff代码风格检查
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+        name: Ruff formatting
+        description: 运行Ruff代码格式化
+
+  # 类型检查
+  - repo: local
+    hooks:
+      - id: mypy
+        name: MyPy type checking
+        entry: python -m mypy
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true
+        description: 运行MyPy类型检查
+
+  # 【核心】本地测试与覆盖率门禁 - 这是我们的"铁面无私本地法官"
+  # 遵循测试宪法第4条：行覆盖率不得低于85%，分支覆盖率不得低于80%
+  - repo: local
+    hooks:
+      - id: pytest-cov
+        name: pytest with coverage enforcement
+        entry: bash -c 'cd packages/backend-python && python -m pytest --cov=src --cov-fail-under=85 --cov-branch --cov-report=term-missing --cov-report=html'
+        language: system
+        types: [python]
+        pass_filenames: false  # 确保每次都运行完整的测试套件
+        always_run: true       # 确保在每次commit时都运行
+        description: 运行pytest并强制执行85%行覆盖率、80%分支覆盖率门禁
+
+  # 安全扫描
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        name: Bandit security scan
+        description: 运行Bandit安全漏洞扫描
+        args: [-r, src/, -f, json, -o, bandit-report.json]
+        additional_dependencies: ["bandit[toml]"]
+
+  # 依赖安全检查
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    rev: v1.3.2
+    hooks:
+      - id: python-safety-dependencies-check
+        name: Safety dependency check
+        description: 检查Python依赖包的安全漏洞
+        files: requirements\.txt$
+
+  # 【新增】pnpm 锁文件同步检查 - 防止CI失败
+  - repo: local
+    hooks:
+      - id: pnpm-lockfile-check
+        name: Check pnpm lockfile sync
+        entry: bash -c 'pnpm install --frozen-lockfile'
+        language: system
+        types: [json]
+        files: package\.json$|packages/.*/package\.json$
+        pass_filenames: false
+        always_run: true
+        description: 检查pnpm-lock.yaml与package.json是否同步，防止CI失败
+
+# 全局配置
+default_stages: [pre-commit]
+fail_fast: false  # 即使某个钩子失败，也继续运行其他钩子

@@ -52,3 +52,7 @@ coverage/
 # 缓存文件
 .cache/
 .parcel-cache/
+
+# 归档和备份目录
+archive/
+backup/

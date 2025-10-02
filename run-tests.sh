@@ -65,14 +65,23 @@ case "$TEST_SCOPE" in
         ;;
     "e2e")
         echo "运行端到端测试..."
-        pnpm run test:e2e
+        echo "安装Playwright浏览器..."
+        pnpm --filter papa-test-suite run e2e:install
+        echo "运行E2E测试..."
+        pnpm --filter papa-test-suite run test:e2e
         ;;
     "backend")
         echo "运行所有后端模块的测试..."
         pnpm run test:backend
         ;;
     "coverage")
-        echo "运行测试并生成覆盖率报告..."
+        echo "运行测试并生成覆盖率报告（含门禁检查）..."
+        echo "遵循测试宪法第4条：行覆盖率≥85%，分支覆盖率≥80%"
+        # 运行Python测试并检查覆盖率门禁
+        cd packages/backend
+        python -m pytest --cov=src --cov-fail-under=85 --cov-branch --cov-report=term-missing --cov-report=html
+        cd ../..
+        # 运行其他模块的覆盖率测试
         pnpm run test:coverage
         ;;
     "all")

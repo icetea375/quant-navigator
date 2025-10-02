@@ -1,0 +1,167 @@
+{
+  "extends": ["dependency-cruiser/configs/recommended"],
+  "forbidden": [
+    {
+      "name": "no-direct-import-from-concrete-implementations",
+      "comment": "业务逻辑层禁止直接导入具体实现，必须通过抽象接口",
+      "severity": "error",
+      "from": {
+        "path": "src/(services|analysis|workflow)/.*"
+      },
+      "to": {
+        "path": "src/services/(data_sources|llm_providers)/.*\\.py$",
+        "pathNot": "src/core/interfaces/.*"
+      }
+    },
+    {
+      "name": "no-import-from-archived-proposals",
+      "comment": "禁止从已归档的预研方案中导入代码",
+      "severity": "error",
+      "from": {},
+      "to": {
+        "path": "src/core/infra_proposals/.*"
+      }
+    },
+    {
+      "name": "no-circular-dependencies",
+      "comment": "禁止循环依赖",
+      "severity": "error",
+      "from": {},
+      "to": {
+        "circular": true
+      }
+    },
+    {
+      "name": "no-orphans",
+      "comment": "禁止孤立模块（未被任何模块导入）",
+      "severity": "warn",
+      "from": {
+        "orphan": true
+      },
+      "to": {}
+    }
+  ],
+  "allowed": [
+    {
+      "name": "allow-import-from-interfaces",
+      "comment": "允许从抽象接口导入",
+      "from": {
+        "path": "src/(services|analysis|workflow)/.*"
+      },
+      "to": {
+        "path": "src/core/interfaces/.*"
+      }
+    },
+    {
+      "name": "allow-import-from-core",
+      "comment": "允许从核心模块导入",
+      "from": {
+        "path": "src/.*"
+      },
+      "to": {
+        "path": "src/core/(config|logging_config).*"
+      }
+    },
+    {
+      "name": "allow-import-from-schemas",
+      "comment": "允许从数据模型导入",
+      "from": {
+        "path": "src/.*"
+      },
+      "to": {
+        "path": "src/schemas/.*"
+      }
+    },
+    {
+      "name": "allow-import-from-database",
+      "comment": "允许从数据库模块导入",
+      "from": {
+        "path": "src/.*"
+      },
+      "to": {
+        "path": "src/database/.*"
+      }
+    },
+    {
+      "name": "allow-import-from-api",
+      "comment": "允许从API模块导入",
+      "from": {
+        "path": "src/.*"
+      },
+      "to": {
+        "path": "src/api/.*"
+      }
+    },
+    {
+      "name": "allow-import-from-tests",
+      "comment": "允许测试模块导入任何生产代码",
+      "from": {
+        "path": "tests/.*"
+      },
+      "to": {
+        "path": "src/.*"
+      }
+    }
+  ],
+  "options": {
+    "doNotFollow": {
+      "path": "node_modules"
+    },
+    "includeOnly": "src/.*",
+    "exclude": {
+      "path": "(node_modules|tests|__pycache__|.*\\.pyc)"
+    },
+    "tsPreCompilationDeps": true,
+    "tsConfig": {
+      "fileName": "tsconfig.json"
+    },
+    "reporterOptions": {
+      "dot": {
+        "collapsePattern": "node_modules/[^/]+",
+        "theme": {
+          "graph": {
+            "splines": "ortho"
+          },
+          "modules": [
+            {
+              "criteria": {
+                "source": "src/core/interfaces"
+              },
+              "attributes": {
+                "fillcolor": "lightblue",
+                "shape": "box"
+              }
+            },
+            {
+              "criteria": {
+                "source": "src/services/data_sources"
+              },
+              "attributes": {
+                "fillcolor": "lightgreen",
+                "shape": "box"
+              }
+            },
+            {
+              "criteria": {
+                "source": "src/services/llm_providers"
+              },
+              "attributes": {
+                "fillcolor": "lightyellow",
+                "shape": "box"
+              }
+            },
+            {
+              "criteria": {
+                "source": "src/services"
+              },
+              "attributes": {
+                "fillcolor": "lightcoral",
+                "shape": "box"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,95 @@
+# Qwen API 响应契约定义
+# 符合《测试宪法》第3.0条：定义契约，而非修补测试
+
+response_schemas:
+  chat_completion:
+    type: object
+    properties:
+      output:
+        type: object
+        properties:
+          text:
+            type: string
+            description: "生成的文本内容"
+        required: [text]
+      usage:
+        type: object
+        properties:
+          total_tokens:
+            type: integer
+            minimum: 0
+        required: [total_tokens]
+    required: [output, usage]
+
+  generate_embeddings:
+    type: object
+    properties:
+      output:
+        type: object
+        properties:
+          embeddings:
+            type: array
+            items:
+              type: object
+              properties:
+                embedding:
+                  type: array
+                  items:
+                    type: number
+                text_index:
+                  type: integer
+                  minimum: 0
+              required: [embedding, text_index]
+        required: [embeddings]
+      usage:
+        type: object
+        properties:
+          total_tokens:
+            type: integer
+            minimum: 0
+        required: [total_tokens]
+    required: [output, usage]
+
+  analyze_sentiment:
+    type: object
+    properties:
+      output:
+        type: object
+        properties:
+          sentiment:
+            type: string
+            enum: ["positive", "negative", "neutral"]
+          confidence:
+            type: number
+            minimum: 0
+            maximum: 1
+        required: [sentiment, confidence]
+    required: [output]
+
+  analyze_fact:
+    type: object
+    properties:
+      output:
+        type: object
+        properties:
+          is_fact:
+            type: boolean
+          confidence:
+            type: number
+            minimum: 0
+            maximum: 1
+          reasoning:
+            type: string
+        required: [is_fact, confidence, reasoning]
+    required: [output]
+
+  health_check:
+    type: object
+    properties:
+      status:
+        type: string
+        enum: ["healthy", "unhealthy"]
+      timestamp:
+        type: string
+        format: date-time
+    required: [status, timestamp]

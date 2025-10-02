@@ -1,0 +1,123 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * *'  # 每天凌晨2点运行
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        test-group: [ai-training, system, reports, arbitration, attribution, market, performance, error-handling, network, auth, stock-pool]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install frontend dependencies
+      run: |
+        cd packages/frontend-main
+        npm ci
+        
+    - name: Install backend dependencies
+      run: |
+        cd packages/backend-python
+        pip install -r requirements.txt
+        
+    - name: Install Playwright
+      run: |
+        cd packages/frontend-main
+        npx playwright install --with-deps
+        
+    - name: Start backend service
+      run: |
+        cd packages/backend-python
+        python -m uvicorn src.main:app --host 0.0.0.0 --port 3001 &
+        sleep 10
+        
+    - name: Start frontend service
+      run: |
+        cd packages/frontend-main
+        npm run build
+        npm run preview -- --port 3000 &
+        sleep 15
+        
+    - name: Wait for services
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:3000 && curl -f http://localhost:3001/health; do sleep 2; done'
+        
+    - name: Run E2E tests
+      run: |
+        cd packages/frontend-main
+        npx playwright test ../../tools/tests/e2e/${{ matrix.test-group }}/*.e2e.spec.ts --reporter=html --output-dir=../../test-results/e2e/${{ matrix.test-group }}
+        
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: e2e-test-results-${{ matrix.test-group }}
+        path: test-results/e2e/${{ matrix.test-group }}/
+        
+    - name: Upload test screenshots
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: e2e-test-screenshots-${{ matrix.test-group }}
+        path: test-results/
+
+  e2e-tests-summary:
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+    if: always()
+    
+    steps:
+    - name: Download all test results
+      uses: actions/download-artifact@v3
+      
+    - name: Generate test summary
+      run: |
+        echo "# E2E测试结果汇总" > test-summary.md
+        echo "" >> test-summary.md
+        echo "## 测试组状态" >> test-summary.md
+        echo "" >> test-summary.md
+        echo "| 测试组 | 状态 | 报告链接 |" >> test-summary.md
+        echo "|--------|------|----------|" >> test-summary.md
+        
+        for dir in e2e-test-results-*/; do
+          group_name=$(echo $dir | sed 's/e2e-test-results-//' | sed 's/\///')
+          if [ -d "$dir" ]; then
+            echo "| $group_name | ✅ 通过 | [查看报告]($dir/index.html) |" >> test-summary.md
+          else
+            echo "| $group_name | ❌ 失败 | 无报告 |" >> test-summary.md
+          fi
+        done
+        
+        echo "" >> test-summary.md
+        echo "## 测试环境信息" >> test-summary.md
+        echo "- 运行时间: $(date)" >> test-summary.md
+        echo "- 操作系统: Ubuntu Latest" >> test-summary.md
+        echo "- Node.js版本: $(node --version)" >> test-summary.md
+        echo "- Python版本: $(python3 --version)" >> test-summary.md
+        
+    - name: Upload test summary
+      uses: actions/upload-artifact@v3
+      with:
+        name: e2e-test-summary
+        path: test-summary.md

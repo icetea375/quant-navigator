@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # 测试数据库
+  test-postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: test_quant_navigator
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data
+      - ./init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d test_quant_navigator"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 测试Redis
+  test-redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    volumes:
+      - test_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # 测试应用
+  test-app:
+    build:
+      context: ../../packages/backend-python
+      dockerfile: Dockerfile.test
+    environment:
+      - DATABASE_URL=postgresql://test_user:test_password@test-postgres:5432/test_quant_navigator
+      - REDIS_URL=redis://test-redis:6379/1
+      - TESTING=true
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    ports:
+      - "8001:8000"
+    depends_on:
+      test-postgres:
+        condition: service_healthy
+      test-redis:
+        condition: service_healthy
+    volumes:
+      - ../../packages/backend-python:/app
+      - ../../tools/tests:/app/tests
+    command: ["python", "-m", "pytest", "/app/tests/integration/", "-v", "--tb=short"]
+
+volumes:
+  test_postgres_data:
+  test_redis_data:
+
+networks:
+  default:
+    name: test_quant_navigator_network
