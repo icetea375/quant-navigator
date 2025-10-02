@@ -48,7 +48,8 @@ export const createTestWrapper = (component: unknown, options: Record<string, un
       stubs: {
         'router-link': true,
         'router-view': true,
-        ...mockElementPlusComponents(),
+        // 移除 Element Plus 组件的 stub，让真实组件渲染
+        // ...mockElementPlusComponents(),
       },
     },
   }
@@ -304,11 +305,14 @@ export const testAssertions = {
 
 // 测试环境设置
 export const setupTestEnvironment = () => {
+  // 在浏览器环境中，global对象不存在，使用window
+  const globalObj = typeof global !== 'undefined' ? global : window as any
+  
   // 设置全局测试变量
-  (global as any).vi = (global as any).vi || {}
+  globalObj.vi = globalObj.vi || {}
 
   // 模拟console方法
-  ;(global as any).console = {
+  globalObj.console = {
     ...console,
     log: vi.fn(),
     warn: vi.fn(),
@@ -327,19 +331,25 @@ export const setupTestEnvironment = () => {
     writable: true,
   })
 
-  // 模拟IntersectionObserver
-  ;(global as any).IntersectionObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  }))
+  // 在浏览器环境中不需要模拟IntersectionObserver，使用真实的API
+  // 只在非浏览器环境中模拟
+  if (typeof global !== 'undefined') {
+    ;(global as any).IntersectionObserver = vi.fn().mockImplementation(() => ({
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn(),
+    }))
+  }
 
-  // 模拟ResizeObserver
-  ;(global as any).ResizeObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  }))
+  // 在浏览器环境中不需要模拟ResizeObserver，使用真实的API
+  // 只在非浏览器环境中模拟
+  if (typeof global !== 'undefined') {
+    ;(global as any).ResizeObserver = vi.fn().mockImplementation(() => ({
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn(),
+    }))
+  }
 }
 
 // 清理测试环境

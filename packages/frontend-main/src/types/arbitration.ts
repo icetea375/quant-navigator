@@ -168,3 +168,45 @@ export interface LegacyArbitrationFeedback {
   error_type?: string
   additional_notes?: string
 }
+
+// 个人历史记录查看器组件 Props
+export interface PersonalPrecedentViewerProps {
+  loading?: boolean
+  error?: string | null
+  onPrecedentSelect?: (precedent: HistoricalArbitrations) => void
+  onPrecedentHover?: (precedent: HistoricalArbitrations | null) => void
+}
+
+// 资金流向与筹码查看器组件 Props
+export interface FlowAndChipsViewerProps {
+  data?: {
+    moneyFlow?: any
+    topList?: any[]
+    chipDistribution?: any[]
+  }
+  loading?: boolean
+  error?: string | null
+}
+
+// 财务快照组件 Props
+export interface FinancialSnapshotProps {
+  data?: any[]
+  loading?: boolean
+  error?: string | null
+}
+
+// 原始文本探索器组件 Props
+export interface RawTextExplorerProps {
+  data?: any[]
+  loading?: boolean
+  error?: string | null
+  onTextHighlight?: (text: string) => void
+  onEventSelect?: (event: any) => void
+}
+
+// 量化信号仪表盘组件 Props
+export interface QuantSignalDashboardProps {
+  data?: any[]
+  loading?: boolean
+  error?: string | null
+}

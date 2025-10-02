@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="13" failures="0" skipped="0" tests="13" time="2.424" timestamp="2025-09-28T18:49:55.326657+08:00" hostname="bogon"><testcase classname="" name="unit.backend.api.test_admin" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/pengcheng/Documents/papa/tools/tests/unit/backend/api/test_admin.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+unit/backend/api/test_admin.py:19: in &lt;module&gt;
+    from api.admin import admin_router
+E   ModuleNotFoundError: No module named 'api.admin'</error></testcase><testcase classname="" name="unit.backend.api.test_ai_router" time="0.000"><error message="collection failure">../../venv/lib/python3.13/site-packages/_pytest/python.py:498: in importtestmodule
+    mod = import_path(
+../../venv/lib/python3.13/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;frozen importlib._bootstrap&gt;:1387: in _gcd_import
+    ???
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:1331: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:935: in _load_unlocked
+    ???
+../../venv/lib/python3.13/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../venv/lib/python3.13/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ast.py:50: in parse
+    return compile(source, filename, mode, flags,
+E     File "/Users/pengcheng/Documents/papa/tools/tests/unit/backend/api/test_ai_router.py", line 33
+E       def sample_analysis_client:
+E                                 ^
+E   SyntaxError: expected '('</error></testcase><testcase classname="" name="unit.backend.api.test_calculation_router" time="0.000"><error message="collection failure">../../venv/lib/python3.13/site-packages/_pytest/python.py:498: in importtestmodule
+    mod = import_path(
+../../venv/lib/python3.13/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;frozen importlib._bootstrap&gt;:1387: in _gcd_import
+    ???
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:1331: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:935: in _load_unlocked
+    ???
+../../venv/lib/python3.13/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../venv/lib/python3.13/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ast.py:50: in parse
+    return compile(source, filename, mode, flags,
+E     File "/Users/pengcheng/Documents/papa/tools/tests/unit/backend/api/test_calculation_router.py", line 33
+E       def sample_quant_signal_client:
+E                                     ^
+E   SyntaxError: expected '('</error></testcase><testcase classname="" name="unit.backend.api.test_data_router" time="0.000"><error message="collection failure">../../venv/lib/python3.13/site-packages/_pytest/python.py:498: in importtestmodule
+    mod = import_path(
+../../venv/lib/python3.13/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;frozen importlib._bootstrap&gt;:1387: in _gcd_import
+    ???
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:1331: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:935: in _load_unlocked
+    ???
+../../venv/lib/python3.13/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../venv/lib/python3.13/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ast.py:50: in parse
+    return compile(source, filename, mode, flags,
+E     File "/Users/pengcheng/Documents/papa/tools/tests/unit/backend/api/test_data_router.py", line 33
+E       def sample_fetch_client:
+E                              ^
+E   SyntaxError: expected '('</error></testcase><testcase classname="" name="unit.backend.api.test_reports" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/pengcheng/Documents/papa/tools/tests/unit/backend/api/test_reports.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+unit/backend/api/test_reports.py:19: in &lt;module&gt;
+    from api.reports import reports_router
+E   ModuleNotFoundError: No module named 'api.reports'</error></testcase><testcase classname="" name="unit.backend.api.test_workflow" time="0.000"><error message="collection failure">../../venv/lib/python3.13/site-packages/_pytest/python.py:498: in importtestmodule
+    mod = import_path(
+../../venv/lib/python3.13/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;frozen importlib._bootstrap&gt;:1387: in _gcd_import
+    ???
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:1331: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:935: in _load_unlocked
+    ???
+../../venv/lib/python3.13/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../venv/lib/python3.13/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ast.py:50: in parse
+    return compile(source, filename, mode, flags,
+E     File "/Users/pengcheng/Documents/papa/tools/tests/unit/backend/api/test_workflow.py", line 35
+E       def sample_daily_flow_client:
+E                                   ^
+E   SyntaxError: expected '('</error></testcase><testcase classname="" name="unit.backend.contracts.test_qwen_provider_contract" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/pengcheng/Documents/papa/tools/tests/unit/backend/contracts/test_qwen_provider_contract.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+unit/backend/contracts/test_qwen_provider_contract.py:18: in &lt;module&gt;
+    from tests.contracts import run_llm_provider_contract_tests
+E   ModuleNotFoundError: No module named 'tests.contracts'</error></testcase><testcase classname="" name="unit.backend.contracts.test_tushare_fetcher_contract" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/pengcheng/Documents/papa/tools/tests/unit/backend/contracts/test_tushare_fetcher_contract.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+unit/backend/contracts/test_tushare_fetcher_contract.py:18: in &lt;module&gt;
+    from tests.contracts import run_data_source_contract_tests
+E   ModuleNotFoundError: No module named 'tests.contracts'</error></testcase><testcase classname="" name="unit.backend.entities.test_anomaly_event_entity" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/pengcheng/Documents/papa/tools/tests/unit/backend/entities/test_anomaly_event_entity.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+unit/backend/entities/test_anomaly_event_entity.py:19: in &lt;module&gt;
+    from entities.anomaly_event import AnomalyEventEntity
+../../packages/backend-python/src/entities/__init__.py:8: in &lt;module&gt;
+    from .generated_report import GeneratedReportEntity
+../../packages/backend-python/src/entities/generated_report.py:8: in &lt;module&gt;
+    from ..schemas.reports import GeneratedReport, ReportStatus, ReportType
+E   ImportError: attempted relative import beyond top-level package</error></testcase><testcase classname="" name="unit.backend.entities.test_generated_report" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/pengcheng/Documents/papa/tools/tests/unit/backend/entities/test_generated_report.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+unit/backend/entities/test_generated_report.py:21: in &lt;module&gt;
+    from entities.generated_report import GeneratedReportEntity
+../../packages/backend-python/src/entities/__init__.py:8: in &lt;module&gt;
+    from .generated_report import GeneratedReportEntity
+../../packages/backend-python/src/entities/generated_report.py:8: in &lt;module&gt;
+    from ..schemas.reports import GeneratedReport, ReportStatus, ReportType
+E   ImportError: attempted relative import beyond top-level package</error></testcase><testcase classname="" name="unit.backend.entities.test_processed_event" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/pengcheng/Documents/papa/tools/tests/unit/backend/entities/test_processed_event.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+unit/backend/entities/test_processed_event.py:20: in &lt;module&gt;
+    from entities.processed_event import ProcessedEventEntity
+../../packages/backend-python/src/entities/__init__.py:8: in &lt;module&gt;
+    from .generated_report import GeneratedReportEntity
+../../packages/backend-python/src/entities/generated_report.py:8: in &lt;module&gt;
+    from ..schemas.reports import GeneratedReport, ReportStatus, ReportType
+E   ImportError: attempted relative import beyond top-level package</error></testcase><testcase classname="" name="unit.backend.scripts.test_attribution_engine" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/pengcheng/Documents/papa/tools/tests/unit/backend/scripts/test_attribution_engine.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+unit/backend/scripts/test_attribution_engine.py:27: in &lt;module&gt;
+    from attribution.rule_engine import AttributionRuleEngine
+E   ModuleNotFoundError: No module named 'attribution'</error></testcase><testcase classname="" name="unit.backend.test_quant_signal_entity_coverage" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/pengcheng/Documents/papa/tools/tests/unit/backend/test_quant_signal_entity_coverage.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/homebrew/Cellar/python@3.13/3.13.4/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+unit/backend/test_quant_signal_entity_coverage.py:18: in &lt;module&gt;
+    from entities.quant_signal import QuantSignalEntity
+../../packages/backend-python/src/entities/__init__.py:8: in &lt;module&gt;
+    from .generated_report import GeneratedReportEntity
+../../packages/backend-python/src/entities/generated_report.py:8: in &lt;module&gt;
+    from ..schemas.reports import GeneratedReport, ReportStatus, ReportType
+E   ImportError: attempted relative import beyond top-level package</error></testcase></testsuite></testsuites>

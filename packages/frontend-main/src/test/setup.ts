@@ -6,6 +6,8 @@ import { setupTestEnvironment } from '@/utils/test-utils'
 // 设置测试环境
 setupTestEnvironment()
 
+// 浏览器环境中不需要模拟API，使用真实的浏览器API
+
 // 全局配置
 config.global.stubs = {
   'router-link': true,

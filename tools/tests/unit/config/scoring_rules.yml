@@ -1,0 +1,120 @@
+# 评分规则配置文件
+# 用于量化分析评分系统
+
+scoring_rules:
+  # 技术指标评分
+  technical_indicators:
+    rsi:
+      overbought_threshold: 70
+      oversold_threshold: 30
+      weight: 0.2
+    macd:
+      bullish_threshold: 0
+      weight: 0.15
+    bollinger:
+      upper_band_threshold: 0.8
+      lower_band_threshold: 0.2
+      weight: 0.15
+    ma_signal:
+      short_term: 5
+      long_term: 20
+      weight: 0.1
+
+  # 基本面评分
+  fundamental_analysis:
+    pe_ratio:
+      excellent_threshold: 15
+      poor_threshold: 30
+      weight: 0.2
+    pb_ratio:
+      excellent_threshold: 1.5
+      poor_threshold: 3.0
+      weight: 0.15
+    dividend_yield:
+      excellent_threshold: 0.05
+      weight: 0.1
+
+  # 异常检测阈值
+  anomaly_detection:
+    price_volatility_threshold: 0.15
+    volume_spike_threshold: 2.0
+    return_deviation_threshold: 2.5
+
+  # 综合评分权重
+  overall_weights:
+    technical: 0.4
+    fundamental: 0.3
+    sentiment: 0.2
+    risk: 0.1
+
+# 价值评分规则
+value_score_rules:
+  pe:
+    excellent_threshold: 15
+    poor_threshold: 30
+    excellent_score: 100
+    poor_score: 0
+    weight: 0.3
+  pb:
+    excellent_threshold: 1.5
+    poor_threshold: 3.0
+    excellent_score: 100
+    poor_score: 0
+    weight: 0.25
+  ps:
+    excellent_threshold: 2.0
+    poor_threshold: 5.0
+    excellent_score: 100
+    poor_score: 0
+    weight: 0.2
+  dividend_yield:
+    excellent_threshold: 0.05
+    poor_threshold: 0.01
+    excellent_score: 100
+    poor_score: 0
+    weight: 0.25
+
+# 成长评分规则
+growth_score_rules:
+  revenue_growth:
+    excellent_threshold: 0.2
+    poor_threshold: 0.05
+    weight: 0.4
+  profit_growth:
+    excellent_threshold: 0.25
+    poor_threshold: 0.1
+    weight: 0.3
+  asset_growth:
+    excellent_threshold: 0.15
+    poor_threshold: 0.05
+    weight: 0.3
+
+# 盈利能力评分规则
+profitability_score_rules:
+  roe:
+    excellent_threshold: 0.15
+    poor_threshold: 0.05
+    weight: 0.4
+  roa:
+    excellent_threshold: 0.1
+    poor_threshold: 0.03
+    weight: 0.3
+  net_margin:
+    excellent_threshold: 0.1
+    poor_threshold: 0.03
+    weight: 0.3
+
+# 财务健康评分规则
+financial_health_score_rules:
+  debt_ratio:
+    excellent_threshold: 0.3
+    poor_threshold: 0.7
+    weight: 0.4
+  current_ratio:
+    excellent_threshold: 2.0
+    poor_threshold: 1.0
+    weight: 0.3
+  quick_ratio:
+    excellent_threshold: 1.5
+    poor_threshold: 0.5
+    weight: 0.3

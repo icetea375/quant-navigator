@@ -90,75 +90,79 @@ Object.defineProperty(HTMLCanvasElement.prototype, 'height', {
   writable: true
 })
 
-// 模拟 ImageData
-global.ImageData = class ImageData {
-  constructor(public data: Uint8ClampedArray, public width: number, public height: number, public colorSpace = 'srgb') {}
-} as any
+// 在浏览器环境中，这些API已经存在，不需要模拟
+// 只在非浏览器环境中模拟
+if (typeof global !== 'undefined') {
+  // 模拟 ImageData
+  global.ImageData = class ImageData {
+    constructor(public data: Uint8ClampedArray, public width: number, public height: number, public colorSpace = 'srgb') {}
+  } as any
 
-// 模拟 OffscreenCanvas
-global.OffscreenCanvas = class OffscreenCanvas {
-  constructor(public width: number, public height: number) {}
-  getContext = mockCanvas.getContext
-  toDataURL = mockCanvas.toDataURL
-  toBlob = mockCanvas.toBlob
-  oncontextlost = null
-  oncontextrestored = null
-  convertToBlob = vi.fn()
-  transferToImageBitmap = vi.fn()
-} as any
+  // 模拟 OffscreenCanvas
+  global.OffscreenCanvas = class OffscreenCanvas {
+    constructor(public width: number, public height: number) {}
+    getContext = mockCanvas.getContext
+    toDataURL = mockCanvas.toDataURL
+    toBlob = mockCanvas.toBlob
+    oncontextlost = null
+    oncontextrestored = null
+    convertToBlob = vi.fn()
+    transferToImageBitmap = vi.fn()
+  } as any
 
-// 模拟 requestAnimationFrame
-global.requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
-  return setTimeout(callback, 16)
-})
+  // 模拟 requestAnimationFrame
+  global.requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
+    return setTimeout(callback, 16)
+  })
 
-global.cancelAnimationFrame = vi.fn((id: number) => {
-  clearTimeout(id)
-})
+  global.cancelAnimationFrame = vi.fn((id: number) => {
+    clearTimeout(id)
+  })
 
-// 模拟 ResizeObserver
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn()
-}))
+  // 模拟 ResizeObserver
+  global.ResizeObserver = vi.fn().mockImplementation(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn()
+  }))
 
-// 模拟 IntersectionObserver
-global.IntersectionObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn()
-}))
+  // 模拟 IntersectionObserver
+  global.IntersectionObserver = vi.fn().mockImplementation(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn()
+  }))
 
-// 模拟 MutationObserver
-global.MutationObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  disconnect: vi.fn(),
-  takeRecords: vi.fn(() => [])
-}))
+  // 模拟 MutationObserver
+  global.MutationObserver = vi.fn().mockImplementation(() => ({
+    observe: vi.fn(),
+    disconnect: vi.fn(),
+    takeRecords: vi.fn(() => [])
+  }))
 
-// 模拟 getComputedStyle
-global.getComputedStyle = vi.fn(() => ({
-  getPropertyValue: vi.fn(() => ''),
-  setProperty: vi.fn(),
-  removeProperty: vi.fn()
-})) as any
+  // 模拟 getComputedStyle
+  global.getComputedStyle = vi.fn(() => ({
+    getPropertyValue: vi.fn(() => ''),
+    setProperty: vi.fn(),
+    removeProperty: vi.fn()
+  })) as any
 
-// 模拟 matchMedia
-global.matchMedia = vi.fn(() => ({
-  matches: false,
-  media: '',
-  onchange: null,
-  addListener: vi.fn(),
-  removeListener: vi.fn(),
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-  dispatchEvent: vi.fn()
-}))
+  // 模拟 matchMedia
+  global.matchMedia = vi.fn(() => ({
+    matches: false,
+    media: '',
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn()
+  }))
 
-// 模拟 URL.createObjectURL
-global.URL.createObjectURL = vi.fn(() => 'blob:mock-url')
-global.URL.revokeObjectURL = vi.fn()
+  // 模拟 URL.createObjectURL
+  global.URL.createObjectURL = vi.fn(() => 'blob:mock-url')
+  global.URL.revokeObjectURL = vi.fn()
+}
 
 // 模拟 createElement 以返回模拟的 Canvas
 const originalCreateElement = document.createElement

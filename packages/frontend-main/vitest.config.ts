@@ -7,9 +7,18 @@ export default defineConfig({
   plugins: [vue()],
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts', './src/test/setup-canvas.ts', './src/test/setup-echarts-mock.ts'],
-    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    browser: {
+      enabled: true,
+      provider: 'playwright',
+      name: 'chromium',
+      instances: [
+        {
+          browser: 'chromium'
+        }
+      ]
+    },
+    setupFiles: ['./src/test/setup.ts', './src/test/setup-canvas.ts'],
+    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}', 'tools/tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
     typecheck: {
       tsconfig: './tsconfig.vitest.json'

@@ -12,27 +12,27 @@ describe('基础覆盖率测试 - 遵循测试宪法', () => {
     it('应该能够创建仲裁 store', () => {
       const store = useArbitrationStore()
       expect(store).toBeDefined()
-      expect(store.currentCaseId).toBeNull()
-      expect(store.loading).toBe(false)
-      expect(store.error).toBeNull()
+      expect(store.currentCaseId.value).toBeNull()
+      expect(store.loading.value).toBe(false)
+      expect(store.error.value).toBeNull()
     })
 
     it('应该能够设置当前案例', () => {
       const store = useArbitrationStore()
       store.setCurrentCase('test-case-1')
-      expect(store.currentCaseId).toBe('test-case-1')
+      expect(store.currentCaseId.value).toBe('test-case-1')
     })
 
     it('应该能够设置加载状态', () => {
       const store = useArbitrationStore()
       store.setLoading(true)
-      expect(store.loading).toBe(true)
+      expect(store.loading.value).toBe(true)
     })
 
     it('应该能够设置错误状态', () => {
       const store = useArbitrationStore()
       store.setError('测试错误')
-      expect(store.error).toBe('测试错误')
+      expect(store.error.value).toBe('测试错误')
     })
 
     it('应该能够设置案例数据', () => {
@@ -91,7 +91,7 @@ describe('基础覆盖率测试 - 遵循测试宪法', () => {
         }
       }
       store.setCaseData(mockData)
-      expect(store.caseData).toEqual(mockData)
+      expect(store.caseData.value).toEqual(mockData)
     })
   })
 

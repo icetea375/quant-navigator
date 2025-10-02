@@ -16,15 +16,15 @@ describe('仲裁功能迁移测试', () => {
   it('应该能够创建仲裁 store', () => {
     const store = useArbitrationStore();
     expect(store).toBeDefined();
-    expect(store.currentCaseId).toBeNull();
-    expect(store.caseData).toBeNull();
-    expect(store.loading).toBe(false);
+    expect(store.currentCaseId.value).toBeNull();
+    expect(store.caseData.value).toBeNull();
+    expect(store.loading.value).toBe(false);
   });
 
   it('应该能够设置当前案例', () => {
     const store = useArbitrationStore();
     store.setCurrentCase('test-case-001');
-    expect(store.currentCaseId).toBe('test-case-001');
+    expect(store.currentCaseId.value).toBe('test-case-001');
   });
 
   it('应该能够设置案例数据', () => {
@@ -82,7 +82,7 @@ describe('仲裁功能迁移测试', () => {
     };
 
     store.setCaseData(mockCaseData);
-    expect(store.caseData).toEqual(mockCaseData);
+    expect(store.caseData.value).toEqual(mockCaseData);
   });
 
   it('应该能够处理原始文本数据', () => {
@@ -148,7 +148,7 @@ describe('仲裁功能迁移测试', () => {
   it('应该能够处理错误状态', () => {
     const store = useArbitrationStore();
     store.setError('测试错误信息');
-    expect(store.error).toBe('测试错误信息');
+    expect(store.error.value).toBe('测试错误信息');
     expect(store.hasError).toBe(true);
   });
 
@@ -156,7 +156,7 @@ describe('仲裁功能迁移测试', () => {
     const store = useArbitrationStore();
     store.setError('测试错误信息');
     store.clearError();
-    expect(store.error).toBeNull();
+    expect(store.error.value).toBeNull();
     expect(store.hasError).toBe(false);
   });
 
@@ -165,8 +165,8 @@ describe('仲裁功能迁移测试', () => {
     store.setCurrentCase('test-case');
     store.setError('test error');
     store.reset();
-    expect(store.currentCaseId).toBeNull();
-    expect(store.error).toBeNull();
-    expect(store.caseData).toBeNull();
+    expect(store.currentCaseId.value).toBeNull();
+    expect(store.error.value).toBeNull();
+    expect(store.caseData.value).toBeNull();
   });
 });

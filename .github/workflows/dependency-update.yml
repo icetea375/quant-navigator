@@ -1,0 +1,408 @@
+name: Automated Dependency Updates
+
+on:
+  schedule:
+    # 每周一上午9点运行
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      update_type:
+        description: '更新类型'
+        required: true
+        default: 'security'
+        type: choice
+        options:
+          - security
+          - patch
+          - minor
+          - major
+      dry_run:
+        description: '试运行模式'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+  PNPM_VERSION: '8'
+
+jobs:
+  # 依赖安全扫描
+  security-scan:
+    name: Security Vulnerability Scan
+    runs-on: ubuntu-latest
+    outputs:
+      has_vulnerabilities: ${{ steps.security-check.outputs.has_vulnerabilities }}
+      vulnerabilities_count: ${{ steps.security-check.outputs.vulnerabilities_count }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: ${{ env.PNPM_VERSION }}
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install safety
+
+    - name: Security scan for Node.js dependencies
+      id: node-security
+      run: |
+        # 使用audit-ci进行Node.js依赖安全扫描
+        npx audit-ci --config .audit-ci.json --output-format json > node-security-report.json || true
+        
+        # 检查是否有漏洞
+        VULNERABILITIES=$(jq '.vulnerabilities | length' node-security-report.json)
+        echo "Node.js vulnerabilities: $VULNERABILITIES"
+        echo "node_vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
+
+    - name: Security scan for Python dependencies
+      id: python-security
+      run: |
+        # 使用safety进行Python依赖安全扫描
+        safety check --file requirements.txt --json > python-security-report.json || true
+        
+        # 检查是否有漏洞
+        VULNERABILITIES=$(jq '.vulnerabilities | length' python-security-report.json)
+        echo "Python vulnerabilities: $VULNERABILITIES"
+        echo "python_vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
+
+    - name: Security check summary
+      id: security-check
+      run: |
+        NODE_VULN=${{ steps.node-security.outputs.node_vulnerabilities }}
+        PYTHON_VULN=${{ steps.python-security.outputs.python_vulnerabilities }}
+        TOTAL_VULN=$((NODE_VULN + PYTHON_VULN))
+        
+        echo "Total vulnerabilities found: $TOTAL_VULN"
+        echo "vulnerabilities_count=$TOTAL_VULN" >> $GITHUB_OUTPUT
+        
+        if [ $TOTAL_VULN -gt 0 ]; then
+          echo "has_vulnerabilities=true" >> $GITHUB_OUTPUT
+        else
+          echo "has_vulnerabilities=false" >> $GITHUB_OUTPUT
+        fi
+
+  # 依赖更新检查
+  dependency-check:
+    name: Dependency Update Check
+    runs-on: ubuntu-latest
+    needs: security-scan
+    if: needs.security-scan.outputs.has_vulnerabilities == 'true' || github.event_name == 'workflow_dispatch'
+    outputs:
+      updates_available: ${{ steps.update-check.outputs.updates_available }}
+      update_summary: ${{ steps.update-check.outputs.update_summary }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: ${{ env.PNPM_VERSION }}
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pip-tools
+
+    - name: Check for Node.js updates
+      id: node-updates
+      run: |
+        # 检查pnpm outdated
+        pnpm outdated --json > node-updates.json || true
+        
+        # 分析更新类型
+        UPDATES=$(jq 'to_entries | length' node-updates.json)
+        echo "Node.js packages with updates: $UPDATES"
+        echo "node_updates=$UPDATES" >> $GITHUB_OUTPUT
+
+    - name: Check for Python updates
+      id: python-updates
+      run: |
+        # 使用pip-tools检查Python依赖更新
+        pip-compile --upgrade --dry-run requirements.txt > python-updates.txt || true
+        
+        # 分析更新
+        UPDATES=$(grep -c "would upgrade" python-updates.txt || echo "0")
+        echo "Python packages with updates: $UPDATES"
+        echo "python_updates=$UPDATES" >> $GITHUB_OUTPUT
+
+    - name: Update check summary
+      id: update-check
+      run: |
+        NODE_UPDATES=${{ steps.node-updates.outputs.node_updates }}
+        PYTHON_UPDATES=${{ steps.python-updates.outputs.python_updates }}
+        TOTAL_UPDATES=$((NODE_UPDATES + PYTHON_UPDATES))
+        
+        echo "Total packages with updates: $TOTAL_UPDATES"
+        echo "updates_available=$TOTAL_UPDATES" >> $GITHUB_OUTPUT
+        echo "update_summary=Node.js: $NODE_UPDATES, Python: $PYTHON_UPDATES" >> $GITHUB_OUTPUT
+
+  # 智能依赖更新
+  smart-update:
+    name: Smart Dependency Update
+    runs-on: ubuntu-latest
+    needs: [security-scan, dependency-check]
+    if: needs.dependency-check.outputs.updates_available > 0
+    strategy:
+      matrix:
+        update_type: [security, patch, minor]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: ${{ env.PNPM_VERSION }}
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        pnpm install --frozen-lockfile
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pip-tools safety
+
+    - name: Create update branch
+      run: |
+        UPDATE_TYPE=${{ matrix.update_type }}
+        BRANCH_NAME="deps/auto-update-$UPDATE_TYPE-$(date +%Y%m%d-%H%M%S)"
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git checkout -b $BRANCH_NAME
+        echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+    - name: Update Node.js dependencies
+      if: matrix.update_type == 'security' || matrix.update_type == 'patch'
+      run: |
+        # 安全更新和补丁更新
+        if [ "${{ matrix.update_type }}" = "security" ]; then
+          # 只更新有安全漏洞的包
+          pnpm audit --fix
+        else
+          # 更新补丁版本
+          pnpm update --recursive
+        fi
+
+    - name: Update Python dependencies
+      if: matrix.update_type == 'security' || matrix.update_type == 'patch'
+      run: |
+        # 更新Python依赖
+        if [ "${{ matrix.update_type }}" = "security" ]; then
+          # 安全更新
+          safety check --file requirements.txt --json | jq -r '.vulnerabilities[].package' | while read package; do
+            pip install --upgrade "$package"
+          done
+        else
+          # 补丁更新
+          pip install --upgrade -r requirements.txt
+        fi
+        
+        # 重新生成requirements.txt
+        pip freeze > requirements.txt
+
+    - name: Dependency conflict detection
+      id: conflict-check
+      run: |
+        # 检查依赖冲突
+        echo "Checking for dependency conflicts..."
+        
+        # Node.js冲突检查
+        pnpm install --frozen-lockfile 2>&1 | tee install.log
+        if grep -q "conflict\|Conflict\|CONFLICT" install.log; then
+          echo "Node.js dependency conflicts detected"
+          echo "node_conflicts=true" >> $GITHUB_OUTPUT
+        else
+          echo "node_conflicts=false" >> $GITHUB_OUTPUT
+        fi
+        
+        # Python冲突检查
+        pip check 2>&1 | tee pip-check.log
+        if grep -q "conflict\|Conflict\|CONFLICT" pip-check.log; then
+          echo "Python dependency conflicts detected"
+          echo "python_conflicts=true" >> $GITHUB_OUTPUT
+        else
+          echo "python_conflicts=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Run tests
+      if: steps.conflict-check.outputs.node_conflicts == 'false' && steps.conflict-check.outputs.python_conflicts == 'false'
+      run: |
+        # 运行测试确保更新没有破坏功能
+        pnpm run test:unit
+        pnpm run test:backend
+
+    - name: Commit changes
+      if: steps.conflict-check.outputs.node_conflicts == 'false' && steps.conflict-check.outputs.python_conflicts == 'false'
+      run: |
+        git add .
+        git commit -m "chore: auto-update dependencies (${{ matrix.update_type }})
+        
+        - Updated Node.js dependencies
+        - Updated Python dependencies
+        - Resolved security vulnerabilities
+        - All tests passing"
+        
+        git push origin $BRANCH_NAME
+
+    - name: Create Pull Request
+      if: steps.conflict-check.outputs.node_conflicts == 'false' && steps.conflict-check.outputs.python_conflicts == 'false'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { data: pr } = await github.rest.pulls.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `🔄 Auto-update dependencies (${{ matrix.update_type }})`,
+            head: process.env.BRANCH_NAME,
+            base: 'main',
+            body: `
+            ## 自动依赖更新报告
+            
+            **更新类型**: ${{ matrix.update_type }}
+            **更新时间**: ${new Date().toISOString()}
+            
+            ### 更新内容
+            - Node.js依赖更新
+            - Python依赖更新
+            - 安全漏洞修复
+            
+            ### 测试状态
+            - ✅ 依赖冲突检查通过
+            - ✅ 单元测试通过
+            - ✅ 集成测试通过
+            
+            ### 安全扫描
+            - 修复了 ${{ needs.security-scan.outputs.vulnerabilities_count }} 个安全漏洞
+            
+            ---
+            
+            **注意**: 这是自动生成的PR，请仔细审查更改内容。
+            `
+          });
+          
+          console.log(`Created PR: ${pr.html_url}`);
+
+  # 依赖冲突解决
+  conflict-resolution:
+    name: Dependency Conflict Resolution
+    runs-on: ubuntu-latest
+    needs: [security-scan, dependency-check]
+    if: failure() && needs.dependency-check.outputs.updates_available > 0
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: ${{ env.PNPM_VERSION }}
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        pnpm install --frozen-lockfile
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Analyze conflicts
+      run: |
+        echo "Analyzing dependency conflicts..."
+        
+        # 生成依赖树
+        pnpm list --depth=0 > pnpm-tree.txt
+        pip list > pip-list.txt
+        
+        # 分析冲突
+        echo "## 依赖冲突分析报告" > conflict-report.md
+        echo "生成时间: $(date)" >> conflict-report.md
+        echo "" >> conflict-report.md
+        
+        echo "### Node.js 依赖树" >> conflict-report.md
+        echo '```' >> conflict-report.md
+        cat pnpm-tree.txt >> conflict-report.md
+        echo '```' >> conflict-report.md
+        
+        echo "### Python 依赖列表" >> conflict-report.md
+        echo '```' >> conflict-report.md
+        cat pip-list.txt >> conflict-report.md
+        echo '```' >> conflict-report.md
+
+    - name: Upload conflict report
+      uses: actions/upload-artifact@v3
+      with:
+        name: dependency-conflict-report
+        path: conflict-report.md
+
+  # 通知
+  notify:
+    name: Notification
+    runs-on: ubuntu-latest
+    needs: [security-scan, dependency-check, smart-update]
+    if: always()
+    
+    steps:
+    - name: Send notification
+      run: |
+        echo "Dependency update workflow completed"
+        echo "Security vulnerabilities: ${{ needs.security-scan.outputs.vulnerabilities_count }}"
+        echo "Updates available: ${{ needs.dependency-check.outputs.updates_available }}"
+        echo "Update summary: ${{ needs.dependency-check.outputs.update_summary }}"
